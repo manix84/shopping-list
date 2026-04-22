@@ -13,6 +13,7 @@ export const MATCHER_TEST_CASES: MatcherTestCase[] = [
   { input: 'fettuccine', expectedSection: 'pasta' },
   { input: 'macaroni', expectedSection: 'pasta' },
   { input: 'ravioli', expectedSection: 'pasta' },
+  { input: 'baby food', expectedSection: 'baby_food' },
   { input: 'blue milk', expectedSection: 'chilled_milk_juice_cream' },
   { input: 'gold milk', expectedSection: 'chilled_milk_juice_cream' },
   { input: 'green milk', expectedSection: 'chilled_milk_juice_cream' },

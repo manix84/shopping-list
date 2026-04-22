@@ -1,5 +1,5 @@
 export type PageKey = 'edit' | 'route' | 'settings' | 'debug';
-export type CountryCode = 'uk';
+export type CountryCode = 'uk' | 'us' | 'ca';
 export type ThemeMode = 'system' | 'light' | 'dark';
 
 export type SectionKey =
@@ -17,6 +17,12 @@ export type SectionKey =
   | 'frozen_fruit'
   | 'frozen_meals'
   | 'pasta'
+  | 'baby_food'
+  | 'seafood_counter'
+  | 'pantry'
+  | 'snacks'
+  | 'drinks'
+  | 'baby'
   | 'clothing'
   | 'household'
   | 'health_beauty'

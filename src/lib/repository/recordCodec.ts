@@ -1,4 +1,4 @@
-import { COUNTRY_CONFIGS } from '../../config/countries';
+import { COUNTRY_CONFIGS, isCountryCode } from '../../config/countries';
 import type { CountryCode, ShoppingListRecord } from '../../types';
 import { parseItems } from '../parser';
 import { ensureString } from '../stringUtils';
@@ -11,7 +11,7 @@ export const decodeShoppingListRecord = (
 ): ShoppingListRecord | undefined => {
   try {
     const parsed = JSON.parse(raw) as Partial<ShoppingListRecord>;
-    const countryCode: CountryCode = parsed.countryCode === 'uk' ? 'uk' : fallbackCountryCode;
+    const countryCode: CountryCode = isCountryCode(parsed.countryCode) ? parsed.countryCode : fallbackCountryCode;
     const config = COUNTRY_CONFIGS[countryCode];
     const input = ensureString(parsed.input);
 

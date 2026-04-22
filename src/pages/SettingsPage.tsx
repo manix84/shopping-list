@@ -33,9 +33,14 @@ export function SettingsPage({ countryCode, config, themeMode, onCountryChange, 
           value={countryCode}
           onChange={(event) => onCountryChange(event.target.value as CountryCode)}
         >
-          {Object.values(COUNTRY_CONFIGS).map((country) => (
-            <option key={country.code} value={country.code}>{country.label}</option>
-          ))}
+          {Object.values(COUNTRY_CONFIGS)
+            .slice()
+            .sort((a, b) => a.label.localeCompare(b.label))
+            .map((country) => (
+              <option key={country.code} value={country.code}>
+                {country.label}
+              </option>
+            ))}
         </select>
       </div>
 
