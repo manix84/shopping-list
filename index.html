@@ -14,6 +14,31 @@
     <meta name="apple-mobile-web-app-title" content="Smart Shopping List" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 
+    <script>
+      (() => {
+        const storageKey = 'smart-shopping-list-theme-v1';
+        const isDarkMode = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
+        let mode = 'system';
+
+        try {
+          const stored = localStorage.getItem(storageKey);
+          if (stored === 'light' || stored === 'dark' || stored === 'system') {
+            mode = stored;
+          }
+        } catch (error) {
+          mode = 'system';
+        }
+
+        const resolved = mode === 'system' ? (isDarkMode() ? 'dark' : 'light') : mode;
+        document.documentElement.dataset.theme = resolved;
+
+        const themeColor = document.querySelector('meta[name="theme-color"]');
+        if (themeColor) {
+          themeColor.setAttribute('content', resolved === 'dark' ? '#0b1220' : '#0f172a');
+        }
+      })();
+    </script>
+
     <link rel="manifest" href="%BASE_URL%manifest.webmanifest" />
     <link rel="icon" href="%BASE_URL%icon-192.png" sizes="192x192" />
     <link rel="icon" href="%BASE_URL%icon-512.png" sizes="512x512" />
