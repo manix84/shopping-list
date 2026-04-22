@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Vite generated types
+vite.config.d.ts
+
+# Local environment files
+.env
+.env.local
+.env.*.local
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

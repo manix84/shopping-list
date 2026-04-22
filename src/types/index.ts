@@ -1,0 +1,97 @@
+export type PageKey = 'edit' | 'route' | 'settings' | 'debug';
+export type CountryCode = 'uk';
+
+export type SectionKey =
+  | 'produce'
+  | 'bakery_counter'
+  | 'butcher_counter'
+  | 'fishmonger_counter'
+  | 'deli_counter'
+  | 'chilled_milk_juice_cream'
+  | 'chilled_cooked_meat'
+  | 'chilled_fresh_meat'
+  | 'chilled_ready_meals'
+  | 'frozen_veg'
+  | 'frozen_ice_cream'
+  | 'frozen_fruit'
+  | 'frozen_meals'
+  | 'clothing'
+  | 'household'
+  | 'health_beauty'
+  | 'electrical'
+  | 'pet_supplies'
+  | 'seasonal'
+  | 'other';
+
+export type Item = {
+  id: string;
+  raw: string;
+  normalized: string;
+  cleaned: string;
+  checked: boolean;
+  size?: string;
+  sizeValue?: 'S' | 'M' | 'L';
+  quantity?: string;
+  quantityValue?: number;
+  matchedSection: SectionKey;
+};
+
+export type ShoppingListRecord = {
+  input: string;
+  items: Item[];
+  updatedAt: string;
+  countryCode: CountryCode;
+};
+
+export type SectionDef = {
+  key: SectionKey;
+  label: string;
+  keywords: string[];
+};
+
+export type SectionGroup = {
+  key: string;
+  label: string;
+  order: number;
+  sections: SectionDef[];
+};
+
+export type CountryConfig = {
+  code: CountryCode;
+  label: string;
+  groups: SectionGroup[];
+};
+
+export type GroupedSectionView = {
+  key: SectionKey;
+  label: string;
+  order: number;
+  groupLabel: string;
+  items: Item[];
+  complete: boolean;
+  checkedCount: number;
+};
+
+export type MatcherTestCase = {
+  input: string;
+  expectedSection: SectionKey;
+};
+
+export type QuantityTestCase = {
+  input: string;
+  expectedName: string;
+  expectedQuantity?: string;
+  expectedQuantityValue?: number;
+};
+
+export type MatcherTestResult = MatcherTestCase & {
+  actualSection: SectionKey;
+  passed: boolean;
+};
+
+export type QuantityTestResult = QuantityTestCase & {
+  actualName: string;
+  actualQuantity?: string;
+  actualQuantityValue?: number;
+  passed: boolean;
+};
