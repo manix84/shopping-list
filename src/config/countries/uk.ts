@@ -130,6 +130,24 @@ export const UK_CONFIG: CountryConfig = {
       order: 5,
       sections: [
         {
+          key: 'baby_food',
+          label: 'Baby Food',
+          keywords: [
+            'baby food',
+            'baby rice',
+            'weaning',
+            'weaning food',
+            'puree',
+            'purees',
+            'jar food',
+            'baby jars',
+            'baby porridge',
+            'baby cereal',
+            'snacks for babies',
+            'finger food',
+          ],
+        },
+        {
           key: 'pasta',
           label: 'Pasta',
           keywords: [

@@ -17,6 +17,7 @@ export type SectionKey =
   | 'frozen_fruit'
   | 'frozen_meals'
   | 'pasta'
+  | 'baby_food'
   | 'seafood_counter'
   | 'pantry'
   | 'snacks'
