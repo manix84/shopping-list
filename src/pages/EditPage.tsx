@@ -15,7 +15,6 @@ type EditPageProps = {
   onInputChange: (value: string) => void;
   onDraftItemChange: (value: string) => void;
   onParse: () => void;
-  onExample: () => void;
   onResetAll: () => void;
   onAddSingleItem: () => void;
   onRenameItem: (itemId: string, nextRaw: string) => void;
@@ -35,7 +34,6 @@ export function EditPage({
   onInputChange,
   onDraftItemChange,
   onParse,
-  onExample,
   onResetAll,
   onAddSingleItem,
   onRenameItem,
@@ -81,7 +79,6 @@ export function EditPage({
 
         <div className="button-row">
           <button className="button button-primary" onClick={onParse}>Save and sort</button>
-          <button className="button" onClick={onExample}>Example list</button>
           <button className="button" onClick={onResetAll}>Full reset</button>
         </div>
 

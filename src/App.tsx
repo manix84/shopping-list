@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { COUNTRY_CONFIGS } from './config/countries';
 import { AppHeader } from './components/AppHeader';
-import { runMatcherTests, runQuantityTests } from './lib/debugTests';
+import { runMatcherTests, runQuantityTests, runStorageTests } from './lib/debugTests';
 import { getDisplayValue, getStoredValue, parseItems } from './lib/parser';
-import { EXAMPLE_INPUT, defaultRecord, localStorageRepository } from './lib/repository/localStorageRepository';
+import { defaultRecord, localStorageRepository } from './lib/repository/localStorageRepository';
 import { getSectionMeta } from './lib/sections';
 import { cleanLine, stripDisplaySizeLabel } from './lib/stringUtils';
 import { DebugPage } from './pages/DebugPage';
@@ -89,6 +89,7 @@ export default function App() {
 
   const matcherTests = useMemo(() => runMatcherTests(config), [config]);
   const quantityTests = useMemo(() => runQuantityTests(), []);
+  const storageTests = useMemo(() => runStorageTests(), []);
 
   const grouped = useMemo((): GroupedSectionView[] => {
     const filteredItems = items.filter((item) => getDisplayValue(item).toLowerCase().includes(query.toLowerCase()));
@@ -215,7 +216,6 @@ export default function App() {
             onInputChange={setInput}
             onDraftItemChange={setDraftItem}
             onParse={handleParse}
-            onExample={() => setInput(EXAMPLE_INPUT)}
             onResetAll={resetAll}
             onAddSingleItem={handleAddSingleItem}
             onRenameItem={handleRenameItem}
@@ -252,8 +252,10 @@ export default function App() {
           <DebugPage
             matcherTests={matcherTests}
             quantityTests={quantityTests}
+            storageTests={storageTests}
             matcherHasFailures={matcherTests.some((test) => !test.passed)}
             quantityHasFailures={quantityTests.some((test) => !test.passed)}
+            storageHasFailures={storageTests.some((test) => !test.passed)}
             onBackToEdit={() => setPage('edit')}
             onBackToSettings={() => setPage('settings')}
           />

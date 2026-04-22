@@ -1,12 +1,14 @@
-import type { MatcherTestResult, QuantityTestResult } from '../types';
+import type { MatcherTestResult, QuantityTestResult, StorageTestResult } from '../types';
 import { Card } from '../components/Card';
 import { TestResultCard } from '../components/TestResultCard';
 
 type DebugPageProps = {
   matcherTests: MatcherTestResult[];
   quantityTests: QuantityTestResult[];
+  storageTests: StorageTestResult[];
   matcherHasFailures: boolean;
   quantityHasFailures: boolean;
+  storageHasFailures: boolean;
   onBackToEdit: () => void;
   onBackToSettings: () => void;
 };
@@ -14,8 +16,10 @@ type DebugPageProps = {
 export function DebugPage({
   matcherTests,
   quantityTests,
+  storageTests,
   matcherHasFailures,
   quantityHasFailures,
+  storageHasFailures,
   onBackToEdit,
   onBackToSettings,
 }: DebugPageProps) {
@@ -87,6 +91,27 @@ export function DebugPage({
           />
         ))}
         {!quantityHasFailures ? <div className="empty-state">All quantity checks are passing.</div> : null}
+      </Card>
+
+      <Card
+        header={
+          <>
+            <h2 className="title title-sm">Storage self-checks</h2>
+            <p className="subtitle">Record data should round-trip cleanly through local storage and any future database store.</p>
+          </>
+        }
+        bodyClassName="stack"
+      >
+        {storageTests.map((test) => (
+          <TestResultCard
+            key={test.title}
+            title={test.title}
+            expected={test.expected}
+            actual={test.actual}
+            passed={test.passed}
+          />
+        ))}
+        {!storageHasFailures ? <div className="empty-state">All storage checks are passing.</div> : null}
       </Card>
     </Card>
   );

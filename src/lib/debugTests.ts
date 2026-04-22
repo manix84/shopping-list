@@ -1,7 +1,11 @@
-import type { CountryConfig, MatcherTestCase, MatcherTestResult, QuantityTestCase, QuantityTestResult } from '../types';
+import { COUNTRY_CONFIGS } from '../config/countries';
+import type { CountryConfig, MatcherTestCase, MatcherTestResult, QuantityTestCase, QuantityTestResult, StorageTestResult } from '../types';
 import { extractQuantity } from './quantity';
 import { detectSection } from './sections';
 import { cleanLine } from './stringUtils';
+import { parseItems } from './parser';
+import { STORAGE_KEY, localStorageRepository } from './repository/localStorageRepository';
+import { decodeShoppingListRecord, encodeShoppingListRecord } from './repository/recordCodec';
 
 export const MATCHER_TEST_CASES: MatcherTestCase[] = [
   { input: 'spaghetti', expectedSection: 'pasta' },
@@ -38,6 +42,71 @@ export const QUANTITY_TEST_CASES: QuantityTestCase[] = [
   { input: 'ice-cream', expectedName: 'ice-cream' },
   { input: 'x3 bananas', expectedName: 'bananas', expectedQuantity: 'x3', expectedQuantityValue: 3 },
 ];
+
+const STORAGE_FIXTURE_INPUT = 'small milk\nbananas x2\n500g mince';
+const STORAGE_FIXTURE_RECORD = {
+  input: STORAGE_FIXTURE_INPUT,
+  items: parseItems(STORAGE_FIXTURE_INPUT, COUNTRY_CONFIGS.uk),
+  updatedAt: '2026-04-22T00:00:00.000Z',
+  countryCode: 'uk' as const,
+};
+
+export const runStorageTests = (): StorageTestResult[] => {
+  const codecRaw = encodeShoppingListRecord(STORAGE_FIXTURE_RECORD);
+  const decoded = decodeShoppingListRecord(codecRaw);
+  const codecPassed =
+    !!decoded &&
+    decoded.input === STORAGE_FIXTURE_RECORD.input &&
+    decoded.countryCode === STORAGE_FIXTURE_RECORD.countryCode &&
+    decoded.items.length === STORAGE_FIXTURE_RECORD.items.length &&
+    decoded.items[0]?.sizeValue === 'S' &&
+    decoded.items[1]?.quantityValue === 2 &&
+    decoded.items[2]?.quantity === '500g';
+
+  const results: StorageTestResult[] = [
+    {
+      title: 'Storage codec round-trip',
+      expected: 'Keep input, items, country, and derived metadata intact',
+      actual: decoded
+        ? `input ${decoded.input.length} chars, ${decoded.items.length} items, country ${decoded.countryCode}`
+        : 'decode failed',
+      passed: codecPassed,
+    },
+  ];
+
+  if (typeof window === 'undefined') {
+    return results;
+  }
+
+  const previous = window.localStorage.getItem(STORAGE_KEY);
+
+  try {
+    localStorageRepository.save(STORAGE_FIXTURE_RECORD);
+    const loaded = localStorageRepository.load();
+    const repoPassed =
+      loaded.input === STORAGE_FIXTURE_RECORD.input &&
+      loaded.countryCode === STORAGE_FIXTURE_RECORD.countryCode &&
+      loaded.items.length === STORAGE_FIXTURE_RECORD.items.length &&
+      loaded.items[0]?.sizeValue === 'S' &&
+      loaded.items[1]?.quantityValue === 2 &&
+      loaded.items[2]?.quantity === '500g';
+
+    results.push({
+      title: 'Local storage round-trip',
+      expected: 'Persist and restore the full shopping list record',
+      actual: `input ${loaded.input.length} chars, ${loaded.items.length} items, country ${loaded.countryCode}`,
+      passed: repoPassed,
+    });
+  } finally {
+    if (previous === null) {
+      window.localStorage.removeItem(STORAGE_KEY);
+    } else {
+      window.localStorage.setItem(STORAGE_KEY, previous);
+    }
+  }
+
+  return results;
+};
 
 export const runMatcherTests = (config: CountryConfig): MatcherTestResult[] =>
   MATCHER_TEST_CASES.map((test) => ({

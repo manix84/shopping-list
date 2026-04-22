@@ -96,3 +96,10 @@ export type QuantityTestResult = QuantityTestCase & {
   actualQuantityValue?: number;
   passed: boolean;
 };
+
+export type StorageTestResult = {
+  title: string;
+  expected: string;
+  actual: string;
+  passed: boolean;
+};
