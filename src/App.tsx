@@ -42,7 +42,7 @@ function updateItemTextInInput(input: string, previousDisplay: string, nextDispl
 
 export default function App() {
   const [page, setPage] = useState<PageKey>(() => readPageFromHash());
-  const [input, setInput] = useState(EXAMPLE_INPUT);
+  const [input, setInput] = useState('');
   const [items, setItems] = useState<Item[]>([]);
   const [query, setQuery] = useState('');
   const [draftItem, setDraftItem] = useState('');

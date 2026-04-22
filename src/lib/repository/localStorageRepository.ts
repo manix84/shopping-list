@@ -21,7 +21,7 @@ paracetamol
 easter eggs`;
 
 export const defaultRecord = (): ShoppingListRecord => ({
-  input: EXAMPLE_INPUT,
+  input: '',
   items: [],
   updatedAt: new Date().toISOString(),
   countryCode: 'uk',
@@ -43,8 +43,8 @@ export const localStorageRepository: ShoppingListRepository = {
       const countryCode: CountryCode = parsed.countryCode === 'uk' ? 'uk' : 'uk';
       const config = COUNTRY_CONFIGS[countryCode];
       return {
-        input: ensureString(parsed.input) || EXAMPLE_INPUT,
-        items: Array.isArray(parsed.items) ? parsed.items : parseItems(parsed.input ?? EXAMPLE_INPUT, config),
+        input: ensureString(parsed.input),
+        items: Array.isArray(parsed.items) ? parsed.items : parseItems(parsed.input ?? '', config),
         updatedAt: ensureString(parsed.updatedAt) || new Date().toISOString(),
         countryCode,
       };
