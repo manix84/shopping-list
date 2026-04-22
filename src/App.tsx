@@ -6,11 +6,12 @@ import { getDisplayValue, getStoredValue, parseItems } from './lib/parser';
 import { defaultRecord, localStorageRepository } from './lib/repository/localStorageRepository';
 import { getSectionMeta } from './lib/sections';
 import { cleanLine, stripDisplaySizeLabel } from './lib/stringUtils';
+import { getResolvedTheme, loadThemeMode, saveThemeMode } from './lib/themePreference';
 import { DebugPage } from './pages/DebugPage';
 import { EditPage } from './pages/EditPage';
 import { RoutePage } from './pages/RoutePage';
 import { SettingsPage } from './pages/SettingsPage';
-import type { CountryCode, GroupedSectionView, Item, PageKey, SectionKey } from './types';
+import type { CountryCode, GroupedSectionView, Item, PageKey, SectionKey, ThemeMode } from './types';
 
 const APP_PAGES: PageKey[] = ['edit', 'route', 'settings', 'debug'];
 const DEFAULT_PAGE: PageKey = 'edit';
@@ -48,8 +49,21 @@ export default function App() {
   const [draftItem, setDraftItem] = useState('');
   const [isLoaded, setIsLoaded] = useState(false);
   const [countryCode, setCountryCode] = useState<CountryCode>('uk');
+  const [themeMode, setThemeMode] = useState<ThemeMode>(() => loadThemeMode());
 
   const config = useMemo(() => COUNTRY_CONFIGS[countryCode], [countryCode]);
+
+  const applyTheme = (mode: ThemeMode) => {
+    if (typeof document === 'undefined') return;
+
+    const resolved = getResolvedTheme(mode);
+    document.documentElement.dataset.theme = resolved;
+
+    const themeColorMeta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+    if (themeColorMeta) {
+      themeColorMeta.content = resolved === 'dark' ? '#0b1220' : '#0f172a';
+    }
+  };
 
   useEffect(() => {
     const record = localStorageRepository.load();
@@ -72,6 +86,21 @@ export default function App() {
 
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
+
+  useEffect(() => {
+    saveThemeMode(themeMode);
+    applyTheme(themeMode);
+
+    if (themeMode !== 'system' || typeof window === 'undefined') {
+      return;
+    }
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = () => applyTheme('system');
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, [themeMode]);
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -243,7 +272,9 @@ export default function App() {
           <SettingsPage
             countryCode={countryCode}
             config={config}
+            themeMode={themeMode}
             onCountryChange={handleCountryChange}
+            onThemeChange={setThemeMode}
             onOpenDebug={() => setPage('debug')}
           />
         ) : null}

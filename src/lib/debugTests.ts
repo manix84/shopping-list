@@ -6,6 +6,7 @@ import { cleanLine } from './stringUtils';
 import { parseItems } from './parser';
 import { STORAGE_KEY, localStorageRepository } from './repository/localStorageRepository';
 import { decodeShoppingListRecord, encodeShoppingListRecord } from './repository/recordCodec';
+import { THEME_STORAGE_KEY, loadThemeMode, saveThemeMode } from './themePreference';
 
 export const MATCHER_TEST_CASES: MatcherTestCase[] = [
   { input: 'spaghetti', expectedSection: 'pasta' },
@@ -78,9 +79,19 @@ export const runStorageTests = (): StorageTestResult[] => {
     return results;
   }
 
+  const previousTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
   const previous = window.localStorage.getItem(STORAGE_KEY);
 
   try {
+    saveThemeMode('dark');
+    const loadedTheme = loadThemeMode();
+    results.push({
+      title: 'Theme preference round-trip',
+      expected: 'Persist and restore the local theme override only',
+      actual: `mode ${loadedTheme}`,
+      passed: loadedTheme === 'dark',
+    });
+
     localStorageRepository.save(STORAGE_FIXTURE_RECORD);
     const loaded = localStorageRepository.load();
     const repoPassed =
@@ -98,6 +109,12 @@ export const runStorageTests = (): StorageTestResult[] => {
       passed: repoPassed,
     });
   } finally {
+    if (previousTheme === null) {
+      window.localStorage.removeItem(THEME_STORAGE_KEY);
+    } else {
+      window.localStorage.setItem(THEME_STORAGE_KEY, previousTheme);
+    }
+
     if (previous === null) {
       window.localStorage.removeItem(STORAGE_KEY);
     } else {

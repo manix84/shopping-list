@@ -1,5 +1,6 @@
 export type PageKey = 'edit' | 'route' | 'settings' | 'debug';
 export type CountryCode = 'uk';
+export type ThemeMode = 'system' | 'light' | 'dark';
 
 export type SectionKey =
   | 'produce'

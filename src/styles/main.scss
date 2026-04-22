@@ -1,5 +1,47 @@
 @use "./variables" as *;
 
+:root {
+  color-scheme: light;
+  --bg: #f6f7fb;
+  --panel: #ffffff;
+  --panel-alt: #f9fafc;
+  --border: #d9deea;
+  --text: #18202b;
+  --muted: #617086;
+  --primary: #2563eb;
+  --primary-strong: #1d4ed8;
+  --danger: #dc2626;
+  --danger-strong: #b91c1c;
+  --success-bg: #eefaf2;
+  --success-text: #166534;
+  --success-border: #bbf7d0;
+  --danger-bg: #fef2f2;
+  --danger-text: #991b1b;
+  --danger-border: #fecaca;
+  --shadow-color: rgba(15, 23, 42, 0.08);
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0b1220;
+  --panel: #121a2b;
+  --panel-alt: #182235;
+  --border: #2b3750;
+  --text: #edf2ff;
+  --muted: #9fb0c9;
+  --primary: #4f8cff;
+  --primary-strong: #2f73ff;
+  --danger: #ef6b6b;
+  --danger-strong: #de4d4d;
+  --success-bg: rgba(22, 101, 52, 0.24);
+  --success-text: #9ef0b8;
+  --success-border: #2d8f57;
+  --danger-bg: rgba(153, 27, 27, 0.26);
+  --danger-text: #ffb7b7;
+  --danger-border: #c74a4a;
+  --shadow-color: rgba(0, 0, 0, 0.35);
+}
+
 * {
   box-sizing: border-box;
 }

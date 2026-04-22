@@ -1,17 +1,20 @@
 import { COUNTRY_CONFIGS } from '../config/countries';
-import type { CountryCode, CountryConfig } from '../types';
+import type { CountryCode, CountryConfig, ThemeMode } from '../types';
 import { Card } from '../components/Card';
 import { DebugLink } from '../components/DebugLink';
 import { Badge } from '../components/Badge';
+import { getThemeLabel } from '../lib/themePreference';
 
 type SettingsPageProps = {
   countryCode: CountryCode;
   config: CountryConfig;
+  themeMode: ThemeMode;
   onCountryChange: (countryCode: CountryCode) => void;
+  onThemeChange: (themeMode: ThemeMode) => void;
   onOpenDebug: () => void;
 };
 
-export function SettingsPage({ countryCode, config, onCountryChange, onOpenDebug }: SettingsPageProps) {
+export function SettingsPage({ countryCode, config, themeMode, onCountryChange, onThemeChange, onOpenDebug }: SettingsPageProps) {
   return (
     <Card
       header={
@@ -34,6 +37,21 @@ export function SettingsPage({ countryCode, config, onCountryChange, onOpenDebug
             <option key={country.code} value={country.code}>{country.label}</option>
           ))}
         </select>
+      </div>
+
+      <div className="field field-compact">
+        <label htmlFor="theme-select">Theme</label>
+        <select
+          id="theme-select"
+          className="select"
+          value={themeMode}
+          onChange={(event) => onThemeChange(event.target.value as ThemeMode)}
+        >
+          <option value="system">{getThemeLabel('system')}</option>
+          <option value="light">{getThemeLabel('light')}</option>
+          <option value="dark">{getThemeLabel('dark')}</option>
+        </select>
+        <div className="small-text">Stored locally on this device only.</div>
       </div>
 
       <DebugLink onOpen={onOpenDebug} />
