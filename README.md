@@ -1,5 +1,7 @@
 # Smart Shopping List
 
+[![Deploy to GitHub Pages](https://github.com/manix84/shopping-list/actions/workflows/deploy-gh-pages.yml/badge.svg)](https://github.com/manix84/shopping-list/actions/workflows/deploy-gh-pages.yml) [![CI](https://github.com/manix84/shopping-list/actions/workflows/ci.yml/badge.svg)](https://github.com/manix84/shopping-list/actions/workflows/ci.yml)
+
 A React + TypeScript shopping list app with country-aware routing, compact item metadata, and GitHub Pages deployment.
 
 ## What it does
