@@ -1,5 +1,5 @@
 name: Pull Request Checks
-run-name: ${{ github.event_name == 'pull_request' && format('PR checks for #{0}', github.event.pull_request.number) || 'Manual validation' }}
+run-name: Pull Request Checks
 
 on:
   pull_request:
