@@ -12,6 +12,7 @@ The app may store:
 - checked/unchecked item state
 - the country profile used for store routing
 - a shared-list identifier when sharing is enabled
+- a local history of recently opened shared lists so they can be reopened quickly
 - local display preferences such as language and theme
 
 In frontend-only mode, this is stored in your browser's local storage on your device.

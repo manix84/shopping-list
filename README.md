@@ -13,6 +13,8 @@ A React + TypeScript shopping list app that turns a rough grocery list into an o
 - applies display aliases for common milk shorthand like `blue milk`, `gold milk`, `green milk`, and `red milk`
 - persists data locally so the app can be reopened without losing state
 - supports backend-backed shared list links that anyone with the link can edit
+- generates themed QR codes for shared lists and can scan shared-list QR codes when the browser supports camera scanning
+- remembers recently opened shared lists locally on the device for quick reopening
 - stores the country profile in the backend when available, with local fallback
 - supports English and Spanish UI text, defaulting from the browser language
 - supports light, dark, and system themes, including PWA chrome theme colours
@@ -112,6 +114,18 @@ Every browser session has an internal UUIDv7-style list id. When the backend is 
 
 Anyone with the link can edit the same list. Changes are saved to the shared backend record after each completed app state change and cached locally as an offline backup. If the backend is offline, new offline-only lists keep their UUID hidden from the URL; lists that have already been backend-backed keep the `/list/<uuidv7>` URL and render from local storage until the backend comes back.
 
+The sharing panel also supports:
+
+- copying the shared URL
+- showing a themed QR code for the current shared list
+- scanning another shared-list QR code into the shared-list input
+- collapsing pasted shared URLs down to just the UUIDv7 in the shared-list input
+- validating that scanned or pasted list ids exist in the backend
+- a device-local history of recently opened shared lists with quick reopen/delete actions
+- tapping a recent-history card to reopen that list, with drag protection so scroll gestures do not trigger accidental loads
+
+Empty lists do not create new shared-list entries. The `New List` action also removes the current shared list instead of leaving behind an empty backend record. If a previously opened shared list is empty, the recent-history panel labels it as `Empty list`.
+
 Shared list API routes:
 
 - `POST /api/shared-lists`
@@ -122,6 +136,21 @@ Shared list API routes:
 ## 📲 PWA install
 
 The app includes a web app manifest, install icons, theme-aware browser favicons, and runtime theme-colour updates. Light, dark, and system theme choices update the browser/PWA chrome where the host OS supports dynamic `theme-color` changes. Some installed app shells cache manifest metadata, so reinstalling the PWA may be needed after manifest colour or icon changes.
+
+### Install it
+
+On supported browsers you can install the app with the browser's install action:
+
+- desktop Chrome / Edge: use the install icon in the address bar
+- Android Chrome: use `Add to Home screen` / `Install app`
+- iPhone / iPad Safari: use `Share` -> `Add to Home Screen`
+
+### PWA notes
+
+- the app works offline with local storage even without the backend
+- backend-backed shared lists still need network access to validate, refresh, or load remote list data
+- QR scanning depends on browser camera support and `BarcodeDetector`; if it is unavailable, the scanner action is hidden and you can paste the shared UUID or URL manually
+- if you change icons or manifest colours, some installed shells keep stale assets until the app is removed and installed again
 
 ## 🧪 Build
 
