@@ -17,20 +17,31 @@
     <script>
       (() => {
         const storageKey = 'smart-shopping-list-theme-v1';
+        const localeKey = 'smart-shopping-list-locale-v1';
         const isDarkMode = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
         let mode = 'system';
+        let locale = 'en';
 
         try {
           const stored = localStorage.getItem(storageKey);
           if (stored === 'light' || stored === 'dark' || stored === 'system') {
             mode = stored;
           }
+
+          const storedLocale = localStorage.getItem(localeKey);
+          if (storedLocale === 'es' || storedLocale === 'en') {
+            locale = storedLocale;
+          } else if (navigator.language && navigator.language.toLowerCase().startsWith('es')) {
+            locale = 'es';
+          }
         } catch (error) {
           mode = 'system';
+          locale = 'en';
         }
 
         const resolved = mode === 'system' ? (isDarkMode() ? 'dark' : 'light') : mode;
         document.documentElement.dataset.theme = resolved;
+        document.documentElement.lang = locale === 'en' ? 'en-GB' : locale;
 
         const themeColor = document.querySelector('meta[name="theme-color"]');
         if (themeColor) {

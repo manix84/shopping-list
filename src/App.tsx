@@ -2,6 +2,13 @@ import { useEffect, useMemo, useState } from 'react';
 import { COUNTRY_CONFIGS } from './config/countries';
 import { AppHeader } from './components/AppHeader';
 import { runMatcherTests, runQuantityTests, runStorageTests } from './lib/debugTests';
+import {
+  applyDocumentLocale,
+  createMessages,
+  I18nProvider,
+  loadLocale,
+  saveLocale,
+} from './lib/i18n';
 import { getDisplayValue, getStoredValue, parseItems } from './lib/parser';
 import { defaultRecord, localStorageRepository } from './lib/repository/localStorageRepository';
 import { getSectionMeta } from './lib/sections';
@@ -50,8 +57,10 @@ export default function App() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [countryCode, setCountryCode] = useState<CountryCode>('uk');
   const [themeMode, setThemeMode] = useState<ThemeMode>(() => loadThemeMode());
+  const [locale, setLocale] = useState(() => loadLocale());
 
   const config = useMemo(() => COUNTRY_CONFIGS[countryCode], [countryCode]);
+  const messages = useMemo(() => createMessages(locale), [locale]);
 
   const applyTheme = (mode: ThemeMode) => {
     if (typeof document === 'undefined') return;
@@ -101,6 +110,14 @@ export default function App() {
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, [themeMode]);
+
+  useEffect(() => {
+    saveLocale(locale);
+    applyDocumentLocale(locale);
+    if (typeof document !== 'undefined') {
+      document.title = messages.app.title;
+    }
+  }, [locale, messages]);
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -229,69 +246,71 @@ export default function App() {
   };
 
   return (
-    <div className="shopping-app">
-      <div className="shopping-shell">
-        <AppHeader page={page} onChangePage={setPage} />
+    <I18nProvider value={{ locale, messages, setLocale }}>
+      <div className="shopping-app">
+        <div className="shopping-shell">
+          <AppHeader page={page} onChangePage={setPage} />
 
-        {page === 'edit' ? (
-          <EditPage
-            input={input}
-            items={items}
-            draftItem={draftItem}
-            total={total}
-            checkedTotal={checkedTotal}
-            progress={progress}
-            config={config}
-            onInputChange={setInput}
-            onDraftItemChange={setDraftItem}
-            onParse={handleParse}
-            onResetAll={resetAll}
-            onAddSingleItem={handleAddSingleItem}
-            onRenameItem={handleRenameItem}
-            onToggleItem={toggleItem}
-            onDeleteItem={handleDeleteItem}
-            onOpenDebug={() => setPage('debug')}
-          />
-        ) : null}
+          {page === 'edit' ? (
+            <EditPage
+              input={input}
+              items={items}
+              draftItem={draftItem}
+              total={total}
+              checkedTotal={checkedTotal}
+              progress={progress}
+              config={config}
+              onInputChange={setInput}
+              onDraftItemChange={setDraftItem}
+              onParse={handleParse}
+              onResetAll={resetAll}
+              onAddSingleItem={handleAddSingleItem}
+              onRenameItem={handleRenameItem}
+              onToggleItem={toggleItem}
+              onDeleteItem={handleDeleteItem}
+              onOpenDebug={() => setPage('debug')}
+            />
+          ) : null}
 
-        {page === 'route' ? (
-          <RoutePage
-            query={query}
-            grouped={grouped}
-            hasItems={items.length > 0}
-            onQueryChange={setQuery}
-            onResetChecks={resetChecks}
-            onResort={handleParse}
-            onToggleSection={toggleSection}
-            onToggleItem={toggleItem}
-            onOpenEdit={() => setPage('edit')}
-          />
-        ) : null}
+          {page === 'route' ? (
+            <RoutePage
+              query={query}
+              grouped={grouped}
+              hasItems={items.length > 0}
+              onQueryChange={setQuery}
+              onResetChecks={resetChecks}
+              onResort={handleParse}
+              onToggleSection={toggleSection}
+              onToggleItem={toggleItem}
+              onOpenEdit={() => setPage('edit')}
+            />
+          ) : null}
 
-        {page === 'settings' ? (
-          <SettingsPage
-            countryCode={countryCode}
-            config={config}
-            themeMode={themeMode}
-            onCountryChange={handleCountryChange}
-            onThemeChange={setThemeMode}
-            onOpenDebug={() => setPage('debug')}
-          />
-        ) : null}
+          {page === 'settings' ? (
+            <SettingsPage
+              countryCode={countryCode}
+              config={config}
+              themeMode={themeMode}
+              onCountryChange={handleCountryChange}
+              onThemeChange={setThemeMode}
+              onOpenDebug={() => setPage('debug')}
+            />
+          ) : null}
 
-        {page === 'debug' ? (
-          <DebugPage
-            matcherTests={matcherTests}
-            quantityTests={quantityTests}
-            storageTests={storageTests}
-            matcherHasFailures={matcherTests.some((test) => !test.passed)}
-            quantityHasFailures={quantityTests.some((test) => !test.passed)}
-            storageHasFailures={storageTests.some((test) => !test.passed)}
-            onBackToEdit={() => setPage('edit')}
-            onBackToSettings={() => setPage('settings')}
-          />
-        ) : null}
+          {page === 'debug' ? (
+            <DebugPage
+              matcherTests={matcherTests}
+              quantityTests={quantityTests}
+              storageTests={storageTests}
+              matcherHasFailures={matcherTests.some((test) => !test.passed)}
+              quantityHasFailures={quantityTests.some((test) => !test.passed)}
+              storageHasFailures={storageTests.some((test) => !test.passed)}
+              onBackToEdit={() => setPage('edit')}
+              onBackToSettings={() => setPage('settings')}
+            />
+          ) : null}
+        </div>
       </div>
-    </div>
+    </I18nProvider>
   );
 }

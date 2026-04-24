@@ -1,6 +1,7 @@
 import type { GroupedSectionView } from '../types';
 import { Card } from '../components/Card';
 import { RouteSectionCard } from '../components/RouteSectionCard';
+import { useI18n } from '../lib/i18n';
 
 type RoutePageProps = {
   query: string;
@@ -25,23 +26,28 @@ export function RoutePage({
   onToggleItem,
   onOpenEdit,
 }: RoutePageProps) {
+  const { messages } = useI18n();
   return (
     <Card
       header={
         <div className="title-row">
           <div>
-            <h2 className="title title-md">Store route</h2>
-            <p className="subtitle">Incomplete sections stay near the top. Fully completed sections drop to the bottom.</p>
+            <h2 className="title title-md">{messages.pages.route.title}</h2>
+            <p className="subtitle">{messages.pages.route.subtitle}</p>
           </div>
           <div className="button-row">
             <input
               className="input input-wide"
               value={query}
               onChange={(event) => onQueryChange(event.target.value)}
-              placeholder="Filter items"
+              placeholder={messages.pages.route.filterPlaceholder}
             />
-            <button className="button" onClick={onResetChecks}>Reset ticks</button>
-            <button className="button button-primary" onClick={onResort}>Re-sort from list</button>
+            <button type="button" className="button" onClick={onResetChecks}>
+              {messages.actions.resetTicks}
+            </button>
+            <button type="button" className="button button-primary" onClick={onResort}>
+              {messages.actions.resortFromList}
+            </button>
           </div>
         </div>
       }
@@ -49,15 +55,15 @@ export function RoutePage({
       <div className="scroll-region stack">
         {!hasItems ? (
           <div className="empty-state stack">
-            <div>
-              You need to add items on the Edit list page before the store route can be shown.
-            </div>
+            <div>{messages.pages.route.emptyNoItems}</div>
             <div className="button-row warning-actions">
-              <button className="button button-primary" onClick={onOpenEdit}>Go to Edit list</button>
+              <button type="button" className="button button-primary" onClick={onOpenEdit}>
+                {messages.actions.goToEditList}
+              </button>
             </div>
           </div>
         ) : grouped.length === 0 ? (
-          <div className="empty-state">Nothing to show yet. Head back to the edit page and add some items.</div>
+          <div className="empty-state">{messages.pages.route.emptyNoResults}</div>
         ) : (
           grouped.map((section) => (
             <RouteSectionCard

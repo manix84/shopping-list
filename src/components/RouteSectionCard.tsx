@@ -1,6 +1,7 @@
 import type { GroupedSectionView } from '../types';
 import { getDisplayValue, getQuantityDisplayValue, getSizeDisplayValue } from '../lib/parser';
 import { Badge } from './Badge';
+import { useI18n } from '../lib/i18n';
 
 type RouteSectionCardProps = {
   section: GroupedSectionView;
@@ -9,11 +10,12 @@ type RouteSectionCardProps = {
 };
 
 export function RouteSectionCard({ section, onToggleSection, onToggleItem }: RouteSectionCardProps) {
+  const { messages } = useI18n();
   const allChecked = section.checkedCount === section.items.length && section.items.length > 0;
   const noneChecked = section.checkedCount === 0;
   const toggleTarget = allChecked;
   const state = allChecked ? 'checked' : noneChecked ? 'unchecked' : 'mixed';
-  const actionLabel = toggleTarget ? 'Untick all items' : 'Tick all items';
+  const actionLabel = toggleTarget ? messages.sectionToggle.untickAll : messages.sectionToggle.tickAll;
 
   return (
     <div className="section-card">
@@ -22,11 +24,14 @@ export function RouteSectionCard({ section, onToggleSection, onToggleItem }: Rou
           <div className="section-group">{section.groupLabel}</div>
           <h3 className="section-title">{section.label}</h3>
           <div className="badge-row">
-            <Badge>{section.checkedCount}/{section.items.length}</Badge>
-            {section.complete ? <Badge tone="success">Done</Badge> : null}
+            <Badge>
+              {section.checkedCount}/{section.items.length}
+            </Badge>
+            {section.complete ? <Badge tone="success">{messages.labels.done}</Badge> : null}
           </div>
         </div>
         <button
+          type="button"
           className={`section-toggle section-toggle-${state}`}
           onClick={() => onToggleSection(section.key, toggleTarget)}
           aria-label={actionLabel}
@@ -54,14 +59,18 @@ export function RouteSectionCard({ section, onToggleSection, onToggleItem }: Rou
             <div className="check-label">
               <input type="checkbox" checked={item.checked} onChange={() => onToggleItem(item.id)} />
               <div className="check-text">
-                  <div className="check-text-line">
-                    <div className={`check-text-main ${item.checked ? 'is-checked' : ''}`}>{getDisplayValue(item)}</div>
-                    {getSizeDisplayValue(item) ? (
-                      <div className="check-text-quantity"><Badge>{getSizeDisplayValue(item)}</Badge></div>
-                    ) : null}
-                    {getQuantityDisplayValue(item) ? (
-                      <div className="check-text-quantity"><Badge>{getQuantityDisplayValue(item)}</Badge></div>
-                    ) : null}
+                <div className="check-text-line">
+                  <div className={`check-text-main ${item.checked ? 'is-checked' : ''}`}>{getDisplayValue(item)}</div>
+                  {getSizeDisplayValue(item) ? (
+                    <div className="check-text-quantity">
+                      <Badge>{getSizeDisplayValue(item)?.replace(/^Size:\s*/i, '')}</Badge>
+                    </div>
+                  ) : null}
+                  {getQuantityDisplayValue(item) ? (
+                    <div className="check-text-quantity">
+                      <Badge>{getQuantityDisplayValue(item)?.replace(/^Qty:\s*/i, '')}</Badge>
+                    </div>
+                  ) : null}
                 </div>
               </div>
             </div>

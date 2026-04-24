@@ -1,6 +1,7 @@
 import type { MatcherTestResult, QuantityTestResult, StorageTestResult } from '../types';
 import { Card } from '../components/Card';
 import { TestResultCard } from '../components/TestResultCard';
+import { useI18n } from '../lib/i18n';
 
 type DebugPageProps = {
   matcherTests: MatcherTestResult[];
@@ -23,17 +24,22 @@ export function DebugPage({
   onBackToEdit,
   onBackToSettings,
 }: DebugPageProps) {
+  const { messages } = useI18n();
   return (
     <Card
       header={
         <div className="title-row">
           <div>
-            <h2 className="title title-md">Debug tools</h2>
-            <p className="subtitle">Self-checks and parser diagnostics live here instead of cluttering the main flow.</p>
+            <h2 className="title title-md">{messages.pages.debug.title}</h2>
+            <p className="subtitle">{messages.pages.debug.subtitle}</p>
           </div>
           <div className="button-row">
-            <button className="button" onClick={onBackToEdit}>Back to edit</button>
-            <button className="button" onClick={onBackToSettings}>Back to settings</button>
+            <button type="button" className="button" onClick={onBackToEdit}>
+              {messages.actions.backToEdit}
+            </button>
+            <button type="button" className="button" onClick={onBackToSettings}>
+              {messages.actions.backToSettings}
+            </button>
           </div>
         </div>
       }
@@ -42,8 +48,8 @@ export function DebugPage({
       <Card
         header={
           <>
-            <h2 className="title title-sm">Matcher self-checks</h2>
-            <p className="subtitle">Lightweight checks so grouping regressions are obvious while building.</p>
+            <h2 className="title title-sm">{messages.pages.debug.matcherTitle}</h2>
+            <p className="subtitle">{messages.pages.debug.matcherSubtitle}</p>
           </>
         }
         bodyClassName="stack"
@@ -57,14 +63,14 @@ export function DebugPage({
             passed={test.passed}
           />
         ))}
-        {!matcherHasFailures ? <div className="empty-state">All matcher checks are passing.</div> : null}
+        {!matcherHasFailures ? <div className="empty-state">{messages.pages.debug.allMatcherPass}</div> : null}
       </Card>
 
       <Card
         header={
           <>
-            <h2 className="title title-sm">Quantity self-checks</h2>
-            <p className="subtitle">Count-style quantities stay as one checkable item, with quantity metadata attached.</p>
+            <h2 className="title title-sm">{messages.pages.debug.quantityTitle}</h2>
+            <p className="subtitle">{messages.pages.debug.quantitySubtitle}</p>
           </>
         }
         bodyClassName="stack"
@@ -90,14 +96,14 @@ export function DebugPage({
             passed={test.passed}
           />
         ))}
-        {!quantityHasFailures ? <div className="empty-state">All quantity checks are passing.</div> : null}
+        {!quantityHasFailures ? <div className="empty-state">{messages.pages.debug.allQuantityPass}</div> : null}
       </Card>
 
       <Card
         header={
           <>
-            <h2 className="title title-sm">Storage self-checks</h2>
-            <p className="subtitle">Record data should round-trip cleanly through local storage and any future database store.</p>
+            <h2 className="title title-sm">{messages.pages.debug.storageTitle}</h2>
+            <p className="subtitle">{messages.pages.debug.storageSubtitle}</p>
           </>
         }
         bodyClassName="stack"
@@ -111,7 +117,7 @@ export function DebugPage({
             passed={test.passed}
           />
         ))}
-        {!storageHasFailures ? <div className="empty-state">All storage checks are passing.</div> : null}
+        {!storageHasFailures ? <div className="empty-state">{messages.pages.debug.allStoragePass}</div> : null}
       </Card>
     </Card>
   );
