@@ -5,6 +5,8 @@ import { decodeShoppingListRecord, encodeShoppingListRecord } from './recordCode
 export type ApiShoppingListPayload = {
   record: ShoppingListRecord;
   exists: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 export type ApiSettingsPayload = {
@@ -91,7 +93,7 @@ export const loadSharedShoppingList = async (listId: string): Promise<ApiShoppin
     throw new Error(`Unable to load shared shopping list: ${response.status}`);
   }
 
-  const payload = (await response.json()) as { record?: unknown; exists?: unknown };
+  const payload = (await response.json()) as { record?: unknown; exists?: unknown; createdAt?: unknown; updatedAt?: unknown };
   const rawRecord = JSON.stringify(payload.record);
   const decoded = rawRecord ? decodeShoppingListRecord(rawRecord) : undefined;
   if (!decoded) {
@@ -101,6 +103,8 @@ export const loadSharedShoppingList = async (listId: string): Promise<ApiShoppin
   return {
     record: decoded,
     exists: payload.exists === true,
+    createdAt: typeof payload.createdAt === 'string' ? payload.createdAt : undefined,
+    updatedAt: typeof payload.updatedAt === 'string' ? payload.updatedAt : undefined,
   };
 };
 

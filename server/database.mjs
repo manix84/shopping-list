@@ -182,18 +182,14 @@ export const saveSharedList = async (id, record) =>
 export const clearSharedList = async (id) =>
   withDatabaseWriteLock(async () => {
     const database = await readDatabase();
-    const existing = database.sharedLists[id];
+    delete database.sharedLists[id];
 
-    database.sharedLists[id] = {
+    await writeDatabase(database);
+    return {
       id,
       exists: false,
       record: DEFAULT_RECORD,
-      createdAt: existing?.createdAt ?? new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
     };
-
-    await writeDatabase(database);
-    return database.sharedLists[id];
   });
 
 export const clearShoppingList = async () =>

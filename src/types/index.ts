@@ -62,6 +62,14 @@ export type AppSettingsRecord = {
   updatedAt: string;
 };
 
+export type SharedListHistoryEntry = {
+  listId: string;
+  itemPreview: string[];
+  createdAt?: string;
+  updatedAt: string;
+  viewedAt: string;
+};
+
 export type SectionDef = {
   key: SectionKey;
   label: string;

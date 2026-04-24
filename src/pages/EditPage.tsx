@@ -3,7 +3,9 @@ import { Card } from '../components/Card';
 import { StatsGrid } from '../components/StatsGrid';
 import { ParsedItemCard } from '../components/ParsedItemCard';
 import { DebugLink } from '../components/DebugLink';
+import { SharedListPanel } from '../components/SharedListPanel';
 import { useI18n } from '../lib/i18n';
+import type { SharedListHistoryEntry } from '../types';
 
 type EditPageProps = {
   input: string;
@@ -25,10 +27,23 @@ type EditPageProps = {
   onRefreshSharedList: () => void;
   onOpenDebug: () => void;
   canUseBackend: boolean;
+  canCreateSharedLink: boolean;
+  resolvedTheme: 'light' | 'dark';
   shareLink?: string;
   isCreatingShareLink: boolean;
   isRefreshingSharedList: boolean;
+  isLoadingSharedList: boolean;
   shareError?: string;
+  sharedListHistory: SharedListHistoryEntry[];
+  onLoadSharedInput: (value: string) => Promise<boolean>;
+  onValidateSharedInput: (value: string) => Promise<
+    | { state: 'valid'; listId: string; normalizedValue: string }
+    | { state: 'invalid' }
+    | { state: 'missing'; listId: string; normalizedValue: string }
+    | { state: 'unavailable' }
+  >;
+  onLoadSharedListFromHistory: (listId: string) => Promise<boolean>;
+  onDeleteSharedListFromHistory: (listId: string) => void;
 };
 
 export function EditPage({
@@ -51,10 +66,18 @@ export function EditPage({
   onRefreshSharedList,
   onOpenDebug,
   canUseBackend,
+  canCreateSharedLink,
+  resolvedTheme,
   shareLink,
   isCreatingShareLink,
   isRefreshingSharedList,
+  isLoadingSharedList,
   shareError,
+  sharedListHistory,
+  onLoadSharedInput,
+  onValidateSharedInput,
+  onLoadSharedListFromHistory,
+  onDeleteSharedListFromHistory,
 }: EditPageProps) {
   const { messages } = useI18n();
 
@@ -125,42 +148,23 @@ export function EditPage({
           }
           bodyClassName="stack"
         >
-          {shareLink ? (
-            <>
-              <div className="field">
-                <label htmlFor="shopping-share-link">{messages.labels.sharedLink}</label>
-                <div className="inline-row">
-                  <input id="shopping-share-link" className="input" readOnly value={shareLink} />
-                  <button type="button" className="button" onClick={() => void navigator.clipboard?.writeText(shareLink)}>
-                    {messages.actions.copy}
-                  </button>
-                  <button
-                    type="button"
-                    className="button"
-                    onClick={onRefreshSharedList}
-                    disabled={isRefreshingSharedList || !canUseBackend}
-                  >
-                    {isRefreshingSharedList ? messages.actions.refreshing : messages.actions.refresh}
-                  </button>
-                </div>
-              </div>
-              {shareError ? <div className="small-text">{shareError}</div> : null}
-            </>
-          ) : canUseBackend ? (
-            <>
-              <button
-                type="button"
-                className="button button-primary"
-                onClick={onCreateSharedLink}
-                disabled={isCreatingShareLink}
-              >
-                {isCreatingShareLink ? messages.actions.creating : messages.actions.createSharedLink}
-              </button>
-              {shareError ? <div className="small-text">{shareError}</div> : null}
-            </>
-          ) : (
-            <div className="empty-state">{messages.pages.edit.sharingUnavailable}</div>
-          )}
+          <SharedListPanel
+            canUseBackend={canUseBackend}
+            canCreateSharedLink={canCreateSharedLink}
+            resolvedTheme={resolvedTheme}
+            shareLink={shareLink}
+            isCreatingShareLink={isCreatingShareLink}
+            isRefreshingSharedList={isRefreshingSharedList}
+            isLoadingSharedList={isLoadingSharedList}
+            shareError={shareError}
+            historyEntries={sharedListHistory}
+            onCreateSharedLink={onCreateSharedLink}
+            onRefreshSharedList={onRefreshSharedList}
+            onLoadSharedInput={onLoadSharedInput}
+            onValidateSharedInput={onValidateSharedInput}
+            onLoadHistoryEntry={onLoadSharedListFromHistory}
+            onDeleteHistoryEntry={onDeleteSharedListFromHistory}
+          />
         </Card>
 
         <Card
