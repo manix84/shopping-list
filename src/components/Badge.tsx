@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from 'react';
 
 type BadgeProps = PropsWithChildren<{
-  tone?: 'default' | 'success' | 'danger';
+  tone?: 'default' | 'success' | 'danger' | 'muted';
 }>;
 
 export function Badge({ children, tone = 'default' }: BadgeProps) {

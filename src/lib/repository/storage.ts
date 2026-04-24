@@ -1,7 +1,9 @@
 import type { ShoppingListRecord } from '../../types';
 
+export type MaybePromise<T> = T | Promise<T>;
+
 export type ShoppingListRepository = {
-  load: () => ShoppingListRecord;
-  save: (record: ShoppingListRecord) => void;
-  clear: () => void;
+  load: () => MaybePromise<ShoppingListRecord>;
+  save: (record: ShoppingListRecord) => MaybePromise<void>;
+  clear: () => MaybePromise<void>;
 };

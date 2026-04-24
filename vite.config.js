@@ -6,4 +6,9 @@ var base = process.env.GITHUB_ACTIONS && repoName ? "/".concat(repoName, "/") : 
 export default defineConfig({
     plugins: [react()],
     base: base,
+    server: {
+        proxy: {
+            '/api': 'http://localhost:8787',
+        },
+    },
 });

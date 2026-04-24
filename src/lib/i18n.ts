@@ -13,6 +13,7 @@ type Messages = {
   nav: {
     editList: string;
     storeRoute: string;
+    sections: string;
     settings: string;
     debugTools: string;
   };
@@ -114,6 +115,7 @@ const en: Messages = {
   nav: {
     editList: 'Edit list',
     storeRoute: 'Store route',
+    sections: 'Sections',
     settings: 'Settings',
     debugTools: 'Debug tools',
   },
@@ -218,6 +220,7 @@ const es: Messages = {
   nav: {
     editList: 'Editar lista',
     storeRoute: 'Ruta de compra',
+    sections: 'Secciones',
     settings: 'Ajustes',
     debugTools: 'Herramientas de depuración',
   },

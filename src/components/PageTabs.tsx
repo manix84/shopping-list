@@ -8,6 +8,7 @@ type PageTabsProps = {
 
 export function PageTabs({ page, onChange }: PageTabsProps) {
   const { messages } = useI18n();
+
   return (
     <div className="button-row">
       <button type="button" className={`button ${page === 'edit' ? 'button-active' : ''}`} onClick={() => onChange('edit')}>
@@ -15,6 +16,9 @@ export function PageTabs({ page, onChange }: PageTabsProps) {
       </button>
       <button type="button" className={`button ${page === 'route' ? 'button-active' : ''}`} onClick={() => onChange('route')}>
         {messages.nav.storeRoute}
+      </button>
+      <button type="button" className={`button ${page === 'sections' ? 'button-active' : ''}`} onClick={() => onChange('sections')}>
+        {messages.nav.sections}
       </button>
       <button type="button" className={`button ${page === 'settings' ? 'button-active' : ''}`} onClick={() => onChange('settings')}>
         {messages.nav.settings}

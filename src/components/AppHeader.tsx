@@ -1,17 +1,27 @@
 import { useEffect, useState } from 'react';
+import { Badge } from './Badge';
 import { Card } from './Card';
 import { PageTabs } from './PageTabs';
 import { useI18n } from '../lib/i18n';
-import type { PageKey } from '../types';
+import type { BackendStatus, PageKey } from '../types';
 
 type AppHeaderProps = {
   page: PageKey;
+  backendStatus: BackendStatus;
   onChangePage: (page: PageKey) => void;
 };
 
-export function AppHeader({ page, onChangePage }: AppHeaderProps) {
+const backendBadge = (status: BackendStatus) => {
+  if (status.state === 'connected') return { tone: 'success' as const, label: 'Backend connected' };
+  if (status.state === 'checking') return { tone: 'muted' as const, label: 'Backend checking' };
+  if (status.state === 'error') return { tone: 'danger' as const, label: 'Backend issue' };
+  return { tone: 'muted' as const, label: 'Frontend only' };
+};
+
+export function AppHeader({ page, backendStatus, onChangePage }: AppHeaderProps) {
   const { messages } = useI18n();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const badge = backendBadge(backendStatus);
 
   useEffect(() => {
     setMobileMenuOpen(false);
@@ -33,37 +43,33 @@ export function AppHeader({ page, onChangePage }: AppHeaderProps) {
               <p className="subtitle">{messages.app.subtitle}</p>
             </div>
           </div>
-          <PageTabs page={page} onChange={handleChangePage} />
 
-          <div className="mobile-menu-shell">
-            <button
-              type="button"
-              className="button mobile-menu-trigger"
-              aria-expanded={mobileMenuOpen}
-              aria-controls="mobile-menu-panel"
-              onClick={() => setMobileMenuOpen((current) => !current)}
-            >
-              <span className="sr-only">{messages.mobileMenu.openNavigation}</span>
-              <span aria-hidden="true" className="mobile-menu-icon">
-                <span />
-                <span />
-                <span />
-              </span>
-            </button>
+          <div className="header-actions">
+            <Badge tone={badge.tone}>{badge.label}</Badge>
+            <PageTabs page={page} onChange={handleChangePage} />
 
-            {mobileMenuOpen ? (
-              <div id="mobile-menu-panel" className="mobile-menu-panel">
-                <button type="button" className={`button ${page === 'edit' ? 'button-active' : ''}`} onClick={() => handleChangePage('edit')}>
-                  {messages.nav.editList}
-                </button>
-                <button type="button" className={`button ${page === 'route' ? 'button-active' : ''}`} onClick={() => handleChangePage('route')}>
-                  {messages.nav.storeRoute}
-                </button>
-                <button type="button" className={`button ${page === 'settings' ? 'button-active' : ''}`} onClick={() => handleChangePage('settings')}>
-                  {messages.nav.settings}
-                </button>
-              </div>
-            ) : null}
+            <div className="mobile-menu-shell">
+              <button
+                type="button"
+                className="button mobile-menu-trigger"
+                aria-expanded={mobileMenuOpen}
+                aria-controls="mobile-menu-panel"
+                onClick={() => setMobileMenuOpen((current) => !current)}
+              >
+                <span className="sr-only">{messages.mobileMenu.openNavigation}</span>
+                <span aria-hidden="true" className="mobile-menu-icon">
+                  <span />
+                  <span />
+                  <span />
+                </span>
+              </button>
+
+              {mobileMenuOpen ? (
+                <div id="mobile-menu-panel" className="mobile-menu-panel">
+                  <PageTabs page={page} onChange={handleChangePage} />
+                </div>
+              ) : null}
+            </div>
           </div>
         </div>
       }

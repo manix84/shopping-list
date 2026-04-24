@@ -21,7 +21,14 @@ type EditPageProps = {
   onRenameItem: (itemId: string, nextRaw: string) => void;
   onToggleItem: (itemId: string) => void;
   onDeleteItem: (itemId: string) => void;
+  onCreateSharedLink: () => void;
+  onRefreshSharedList: () => void;
   onOpenDebug: () => void;
+  canUseBackend: boolean;
+  shareLink?: string;
+  isCreatingShareLink: boolean;
+  isRefreshingSharedList: boolean;
+  shareError?: string;
 };
 
 export function EditPage({
@@ -40,9 +47,17 @@ export function EditPage({
   onRenameItem,
   onToggleItem,
   onDeleteItem,
+  onCreateSharedLink,
+  onRefreshSharedList,
   onOpenDebug,
+  canUseBackend,
+  shareLink,
+  isCreatingShareLink,
+  isRefreshingSharedList,
+  shareError,
 }: EditPageProps) {
   const { messages } = useI18n();
+
   return (
     <div className="layout-split">
       <Card
@@ -95,6 +110,53 @@ export function EditPage({
       </Card>
 
       <div className="stack">
+        <Card
+          header={
+            <>
+              <h2 className="title title-sm">Sharing</h2>
+              <p className="subtitle">Anyone with the shared link can edit this list.</p>
+            </>
+          }
+          bodyClassName="stack"
+        >
+          {shareLink ? (
+            <>
+              <div className="field">
+                <label htmlFor="shopping-share-link">Shared link</label>
+                <div className="inline-row">
+                  <input id="shopping-share-link" className="input" readOnly value={shareLink} />
+                  <button type="button" className="button" onClick={() => void navigator.clipboard?.writeText(shareLink)}>
+                    Copy
+                  </button>
+                  <button
+                    type="button"
+                    className="button"
+                    onClick={onRefreshSharedList}
+                    disabled={isRefreshingSharedList || !canUseBackend}
+                  >
+                    {isRefreshingSharedList ? 'Refreshing...' : 'Refresh'}
+                  </button>
+                </div>
+              </div>
+              {shareError ? <div className="small-text">{shareError}</div> : null}
+            </>
+          ) : canUseBackend ? (
+            <>
+              <button
+                type="button"
+                className="button button-primary"
+                onClick={onCreateSharedLink}
+                disabled={isCreatingShareLink}
+              >
+                {isCreatingShareLink ? 'Creating...' : 'Create shared link'}
+              </button>
+              {shareError ? <div className="small-text">{shareError}</div> : null}
+            </>
+          ) : (
+            <div className="empty-state">Sharing is available when the backend is connected.</div>
+          )}
+        </Card>
+
         <Card
           header={
             <>

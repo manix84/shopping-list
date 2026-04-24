@@ -1,20 +1,18 @@
 import { COUNTRY_CONFIGS } from '../config/countries';
-import type { CountryCode, CountryConfig, ThemeMode } from '../types';
+import type { CountryCode, ThemeMode } from '../types';
 import { Card } from '../components/Card';
 import { DebugLink } from '../components/DebugLink';
-import { Badge } from '../components/Badge';
 import { type LocaleCode, useI18n } from '../lib/i18n';
 
 type SettingsPageProps = {
   countryCode: CountryCode;
-  config: CountryConfig;
   themeMode: ThemeMode;
   onCountryChange: (countryCode: CountryCode) => void;
   onThemeChange: (themeMode: ThemeMode) => void;
   onOpenDebug: () => void;
 };
 
-export function SettingsPage({ countryCode, config, themeMode, onCountryChange, onThemeChange, onOpenDebug }: SettingsPageProps) {
+export function SettingsPage({ countryCode, themeMode, onCountryChange, onThemeChange, onOpenDebug }: SettingsPageProps) {
   const { locale, setLocale, messages } = useI18n();
 
   return (
@@ -78,24 +76,6 @@ export function SettingsPage({ countryCode, config, themeMode, onCountryChange, 
       </div>
 
       <DebugLink onOpen={onOpenDebug} />
-
-      <div className="stack">
-        {config.groups.map((group) => (
-          <div key={group.key} className="section-card">
-            <div className="section-heading section-spacing">
-              <div className="section-group">
-                {messages.labels.order} {group.order}
-              </div>
-              <h3 className="section-title">{group.label}</h3>
-            </div>
-            <div className="badge-row">
-              {group.sections.map((section) => (
-                <Badge key={section.key}>{section.label}</Badge>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
     </Card>
   );
 }
