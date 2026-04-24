@@ -299,13 +299,13 @@ export default function App() {
 
     localStorageRepository.save(record);
 
-    if (storageMode === 'backend') {
+    if (storageMode === 'backend' && backendStatus.state === 'connected') {
       const backendRecord = { ...record, serverBacked: true };
       void saveSharedShoppingList(activeListId, backendRecord).catch((error: unknown) => {
         console.warn('Unable to save shared shopping list to backend.', error);
       });
     }
-  }, [activeListId, countryCode, input, isLoaded, isServerBackedList, items, storageMode]);
+  }, [activeListId, backendStatus.state, countryCode, input, isLoaded, isServerBackedList, items, storageMode]);
 
   useEffect(() => {
     syncRouteToUrl(route);

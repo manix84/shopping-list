@@ -32,9 +32,6 @@ const contentTypes = {
 const sendJson = (response, statusCode, payload) => {
   response.writeHead(statusCode, {
     'Content-Type': 'application/json; charset=utf-8',
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
   });
   response.end(JSON.stringify(payload));
 };
@@ -46,7 +43,19 @@ const readJsonBody = async (request) => {
   }
 
   const raw = Buffer.concat(chunks).toString('utf8');
-  return raw ? JSON.parse(raw) : {};
+  if (!raw) return {};
+
+  try {
+    return JSON.parse(raw);
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      const invalidJsonError = new Error('Invalid JSON body');
+      invalidJsonError.statusCode = 400;
+      throw invalidJsonError;
+    }
+
+    throw error;
+  }
 };
 
 const sendError = (response, error) => {

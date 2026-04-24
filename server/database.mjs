@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { randomBytes } from 'node:crypto';
 
@@ -10,6 +10,7 @@ const DEFAULT_RECORD = {
 };
 
 const databasePath = resolve(process.env.SHOPPING_LIST_DB_PATH ?? 'data/shopping-list-db.json');
+let databaseWriteQueue = Promise.resolve();
 
 const emptyDatabase = () => ({
   shoppingList: {
@@ -28,11 +29,26 @@ const normalizeDatabase = (database) => ({
 const readDatabase = async () => {
   try {
     const raw = await readFile(databasePath, 'utf8');
-    return normalizeDatabase(JSON.parse(raw));
+    try {
+      return normalizeDatabase(JSON.parse(raw));
+    } catch (error) {
+      if (!(error instanceof SyntaxError)) throw error;
+
+      const corruptPath = `${databasePath}.corrupt-${new Date().toISOString().replace(/[:.]/g, '-')}`;
+      await rename(databasePath, corruptPath);
+      console.warn(`Database JSON was invalid. Moved corrupt file to ${corruptPath} and started with an empty database.`);
+      return emptyDatabase();
+    }
   } catch (error) {
     if (error?.code === 'ENOENT') return emptyDatabase();
     throw error;
   }
+};
+
+const withDatabaseWriteLock = async (callback) => {
+  const run = databaseWriteQueue.then(callback);
+  databaseWriteQueue = run.catch(() => {});
+  return run;
 };
 
 const uuidV7 = () => {
@@ -58,7 +74,9 @@ export const isSharedListId = (value) =>
 
 const writeDatabase = async (database) => {
   await mkdir(dirname(databasePath), { recursive: true });
-  await writeFile(databasePath, `${JSON.stringify(database, null, 2)}\n`, 'utf8');
+  const temporaryPath = `${databasePath}.tmp-${process.pid}-${Date.now()}`;
+  await writeFile(temporaryPath, `${JSON.stringify(database, null, 2)}\n`, 'utf8');
+  await rename(temporaryPath, databasePath);
 };
 
 export const getShoppingList = async () => {
@@ -66,32 +84,34 @@ export const getShoppingList = async () => {
   return database.shoppingList;
 };
 
-export const saveShoppingList = async (record) => {
-  const database = await readDatabase();
-  database.shoppingList = {
-    exists: true,
-    record,
-  };
-  await writeDatabase(database);
-  return database.shoppingList;
-};
+export const saveShoppingList = async (record) =>
+  withDatabaseWriteLock(async () => {
+    const database = await readDatabase();
+    database.shoppingList = {
+      exists: true,
+      record,
+    };
+    await writeDatabase(database);
+    return database.shoppingList;
+  });
 
-export const createSharedList = async (record) => {
-  const database = await readDatabase();
-  const id = uuidV7();
-  const now = new Date().toISOString();
+export const createSharedList = async (record) =>
+  withDatabaseWriteLock(async () => {
+    const database = await readDatabase();
+    const id = uuidV7();
+    const now = new Date().toISOString();
 
-  database.sharedLists[id] = {
-    id,
-    exists: true,
-    record,
-    createdAt: now,
-    updatedAt: record.updatedAt || now,
-  };
+    database.sharedLists[id] = {
+      id,
+      exists: true,
+      record,
+      createdAt: now,
+      updatedAt: record.updatedAt || now,
+    };
 
-  await writeDatabase(database);
-  return database.sharedLists[id];
-};
+    await writeDatabase(database);
+    return database.sharedLists[id];
+  });
 
 export const getSharedList = async (id) => {
   const database = await readDatabase();
@@ -102,48 +122,51 @@ export const getSharedList = async (id) => {
   };
 };
 
-export const saveSharedList = async (id, record) => {
-  const database = await readDatabase();
-  const existing = database.sharedLists[id];
-  const now = new Date().toISOString();
+export const saveSharedList = async (id, record) =>
+  withDatabaseWriteLock(async () => {
+    const database = await readDatabase();
+    const existing = database.sharedLists[id];
+    const now = new Date().toISOString();
 
-  database.sharedLists[id] = {
-    id,
-    exists: true,
-    record,
-    createdAt: existing?.createdAt ?? now,
-    updatedAt: record.updatedAt || now,
-  };
+    database.sharedLists[id] = {
+      id,
+      exists: true,
+      record,
+      createdAt: existing?.createdAt ?? now,
+      updatedAt: record.updatedAt || now,
+    };
 
-  await writeDatabase(database);
-  return database.sharedLists[id];
-};
+    await writeDatabase(database);
+    return database.sharedLists[id];
+  });
 
-export const clearSharedList = async (id) => {
-  const database = await readDatabase();
-  const existing = database.sharedLists[id];
+export const clearSharedList = async (id) =>
+  withDatabaseWriteLock(async () => {
+    const database = await readDatabase();
+    const existing = database.sharedLists[id];
 
-  database.sharedLists[id] = {
-    id,
-    exists: false,
-    record: DEFAULT_RECORD,
-    createdAt: existing?.createdAt ?? new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
+    database.sharedLists[id] = {
+      id,
+      exists: false,
+      record: DEFAULT_RECORD,
+      createdAt: existing?.createdAt ?? new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
 
-  await writeDatabase(database);
-  return database.sharedLists[id];
-};
+    await writeDatabase(database);
+    return database.sharedLists[id];
+  });
 
-export const clearShoppingList = async () => {
-  const database = await readDatabase();
-  database.shoppingList = {
-    exists: false,
-    record: DEFAULT_RECORD,
-  };
-  await writeDatabase(database);
-  return database.shoppingList;
-};
+export const clearShoppingList = async () =>
+  withDatabaseWriteLock(async () => {
+    const database = await readDatabase();
+    database.shoppingList = {
+      exists: false,
+      record: DEFAULT_RECORD,
+    };
+    await writeDatabase(database);
+    return database.shoppingList;
+  });
 
 export const getDatabaseStatus = async () => {
   const database = await readDatabase();

@@ -1,6 +1,5 @@
 import type { BackendStatus, ShoppingListRecord } from '../../types';
 import { decodeShoppingListRecord, encodeShoppingListRecord } from './recordCodec';
-import type { ShoppingListRepository } from './storage';
 
 export type ApiShoppingListPayload = {
   record: ShoppingListRecord;
@@ -27,15 +26,6 @@ const fetchWithTimeout = async (path: string, init: RequestInit = {}, timeoutMs 
     });
   } finally {
     window.clearTimeout(timeout);
-  }
-};
-
-export const isApiAvailable = async (): Promise<boolean> => {
-  try {
-    const response = await fetchWithTimeout('/api/health');
-    return response.ok;
-  } catch {
-    return false;
   }
 };
 
@@ -83,25 +73,6 @@ export const checkBackendStatus = async (): Promise<BackendStatus> => {
   }
 };
 
-export const loadApiShoppingList = async (): Promise<ApiShoppingListPayload> => {
-  const response = await fetchWithTimeout('/api/shopping-list', {}, 2_000);
-  if (!response.ok) {
-    throw new Error(`Unable to load backend shopping list: ${response.status}`);
-  }
-
-  const payload = (await response.json()) as { record?: unknown; exists?: unknown };
-  const rawRecord = JSON.stringify(payload.record);
-  const decoded = rawRecord ? decodeShoppingListRecord(rawRecord) : undefined;
-  if (!decoded) {
-    throw new Error('Backend returned an invalid shopping list record');
-  }
-
-  return {
-    record: decoded,
-    exists: payload.exists === true,
-  };
-};
-
 export const loadSharedShoppingList = async (listId: string): Promise<ApiShoppingListPayload> => {
   const response = await fetchWithTimeout(`/api/shared-lists/${listId}`, {}, 2_000);
   if (!response.ok) {
@@ -141,53 +112,4 @@ export const clearSharedShoppingList = async (listId: string): Promise<void> => 
   if (!response.ok) {
     throw new Error(`Unable to clear shared shopping list: ${response.status}`);
   }
-};
-
-export const createSharedShoppingList = async (record: ShoppingListRecord): Promise<string> => {
-  const response = await fetchWithTimeout(
-    '/api/shared-lists',
-    {
-      method: 'POST',
-      body: JSON.stringify({ record }),
-    },
-    2_000,
-  );
-
-  if (!response.ok) {
-    throw new Error(`Unable to create shared shopping list: ${response.status}`);
-  }
-
-  const payload = (await response.json()) as { id?: unknown };
-  if (typeof payload.id !== 'string') {
-    throw new Error('Backend did not return a shared list id');
-  }
-
-  return payload.id;
-};
-
-export const apiRepository: ShoppingListRepository = {
-  load: async () => {
-    const payload = await loadApiShoppingList();
-    return payload.record;
-  },
-  save: async (record) => {
-    const response = await fetchWithTimeout(
-      '/api/shopping-list',
-      {
-        method: 'PUT',
-        body: encodeShoppingListRecord(record),
-      },
-      2_000,
-    );
-
-    if (!response.ok) {
-      throw new Error(`Unable to save backend shopping list: ${response.status}`);
-    }
-  },
-  clear: async () => {
-    const response = await fetchWithTimeout('/api/shopping-list', { method: 'DELETE' }, 2_000);
-    if (!response.ok) {
-      throw new Error(`Unable to clear backend shopping list: ${response.status}`);
-    }
-  },
 };
