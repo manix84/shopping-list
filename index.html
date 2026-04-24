@@ -8,7 +8,7 @@
       name="description"
       content="Paste a shopping list, auto-sort it into store sections, and share a cleaner shopping plan with quantities, sizes, and route metadata."
     />
-    <meta name="theme-color" content="#0f172a" />
+    <meta name="theme-color" content="#f6f7fb" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Smart Shopping List" />
@@ -52,12 +52,13 @@
         }
 
         const resolved = mode === 'system' ? (isDarkMode() ? 'dark' : 'light') : mode;
+        const themeColorValue = resolved === 'dark' ? '#0b1220' : '#f6f7fb';
         document.documentElement.dataset.theme = resolved;
         document.documentElement.lang = locale === 'en' ? 'en-GB' : locale;
 
         const themeColor = document.querySelector('meta[name="theme-color"]');
         if (themeColor) {
-          themeColor.setAttribute('content', resolved === 'dark' ? '#0b1220' : '#0f172a');
+          themeColor.setAttribute('content', themeColorValue);
         }
 
         const browserIcon = document.querySelector('#browser-theme-icon');
