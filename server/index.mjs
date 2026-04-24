@@ -7,9 +7,11 @@ import {
   clearShoppingList,
   createSharedList,
   getDatabaseStatus,
+  getSettings,
   getSharedList,
   getShoppingList,
   isSharedListId,
+  saveSettings,
   saveSharedList,
   saveShoppingList,
 } from './database.mjs';
@@ -73,6 +75,12 @@ const isShoppingListRecord = (value) =>
   typeof value.updatedAt === 'string' &&
   typeof value.countryCode === 'string';
 
+const isSettingsRecord = (value) =>
+  value &&
+  typeof value === 'object' &&
+  ['ca', 'uk', 'us'].includes(value.countryCode) &&
+  typeof value.updatedAt === 'string';
+
 const handleApi = async (request, response, path) => {
   if (request.method === 'OPTIONS') {
     sendJson(response, 204, {});
@@ -86,6 +94,22 @@ const handleApi = async (request, response, path) => {
 
   if (request.method === 'GET' && path === '/api/database/status') {
     sendJson(response, 200, await getDatabaseStatus());
+    return;
+  }
+
+  if (request.method === 'GET' && path === '/api/settings') {
+    sendJson(response, 200, await getSettings());
+    return;
+  }
+
+  if (request.method === 'PUT' && path === '/api/settings') {
+    const record = await readJsonBody(request);
+    if (!isSettingsRecord(record)) {
+      sendJson(response, 400, { error: 'Invalid settings record' });
+      return;
+    }
+
+    sendJson(response, 200, await saveSettings(record));
     return;
   }
 

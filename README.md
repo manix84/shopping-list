@@ -19,10 +19,10 @@ A React + TypeScript shopping list app with country-aware routing, compact item 
 
 The app uses hash-based routing so direct links work on GitHub Pages:
 
-- `#/edit` - list editor
-- `#/route` - store route
+- `#/edit` - list editor, used when there is no saved list yet or when editing an existing list
+- `#/route` - shopping list route view
 - `#/sections` - read-only section and route-order reference
-- `#/settings` - country and theme preferences
+- `#/settings` - language, country profile, and theme preferences
 - `#/debug` - parser self-checks
 
 If a page needs data that is not available yet, it shows a warning and points you to the page that can populate it.
@@ -41,7 +41,7 @@ The app can run in two modes:
 - frontend-only mode uses browser `localStorage` and works as a static site
 - backend mode is enabled automatically when `/api/health` responds
 
-When backend mode is available, the app loads the browser record and the backend record, chooses the newest saved record using `updatedAt`, writes that winning record to both places, then keeps saving future edits to both local cache and the backend.
+When backend mode is available, the app loads the browser record and the backend record, chooses the newest saved record using `updatedAt`, writes that winning record to both places, then keeps saving future edits to both local cache and the backend. The country profile is also stored in the backend settings record and cached locally for offline use. Language remains a browser preference and defaults from the user's browser language.
 
 Run the backend API:
 
@@ -95,6 +95,8 @@ Anyone with the link can edit the same list. Changes are saved to the shared bac
 
 Shared list API routes:
 
+- `GET /api/settings`
+- `PUT /api/settings`
 - `POST /api/shared-lists`
 - `GET /api/shared-lists/:id`
 - `PUT /api/shared-lists/:id`

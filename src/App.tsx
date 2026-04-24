@@ -13,7 +13,9 @@ import { getDisplayValue, getStoredValue, parseItems } from './lib/parser';
 import {
   checkBackendStatus,
   clearSharedShoppingList,
+  loadAppSettings,
   loadSharedShoppingList,
+  saveAppSettings,
   saveSharedShoppingList,
 } from './lib/repository/apiRepository';
 import {
@@ -33,6 +35,7 @@ import { RoutePage } from './pages/RoutePage';
 import { SectionsPage } from './pages/SectionsPage';
 import { SettingsPage } from './pages/SettingsPage';
 import type { AppRoute, BackendStatus, CountryCode, GroupedSectionView, Item, PageKey, SectionKey, ThemeMode } from './types';
+import type { ApiSettingsPayload } from './lib/repository/apiRepository';
 
 const DEFAULT_PAGE: PageKey = 'edit';
 type StorageMode = 'local' | 'backend';
@@ -90,6 +93,59 @@ const buildRecord = (
   updatedAt: new Date().toISOString(),
   countryCode,
 });
+
+const settingsRecord = (countryCode: CountryCode) => ({
+  countryCode,
+  updatedAt: new Date().toISOString(),
+});
+
+const chooseCountryCode = ({
+  backendSettings,
+  hasLocalRecord,
+  localCountryCode,
+  localUpdatedAt,
+}: {
+  backendSettings: ApiSettingsPayload;
+  hasLocalRecord: boolean;
+  localCountryCode: CountryCode;
+  localUpdatedAt: string;
+}) => {
+  if (!backendSettings.exists) return { countryCode: localCountryCode, shouldSave: true };
+  if (!hasLocalRecord) return { countryCode: backendSettings.record.countryCode, shouldSave: false };
+
+  const localTime = Date.parse(localUpdatedAt);
+  const backendTime = Date.parse(backendSettings.record.updatedAt);
+  if (Number.isFinite(localTime) && Number.isFinite(backendTime) && localTime > backendTime) {
+    return { countryCode: localCountryCode, shouldSave: true };
+  }
+
+  return { countryCode: backendSettings.record.countryCode, shouldSave: false };
+};
+
+const fallbackSettingsPayload = (countryCode: CountryCode, updatedAt: string): ApiSettingsPayload => ({
+  exists: false,
+  record: {
+    countryCode,
+    updatedAt,
+  },
+});
+
+const loadAppSettingsOrFallback = async (countryCode: CountryCode, updatedAt: string): Promise<ApiSettingsPayload> => {
+  try {
+    return await loadAppSettings();
+  } catch (error) {
+    console.warn('Unable to load backend settings. Using local country profile fallback.', error);
+    return fallbackSettingsPayload(countryCode, updatedAt);
+  }
+};
+
+const saveAppSettingsIfAvailable = async (countryCode: CountryCode): Promise<void> => {
+  try {
+    await saveAppSettings(settingsRecord(countryCode));
+  } catch (error) {
+    console.warn('Unable to save country profile to backend settings.', error);
+  }
+};
 
 function updateItemTextInInput(input: string, previousDisplay: string, nextDisplay: string): string {
   const lines = input.split('\n');
@@ -175,6 +231,16 @@ export default function App() {
 
       if (initialBackendStatus.state === 'connected') {
         try {
+          const backendSettings = await loadAppSettingsOrFallback(
+            localRecordWithIdentity.countryCode,
+            localRecordWithIdentity.updatedAt,
+          );
+          const selectedCountry = chooseCountryCode({
+            backendSettings,
+            hasLocalRecord,
+            localCountryCode: localRecordWithIdentity.countryCode,
+            localUpdatedAt: localRecordWithIdentity.updatedAt,
+          });
           const remotePayload = await loadSharedShoppingList(nextListId);
           selectedRecord = {
             ...chooseNewestRecord({
@@ -185,8 +251,12 @@ export default function App() {
             }),
             listId: nextListId,
             serverBacked: true,
+            countryCode: selectedCountry.countryCode,
           };
 
+          if (selectedCountry.shouldSave) {
+            void saveAppSettingsIfAvailable(selectedCountry.countryCode);
+          }
           await saveSharedShoppingList(nextListId, selectedRecord);
           localStorageRepository.save(selectedRecord);
           nextStorageMode = 'backend';
@@ -213,11 +283,7 @@ export default function App() {
       }));
       setCountryCode(selectedRecord.countryCode);
       setInput(selectedRecord.input);
-      setItems(
-        selectedRecord.items.length
-          ? selectedRecord.items
-          : parseItems(selectedRecord.input, COUNTRY_CONFIGS[selectedRecord.countryCode]),
-      );
+      setItems(parseItems(selectedRecord.input, COUNTRY_CONFIGS[selectedRecord.countryCode], selectedRecord.items));
       setIsLoaded(true);
     };
 
@@ -244,6 +310,13 @@ export default function App() {
     const connectBackend = async () => {
       try {
         const localRecord = localStorageRepository.load();
+        const backendSettings = await loadAppSettingsOrFallback(localRecord.countryCode, localRecord.updatedAt);
+        const selectedCountry = chooseCountryCode({
+          backendSettings,
+          hasLocalRecord: hasStoredShoppingListRecord(),
+          localCountryCode: localRecord.countryCode,
+          localUpdatedAt: localRecord.updatedAt,
+        });
         const remotePayload = await loadSharedShoppingList(activeListId);
         const selectedRecord = {
           ...chooseNewestRecord({
@@ -254,8 +327,12 @@ export default function App() {
           }),
           listId: activeListId,
           serverBacked: true,
+          countryCode: selectedCountry.countryCode,
         };
 
+        if (selectedCountry.shouldSave) {
+          void saveAppSettingsIfAvailable(selectedCountry.countryCode);
+        }
         await saveSharedShoppingList(activeListId, selectedRecord);
         localStorageRepository.save(selectedRecord);
         setStorageMode('backend');
@@ -266,11 +343,7 @@ export default function App() {
         }));
         setCountryCode(selectedRecord.countryCode);
         setInput(selectedRecord.input);
-        setItems(
-          selectedRecord.items.length
-            ? selectedRecord.items
-            : parseItems(selectedRecord.input, COUNTRY_CONFIGS[selectedRecord.countryCode]),
-        );
+        setItems(parseItems(selectedRecord.input, COUNTRY_CONFIGS[selectedRecord.countryCode], selectedRecord.items));
       } catch (error) {
         console.warn('Backend reconnected but could not be merged. Staying in local storage mode.', error);
         setBackendStatus((current) => ({
@@ -435,6 +508,10 @@ export default function App() {
   const handleCountryChange = (nextCountryCode: CountryCode) => {
     setCountryCode(nextCountryCode);
     setItems((current) => parseItems(input, COUNTRY_CONFIGS[nextCountryCode], current));
+
+    if (backendStatus.state === 'connected') {
+      void saveAppSettingsIfAvailable(nextCountryCode);
+    }
   };
 
   const toggleItem = (id: string) => {
@@ -456,7 +533,7 @@ export default function App() {
     setIsServerBackedList(record.serverBacked === true);
     setCountryCode(record.countryCode);
     setInput(record.input);
-    setItems(record.items.length ? record.items : parseItems(record.input, COUNTRY_CONFIGS[record.countryCode]));
+    setItems(parseItems(record.input, COUNTRY_CONFIGS[record.countryCode], record.items));
   };
 
   const handleCreateSharedLink = async () => {

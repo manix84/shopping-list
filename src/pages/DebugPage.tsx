@@ -23,11 +23,7 @@ const backendSummary = (status: BackendStatus, messages: Messages): string => {
   return messages.pages.debug.backendOffline;
 };
 
-const backendTone = (status: BackendStatus) => {
-  if (status.state === 'connected') return 'success' as const;
-  if (status.state === 'error') return 'danger' as const;
-  return 'muted' as const;
-};
+const checkTone = (passed: boolean) => (passed ? ('success' as const) : ('danger' as const));
 
 const backendStateLabel = (status: BackendStatus, messages: Messages) => {
   if (status.state === 'connected') return messages.backendStatus.connected;
@@ -36,11 +32,7 @@ const backendStateLabel = (status: BackendStatus, messages: Messages) => {
   return messages.backendStatus.frontendOnly;
 };
 
-const backendLabel = (status: BackendStatus, messages: Messages) => {
-  if (status.state === 'connected') return messages.pages.debug.pass;
-  if (status.state === 'error') return messages.pages.debug.fail;
-  return messages.pages.debug.unavailable;
-};
+const checkLabel = (passed: boolean, messages: Messages) => (passed ? messages.pages.debug.pass : messages.pages.debug.fail);
 
 export function DebugPage({
   backendStatus,
@@ -95,8 +87,8 @@ export function DebugPage({
               : `${messages.labels.state} ${backendStateLabel(backendStatus, messages)}`
           }
           passed={backendStatus.health.ok}
-          tone={backendTone(backendStatus)}
-          label={backendLabel(backendStatus, messages)}
+          tone={checkTone(backendStatus.health.ok)}
+          label={checkLabel(backendStatus.health.ok, messages)}
         />
         <TestResultCard
           title={messages.pages.debug.databaseTitle}
@@ -107,12 +99,14 @@ export function DebugPage({
                   backendStatus.database.shoppingListExists ? messages.labels.exists : messages.labels.empty
                 }, ${messages.labels.sharedLists} ${
                   backendStatus.database.sharedListCount ?? 0
+                }, ${messages.labels.countryProfile} ${
+                  backendStatus.database.settingsCountryCode ?? messages.labels.unknown
                 }, ${messages.labels.updated} ${backendStatus.database.updatedAt ?? messages.labels.unknown}`
               : `${messages.labels.state} ${backendStateLabel(backendStatus, messages)}`
           }
           passed={backendStatus.database.ok}
-          tone={backendTone(backendStatus)}
-          label={backendLabel(backendStatus, messages)}
+          tone={checkTone(backendStatus.database.ok)}
+          label={checkLabel(backendStatus.database.ok, messages)}
         />
       </Card>
 
