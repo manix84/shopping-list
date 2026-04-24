@@ -3,6 +3,7 @@ import { mdiDeleteOutline, mdiDownloadOutline } from '@mdi/js';
 import QRCode from 'qrcode';
 import type { SharedListHistoryEntry } from '../types';
 import { useI18n } from '../lib/i18n';
+import { extractSharedListId } from '../lib/sharedLinks';
 
 type BarcodeDetectorResult = {
   rawValue?: string;
@@ -45,6 +46,7 @@ const formatTimestamp = (value: string | undefined, locale: string): string =>
 const QR_CANVAS_SIZE = 320;
 const QR_LOGO_SIZE = 72;
 const HISTORY_CARD_TAP_THRESHOLD_PX = 10;
+const appBasePath = import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_URL.replace(/\/$/, '');
 const logoPath = (theme: 'light' | 'dark'): string =>
   `${import.meta.env.BASE_URL}${theme === 'dark' ? 'favicon-dark.svg' : 'favicon-light.svg'}`;
 
@@ -126,6 +128,7 @@ export function SharedListPanel({
   const [scannerOpen, setScannerOpen] = useState(false);
   const [scannerMessage, setScannerMessage] = useState<string>();
   const [scannerState, setScannerState] = useState<ScannerState>('scanning');
+  const [scannerSupported, setScannerSupported] = useState(false);
   const [sharedInput, setSharedInput] = useState('');
   const [sharedInputStatus, setSharedInputStatus] = useState<SharedInputStatus>('idle');
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -185,6 +188,11 @@ export function SharedListPanel({
       cancelled = true;
     };
   }, [resolvedTheme, shareLink]);
+
+  useEffect(() => {
+    const BarcodeDetectorApi = (window as Window & { BarcodeDetector?: BarcodeDetectorConstructor }).BarcodeDetector;
+    setScannerSupported(Boolean(BarcodeDetectorApi && navigator.mediaDevices?.getUserMedia));
+  }, []);
 
   useEffect(() => {
     if (!canUseBackend || !sharedInput.trim()) {
@@ -437,6 +445,10 @@ export function SharedListPanel({
     event.preventDefault();
     void onLoadHistoryEntry(listId);
   };
+  const normalizeSharedInput = (value: string): string => {
+    const normalized = extractSharedListId(value, appBasePath, window.location.origin);
+    return normalized ?? value;
+  };
 
   return (
     <div className="stack">
@@ -496,7 +508,14 @@ export function SharedListPanel({
                   id="shared-list-load-input"
                   className="input shared-input"
                   value={sharedInput}
-                  onChange={(event) => setSharedInput(event.target.value)}
+                  onChange={(event) => setSharedInput(normalizeSharedInput(event.target.value))}
+                  onPaste={(event) => {
+                    const pastedText = event.clipboardData.getData('text');
+                    const normalized = normalizeSharedInput(pastedText);
+                    if (normalized === pastedText) return;
+                    event.preventDefault();
+                    setSharedInput(normalized);
+                  }}
                   placeholder={messages.sharing.manualLinkPlaceholder}
                 />
                 {showSharedInputTick ? (
@@ -513,9 +532,11 @@ export function SharedListPanel({
               >
                 {messages.actions.loadSharedList}
               </button>
-              <button type="button" className="button" onClick={() => setScannerOpen(true)}>
-                {messages.actions.scanQrCode}
-              </button>
+              {scannerSupported ? (
+                <button type="button" className="button" onClick={() => setScannerOpen(true)}>
+                  {messages.actions.scanQrCode}
+                </button>
+              ) : null}
             </div>
           </div>
         </>
