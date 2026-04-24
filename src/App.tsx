@@ -2,6 +2,13 @@ import { useEffect, useMemo, useState } from 'react';
 import { COUNTRY_CONFIGS } from './config/countries';
 import { AppHeader } from './components/AppHeader';
 import { runMatcherTests, runQuantityTests, runStorageTests } from './lib/debugTests';
+import {
+  applyDocumentLocale,
+  createMessages,
+  I18nProvider,
+  loadLocale,
+  saveLocale,
+} from './lib/i18n';
 import { getDisplayValue, getStoredValue, parseItems } from './lib/parser';
 import {
   checkBackendStatus,
@@ -29,6 +36,7 @@ import type { AppRoute, BackendStatus, CountryCode, GroupedSectionView, Item, Pa
 
 const DEFAULT_PAGE: PageKey = 'edit';
 type StorageMode = 'local' | 'backend';
+type ShareErrorKey = 'connectBackendFirst' | 'createFailed' | 'refreshMissing' | 'refreshFailed' | 'offlineBackup';
 
 const defaultBackendStatus = (): BackendStatus => ({
   state: 'checking',
@@ -95,17 +103,20 @@ export default function App() {
   const [isServerBackedList, setIsServerBackedList] = useState(false);
   const [countryCode, setCountryCode] = useState<CountryCode>('uk');
   const [themeMode, setThemeMode] = useState<ThemeMode>(() => loadThemeMode());
+  const [locale, setLocale] = useState(() => loadLocale());
   const [isCreatingShareLink, setIsCreatingShareLink] = useState(false);
   const [isRefreshingSharedList, setIsRefreshingSharedList] = useState(false);
-  const [shareError, setShareError] = useState<string>();
+  const [shareError, setShareError] = useState<ShareErrorKey>();
 
   const config = useMemo(() => COUNTRY_CONFIGS[countryCode], [countryCode]);
+  const messages = useMemo(() => createMessages(locale), [locale]);
   const { page, listId } = route;
   const canUseBackend = backendStatus.state === 'connected';
   const shareLink =
     typeof window === 'undefined' || !isServerBackedList
       ? undefined
       : `${window.location.origin}${appBasePath}/list/${activeListId}/edit`;
+  const shareErrorMessage = shareError ? messages.sharing[shareError] : undefined;
 
   const changePage = (nextPage: PageKey) => {
     setRoute((current) => ({ ...current, page: nextPage }));
@@ -147,7 +158,7 @@ export default function App() {
       }
 
       if (initialBackendStatus.state !== 'connected' && nextServerBacked) {
-        setShareError('Backend is offline. Showing the local backup for this shared list.');
+        setShareError('offlineBackup');
       }
 
       if (initialBackendStatus.state === 'connected') {
@@ -294,6 +305,14 @@ export default function App() {
   }, [themeMode]);
 
   useEffect(() => {
+    saveLocale(locale);
+    applyDocumentLocale(locale);
+    if (typeof document !== 'undefined') {
+      document.title = messages.app.title;
+    }
+  }, [locale, messages]);
+
+  useEffect(() => {
     if (!isLoaded) return;
     const record = buildRecord(input, items, countryCode, activeListId, isServerBackedList);
 
@@ -424,7 +443,7 @@ export default function App() {
 
   const handleCreateSharedLink = async () => {
     if (backendStatus.state !== 'connected') {
-      setShareError('Connect the backend before creating a shared link.');
+      setShareError('connectBackendFirst');
       return;
     }
 
@@ -440,7 +459,7 @@ export default function App() {
       setRoute({ page: 'edit', listId: activeListId });
     } catch (error) {
       console.warn('Unable to create shared link.', error);
-      setShareError('Could not create the shared link.');
+      setShareError('createFailed');
     } finally {
       setIsCreatingShareLink(false);
     }
@@ -456,10 +475,10 @@ export default function App() {
       const remotePayload = await loadSharedShoppingList(activeListId);
       applyRecord({ ...remotePayload.record, listId: activeListId, serverBacked: true });
       setStorageMode('backend');
-      setShareError(remotePayload.exists ? undefined : 'This shared list does not exist yet. Edits will create it.');
+      setShareError(remotePayload.exists ? undefined : 'refreshMissing');
     } catch (error) {
       console.warn('Unable to refresh shared list.', error);
-      setShareError('Could not refresh the shared list.');
+      setShareError('refreshFailed');
     } finally {
       setIsRefreshingSharedList(false);
     }
@@ -486,78 +505,80 @@ export default function App() {
   };
 
   return (
-    <div className="shopping-app">
-      <div className="shopping-shell">
-        <AppHeader page={page} backendStatus={backendStatus} onChangePage={changePage} />
+    <I18nProvider value={{ locale, messages, setLocale }}>
+      <div className="shopping-app">
+        <div className="shopping-shell">
+          <AppHeader page={page} backendStatus={backendStatus} onChangePage={changePage} />
 
-        {page === 'edit' ? (
-          <EditPage
-            input={input}
-            items={items}
-            draftItem={draftItem}
-            total={total}
-            checkedTotal={checkedTotal}
-            progress={progress}
-            config={config}
-            onInputChange={setInput}
-            onDraftItemChange={setDraftItem}
-            onParse={handleParse}
-            onResetAll={resetAll}
-            onAddSingleItem={handleAddSingleItem}
-            onRenameItem={handleRenameItem}
-            onToggleItem={toggleItem}
-            onDeleteItem={handleDeleteItem}
-            onCreateSharedLink={handleCreateSharedLink}
-            onRefreshSharedList={handleRefreshSharedList}
-            onOpenDebug={() => changePage('debug')}
-            canUseBackend={canUseBackend}
-            shareLink={shareLink}
-            isCreatingShareLink={isCreatingShareLink}
-            isRefreshingSharedList={isRefreshingSharedList}
-            shareError={shareError}
-          />
-        ) : null}
+          {page === 'edit' ? (
+            <EditPage
+              input={input}
+              items={items}
+              draftItem={draftItem}
+              total={total}
+              checkedTotal={checkedTotal}
+              progress={progress}
+              config={config}
+              onInputChange={setInput}
+              onDraftItemChange={setDraftItem}
+              onParse={handleParse}
+              onResetAll={resetAll}
+              onAddSingleItem={handleAddSingleItem}
+              onRenameItem={handleRenameItem}
+              onToggleItem={toggleItem}
+              onDeleteItem={handleDeleteItem}
+              onCreateSharedLink={handleCreateSharedLink}
+              onRefreshSharedList={handleRefreshSharedList}
+              onOpenDebug={() => changePage('debug')}
+              canUseBackend={canUseBackend}
+              shareLink={shareLink}
+              isCreatingShareLink={isCreatingShareLink}
+              isRefreshingSharedList={isRefreshingSharedList}
+              shareError={shareErrorMessage}
+            />
+          ) : null}
 
-        {page === 'route' ? (
-          <RoutePage
-            query={query}
-            grouped={grouped}
-            hasItems={items.length > 0}
-            onQueryChange={setQuery}
-            onResetChecks={resetChecks}
-            onResort={handleParse}
-            onToggleSection={toggleSection}
-            onToggleItem={toggleItem}
-            onOpenEdit={() => changePage('edit')}
-          />
-        ) : null}
+          {page === 'route' ? (
+            <RoutePage
+              query={query}
+              grouped={grouped}
+              hasItems={items.length > 0}
+              onQueryChange={setQuery}
+              onResetChecks={resetChecks}
+              onResort={handleParse}
+              onToggleSection={toggleSection}
+              onToggleItem={toggleItem}
+              onOpenEdit={() => changePage('edit')}
+            />
+          ) : null}
 
-        {page === 'settings' ? (
-          <SettingsPage
-            countryCode={countryCode}
-            themeMode={themeMode}
-            onCountryChange={handleCountryChange}
-            onThemeChange={setThemeMode}
-            onOpenDebug={() => changePage('debug')}
-          />
-        ) : null}
+          {page === 'settings' ? (
+            <SettingsPage
+              countryCode={countryCode}
+              themeMode={themeMode}
+              onCountryChange={handleCountryChange}
+              onThemeChange={setThemeMode}
+              onOpenDebug={() => changePage('debug')}
+            />
+          ) : null}
 
-        {page === 'sections' ? <SectionsPage config={config} /> : null}
+          {page === 'sections' ? <SectionsPage config={config} /> : null}
 
-        {page === 'debug' ? (
-          <DebugPage
-            backendStatus={backendStatus}
-            matcherTests={matcherTests}
-            quantityTests={quantityTests}
-            storageTests={storageTests}
-            matcherHasFailures={matcherTests.some((test) => !test.passed)}
-            quantityHasFailures={quantityTests.some((test) => !test.passed)}
-            storageHasFailures={storageTests.some((test) => !test.passed)}
-            onBackToEdit={() => changePage('edit')}
-            onBackToSettings={() => changePage('settings')}
-          />
-        ) : null}
+          {page === 'debug' ? (
+            <DebugPage
+              backendStatus={backendStatus}
+              matcherTests={matcherTests}
+              quantityTests={quantityTests}
+              storageTests={storageTests}
+              matcherHasFailures={matcherTests.some((test) => !test.passed)}
+              quantityHasFailures={quantityTests.some((test) => !test.passed)}
+              storageHasFailures={storageTests.some((test) => !test.passed)}
+              onBackToEdit={() => changePage('edit')}
+              onBackToSettings={() => changePage('settings')}
+            />
+          ) : null}
+        </div>
       </div>
-    </div>
+    </I18nProvider>
   );
 }

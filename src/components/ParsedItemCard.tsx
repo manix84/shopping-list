@@ -1,7 +1,8 @@
 import type { Item, CountryConfig } from '../types';
-import { getDisplayValue, getQuantityDisplayValue, getSizeDisplayValue } from '../lib/parser';
+import { getDisplayValue, getQuantityValue, getSizeValue } from '../lib/parser';
 import { getSectionMeta } from '../lib/sections';
 import { Badge } from './Badge';
+import { useI18n } from '../lib/i18n';
 
 type ParsedItemCardProps = {
   item: Item;
@@ -12,6 +13,7 @@ type ParsedItemCardProps = {
 };
 
 export function ParsedItemCard({ item, config, onRename, onToggle, onDelete }: ParsedItemCardProps) {
+  const { messages } = useI18n();
   const meta = getSectionMeta(config, item.matchedSection);
   const displayValue = getDisplayValue(item);
 
@@ -30,16 +32,34 @@ export function ParsedItemCard({ item, config, onRename, onToggle, onDelete }: P
             }}
           />
           <div className="badge-row">
-            <Badge>Cleaned: {item.cleaned}</Badge>
-            <Badge>Section: {meta.label}</Badge>
-            <Badge>Group: {meta.groupLabel}</Badge>
-            {getSizeDisplayValue(item) ? <Badge>{getSizeDisplayValue(item)}</Badge> : null}
-            {getQuantityDisplayValue(item) ? <Badge>{getQuantityDisplayValue(item)}</Badge> : null}
+            <Badge>
+              {messages.labels.cleaned}: {item.cleaned}
+            </Badge>
+            <Badge>
+              {messages.labels.section}: {meta.label}
+            </Badge>
+            <Badge>
+              {messages.labels.group}: {meta.groupLabel}
+            </Badge>
+            {getSizeValue(item) ? (
+              <Badge>
+                {messages.labels.size}: {getSizeValue(item)}
+              </Badge>
+            ) : null}
+            {getQuantityValue(item) ? (
+              <Badge>
+                {messages.labels.qty}: {getQuantityValue(item)}
+              </Badge>
+            ) : null}
           </div>
         </div>
         <div className="button-row">
-          <button className="button" onClick={() => onToggle(item.id)}>{item.checked ? 'Untick' : 'Tick'}</button>
-          <button className="button button-danger" onClick={() => onDelete(item.id)}>Remove</button>
+          <button type="button" className="button" onClick={() => onToggle(item.id)}>
+            {item.checked ? messages.actions.untick : messages.actions.tick}
+          </button>
+          <button type="button" className="button button-danger" onClick={() => onDelete(item.id)}>
+            {messages.actions.remove}
+          </button>
         </div>
       </div>
     </div>

@@ -2,7 +2,7 @@ import { COUNTRY_CONFIGS } from '../config/countries';
 import type { CountryCode, ThemeMode } from '../types';
 import { Card } from '../components/Card';
 import { DebugLink } from '../components/DebugLink';
-import { getThemeLabel } from '../lib/themePreference';
+import { type LocaleCode, useI18n } from '../lib/i18n';
 
 type SettingsPageProps = {
   countryCode: CountryCode;
@@ -13,18 +13,20 @@ type SettingsPageProps = {
 };
 
 export function SettingsPage({ countryCode, themeMode, onCountryChange, onThemeChange, onOpenDebug }: SettingsPageProps) {
+  const { locale, setLocale, messages } = useI18n();
+
   return (
     <Card
       header={
         <>
-          <h2 className="title title-md">Settings</h2>
-          <p className="subtitle">Preferences that affect how this device displays and groups shopping lists.</p>
+          <h2 className="title title-md">{messages.pages.settings.title}</h2>
+          <p className="subtitle">{messages.pages.settings.subtitle}</p>
         </>
       }
       bodyClassName="stack"
     >
       <div className="field field-compact">
-        <label htmlFor="country-select">Country profile</label>
+        <label htmlFor="country-select">{messages.pages.settings.countryLabel}</label>
         <select
           id="country-select"
           className="select"
@@ -43,18 +45,34 @@ export function SettingsPage({ countryCode, themeMode, onCountryChange, onThemeC
       </div>
 
       <div className="field field-compact">
-        <label htmlFor="theme-select">Theme</label>
+        <label htmlFor="theme-select">{messages.pages.settings.themeLabel}</label>
         <select
           id="theme-select"
           className="select"
           value={themeMode}
           onChange={(event) => onThemeChange(event.target.value as ThemeMode)}
         >
-          <option value="system">{getThemeLabel('system')}</option>
-          <option value="light">{getThemeLabel('light')}</option>
-          <option value="dark">{getThemeLabel('dark')}</option>
+          <option value="system">{messages.themeOptions.system}</option>
+          <option value="light">{messages.themeOptions.light}</option>
+          <option value="dark">{messages.themeOptions.dark}</option>
         </select>
-        <div className="small-text">Stored locally on this device only.</div>
+        <div className="small-text">{messages.labels.storedLocally}</div>
+      </div>
+
+      <div className="field field-compact">
+        <label htmlFor="locale-select">{messages.pages.settings.localeLabel}</label>
+        <select
+          id="locale-select"
+          className="select"
+          value={locale}
+          onChange={(event) => setLocale(event.target.value as LocaleCode)}
+        >
+          {Object.entries(messages.localeOptions).map(([value, label]) => (
+            <option key={value} value={value}>
+              {label}
+            </option>
+          ))}
+        </select>
       </div>
 
       <DebugLink onOpen={onOpenDebug} />

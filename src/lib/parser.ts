@@ -20,8 +20,15 @@ export const getDisplayValue = (item: Item): string => getDisplayName(item);
 export const getSizeDisplayValue = (item: Item): string | undefined =>
   typeof item.sizeValue === 'string' ? `Size: ${item.sizeValue}` : undefined;
 
+export const getSizeValue = (item: Item): string | undefined => item.sizeValue;
+
 export const getQuantityDisplayValue = (item: Item): string | undefined => {
   if (typeof item.quantityValue === 'number') return `Qty: ${item.quantityValue}`;
+  return item.quantity;
+};
+
+export const getQuantityValue = (item: Item): string | undefined => {
+  if (typeof item.quantityValue === 'number') return String(item.quantityValue);
   return item.quantity;
 };
 

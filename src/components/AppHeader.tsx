@@ -1,6 +1,9 @@
+import { useEffect, useState } from 'react';
+import { Badge } from './Badge';
 import { Card } from './Card';
 import { PageTabs } from './PageTabs';
-import { Badge } from './Badge';
+import { useI18n } from '../lib/i18n';
+import type { Messages } from '../lib/i18n';
 import type { BackendStatus, PageKey } from '../types';
 
 type AppHeaderProps = {
@@ -9,15 +12,26 @@ type AppHeaderProps = {
   onChangePage: (page: PageKey) => void;
 };
 
-const backendBadge = (status: BackendStatus) => {
-  if (status.state === 'connected') return { tone: 'success' as const, label: 'Backend connected' };
-  if (status.state === 'checking') return { tone: 'muted' as const, label: 'Backend checking' };
-  if (status.state === 'error') return { tone: 'danger' as const, label: 'Backend issue' };
-  return { tone: 'muted' as const, label: 'Frontend only' };
+const backendBadge = (status: BackendStatus, messages: Messages) => {
+  if (status.state === 'connected') return { tone: 'success' as const, label: messages.backendStatus.connected };
+  if (status.state === 'checking') return { tone: 'muted' as const, label: messages.backendStatus.checking };
+  if (status.state === 'error') return { tone: 'danger' as const, label: messages.backendStatus.issue };
+  return { tone: 'muted' as const, label: messages.backendStatus.frontendOnly };
 };
 
 export function AppHeader({ page, backendStatus, onChangePage }: AppHeaderProps) {
-  const badge = backendBadge(backendStatus);
+  const { messages } = useI18n();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const badge = backendBadge(backendStatus, messages);
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [page]);
+
+  const handleChangePage = (nextPage: PageKey) => {
+    setMobileMenuOpen(false);
+    onChangePage(nextPage);
+  };
 
   return (
     <Card
@@ -26,13 +40,37 @@ export function AppHeader({ page, backendStatus, onChangePage }: AppHeaderProps)
           <div className="title-block">
             <div className="app-icon">🛒</div>
             <div>
-              <h1 className="title">Smart Shopping List</h1>
-              <p className="subtitle">Country-aware supermarket routing, with the UK setup as the default.</p>
+              <h1 className="title">{messages.app.title}</h1>
+              <p className="subtitle">{messages.app.subtitle}</p>
             </div>
           </div>
+
           <div className="header-actions">
             <Badge tone={badge.tone}>{badge.label}</Badge>
-            <PageTabs page={page} onChange={onChangePage} />
+            <PageTabs page={page} onChange={handleChangePage} />
+
+            <div className="mobile-menu-shell">
+              <button
+                type="button"
+                className="button mobile-menu-trigger"
+                aria-expanded={mobileMenuOpen}
+                aria-controls="mobile-menu-panel"
+                onClick={() => setMobileMenuOpen((current) => !current)}
+              >
+                <span className="sr-only">{messages.mobileMenu.openNavigation}</span>
+                <span aria-hidden="true" className="mobile-menu-icon">
+                  <span />
+                  <span />
+                  <span />
+                </span>
+              </button>
+
+              {mobileMenuOpen ? (
+                <div id="mobile-menu-panel" className="mobile-menu-panel">
+                  <PageTabs page={page} onChange={handleChangePage} />
+                </div>
+              ) : null}
+            </div>
           </div>
         </div>
       }

@@ -1,6 +1,8 @@
 import type { BackendStatus, MatcherTestResult, QuantityTestResult, StorageTestResult } from '../types';
 import { Card } from '../components/Card';
 import { TestResultCard } from '../components/TestResultCard';
+import { useI18n } from '../lib/i18n';
+import type { Messages } from '../lib/i18n';
 
 type DebugPageProps = {
   backendStatus: BackendStatus;
@@ -14,11 +16,11 @@ type DebugPageProps = {
   onBackToSettings: () => void;
 };
 
-const backendSummary = (status: BackendStatus): string => {
-  if (status.state === 'connected') return 'Backend API and database are available.';
-  if (status.state === 'checking') return 'Backend status is being checked.';
-  if (status.state === 'error') return 'Backend responded, but one or more checks failed.';
-  return 'Backend is offline; the app is using frontend-only storage.';
+const backendSummary = (status: BackendStatus, messages: Messages): string => {
+  if (status.state === 'connected') return messages.pages.debug.backendConnected;
+  if (status.state === 'checking') return messages.pages.debug.backendChecking;
+  if (status.state === 'error') return messages.pages.debug.backendError;
+  return messages.pages.debug.backendOffline;
 };
 
 const backendTone = (status: BackendStatus) => {
@@ -27,10 +29,17 @@ const backendTone = (status: BackendStatus) => {
   return 'muted' as const;
 };
 
-const backendLabel = (status: BackendStatus) => {
-  if (status.state === 'connected') return 'Pass';
-  if (status.state === 'error') return 'Fail';
-  return 'Unavailable';
+const backendStateLabel = (status: BackendStatus, messages: Messages) => {
+  if (status.state === 'connected') return messages.backendStatus.connected;
+  if (status.state === 'checking') return messages.backendStatus.checking;
+  if (status.state === 'error') return messages.backendStatus.issue;
+  return messages.backendStatus.frontendOnly;
+};
+
+const backendLabel = (status: BackendStatus, messages: Messages) => {
+  if (status.state === 'connected') return messages.pages.debug.pass;
+  if (status.state === 'error') return messages.pages.debug.fail;
+  return messages.pages.debug.unavailable;
 };
 
 export function DebugPage({
@@ -44,17 +53,23 @@ export function DebugPage({
   onBackToEdit,
   onBackToSettings,
 }: DebugPageProps) {
+  const { messages } = useI18n();
+
   return (
     <Card
       header={
         <div className="title-row">
           <div>
-            <h2 className="title title-md">Debug tools</h2>
-            <p className="subtitle">Self-checks and parser diagnostics live here instead of cluttering the main flow.</p>
+            <h2 className="title title-md">{messages.pages.debug.title}</h2>
+            <p className="subtitle">{messages.pages.debug.subtitle}</p>
           </div>
           <div className="button-row">
-            <button className="button" onClick={onBackToEdit}>Back to edit</button>
-            <button className="button" onClick={onBackToSettings}>Back to settings</button>
+            <button type="button" className="button" onClick={onBackToEdit}>
+              {messages.actions.backToEdit}
+            </button>
+            <button type="button" className="button" onClick={onBackToSettings}>
+              {messages.actions.backToSettings}
+            </button>
           </div>
         </div>
       }
@@ -63,43 +78,49 @@ export function DebugPage({
       <Card
         header={
           <>
-            <h2 className="title title-sm">Backend checks</h2>
-            <p className="subtitle">{backendSummary(backendStatus)}</p>
+            <h2 className="title title-sm">{messages.pages.debug.backendTitle}</h2>
+            <p className="subtitle">{backendSummary(backendStatus, messages)}</p>
           </>
         }
         bodyClassName="stack"
       >
         <TestResultCard
-          title="Backend health"
-          expected="GET /api/health returns OK"
+          title={messages.pages.debug.backendHealthTitle}
+          expected={messages.pages.debug.backendHealthExpected}
           actual={
             backendStatus.state === 'connected' || backendStatus.state === 'error'
-              ? `state ${backendStatus.state}, mode ${backendStatus.health.mode ?? 'unknown'}`
-              : `state ${backendStatus.state}`
+              ? `${messages.labels.state} ${backendStateLabel(backendStatus, messages)}, ${messages.labels.mode} ${
+                  backendStatus.health.mode ?? messages.labels.unknown
+                }`
+              : `${messages.labels.state} ${backendStateLabel(backendStatus, messages)}`
           }
           passed={backendStatus.health.ok}
           tone={backendTone(backendStatus)}
-          label={backendLabel(backendStatus)}
+          label={backendLabel(backendStatus, messages)}
         />
         <TestResultCard
-          title="Database"
-          expected="GET /api/database/status can read the backend store"
+          title={messages.pages.debug.databaseTitle}
+          expected={messages.pages.debug.databaseExpected}
           actual={
             backendStatus.database.ok
-              ? `available, default list ${backendStatus.database.shoppingListExists ? 'exists' : 'empty'}, shared lists ${backendStatus.database.sharedListCount ?? 0}, updated ${backendStatus.database.updatedAt ?? 'unknown'}`
-              : `state ${backendStatus.state}`
+              ? `${messages.labels.available}, ${messages.labels.defaultList} ${
+                  backendStatus.database.shoppingListExists ? messages.labels.exists : messages.labels.empty
+                }, ${messages.labels.sharedLists} ${
+                  backendStatus.database.sharedListCount ?? 0
+                }, ${messages.labels.updated} ${backendStatus.database.updatedAt ?? messages.labels.unknown}`
+              : `${messages.labels.state} ${backendStateLabel(backendStatus, messages)}`
           }
           passed={backendStatus.database.ok}
           tone={backendTone(backendStatus)}
-          label={backendLabel(backendStatus)}
+          label={backendLabel(backendStatus, messages)}
         />
       </Card>
 
       <Card
         header={
           <>
-            <h2 className="title title-sm">Matcher self-checks</h2>
-            <p className="subtitle">Lightweight checks so grouping regressions are obvious while building.</p>
+            <h2 className="title title-sm">{messages.pages.debug.matcherTitle}</h2>
+            <p className="subtitle">{messages.pages.debug.matcherSubtitle}</p>
           </>
         }
         bodyClassName="stack"
@@ -113,14 +134,14 @@ export function DebugPage({
             passed={test.passed}
           />
         ))}
-        {!matcherHasFailures ? <div className="empty-state">All matcher checks are passing.</div> : null}
+        {!matcherHasFailures ? <div className="empty-state">{messages.pages.debug.allMatcherPass}</div> : null}
       </Card>
 
       <Card
         header={
           <>
-            <h2 className="title title-sm">Quantity self-checks</h2>
-            <p className="subtitle">Count-style quantities stay as one checkable item, with quantity metadata attached.</p>
+            <h2 className="title title-sm">{messages.pages.debug.quantityTitle}</h2>
+            <p className="subtitle">{messages.pages.debug.quantitySubtitle}</p>
           </>
         }
         bodyClassName="stack"
@@ -133,27 +154,29 @@ export function DebugPage({
               <>
                 {test.expectedName}
                 {test.expectedQuantity ? ` · ${test.expectedQuantity}` : ''}
-                {typeof test.expectedQuantityValue === 'number' ? ` · count ${test.expectedQuantityValue}` : ''}
+                {typeof test.expectedQuantityValue === 'number'
+                  ? ` · ${messages.labels.count} ${test.expectedQuantityValue}`
+                  : ''}
               </>
             }
             actual={
               <>
                 {test.actualName}
                 {test.actualQuantity ? ` · ${test.actualQuantity}` : ''}
-                {typeof test.actualQuantityValue === 'number' ? ` · count ${test.actualQuantityValue}` : ''}
+                {typeof test.actualQuantityValue === 'number' ? ` · ${messages.labels.count} ${test.actualQuantityValue}` : ''}
               </>
             }
             passed={test.passed}
           />
         ))}
-        {!quantityHasFailures ? <div className="empty-state">All quantity checks are passing.</div> : null}
+        {!quantityHasFailures ? <div className="empty-state">{messages.pages.debug.allQuantityPass}</div> : null}
       </Card>
 
       <Card
         header={
           <>
-            <h2 className="title title-sm">Storage self-checks</h2>
-            <p className="subtitle">Record data should round-trip cleanly through local storage and any future database store.</p>
+            <h2 className="title title-sm">{messages.pages.debug.storageTitle}</h2>
+            <p className="subtitle">{messages.pages.debug.storageSubtitle}</p>
           </>
         }
         bodyClassName="stack"
@@ -167,7 +190,7 @@ export function DebugPage({
             passed={test.passed}
           />
         ))}
-        {!storageHasFailures ? <div className="empty-state">All storage checks are passing.</div> : null}
+        {!storageHasFailures ? <div className="empty-state">{messages.pages.debug.allStoragePass}</div> : null}
       </Card>
     </Card>
   );

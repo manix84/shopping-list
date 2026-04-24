@@ -3,6 +3,7 @@ import { Card } from '../components/Card';
 import { StatsGrid } from '../components/StatsGrid';
 import { ParsedItemCard } from '../components/ParsedItemCard';
 import { DebugLink } from '../components/DebugLink';
+import { useI18n } from '../lib/i18n';
 
 type EditPageProps = {
   input: string;
@@ -55,45 +56,53 @@ export function EditPage({
   isRefreshingSharedList,
   shareError,
 }: EditPageProps) {
+  const { messages } = useI18n();
+
   return (
     <div className="layout-split">
       <Card
         header={
           <>
-            <h2 className="title title-sm">List editor</h2>
-            <p className="subtitle">Paste from anywhere, tweak the list, and save it locally for now.</p>
+            <h2 className="title title-sm">{messages.pages.edit.title}</h2>
+            <p className="subtitle">{messages.pages.edit.subtitle}</p>
           </>
         }
         bodyClassName="stack"
       >
         <div className="field">
-          <label htmlFor="shopping-list-input">Paste or type your list</label>
+          <label htmlFor="shopping-list-input">{messages.pages.edit.pasteLabel}</label>
           <textarea
             id="shopping-list-input"
             className="textarea"
             value={input}
             onChange={(event) => onInputChange(event.target.value)}
-            placeholder={'milk\nbread\napples\ncoffee'}
+            placeholder={messages.pages.edit.pastePlaceholder}
           />
         </div>
 
         <div className="field">
-          <label htmlFor="shopping-quick-add">Quick add single item</label>
+          <label htmlFor="shopping-quick-add">{messages.pages.edit.quickAddLabel}</label>
           <div className="inline-row">
             <input
               id="shopping-quick-add"
               className="input"
               value={draftItem}
               onChange={(event) => onDraftItemChange(event.target.value)}
-              placeholder="e.g. bananas x20"
+              placeholder={messages.pages.edit.quickAddPlaceholder}
             />
-            <button className="button button-primary" onClick={onAddSingleItem}>Add</button>
+            <button type="button" className="button button-primary" onClick={onAddSingleItem}>
+              {messages.actions.add}
+            </button>
           </div>
         </div>
 
         <div className="button-row">
-          <button className="button button-primary" onClick={onParse}>Save and sort</button>
-          <button className="button" onClick={onResetAll}>Full reset</button>
+          <button type="button" className="button button-primary" onClick={onParse}>
+            {messages.actions.saveAndSort}
+          </button>
+          <button type="button" className="button" onClick={onResetAll}>
+            {messages.actions.fullReset}
+          </button>
         </div>
 
         <div className="separator" />
@@ -104,24 +113,20 @@ export function EditPage({
         <Card
           header={
             <>
-              <h2 className="title title-sm">Sharing</h2>
-              <p className="subtitle">Anyone with the shared link can edit this list.</p>
+              <h2 className="title title-sm">{messages.pages.edit.sharingTitle}</h2>
+              <p className="subtitle">{messages.pages.edit.sharingSubtitle}</p>
             </>
-        }
-        bodyClassName="stack"
-      >
+          }
+          bodyClassName="stack"
+        >
           {shareLink ? (
             <>
               <div className="field">
-                <label htmlFor="shopping-share-link">Shared link</label>
+                <label htmlFor="shopping-share-link">{messages.labels.sharedLink}</label>
                 <div className="inline-row">
                   <input id="shopping-share-link" className="input" readOnly value={shareLink} />
-                  <button
-                    type="button"
-                    className="button"
-                    onClick={() => void navigator.clipboard?.writeText(shareLink)}
-                  >
-                    Copy
+                  <button type="button" className="button" onClick={() => void navigator.clipboard?.writeText(shareLink)}>
+                    {messages.actions.copy}
                   </button>
                   <button
                     type="button"
@@ -129,7 +134,7 @@ export function EditPage({
                     onClick={onRefreshSharedList}
                     disabled={isRefreshingSharedList || !canUseBackend}
                   >
-                    {isRefreshingSharedList ? 'Refreshing...' : 'Refresh'}
+                    {isRefreshingSharedList ? messages.actions.refreshing : messages.actions.refresh}
                   </button>
                 </div>
               </div>
@@ -143,26 +148,26 @@ export function EditPage({
                 onClick={onCreateSharedLink}
                 disabled={isCreatingShareLink}
               >
-                {isCreatingShareLink ? 'Creating...' : 'Create shared link'}
+                {isCreatingShareLink ? messages.actions.creating : messages.actions.createSharedLink}
               </button>
               {shareError ? <div className="small-text">{shareError}</div> : null}
             </>
           ) : (
-            <div className="empty-state">Sharing is available when the backend is connected.</div>
+            <div className="empty-state">{messages.pages.edit.sharingUnavailable}</div>
           )}
         </Card>
 
         <Card
           header={
             <>
-              <h2 className="title title-sm">Parsed items</h2>
-              <p className="subtitle">Structured items, ready for local storage today and a database later.</p>
+              <h2 className="title title-sm">{messages.pages.edit.parsedTitle}</h2>
+              <p className="subtitle">{messages.pages.edit.parsedSubtitle}</p>
             </>
           }
         >
           <div className="scroll-region stack">
             {items.length === 0 ? (
-              <div className="empty-state">Save and sort the list to generate structured shopping items.</div>
+              <div className="empty-state">{messages.pages.edit.parsedEmpty}</div>
             ) : (
               items.map((item) => (
                 <ParsedItemCard
