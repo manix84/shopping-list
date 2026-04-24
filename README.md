@@ -2,7 +2,7 @@
 
 [![Deploy to GitHub Pages](https://github.com/manix84/shopping-list/actions/workflows/deploy-gh-pages.yml/badge.svg)](https://github.com/manix84/shopping-list/actions/workflows/deploy-gh-pages.yml) [![CI](https://github.com/manix84/shopping-list/actions/workflows/ci.yml/badge.svg)](https://github.com/manix84/shopping-list/actions/workflows/ci.yml)
 
-A React + TypeScript shopping list app that turns a rough grocery list into an ordered route through the store. It runs as a static frontend by default, can install as a PWA, and can use an optional backend for shared lists, durable settings, and Home Assistant integration.
+A React + TypeScript shopping list app that turns a rough grocery list into an ordered route through the store. It runs as a static frontend by default, can install as a PWA, and can use an optional backend for shared lists and durable settings.
 
 ## ✨ What it does
 
@@ -82,14 +82,17 @@ Backend utility routes:
 
 ### 🏠 Home Assistant
 
-Set these environment variables before starting the backend:
+Home Assistant integration code exists in the backend, but it is currently disabled by default. The current implementation does not yet model one Home Assistant list per shared app list, so it is not suitable for general multi-user use.
+
+To experiment with the disabled integration locally, explicitly opt in before starting the backend:
 
 ```bash
+ENABLE_HOME_ASSISTANT_INTEGRATION=true
 HOME_ASSISTANT_URL=http://homeassistant.local:8123
 HOME_ASSISTANT_TOKEN=your-long-lived-access-token
 ```
 
-Backend routes:
+Disabled-by-default backend routes:
 
 - `GET /api/home-assistant/status`
 - `POST /api/home-assistant/sync` pushes the current backend shopping list to Home Assistant
@@ -133,7 +136,7 @@ The repo includes a GitHub Actions workflow in `.github/workflows/deploy-gh-page
 
 ## 🧱 Project structure
 
-- `server` file-backed backend API and Home Assistant integration
+- `server` file-backed backend API and disabled Home Assistant integration stub
 - `src/config/countries` country-specific supermarket configs
 - `src/lib` parsing, matching, routing helpers, and debug checks
 - `src/lib/repository` persistence layer

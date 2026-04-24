@@ -26,7 +26,9 @@ The app does not add accounts, passwords, user tracking, or analytics around sha
 
 ## Home Assistant
 
-If you configure Home Assistant integration, the app can send shopping list actions to your Home Assistant instance. That only happens when the backend is configured with your Home Assistant URL and token.
+Home Assistant integration is currently disabled by default. The code is still present for future work, but the live app should not send shopping list actions to Home Assistant unless a backend operator explicitly enables the experimental integration.
+
+If that experimental integration is enabled, the app can send shopping list actions to the configured Home Assistant instance. That only happens when the backend is configured with your Home Assistant URL and token.
 
 Those credentials are read by the backend from environment variables. They are not part of the frontend app.
 
