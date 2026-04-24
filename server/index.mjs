@@ -19,6 +19,7 @@ import { callShoppingListService, getHomeAssistantStatus, pushRecordToHomeAssist
 
 const port = Number(process.env.PORT ?? 8787);
 const distDir = resolve('dist');
+const homeAssistantIntegrationEnabled = process.env.ENABLE_HOME_ASSISTANT_INTEGRATION === 'true';
 
 const contentTypes = {
   '.css': 'text/css; charset=utf-8',
@@ -175,37 +176,44 @@ const handleApi = async (request, response, path) => {
     }
   }
 
-  if (request.method === 'GET' && path === '/api/home-assistant/status') {
-    sendJson(response, 200, getHomeAssistantStatus());
-    return;
-  }
-
-  if (request.method === 'POST' && path === '/api/home-assistant/sync') {
-    const body = await readJsonBody(request);
-    const record = isShoppingListRecord(body.record) ? body.record : (await getShoppingList()).record;
-    const actions = await pushRecordToHomeAssistant(record);
-    sendJson(response, 200, { ok: true, actions });
-    return;
-  }
-
-  const serviceMatch = path.match(/^\/api\/home-assistant\/(add-item|remove-item|complete-item|incomplete-item)$/);
-  if (request.method === 'POST' && serviceMatch) {
-    const body = await readJsonBody(request);
-    if (typeof body.name !== 'string' || !body.name.trim()) {
-      sendJson(response, 400, { error: 'A non-empty item name is required' });
+  if (path.startsWith('/api/home-assistant/')) {
+    if (!homeAssistantIntegrationEnabled) {
+      sendJson(response, 404, { error: 'Home Assistant integration is disabled' });
       return;
     }
 
-    const service = serviceMatch[1].replaceAll('-', '_');
-    const result = await callShoppingListService(service, { name: body.name.trim() });
-    sendJson(response, 200, { ok: true, result });
-    return;
-  }
+    if (request.method === 'GET' && path === '/api/home-assistant/status') {
+      sendJson(response, 200, getHomeAssistantStatus());
+      return;
+    }
 
-  if (request.method === 'POST' && path === '/api/home-assistant/sort') {
-    const result = await callShoppingListService('sort');
-    sendJson(response, 200, { ok: true, result });
-    return;
+    if (request.method === 'POST' && path === '/api/home-assistant/sync') {
+      const body = await readJsonBody(request);
+      const record = isShoppingListRecord(body.record) ? body.record : (await getShoppingList()).record;
+      const actions = await pushRecordToHomeAssistant(record);
+      sendJson(response, 200, { ok: true, actions });
+      return;
+    }
+
+    const serviceMatch = path.match(/^\/api\/home-assistant\/(add-item|remove-item|complete-item|incomplete-item)$/);
+    if (request.method === 'POST' && serviceMatch) {
+      const body = await readJsonBody(request);
+      if (typeof body.name !== 'string' || !body.name.trim()) {
+        sendJson(response, 400, { error: 'A non-empty item name is required' });
+        return;
+      }
+
+      const service = serviceMatch[1].replaceAll('-', '_');
+      const result = await callShoppingListService(service, { name: body.name.trim() });
+      sendJson(response, 200, { ok: true, result });
+      return;
+    }
+
+    if (request.method === 'POST' && path === '/api/home-assistant/sort') {
+      const result = await callShoppingListService('sort');
+      sendJson(response, 200, { ok: true, result });
+      return;
+    }
   }
 
   sendJson(response, 404, { error: 'API route not found' });

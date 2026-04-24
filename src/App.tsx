@@ -23,9 +23,11 @@ import {
   hasStoredShoppingListRecord,
   localStorageRepository,
 } from './lib/repository/localStorageRepository';
+import { sharedListHistoryRepository } from './lib/repository/sharedListHistoryRepository';
 import { chooseNewestRecord } from './lib/repository/recordMerge';
 import { readRouteFromLocationParts, routeToUrl } from './lib/routing';
 import { getSectionMeta } from './lib/sections';
+import { extractSharedListId } from './lib/sharedLinks';
 import { cleanLine, stripDisplaySizeLabel } from './lib/stringUtils';
 import { getResolvedTheme, loadThemeMode, saveThemeMode } from './lib/themePreference';
 import { createUuidV7 } from './lib/uuid';
@@ -34,12 +36,25 @@ import { EditPage } from './pages/EditPage';
 import { RoutePage } from './pages/RoutePage';
 import { SectionsPage } from './pages/SectionsPage';
 import { SettingsPage } from './pages/SettingsPage';
-import type { AppRoute, BackendStatus, CountryCode, GroupedSectionView, Item, PageKey, SectionKey, ThemeMode } from './types';
+import type { AppRoute, BackendStatus, CountryCode, GroupedSectionView, Item, PageKey, SectionKey, SharedListHistoryEntry, ThemeMode } from './types';
 import type { ApiSettingsPayload } from './lib/repository/apiRepository';
 
 const DEFAULT_PAGE: PageKey = 'edit';
 type StorageMode = 'local' | 'backend';
-type ShareErrorKey = 'connectBackendFirst' | 'createFailed' | 'refreshMissing' | 'refreshFailed' | 'offlineBackup';
+type ShareErrorKey =
+  | 'connectBackendFirst'
+  | 'createFailed'
+  | 'invalidLink'
+  | 'loadFailed'
+  | 'loadMissing'
+  | 'refreshMissing'
+  | 'refreshFailed'
+  | 'offlineBackup';
+type SharedInputValidation =
+  | { state: 'valid'; listId: string; normalizedValue: string }
+  | { state: 'invalid' }
+  | { state: 'missing'; listId: string; normalizedValue: string }
+  | { state: 'unavailable' };
 
 const defaultBackendStatus = (): BackendStatus => ({
   state: 'checking',
@@ -48,6 +63,7 @@ const defaultBackendStatus = (): BackendStatus => ({
 });
 
 const appBasePath = import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_URL.replace(/\/$/, '');
+const currentOrigin = (): string | undefined => (typeof window === 'undefined' ? undefined : window.location.origin);
 
 const updateBrowserIcon = (theme: 'light' | 'dark'): void => {
   if (typeof document === 'undefined') return;
@@ -147,6 +163,8 @@ const saveAppSettingsIfAvailable = async (countryCode: CountryCode): Promise<voi
   }
 };
 
+const getSharedListPreview = (items: Item[]): string[] => items.slice(0, 6).map((item) => item.raw);
+
 function updateItemTextInInput(input: string, previousDisplay: string, nextDisplay: string): string {
   const lines = input.split('\n');
   const index = lines.findIndex((line) => cleanLine(line) === cleanLine(previousDisplay));
@@ -169,15 +187,19 @@ export default function App() {
   const [isServerBackedList, setIsServerBackedList] = useState(false);
   const [countryCode, setCountryCode] = useState<CountryCode>('uk');
   const [themeMode, setThemeMode] = useState<ThemeMode>(() => loadThemeMode());
+  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>(() => getResolvedTheme(loadThemeMode()));
   const [locale, setLocale] = useState(() => loadLocale());
   const [isCreatingShareLink, setIsCreatingShareLink] = useState(false);
   const [isRefreshingSharedList, setIsRefreshingSharedList] = useState(false);
+  const [isLoadingSharedList, setIsLoadingSharedList] = useState(false);
   const [shareError, setShareError] = useState<ShareErrorKey>();
+  const [sharedListHistory, setSharedListHistory] = useState<SharedListHistoryEntry[]>(() => sharedListHistoryRepository.load());
 
   const config = useMemo(() => COUNTRY_CONFIGS[countryCode], [countryCode]);
   const messages = useMemo(() => createMessages(locale), [locale]);
   const { page, listId } = route;
   const canUseBackend = backendStatus.state === 'connected';
+  const canCreateSharedLink = items.length > 0 || cleanLine(input).length > 0;
   const shareLink =
     typeof window === 'undefined' || !isServerBackedList
       ? undefined
@@ -192,6 +214,7 @@ export default function App() {
     if (typeof document === 'undefined') return;
 
     const resolved = getResolvedTheme(mode);
+    setResolvedTheme(resolved);
     document.documentElement.dataset.theme = resolved;
 
     const themeColorMeta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
@@ -200,6 +223,104 @@ export default function App() {
     }
 
     updateBrowserIcon(resolved);
+  };
+
+  const rememberSharedList = ({
+    listId,
+    items,
+    createdAt,
+    updatedAt,
+  }: {
+    listId: string;
+    items: Item[];
+    createdAt?: string;
+    updatedAt: string;
+  }) => {
+    setSharedListHistory(
+      sharedListHistoryRepository.remember({
+        listId,
+        itemPreview: getSharedListPreview(items),
+        createdAt,
+        updatedAt,
+        viewedAt: new Date().toISOString(),
+      }),
+    );
+  };
+
+  const removeSharedListFromHistory = (nextListId: string) => {
+    setSharedListHistory(sharedListHistoryRepository.remove(nextListId));
+  };
+
+  const loadSharedListById = async (nextListId: string): Promise<boolean> => {
+    if (backendStatus.state !== 'connected') {
+      setShareError('connectBackendFirst');
+      return false;
+    }
+
+    setIsLoadingSharedList(true);
+    setShareError(undefined);
+
+    try {
+      const remotePayload = await loadSharedShoppingList(nextListId);
+      if (!remotePayload.exists) {
+        setShareError('loadMissing');
+        return false;
+      }
+
+      const record = { ...remotePayload.record, listId: nextListId, serverBacked: true };
+      applyRecord(record);
+      localStorageRepository.save(record);
+      rememberSharedList({
+        listId: nextListId,
+        items: record.items,
+        createdAt: remotePayload.createdAt,
+        updatedAt: remotePayload.updatedAt ?? record.updatedAt,
+      });
+      setStorageMode('backend');
+      setIsServerBackedList(true);
+      setRoute({ page: 'edit', listId: nextListId });
+      setShareError(undefined);
+      return true;
+    } catch (error) {
+      console.warn('Unable to load shared list from input.', error);
+      setShareError('loadFailed');
+      return false;
+    } finally {
+      setIsLoadingSharedList(false);
+    }
+  };
+
+  const handleLoadSharedInput = async (value: string): Promise<boolean> => {
+    const nextListId = extractSharedListId(value, appBasePath, currentOrigin());
+    if (!nextListId) {
+      setShareError('invalidLink');
+      return false;
+    }
+
+    return loadSharedListById(nextListId);
+  };
+
+  const validateSharedInput = async (value: string): Promise<SharedInputValidation> => {
+    const nextListId = extractSharedListId(value, appBasePath, currentOrigin());
+    if (!nextListId) {
+      return { state: 'invalid' };
+    }
+
+    const normalizedValue = `${currentOrigin() ?? ''}${appBasePath}/list/${nextListId}/edit`;
+    if (backendStatus.state !== 'connected') {
+      return { state: 'unavailable' };
+    }
+
+    try {
+      const remotePayload = await loadSharedShoppingList(nextListId);
+      if (!remotePayload.exists) {
+        return { state: 'missing', listId: nextListId, normalizedValue };
+      }
+
+      return { state: 'valid', listId: nextListId, normalizedValue };
+    } catch {
+      return { state: 'unavailable' };
+    }
   };
 
   useEffect(() => {
@@ -259,6 +380,14 @@ export default function App() {
           }
           await saveSharedShoppingList(nextListId, selectedRecord);
           localStorageRepository.save(selectedRecord);
+          if (remotePayload.exists) {
+            rememberSharedList({
+              listId: nextListId,
+              items: selectedRecord.items,
+              createdAt: remotePayload.createdAt,
+              updatedAt: remotePayload.updatedAt ?? selectedRecord.updatedAt,
+            });
+          }
           nextStorageMode = 'backend';
           nextServerBacked = true;
         } catch (error) {
@@ -335,6 +464,14 @@ export default function App() {
         }
         await saveSharedShoppingList(activeListId, selectedRecord);
         localStorageRepository.save(selectedRecord);
+        if (remotePayload.exists) {
+          rememberSharedList({
+            listId: activeListId,
+            items: selectedRecord.items,
+            createdAt: remotePayload.createdAt,
+            updatedAt: remotePayload.updatedAt ?? selectedRecord.updatedAt,
+          });
+        }
         setStorageMode('backend');
         setIsServerBackedList(true);
         setRoute((current) => ({
@@ -549,6 +686,12 @@ export default function App() {
       const record = buildRecord(input, items, countryCode, activeListId, true);
       await saveSharedShoppingList(activeListId, record);
       localStorageRepository.save(record);
+      rememberSharedList({
+        listId: activeListId,
+        items: record.items,
+        createdAt: record.updatedAt,
+        updatedAt: record.updatedAt,
+      });
       setStorageMode('backend');
       setIsServerBackedList(true);
       setRoute({ page: 'edit', listId: activeListId });
@@ -568,8 +711,17 @@ export default function App() {
 
     try {
       const remotePayload = await loadSharedShoppingList(activeListId);
-      applyRecord({ ...remotePayload.record, listId: activeListId, serverBacked: true });
+      const record = { ...remotePayload.record, listId: activeListId, serverBacked: true };
+      applyRecord(record);
       setStorageMode('backend');
+      if (remotePayload.exists) {
+        rememberSharedList({
+          listId: activeListId,
+          items: record.items,
+          createdAt: remotePayload.createdAt,
+          updatedAt: remotePayload.updatedAt ?? record.updatedAt,
+        });
+      }
       setShareError(remotePayload.exists ? undefined : 'refreshMissing');
     } catch (error) {
       console.warn('Unable to refresh shared list.', error);
@@ -582,6 +734,7 @@ export default function App() {
   const resetAll = () => {
     localStorageRepository.clear();
     if (isServerBackedList) {
+      removeSharedListFromHistory(activeListId);
       void clearSharedShoppingList(activeListId).catch((error: unknown) => {
         console.warn('Unable to clear shared shopping list.', error);
       });
@@ -603,7 +756,13 @@ export default function App() {
     <I18nProvider value={{ locale, messages, setLocale }}>
       <div className="shopping-app">
         <div className="shopping-shell">
-          <AppHeader page={page} hasItems={items.length > 0} backendStatus={backendStatus} onChangePage={changePage} />
+          <AppHeader
+            page={page}
+            hasItems={items.length > 0}
+            backendStatus={backendStatus}
+            resolvedTheme={resolvedTheme}
+            onChangePage={changePage}
+          />
 
           {page === 'edit' ? (
             <EditPage
@@ -626,10 +785,18 @@ export default function App() {
               onRefreshSharedList={handleRefreshSharedList}
               onOpenDebug={() => changePage('debug')}
               canUseBackend={canUseBackend}
+              canCreateSharedLink={canCreateSharedLink}
+              resolvedTheme={resolvedTheme}
               shareLink={shareLink}
               isCreatingShareLink={isCreatingShareLink}
               isRefreshingSharedList={isRefreshingSharedList}
+              isLoadingSharedList={isLoadingSharedList}
               shareError={shareErrorMessage}
+              sharedListHistory={sharedListHistory}
+              onLoadSharedInput={handleLoadSharedInput}
+              onValidateSharedInput={validateSharedInput}
+              onLoadSharedListFromHistory={loadSharedListById}
+              onDeleteSharedListFromHistory={removeSharedListFromHistory}
             />
           ) : null}
 

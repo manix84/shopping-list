@@ -27,6 +27,11 @@ export const readRouteFromLocationParts = ({
     return { page, listId: pathParts[1] };
   }
 
+  if (isUuidV7(pathParts[0])) {
+    const page = APP_PAGES.includes(pathParts[1] as PageKey) ? (pathParts[1] as PageKey) : DEFAULT_PAGE;
+    return { page, listId: pathParts[0] };
+  }
+
   const hashParts = hash.replace(/^#\/?/, '').toLowerCase().split('/').filter(Boolean);
   if (hashParts[0] === 'list' && isUuidV7(hashParts[1])) {
     const page = APP_PAGES.includes(hashParts[2] as PageKey) ? (hashParts[2] as PageKey) : DEFAULT_PAGE;

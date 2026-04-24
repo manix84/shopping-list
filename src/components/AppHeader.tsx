@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { mdiMenu } from '@mdi/js';
 import { Badge } from './Badge';
 import { Card } from './Card';
 import { PageTabs } from './PageTabs';
@@ -13,6 +14,7 @@ type AppHeaderProps = {
   page: PageKey;
   hasItems: boolean;
   backendStatus: BackendStatus;
+  resolvedTheme: 'light' | 'dark';
   onChangePage: (page: PageKey) => void;
 };
 
@@ -23,7 +25,7 @@ const backendBadge = (status: BackendStatus, messages: Messages) => {
   return { tone: 'danger' as const, label: messages.backendStatus.frontendOnly };
 };
 
-export function AppHeader({ page, hasItems, backendStatus, onChangePage }: AppHeaderProps) {
+export function AppHeader({ page, hasItems, backendStatus, resolvedTheme, onChangePage }: AppHeaderProps) {
   const { messages } = useI18n();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [connectionBadgeVisible, setConnectionBadgeVisible] = useState(false);
@@ -65,6 +67,8 @@ export function AppHeader({ page, hasItems, backendStatus, onChangePage }: AppHe
     onChangePage(nextPage);
   };
 
+  const logoHref = `${import.meta.env.BASE_URL}${resolvedTheme === 'dark' ? 'favicon-dark.svg' : 'favicon-light.svg'}`;
+
   return (
     <header className="app-header">
       <div className="app-header-inner">
@@ -73,7 +77,9 @@ export function AppHeader({ page, hasItems, backendStatus, onChangePage }: AppHe
           header={
             <div className="title-row">
               <div className="title-block">
-                <div className="app-icon">🛒</div>
+                <div className="app-icon">
+                  <img className="app-icon-image" src={logoHref} alt="" />
+                </div>
                 <div>
                   <h1 className="title">{messages.app.title}</h1>
                   <p className="subtitle">{messages.app.subtitle}</p>
@@ -102,11 +108,9 @@ export function AppHeader({ page, hasItems, backendStatus, onChangePage }: AppHe
                     onClick={() => setMobileMenuOpen((current) => !current)}
                   >
                     <span className="sr-only">{messages.mobileMenu.openNavigation}</span>
-                    <span aria-hidden="true" className="mobile-menu-icon">
-                      <span />
-                      <span />
-                      <span />
-                    </span>
+                    <svg aria-hidden="true" className="button-icon-svg" viewBox="0 0 24 24">
+                      <path d={mdiMenu} fill="currentColor" />
+                    </svg>
                   </button>
 
                   {mobileMenuOpen ? (

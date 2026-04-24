@@ -11,6 +11,13 @@ describe('routing', () => {
     });
   });
 
+  it('reads bare shared list routes', () => {
+    expect(readRouteFromLocationParts({ pathname: `/${LIST_ID}`, hash: '' })).toEqual({
+      page: 'edit',
+      listId: LIST_ID,
+    });
+  });
+
   it('keeps settings and sections app-level when rendering URLs', () => {
     expect(routeToUrl({ page: 'settings', listId: LIST_ID })).toBe('/#/settings');
     expect(routeToUrl({ page: 'sections', listId: LIST_ID })).toBe('/#/sections');

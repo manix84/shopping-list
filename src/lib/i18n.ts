@@ -26,11 +26,15 @@ type Messages = {
     editList: string;
     fullReset: string;
     goToEditList: string;
+    loadSharedList: string;
     openDebugTools: string;
     refresh: string;
     refreshing: string;
     remove: string;
+    scanQrCode: string;
+    stopScanning: string;
     resetTicks: string;
+    revealQrCode: string;
     resortFromList: string;
     saveAndSort: string;
     tick: string;
@@ -43,6 +47,7 @@ type Messages = {
     cleaned: string;
     count: string;
     countryProfile: string;
+    created: string;
     defaultList: string;
     done: string;
     empty: string;
@@ -143,11 +148,25 @@ type Messages = {
     frontendOnly: string;
   };
   sharing: {
+    cameraUnavailable: string;
     connectBackendFirst: string;
     createFailed: string;
+    emptyList: string;
+    invalidLink: string;
+    loadFailed: string;
+    loadMissing: string;
+    manualLinkLabel: string;
+    manualLinkPlaceholder: string;
     refreshMissing: string;
     refreshFailed: string;
     offlineBackup: string;
+    recentListsEmpty: string;
+    recentListsTitle: string;
+    scannerInstructions: string;
+    scannerListMissing: string;
+    scannerOpenFailed: string;
+    scannerReady: string;
+    scannerUnsupported: string;
   };
   sectionToggle: {
     tickAll: string;
@@ -174,13 +193,17 @@ const en: Messages = {
     createSharedLink: 'Create shared link',
     creating: 'Creating...',
     editList: 'Edit list',
-    fullReset: 'Full reset',
+    fullReset: 'New List',
     goToEditList: 'Go to Edit list',
+    loadSharedList: 'Load shared list',
     openDebugTools: 'Open debug tools',
     refresh: 'Refresh',
     refreshing: 'Refreshing...',
     remove: 'Remove',
+    scanQrCode: 'Scan QR code',
+    stopScanning: 'Stop scanning',
     resetTicks: 'Reset ticks',
+    revealQrCode: 'Reveal QR code',
     resortFromList: 'Re-sort from list',
     saveAndSort: 'Save list',
     tick: 'Tick',
@@ -193,6 +216,7 @@ const en: Messages = {
     cleaned: 'Cleaned',
     count: 'count',
     countryProfile: 'Country profile',
+    created: 'created',
     defaultList: 'default list',
     done: 'Done',
     empty: 'empty',
@@ -296,11 +320,25 @@ const en: Messages = {
     frontendOnly: 'Offline',
   },
   sharing: {
+    cameraUnavailable: 'Camera access is not available on this device.',
     connectBackendFirst: 'Connect the backend before creating a shared link.',
     createFailed: 'Could not create the shared link.',
+    emptyList: 'Empty list',
+    invalidLink: 'Enter a valid shared list URL or UUID.',
+    loadFailed: 'Could not load that shared list.',
+    loadMissing: 'That shared list does not exist in the backend.',
+    manualLinkLabel: 'Open a shared list',
+    manualLinkPlaceholder: 'Paste a shared URL or UUID',
     refreshMissing: 'This shared list does not exist yet. Edits will create it.',
     refreshFailed: 'Could not refresh the shared list.',
     offlineBackup: 'Backend is offline. Showing the local backup for this shared list.',
+    recentListsEmpty: 'No shared lists have been opened on this device yet.',
+    recentListsTitle: 'Recently opened shared lists',
+    scannerInstructions: 'Point the camera at a Smart Shopping List QR code.',
+    scannerListMissing: 'That shared list does not exist.',
+    scannerOpenFailed: 'Could not open the camera for QR scanning.',
+    scannerReady: 'Shared list found. Review the input, then load it.',
+    scannerUnsupported: 'QR scanning is not supported in this browser. Paste the URL or UUID instead.',
   },
   sectionToggle: {
     tickAll: 'Tick all items',
@@ -327,13 +365,17 @@ const es: Messages = {
     createSharedLink: 'Crear enlace compartido',
     creating: 'Creando...',
     editList: 'Editar lista',
-    fullReset: 'Restablecer todo',
+    fullReset: 'Nueva lista',
     goToEditList: 'Ir a Editar lista',
+    loadSharedList: 'Abrir lista compartida',
     openDebugTools: 'Abrir herramientas de depuración',
     refresh: 'Actualizar',
     refreshing: 'Actualizando...',
     remove: 'Eliminar',
+    scanQrCode: 'Escanear QR',
+    stopScanning: 'Detener escaneo',
     resetTicks: 'Quitar marcas',
+    revealQrCode: 'Mostrar código QR',
     resortFromList: 'Reordenar desde la lista',
     saveAndSort: 'Guardar lista',
     tick: 'Marcar',
@@ -346,6 +388,7 @@ const es: Messages = {
     cleaned: 'Limpio',
     count: 'cantidad',
     countryProfile: 'Perfil de país',
+    created: 'creada',
     defaultList: 'lista predeterminada',
     done: 'Hecho',
     empty: 'vacía',
@@ -449,11 +492,25 @@ const es: Messages = {
     frontendOnly: 'Sin conexión',
   },
   sharing: {
+    cameraUnavailable: 'El acceso a la cámara no está disponible en este dispositivo.',
     connectBackendFirst: 'Conecta el backend antes de crear un enlace compartido.',
     createFailed: 'No se pudo crear el enlace compartido.',
+    emptyList: 'Lista vacía',
+    invalidLink: 'Introduce una URL o UUID de lista compartida válido.',
+    loadFailed: 'No se pudo abrir esa lista compartida.',
+    loadMissing: 'Esa lista compartida no existe en el backend.',
+    manualLinkLabel: 'Abrir una lista compartida',
+    manualLinkPlaceholder: 'Pega una URL compartida o un UUID',
     refreshMissing: 'Esta lista compartida aún no existe. Las ediciones la crearán.',
     refreshFailed: 'No se pudo actualizar la lista compartida.',
     offlineBackup: 'El backend está sin conexión. Se muestra la copia local de esta lista compartida.',
+    recentListsEmpty: 'Todavía no se ha abierto ninguna lista compartida en este dispositivo.',
+    recentListsTitle: 'Listas compartidas abiertas recientemente',
+    scannerInstructions: 'Apunta la cámara a un código QR de Smart Shopping List.',
+    scannerListMissing: 'Esa lista compartida no existe.',
+    scannerOpenFailed: 'No se pudo abrir la cámara para escanear el QR.',
+    scannerReady: 'Lista compartida encontrada. Revisa el campo y ábrela.',
+    scannerUnsupported: 'El escaneo QR no es compatible con este navegador. Pega la URL o el UUID.',
   },
   sectionToggle: {
     tickAll: 'Marcar todo',
