@@ -1,10 +1,10 @@
-# Smart Shopping List
+# 🛒 Smart Shopping List
 
 [![Deploy to GitHub Pages](https://github.com/manix84/shopping-list/actions/workflows/deploy-gh-pages.yml/badge.svg)](https://github.com/manix84/shopping-list/actions/workflows/deploy-gh-pages.yml) [![CI](https://github.com/manix84/shopping-list/actions/workflows/ci.yml/badge.svg)](https://github.com/manix84/shopping-list/actions/workflows/ci.yml)
 
 A React + TypeScript shopping list app that turns a rough grocery list into an ordered route through the store. It runs as a static frontend by default, can install as a PWA, and can use an optional backend for shared lists, durable settings, and Home Assistant integration.
 
-## What it does
+## ✨ What it does
 
 - accepts pasted or typed shopping lists
 - groups items into supermarket sections using country configs
@@ -19,7 +19,7 @@ A React + TypeScript shopping list app that turns a rough grocery list into an o
 - includes debug self-checks for backend health, database state, quantity parsing, and section matching
 - deploys to GitHub Pages via GitHub Actions
 
-## Routes
+## 🧭 Routes
 
 The app uses hash-based routing so direct links work on GitHub Pages:
 
@@ -36,14 +36,14 @@ Backend-backed shared lists use path routes:
 
 If a page needs data that is not available yet, it shows a warning and points you to the page that can populate it.
 
-## Getting started
+## 🚀 Getting started
 
 ```bash
 npm install
 npm run dev
 ```
 
-## Optional backend mode
+## 🗄️ Optional backend mode
 
 The app can run in two modes:
 
@@ -80,7 +80,7 @@ Backend utility routes:
 - `GET /api/settings`
 - `PUT /api/settings`
 
-### Home Assistant
+### 🏠 Home Assistant
 
 Set these environment variables before starting the backend:
 
@@ -99,7 +99,7 @@ Backend routes:
 - `POST /api/home-assistant/incomplete-item` with `{ "name": "Milk" }`
 - `POST /api/home-assistant/sort`
 
-## Shared lists
+## 🔗 Shared lists
 
 Every browser session has an internal UUIDv7-style list id. When the backend is connected, that list id is migrated to the backend and shown in path-based URLs:
 
@@ -116,22 +116,22 @@ Shared list API routes:
 - `PUT /api/shared-lists/:id`
 - `DELETE /api/shared-lists/:id`
 
-## PWA install
+## 📲 PWA install
 
 The app includes a web app manifest, install icons, theme-aware browser favicons, and runtime theme-colour updates. Light, dark, and system theme choices update the browser/PWA chrome where the host OS supports dynamic `theme-color` changes. Some installed app shells cache manifest metadata, so reinstalling the PWA may be needed after manifest colour or icon changes.
 
-## Build
+## 🧪 Build
 
 ```bash
 npm run build
 npm run preview
 ```
 
-## Deployment
+## 🚢 Deployment
 
 The repo includes a GitHub Actions workflow in `.github/workflows/deploy-gh-pages.yml` that builds on push to `main` and publishes `dist/` to GitHub Pages.
 
-## Project structure
+## 🧱 Project structure
 
 - `server` file-backed backend API and Home Assistant integration
 - `src/config/countries` country-specific supermarket configs
@@ -142,6 +142,10 @@ The repo includes a GitHub Actions workflow in `.github/workflows/deploy-gh-page
 - `src/styles` SCSS styling
 - `.github/workflows` GitHub Pages deployment
 
-## License
+## 📄 License
 
 MIT. See [LICENSE](./LICENSE).
+
+## 🔒 Privacy
+
+See [PRIVACY.md](./PRIVACY.md).
