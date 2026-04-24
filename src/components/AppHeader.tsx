@@ -8,6 +8,7 @@ import type { BackendStatus, PageKey } from '../types';
 
 type AppHeaderProps = {
   page: PageKey;
+  hasItems: boolean;
   backendStatus: BackendStatus;
   onChangePage: (page: PageKey) => void;
 };
@@ -19,7 +20,7 @@ const backendBadge = (status: BackendStatus, messages: Messages) => {
   return { tone: 'muted' as const, label: messages.backendStatus.frontendOnly };
 };
 
-export function AppHeader({ page, backendStatus, onChangePage }: AppHeaderProps) {
+export function AppHeader({ page, hasItems, backendStatus, onChangePage }: AppHeaderProps) {
   const { messages } = useI18n();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const badge = backendBadge(backendStatus, messages);
@@ -47,7 +48,7 @@ export function AppHeader({ page, backendStatus, onChangePage }: AppHeaderProps)
 
           <div className="header-actions">
             <Badge tone={badge.tone}>{badge.label}</Badge>
-            <PageTabs page={page} onChange={handleChangePage} />
+            <PageTabs page={page} hasItems={hasItems} onChange={handleChangePage} />
 
             <div className="mobile-menu-shell">
               <button
@@ -67,7 +68,7 @@ export function AppHeader({ page, backendStatus, onChangePage }: AppHeaderProps)
 
               {mobileMenuOpen ? (
                 <div id="mobile-menu-panel" className="mobile-menu-panel">
-                  <PageTabs page={page} onChange={handleChangePage} />
+                  <PageTabs page={page} hasItems={hasItems} onChange={handleChangePage} />
                 </div>
               ) : null}
             </div>

@@ -11,8 +11,7 @@ type Messages = {
     subtitle: string;
   };
   nav: {
-    editList: string;
-    storeRoute: string;
+    shoppingList: string;
     sections: string;
     settings: string;
     debugTools: string;
@@ -24,6 +23,7 @@ type Messages = {
     copy: string;
     createSharedLink: string;
     creating: string;
+    editList: string;
     fullReset: string;
     goToEditList: string;
     openDebugTools: string;
@@ -161,8 +161,7 @@ const en: Messages = {
     subtitle: 'Country-aware supermarket routing, with the UK setup as the default.',
   },
   nav: {
-    editList: 'Edit list',
-    storeRoute: 'Store route',
+    shoppingList: 'Shopping List',
     sections: 'Sections',
     settings: 'Settings',
     debugTools: 'Debug tools',
@@ -174,6 +173,7 @@ const en: Messages = {
     copy: 'Copy',
     createSharedLink: 'Create shared link',
     creating: 'Creating...',
+    editList: 'Edit list',
     fullReset: 'Full reset',
     goToEditList: 'Go to Edit list',
     openDebugTools: 'Open debug tools',
@@ -182,7 +182,7 @@ const en: Messages = {
     remove: 'Remove',
     resetTicks: 'Reset ticks',
     resortFromList: 'Re-sort from list',
-    saveAndSort: 'Save and sort',
+    saveAndSort: 'Save list',
     tick: 'Tick',
     tickAll: 'Tick all items',
     untick: 'Untick',
@@ -314,8 +314,7 @@ const es: Messages = {
     subtitle: 'Rutas de supermercado por país, con la configuración del Reino Unido como valor predeterminado.',
   },
   nav: {
-    editList: 'Editar lista',
-    storeRoute: 'Ruta de compra',
+    shoppingList: 'Lista de la compra',
     sections: 'Secciones',
     settings: 'Ajustes',
     debugTools: 'Herramientas de depuración',
@@ -327,6 +326,7 @@ const es: Messages = {
     copy: 'Copiar',
     createSharedLink: 'Crear enlace compartido',
     creating: 'Creando...',
+    editList: 'Editar lista',
     fullReset: 'Restablecer todo',
     goToEditList: 'Ir a Editar lista',
     openDebugTools: 'Abrir herramientas de depuración',
@@ -335,7 +335,7 @@ const es: Messages = {
     remove: 'Eliminar',
     resetTicks: 'Quitar marcas',
     resortFromList: 'Reordenar desde la lista',
-    saveAndSort: 'Guardar y ordenar',
+    saveAndSort: 'Guardar lista',
     tick: 'Marcar',
     tickAll: 'Marcar todo',
     untick: 'Desmarcar',
