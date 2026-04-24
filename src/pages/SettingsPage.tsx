@@ -1,10 +1,10 @@
 import { mdiChevronDown } from '@mdi/js';
 import { type ReactNode, useMemo, useState } from 'react';
 import { COUNTRY_CONFIGS } from '../config/countries';
-import type { CountryCode, ThemeMode } from '../types';
+import type { CountryCode, RouteViewMode, ThemeMode } from '../types';
 import { Card } from '../components/Card';
 import { DebugLink } from '../components/DebugLink';
-import { type LocaleCode, useI18n } from '../lib/i18n';
+import { getRouteViewLabel, type LocaleCode, useI18n } from '../lib/i18n';
 
 const THEME_OPTIONS: ThemeMode[] = ['system', 'light', 'dark'];
 
@@ -16,8 +16,10 @@ type SelectOption<T extends string> = {
 
 type SettingsPageProps = {
   countryCode: CountryCode;
+  routeViewMode: RouteViewMode;
   themeMode: ThemeMode;
   onCountryChange: (countryCode: CountryCode) => void;
+  onRouteViewModeChange: (mode: RouteViewMode) => void;
   onThemeChange: (themeMode: ThemeMode) => void;
   onOpenDebug: () => void;
 };
@@ -34,6 +36,27 @@ function LocaleIcon({ locale }: { locale: LocaleCode }) {
   return (
     <span aria-hidden="true" className="locale-option-icon">
       {locale.toUpperCase()}
+    </span>
+  );
+}
+
+function RouteDensityPreview({ mode }: { mode: RouteViewMode }) {
+  return (
+    <span aria-hidden="true" className={`route-density-preview route-density-preview-${mode}`}>
+      <span className="route-density-preview-shell">
+        <span className="route-density-preview-row">
+          <span className="route-density-preview-dot" />
+          <span className="route-density-preview-line route-density-preview-line-title" />
+        </span>
+        <span className="route-density-preview-row">
+          <span className="route-density-preview-dot" />
+          <span className="route-density-preview-line" />
+        </span>
+        <span className="route-density-preview-row">
+          <span className="route-density-preview-dot" />
+          <span className="route-density-preview-line route-density-preview-line-short" />
+        </span>
+      </span>
     </span>
   );
 }
@@ -104,8 +127,17 @@ function SettingsSelect<T extends string>({
   );
 }
 
-export function SettingsPage({ countryCode, themeMode, onCountryChange, onThemeChange, onOpenDebug }: SettingsPageProps) {
+export function SettingsPage({
+  countryCode,
+  routeViewMode,
+  themeMode,
+  onCountryChange,
+  onRouteViewModeChange,
+  onThemeChange,
+  onOpenDebug,
+}: SettingsPageProps) {
   const { locale, setLocale, messages } = useI18n();
+  const routeViewOptions: RouteViewMode[] = ['default', 'comfortable', 'compact'];
   const countryOptions = useMemo(
     () =>
       Object.values(COUNTRY_CONFIGS)
@@ -168,6 +200,35 @@ export function SettingsPage({ countryCode, themeMode, onCountryChange, onThemeC
       <div className="field field-compact">
         <label htmlFor="theme-select">{messages.pages.settings.themeLabel}</label>
         <SettingsSelect id="theme-select" value={themeMode} options={themeOptions} onChange={onThemeChange} />
+        <div className="small-text">{messages.labels.storedLocally}</div>
+      </div>
+
+      <div className="field">
+        <div>
+          <label>{messages.pages.settings.routeDensityLabel}</label>
+          <div className="small-text">{messages.pages.settings.routeDensitySubtitle}</div>
+        </div>
+        <div className="route-density-settings" role="radiogroup" aria-label={messages.pages.settings.routeDensityLabel}>
+          {routeViewOptions.map((mode) => (
+            <button
+              key={mode}
+              type="button"
+              role="radio"
+              aria-checked={routeViewMode === mode}
+              className={`route-density-option ${routeViewMode === mode ? 'route-density-option-active' : ''}`}
+              onClick={() => onRouteViewModeChange(mode)}
+            >
+              <span className="route-density-option-copy">
+                <span
+                  aria-hidden="true"
+                  className={`route-density-radio ${routeViewMode === mode ? 'route-density-radio-active' : ''}`}
+                />
+                <span className="route-density-option-label">{getRouteViewLabel(mode, messages)}</span>
+              </span>
+              <RouteDensityPreview mode={mode} />
+            </button>
+          ))}
+        </div>
         <div className="small-text">{messages.labels.storedLocally}</div>
       </div>
 

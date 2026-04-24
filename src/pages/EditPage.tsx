@@ -1,32 +1,24 @@
 import { mdiContentSave, mdiPlus } from '@mdi/js';
-import type { CountryConfig, Item } from '../types';
 import { Card } from '../components/Card';
 import { StatsGrid } from '../components/StatsGrid';
-import { ParsedItemCard } from '../components/ParsedItemCard';
-import { DebugLink } from '../components/DebugLink';
 import { SharedListPanel } from '../components/SharedListPanel';
 import { useI18n } from '../lib/i18n';
 import type { SharedListHistoryEntry } from '../types';
 
 type EditPageProps = {
   input: string;
-  items: Item[];
   draftItem: string;
   total: number;
   checkedTotal: number;
   progress: number;
-  config: CountryConfig;
   onInputChange: (value: string) => void;
   onDraftItemChange: (value: string) => void;
   onParse: () => void;
   onResetAll: () => void;
+  onResetChecks: () => void;
   onAddSingleItem: () => void;
-  onRenameItem: (itemId: string, nextRaw: string) => void;
-  onToggleItem: (itemId: string) => void;
-  onDeleteItem: (itemId: string) => void;
   onCreateSharedLink: () => void;
   onRefreshSharedList: () => void;
-  onOpenDebug: () => void;
   canUseBackend: boolean;
   canCreateSharedLink: boolean;
   resolvedTheme: 'light' | 'dark';
@@ -49,23 +41,18 @@ type EditPageProps = {
 
 export function EditPage({
   input,
-  items,
   draftItem,
   total,
   checkedTotal,
   progress,
-  config,
   onInputChange,
   onDraftItemChange,
   onParse,
   onResetAll,
+  onResetChecks,
   onAddSingleItem,
-  onRenameItem,
-  onToggleItem,
-  onDeleteItem,
   onCreateSharedLink,
   onRefreshSharedList,
-  onOpenDebug,
   canUseBackend,
   canCreateSharedLink,
   resolvedTheme,
@@ -140,6 +127,9 @@ export function EditPage({
         </div>
 
         <div className="button-row">
+          <button type="button" className="button" onClick={onResetChecks}>
+            {messages.actions.resetTicks}
+          </button>
           <button type="button" className="button" onClick={onResetAll}>
             {messages.actions.fullReset}
           </button>
@@ -178,33 +168,6 @@ export function EditPage({
           />
         </Card>
 
-        <Card
-          header={
-            <>
-              <h2 className="title title-sm">{messages.pages.edit.parsedTitle}</h2>
-              <p className="subtitle">{messages.pages.edit.parsedSubtitle}</p>
-            </>
-          }
-        >
-          <div className="scroll-region stack">
-            {items.length === 0 ? (
-              <div className="empty-state">{messages.pages.edit.parsedEmpty}</div>
-            ) : (
-              items.map((item) => (
-                <ParsedItemCard
-                  key={item.id}
-                  item={item}
-                  config={config}
-                  onRename={onRenameItem}
-                  onToggle={onToggleItem}
-                  onDelete={onDeleteItem}
-                />
-              ))
-            )}
-          </div>
-        </Card>
-
-        <DebugLink onOpen={onOpenDebug} />
       </div>
     </div>
   );

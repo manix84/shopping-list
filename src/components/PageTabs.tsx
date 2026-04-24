@@ -9,19 +9,22 @@ type PageTabsProps = {
 
 export function PageTabs({ page, hasItems, onChange }: PageTabsProps) {
   const { messages } = useI18n();
-  const shoppingListPage = hasItems ? 'route' : 'edit';
 
   return (
     <div className="button-row">
       <button
         type="button"
-        className={`button ${page === 'edit' || page === 'route' ? 'button-active' : ''}`}
-        onClick={() => onChange(shoppingListPage)}
+        className={`button ${page === 'edit' ? 'button-active' : ''}`}
+        onClick={() => onChange('edit')}
       >
-        {messages.nav.shoppingList}
+        {messages.nav.editList}
       </button>
-      <button type="button" className={`button ${page === 'sections' ? 'button-active' : ''}`} onClick={() => onChange('sections')}>
-        {messages.nav.sections}
+      <button
+        type="button"
+        className={`button ${page === 'route' ? 'button-active' : ''}`}
+        onClick={() => onChange(hasItems ? 'route' : 'edit')}
+      >
+        {messages.nav.route}
       </button>
       <button type="button" className={`button ${page === 'settings' ? 'button-active' : ''}`} onClick={() => onChange('settings')}>
         {messages.nav.settings}

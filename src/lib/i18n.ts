@@ -1,4 +1,5 @@
 import { createContext, useContext } from 'react';
+import type { RouteViewMode } from '../types';
 
 export const SUPPORTED_LOCALES = ['en', 'es'] as const;
 export type LocaleCode = (typeof SUPPORTED_LOCALES)[number];
@@ -11,7 +12,8 @@ type Messages = {
     subtitle: string;
   };
   nav: {
-    shoppingList: string;
+    editList: string;
+    route: string;
     sections: string;
     settings: string;
     debugTools: string;
@@ -28,6 +30,7 @@ type Messages = {
     goToEditList: string;
     loadSharedList: string;
     openDebugTools: string;
+    filterItems: string;
     refresh: string;
     refreshing: string;
     remove: string;
@@ -92,6 +95,9 @@ type Messages = {
       filterPlaceholder: string;
       emptyNoItems: string;
       emptyNoResults: string;
+      viewDefault: string;
+      viewComfortable: string;
+      viewCompact: string;
     };
     settings: {
       title: string;
@@ -99,6 +105,8 @@ type Messages = {
       countryLabel: string;
       themeLabel: string;
       localeLabel: string;
+      routeDensityLabel: string;
+      routeDensitySubtitle: string;
     };
     sections: {
       title: string;
@@ -107,6 +115,14 @@ type Messages = {
     debug: {
       title: string;
       subtitle: string;
+      parsedTitle: string;
+      parsedSubtitle: string;
+      tabParsed: string;
+      tabBackend: string;
+      tabMatcher: string;
+      tabQuantity: string;
+      tabSections: string;
+      tabStorage: string;
       backendTitle: string;
       backendConnected: string;
       backendChecking: string;
@@ -180,7 +196,8 @@ const en: Messages = {
     subtitle: 'Turn a rough grocery list into an ordered route through the store.',
   },
   nav: {
-    shoppingList: 'Shopping List',
+    editList: 'Edit list',
+    route: 'Route',
     sections: 'Sections',
     settings: 'Settings',
     debugTools: 'Debug tools',
@@ -197,6 +214,7 @@ const en: Messages = {
     goToEditList: 'Go to Edit list',
     loadSharedList: 'Load shared list',
     openDebugTools: 'Open debug tools',
+    filterItems: 'Filter items',
     refresh: 'Refresh',
     refreshing: 'Refreshing...',
     remove: 'Remove',
@@ -261,6 +279,9 @@ const en: Messages = {
       filterPlaceholder: 'Filter items',
       emptyNoItems: 'You need to add items on the Edit list page before the store route can be shown.',
       emptyNoResults: 'Nothing to show yet. Head back to the edit page and add some items.',
+      viewDefault: 'Default view',
+      viewComfortable: 'Comfortable view',
+      viewCompact: 'Compact view',
     },
     settings: {
       title: 'Settings',
@@ -268,6 +289,8 @@ const en: Messages = {
       countryLabel: 'Country profile',
       themeLabel: 'Theme',
       localeLabel: 'Language',
+      routeDensityLabel: 'Route density',
+      routeDensitySubtitle: 'How the shopping route is spaced on this device.',
     },
     sections: {
       title: 'Sections',
@@ -276,6 +299,14 @@ const en: Messages = {
     debug: {
       title: 'Debug tools',
       subtitle: 'Self-checks and parser diagnostics live here instead of cluttering the main flow.',
+      parsedTitle: 'Parsed items',
+      parsedSubtitle: 'Inspect and manually adjust the structured items generated from the current list.',
+      tabParsed: 'Parsed',
+      tabBackend: 'Backend',
+      tabMatcher: 'Matcher',
+      tabQuantity: 'Quantity',
+      tabSections: 'Sections',
+      tabStorage: 'Storage',
       backendTitle: 'Backend checks',
       backendConnected: 'Backend API and database are available.',
       backendChecking: 'Backend status is being checked.',
@@ -352,7 +383,8 @@ const es: Messages = {
     subtitle: 'Convierte una lista rápida en una ruta ordenada por la tienda.',
   },
   nav: {
-    shoppingList: 'Lista de la compra',
+    editList: 'Editar lista',
+    route: 'Ruta',
     sections: 'Secciones',
     settings: 'Ajustes',
     debugTools: 'Herramientas de depuración',
@@ -369,6 +401,7 @@ const es: Messages = {
     goToEditList: 'Ir a Editar lista',
     loadSharedList: 'Abrir lista compartida',
     openDebugTools: 'Abrir herramientas de depuración',
+    filterItems: 'Filtrar artículos',
     refresh: 'Actualizar',
     refreshing: 'Actualizando...',
     remove: 'Eliminar',
@@ -433,6 +466,9 @@ const es: Messages = {
       filterPlaceholder: 'Filtrar artículos',
       emptyNoItems: 'Primero debes añadir artículos en la página de edición para mostrar la ruta.',
       emptyNoResults: 'Aún no hay nada que mostrar. Vuelve a la página de edición y añade algunos artículos.',
+      viewDefault: 'Vista predeterminada',
+      viewComfortable: 'Vista cómoda',
+      viewCompact: 'Vista compacta',
     },
     settings: {
       title: 'Ajustes',
@@ -440,6 +476,8 @@ const es: Messages = {
       countryLabel: 'Perfil de país',
       themeLabel: 'Tema',
       localeLabel: 'Idioma',
+      routeDensityLabel: 'Densidad de la ruta',
+      routeDensitySubtitle: 'Cómo se espacia la ruta de compra en este dispositivo.',
     },
     sections: {
       title: 'Secciones',
@@ -448,6 +486,14 @@ const es: Messages = {
     debug: {
       title: 'Herramientas de depuración',
       subtitle: 'Las comprobaciones y diagnósticos viven aquí en vez de saturar el flujo principal.',
+      parsedTitle: 'Artículos procesados',
+      parsedSubtitle: 'Inspecciona y ajusta manualmente los elementos estructurados generados desde la lista actual.',
+      tabParsed: 'Procesados',
+      tabBackend: 'Backend',
+      tabMatcher: 'Clasificador',
+      tabQuantity: 'Cantidad',
+      tabSections: 'Secciones',
+      tabStorage: 'Almacenamiento',
       backendTitle: 'Comprobaciones del backend',
       backendConnected: 'La API del backend y la base de datos están disponibles.',
       backendChecking: 'Se está comprobando el estado del backend.',
@@ -527,6 +573,16 @@ export const isLocaleCode = (value: unknown): value is LocaleCode =>
   typeof value === 'string' && SUPPORTED_LOCALES.includes(value as LocaleCode);
 
 export const resolveLocale = (value: unknown): LocaleCode => (isLocaleCode(value) ? value : 'en');
+
+export const getRouteViewLabel = (
+  mode: RouteViewMode,
+  messages: Messages,
+): string =>
+  mode === 'comfortable'
+    ? messages.pages.route.viewComfortable
+    : mode === 'compact'
+      ? messages.pages.route.viewCompact
+      : messages.pages.route.viewDefault;
 
 export const getBrowserLocale = (language?: string): LocaleCode => {
   const effectiveLanguage =

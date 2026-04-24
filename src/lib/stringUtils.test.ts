@@ -6,6 +6,7 @@ import {
   normalize,
   pluralizeEntryName,
   stripDisplaySizeLabel,
+  unwrapContainerName,
 } from './stringUtils';
 
 describe('string utilities', () => {
@@ -38,5 +39,10 @@ describe('string utilities', () => {
 
   it('cleans entry names for matching', () => {
     expect(cleanEntryName('free-range bananas')).toBe('banana');
+  });
+
+  it('unwraps container prefixes from product names', () => {
+    expect(unwrapContainerName('bags of rice')).toBe('rice');
+    expect(unwrapContainerName('bag of basmati rice')).toBe('basmati rice');
   });
 });

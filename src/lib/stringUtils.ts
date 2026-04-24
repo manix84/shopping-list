@@ -114,8 +114,17 @@ export const removeLeadingDescriptors = (value: unknown): string =>
     .replace(/^(fresh|large|small|medium|organic|british|free range|free-range|extra large|extra-large)\s+/i, '')
     .trim();
 
+export const unwrapContainerName = (value: unknown): string =>
+  ensureString(value)
+    .trim()
+    .replace(
+      /^(?:bag|bags|pack|packs|packet|packets|box|boxes|pouch|pouches|sack|sacks|tray|trays|tub|tubs)\s+of\s+/i,
+      '',
+    )
+    .trim();
+
 export const cleanEntryName = (value: unknown): string =>
-  removeLeadingDescriptors(value)
+  unwrapContainerName(removeLeadingDescriptors(value))
     .split(' ')
     .filter(Boolean)
     .map(singularizeWord)
