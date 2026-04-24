@@ -2,6 +2,7 @@ import type { CountryConfig } from '../../types';
 
 export const UK_CONFIG: CountryConfig = {
   code: 'uk',
+  flag: '🇬🇧',
   label: 'United Kingdom',
   groups: [
     {

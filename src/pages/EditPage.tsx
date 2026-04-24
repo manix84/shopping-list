@@ -82,7 +82,7 @@ export function EditPage({
 
         <div className="field">
           <label htmlFor="shopping-quick-add">{messages.pages.edit.quickAddLabel}</label>
-          <div className="inline-row">
+          <div className="inline-row quick-add-row">
             <input
               id="shopping-quick-add"
               className="input"
@@ -90,8 +90,14 @@ export function EditPage({
               onChange={(event) => onDraftItemChange(event.target.value)}
               placeholder={messages.pages.edit.quickAddPlaceholder}
             />
-            <button type="button" className="button button-primary" onClick={onAddSingleItem}>
-              {messages.actions.add}
+            <button
+              type="button"
+              className="button button-primary button-icon"
+              onClick={onAddSingleItem}
+              aria-label={messages.actions.add}
+              title={messages.actions.add}
+            >
+              <span aria-hidden="true" className="button-icon-plus" />
             </button>
           </div>
         </div>

@@ -72,6 +72,7 @@ export type SectionGroup = {
 
 export type CountryConfig = {
   code: CountryCode;
+  flag: string;
   label: string;
   groups: SectionGroup[];
 };

@@ -46,6 +46,16 @@ const defaultBackendStatus = (): BackendStatus => ({
 
 const appBasePath = import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_URL.replace(/\/$/, '');
 
+const updateBrowserIcon = (theme: 'light' | 'dark'): void => {
+  if (typeof document === 'undefined') return;
+
+  const iconLink = document.querySelector<HTMLLinkElement>('#browser-theme-icon');
+  const nextIcon = theme === 'dark' ? iconLink?.dataset.darkHref : iconLink?.dataset.lightHref;
+  if (iconLink && nextIcon) {
+    iconLink.href = nextIcon;
+  }
+};
+
 const readRouteFromLocation = (): AppRoute => {
   if (typeof window === 'undefined') return { page: DEFAULT_PAGE };
 
@@ -132,6 +142,8 @@ export default function App() {
     if (themeColorMeta) {
       themeColorMeta.content = resolved === 'dark' ? '#0b1220' : '#0f172a';
     }
+
+    updateBrowserIcon(resolved);
   };
 
   useEffect(() => {
@@ -330,6 +342,12 @@ export default function App() {
     syncRouteToUrl(route);
   }, [route]);
 
+  useEffect(() => {
+    if (isLoaded && page === 'route' && items.length === 0) {
+      setRoute((current) => ({ ...current, page: 'edit' }));
+    }
+  }, [isLoaded, items.length, page]);
+
   const matcherTests = useMemo(() => runMatcherTests(config), [config]);
   const quantityTests = useMemo(() => runQuantityTests(), []);
   const storageTests = useMemo(() => runStorageTests(), []);
@@ -508,7 +526,7 @@ export default function App() {
     <I18nProvider value={{ locale, messages, setLocale }}>
       <div className="shopping-app">
         <div className="shopping-shell">
-          <AppHeader page={page} backendStatus={backendStatus} onChangePage={changePage} />
+          <AppHeader page={page} hasItems={items.length > 0} backendStatus={backendStatus} onChangePage={changePage} />
 
           {page === 'edit' ? (
             <EditPage

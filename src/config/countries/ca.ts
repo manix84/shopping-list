@@ -2,6 +2,7 @@ import type { CountryConfig } from '../../types';
 
 export const CA_CONFIG: CountryConfig = {
   code: 'ca',
+  flag: '🇨🇦',
   label: 'Canada',
   groups: [
     {

@@ -45,6 +45,11 @@ export function RoutePage({
             <button type="button" className="button" onClick={onResetChecks}>
               {messages.actions.resetTicks}
             </button>
+            {hasItems ? (
+              <button type="button" className="button" onClick={onOpenEdit}>
+                {messages.actions.editList}
+              </button>
+            ) : null}
             <button type="button" className="button button-primary" onClick={onResort}>
               {messages.actions.resortFromList}
             </button>
