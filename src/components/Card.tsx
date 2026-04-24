@@ -10,7 +10,7 @@ export function Card({ header, className = '', bodyClassName = '', children }: C
   return (
     <section className={`card ${className}`.trim()}>
       {header ? <div className="card-header">{header}</div> : null}
-      <div className={`card-body ${bodyClassName}`.trim()}>{children}</div>
+      {children ? <div className={`card-body ${bodyClassName}`.trim()}>{children}</div> : null}
     </section>
   );
 }

@@ -196,7 +196,7 @@ export default function App() {
 
     const themeColorMeta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
     if (themeColorMeta) {
-      themeColorMeta.content = resolved === 'dark' ? '#0b1220' : '#0f172a';
+      themeColorMeta.content = resolved === 'dark' ? '#0b1220' : '#f6f7fb';
     }
 
     updateBrowserIcon(resolved);
