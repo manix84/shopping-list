@@ -1,5 +1,5 @@
 import type { Item, CountryConfig } from '../types';
-import { getDisplayValue, getQuantityValue, getSizeValue } from '../lib/parser';
+import { getDisplayValue, getQuantityValue, getSizeValue, getUnitQuantityValue } from '../lib/parser';
 import { getSectionMeta } from '../lib/sections';
 import { Badge } from './Badge';
 import { useI18n } from '../lib/i18n';
@@ -51,6 +51,7 @@ export function ParsedItemCard({ item, config, onRename, onToggle, onDelete }: P
                 {messages.labels.qty}: {getQuantityValue(item)}
               </Badge>
             ) : null}
+            {getUnitQuantityValue(item) ? <Badge>{getUnitQuantityValue(item)}</Badge> : null}
           </div>
         </div>
         <div className="button-row">

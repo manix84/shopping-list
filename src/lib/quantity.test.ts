@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { extractQuantity, formatCountQuantity, parseQuantityValue } from './quantity';
+import { extractQuantifiedItem, extractQuantity, formatCountQuantity, parseQuantityValue } from './quantity';
 
 describe('quantity helpers', () => {
   it('formats count quantities', () => {
@@ -22,5 +22,13 @@ describe('quantity helpers', () => {
     ['1.5kg potatoes', { name: 'potatoes', quantity: '1.5kg' }],
   ])('extracts %s', (input, expected) => {
     expect(extractQuantity(input)).toMatchObject(expected);
+  });
+
+  it('extracts count and unit quantity together', () => {
+    expect(extractQuantifiedItem('2x 500g bags of rice')).toMatchObject({
+      name: 'bags of rice',
+      quantity: '500g',
+      quantityValue: 2,
+    });
   });
 });

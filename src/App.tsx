@@ -29,14 +29,16 @@ import { readRouteFromLocationParts, routeToUrl } from './lib/routing';
 import { getSectionMeta } from './lib/sections';
 import { extractSharedListId } from './lib/sharedLinks';
 import { cleanLine, stripDisplaySizeLabel } from './lib/stringUtils';
+import { loadRouteViewMode, saveRouteViewMode } from './lib/routeViewPreference';
 import { getResolvedTheme, loadThemeMode, saveThemeMode } from './lib/themePreference';
 import { createUuidV7 } from './lib/uuid';
+import { formatCountQuantity } from './lib/quantity';
 import { DebugPage } from './pages/DebugPage';
 import { EditPage } from './pages/EditPage';
 import { RoutePage } from './pages/RoutePage';
 import { SectionsPage } from './pages/SectionsPage';
 import { SettingsPage } from './pages/SettingsPage';
-import type { AppRoute, BackendStatus, CountryCode, GroupedSectionView, Item, PageKey, SectionKey, SharedListHistoryEntry, ThemeMode } from './types';
+import type { AppRoute, BackendStatus, CountryCode, GroupedSectionView, Item, PageKey, RouteViewMode, SectionKey, SharedListHistoryEntry, ThemeMode } from './types';
 import type { ApiSettingsPayload } from './lib/repository/apiRepository';
 
 const DEFAULT_PAGE: PageKey = 'edit';
@@ -187,6 +189,7 @@ export default function App() {
   const [isServerBackedList, setIsServerBackedList] = useState(false);
   const [countryCode, setCountryCode] = useState<CountryCode>('uk');
   const [themeMode, setThemeMode] = useState<ThemeMode>(() => loadThemeMode());
+  const [routeViewMode, setRouteViewMode] = useState<RouteViewMode>(() => loadRouteViewMode());
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>(() => getResolvedTheme(loadThemeMode()));
   const [locale, setLocale] = useState(() => loadLocale());
   const [isCreatingShareLink, setIsCreatingShareLink] = useState(false);
@@ -535,6 +538,10 @@ export default function App() {
   }, [locale, messages]);
 
   useEffect(() => {
+    saveRouteViewMode(routeViewMode);
+  }, [routeViewMode]);
+
+  useEffect(() => {
     if (!isLoaded) return;
     const record = buildRecord(input, items, countryCode, activeListId, isServerBackedList);
 
@@ -635,7 +642,12 @@ export default function App() {
       const target = current.find((item) => item.id === itemId);
       if (!target) return current;
 
-      const nextStoredValue = [target.size, cleanedRaw, target.quantity].filter(Boolean).join(' ');
+      const nextStoredValue = [
+        target.size,
+        typeof target.quantityValue === 'number' ? formatCountQuantity(target.quantityValue) : undefined,
+        cleanedRaw,
+        target.quantity,
+      ].filter(Boolean).join(' ');
       const nextInput = updateItemTextInInput(input, getStoredValue(target), nextStoredValue);
       setInput(nextInput);
       return parseItems(nextInput, config, current);
@@ -805,7 +817,9 @@ export default function App() {
               query={query}
               grouped={grouped}
               hasItems={items.length > 0}
+              viewMode={routeViewMode}
               onQueryChange={setQuery}
+              onViewModeChange={setRouteViewMode}
               onResetChecks={resetChecks}
               onResort={handleParse}
               onToggleSection={toggleSection}
@@ -817,8 +831,10 @@ export default function App() {
           {page === 'settings' ? (
             <SettingsPage
               countryCode={countryCode}
+              routeViewMode={routeViewMode}
               themeMode={themeMode}
               onCountryChange={handleCountryChange}
+              onRouteViewModeChange={setRouteViewMode}
               onThemeChange={setThemeMode}
               onOpenDebug={() => changePage('debug')}
             />

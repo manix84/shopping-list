@@ -17,37 +17,71 @@ export const parseQuantityValue = (quantity: unknown): number | undefined => {
   return undefined;
 };
 
-export const extractQuantity = (value: unknown): { quantity?: string; quantityValue?: number; name: string } => {
-  const trimmed = cleanLine(value);
+type ExtractedQuantifiedItem = {
+  name: string;
+  quantity?: string;
+  quantityValue?: number;
+};
 
-  let match = trimmed.match(/^(\d+)\s*x\s+(.+)$/i);
+const extractCountQuantity = (value: string): ExtractedQuantifiedItem => {
+  let match = value.match(/^(\d+)\s*x\s+(.+)$/i);
   if (match) {
     const quantityValue = Number(match[1]);
-    return { quantity: formatCountQuantity(quantityValue), quantityValue, name: match[2] };
+    return { quantityValue, name: match[2] };
   }
 
-  match = trimmed.match(/^(x\s*\d+)\s+(.+)$/i);
+  match = value.match(/^(x\s*\d+)\s+(.+)$/i);
   if (match) {
-    const quantityValue = parseQuantityValue(match[1]);
-    return { quantity: formatCountQuantity(quantityValue ?? 0), quantityValue, name: match[2] };
+    return { quantityValue: parseQuantityValue(match[1]), name: match[2] };
   }
 
-  match = trimmed.match(/^(.+?)\s+x\s*(\d+)$/i);
+  match = value.match(/^(.+?)\s+x\s*(\d+)$/i);
   if (match) {
     const quantityValue = Number(match[2]);
-    return { quantity: formatCountQuantity(quantityValue), quantityValue, name: match[1] };
+    return { quantityValue, name: match[1] };
   }
 
-  match = trimmed.match(/^(\d+(?:\.\d+)?[a-zA-Z]+)\s+(.+)$/i);
+  match = value.match(/^(\d+)\s+(.+)$/i);
+  if (match) {
+    const quantityValue = Number(match[1]);
+    return { quantityValue, name: match[2] };
+  }
+
+  return { name: value };
+};
+
+const extractUnitQuantity = (value: string): { quantity?: string; name: string } => {
+  let match = value.match(/^(\d+(?:\.\d+)?[a-zA-Z]+)\s+(.+)$/i);
   if (match) {
     return { quantity: match[1], name: match[2] };
   }
 
-  match = trimmed.match(/^(\d+)\s+(.+)$/i);
+  match = value.match(/^(.+?)\s+(\d+(?:\.\d+)?[a-zA-Z]+)$/i);
   if (match) {
-    const quantityValue = Number(match[1]);
-    return { quantity: formatCountQuantity(quantityValue), quantityValue, name: match[2] };
+    return { quantity: match[2], name: match[1] };
   }
 
-  return { name: trimmed };
+  return { name: value };
+};
+
+export const extractQuantifiedItem = (value: unknown): ExtractedQuantifiedItem => {
+  const trimmed = cleanLine(value);
+  const counted = extractCountQuantity(trimmed);
+  const unitized = extractUnitQuantity(counted.name);
+
+  return {
+    name: unitized.name,
+    quantity: unitized.quantity,
+    quantityValue: counted.quantityValue,
+  };
+};
+
+export const extractQuantity = (value: unknown): { quantity?: string; quantityValue?: number; name: string } => {
+  const extracted = extractQuantifiedItem(value);
+
+  if (typeof extracted.quantityValue === 'number') {
+    return { quantity: formatCountQuantity(extracted.quantityValue), quantityValue: extracted.quantityValue, name: extracted.name };
+  }
+
+  return { quantity: extracted.quantity, name: extracted.name };
 };

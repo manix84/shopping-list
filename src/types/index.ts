@@ -5,6 +5,7 @@ export type AppRoute = {
 };
 export type CountryCode = 'uk' | 'us' | 'ca';
 export type ThemeMode = 'system' | 'light' | 'dark';
+export type RouteViewMode = 'default' | 'comfortable' | 'compact';
 
 export type SectionKey =
   | 'produce'

@@ -44,6 +44,7 @@ export const QUANTITY_TEST_CASES: QuantityTestCase[] = [
   { input: '1.5kg potatoes', expectedName: 'potatoes', expectedQuantity: '1.5kg' },
   { input: 'ice-cream', expectedName: 'ice-cream' },
   { input: 'x3 bananas', expectedName: 'bananas', expectedQuantity: 'x3', expectedQuantityValue: 3 },
+  { input: '2x 500g bags of rice', expectedName: 'bags of rice', expectedQuantity: 'x2', expectedQuantityValue: 2 },
 ];
 
 const STORAGE_FIXTURE_INPUT = 'small milk\nbananas x2\n500g mince';

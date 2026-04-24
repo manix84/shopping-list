@@ -1,4 +1,5 @@
 import { createContext, useContext } from 'react';
+import type { RouteViewMode } from '../types';
 
 export const SUPPORTED_LOCALES = ['en', 'es'] as const;
 export type LocaleCode = (typeof SUPPORTED_LOCALES)[number];
@@ -92,6 +93,9 @@ type Messages = {
       filterPlaceholder: string;
       emptyNoItems: string;
       emptyNoResults: string;
+      viewDefault: string;
+      viewComfortable: string;
+      viewCompact: string;
     };
     settings: {
       title: string;
@@ -99,6 +103,8 @@ type Messages = {
       countryLabel: string;
       themeLabel: string;
       localeLabel: string;
+      routeDensityLabel: string;
+      routeDensitySubtitle: string;
     };
     sections: {
       title: string;
@@ -261,6 +267,9 @@ const en: Messages = {
       filterPlaceholder: 'Filter items',
       emptyNoItems: 'You need to add items on the Edit list page before the store route can be shown.',
       emptyNoResults: 'Nothing to show yet. Head back to the edit page and add some items.',
+      viewDefault: 'Default view',
+      viewComfortable: 'Comfortable view',
+      viewCompact: 'Compact view',
     },
     settings: {
       title: 'Settings',
@@ -268,6 +277,8 @@ const en: Messages = {
       countryLabel: 'Country profile',
       themeLabel: 'Theme',
       localeLabel: 'Language',
+      routeDensityLabel: 'Route density',
+      routeDensitySubtitle: 'How the shopping route is spaced on this device.',
     },
     sections: {
       title: 'Sections',
@@ -433,6 +444,9 @@ const es: Messages = {
       filterPlaceholder: 'Filtrar artículos',
       emptyNoItems: 'Primero debes añadir artículos en la página de edición para mostrar la ruta.',
       emptyNoResults: 'Aún no hay nada que mostrar. Vuelve a la página de edición y añade algunos artículos.',
+      viewDefault: 'Vista predeterminada',
+      viewComfortable: 'Vista cómoda',
+      viewCompact: 'Vista compacta',
     },
     settings: {
       title: 'Ajustes',
@@ -440,6 +454,8 @@ const es: Messages = {
       countryLabel: 'Perfil de país',
       themeLabel: 'Tema',
       localeLabel: 'Idioma',
+      routeDensityLabel: 'Densidad de la ruta',
+      routeDensitySubtitle: 'Cómo se espacia la ruta de compra en este dispositivo.',
     },
     sections: {
       title: 'Secciones',
@@ -527,6 +543,16 @@ export const isLocaleCode = (value: unknown): value is LocaleCode =>
   typeof value === 'string' && SUPPORTED_LOCALES.includes(value as LocaleCode);
 
 export const resolveLocale = (value: unknown): LocaleCode => (isLocaleCode(value) ? value : 'en');
+
+export const getRouteViewLabel = (
+  mode: RouteViewMode,
+  messages: Messages,
+): string =>
+  mode === 'comfortable'
+    ? messages.pages.route.viewComfortable
+    : mode === 'compact'
+      ? messages.pages.route.viewCompact
+      : messages.pages.route.viewDefault;
 
 export const getBrowserLocale = (language?: string): LocaleCode => {
   const effectiveLanguage =
