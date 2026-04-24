@@ -18,6 +18,9 @@
   --danger-bg: #fef2f2;
   --danger-text: #991b1b;
   --danger-border: #fecaca;
+  --muted-bg: #eef1f6;
+  --muted-text: #526172;
+  --muted-border: #cfd6e2;
   --shadow-color: rgba(15, 23, 42, 0.08);
 }
 
@@ -39,6 +42,9 @@
   --danger-bg: rgba(153, 27, 27, 0.26);
   --danger-text: #ffb7b7;
   --danger-border: #c74a4a;
+  --muted-bg: rgba(148, 163, 184, 0.16);
+  --muted-text: #b8c4d6;
+  --muted-border: #3a465b;
   --shadow-color: rgba(0, 0, 0, 0.35);
 }
 
@@ -112,6 +118,14 @@ select {
   display: flex;
   align-items: center;
   gap: 16px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .app-icon {
@@ -346,6 +360,12 @@ select {
     color: $danger-text;
     border-color: $danger-border;
   }
+
+  &-muted {
+    background: var(--muted-bg);
+    color: var(--muted-text);
+    border-color: var(--muted-border);
+  }
 }
 
 .section-card {
@@ -550,7 +570,8 @@ select {
 
   .item-row,
   .section-header,
-  .title-row {
+  .title-row,
+  .header-actions {
     flex-direction: column;
     align-items: stretch;
   }

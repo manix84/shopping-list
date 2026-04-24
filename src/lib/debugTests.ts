@@ -7,6 +7,7 @@ import { parseItems } from './parser';
 import { STORAGE_KEY, localStorageRepository } from './repository/localStorageRepository';
 import { decodeShoppingListRecord, encodeShoppingListRecord } from './repository/recordCodec';
 import { THEME_STORAGE_KEY, loadThemeMode, saveThemeMode } from './themePreference';
+import { isUuidV7 } from './uuid';
 
 export const MATCHER_TEST_CASES: MatcherTestCase[] = [
   { input: 'spaghetti', expectedSection: 'pasta' },
@@ -47,6 +48,8 @@ export const QUANTITY_TEST_CASES: QuantityTestCase[] = [
 
 const STORAGE_FIXTURE_INPUT = 'small milk\nbananas x2\n500g mince';
 const STORAGE_FIXTURE_RECORD = {
+  listId: '019dbf30-56de-7b2b-aacc-a5ae59430d7f',
+  serverBacked: true,
   input: STORAGE_FIXTURE_INPUT,
   items: parseItems(STORAGE_FIXTURE_INPUT, COUNTRY_CONFIGS.uk),
   updatedAt: '2026-04-22T00:00:00.000Z',
@@ -59,6 +62,8 @@ export const runStorageTests = (): StorageTestResult[] => {
   const codecPassed =
     !!decoded &&
     decoded.input === STORAGE_FIXTURE_RECORD.input &&
+    decoded.listId === STORAGE_FIXTURE_RECORD.listId &&
+    decoded.serverBacked === true &&
     decoded.countryCode === STORAGE_FIXTURE_RECORD.countryCode &&
     decoded.items.length === STORAGE_FIXTURE_RECORD.items.length &&
     decoded.items[0]?.sizeValue === 'S' &&
@@ -68,11 +73,17 @@ export const runStorageTests = (): StorageTestResult[] => {
   const results: StorageTestResult[] = [
     {
       title: 'Storage codec round-trip',
-      expected: 'Keep input, items, country, and derived metadata intact',
+      expected: 'Keep list identity, backend status, input, items, country, and derived metadata intact',
       actual: decoded
-        ? `input ${decoded.input.length} chars, ${decoded.items.length} items, country ${decoded.countryCode}`
+        ? `list ${decoded.listId ?? 'missing'}, backend ${decoded.serverBacked ? 'yes' : 'no'}, ${decoded.items.length} items`
         : 'decode failed',
       passed: codecPassed,
+    },
+    {
+      title: 'UUIDv7 list identity',
+      expected: 'Records carry a share-ready UUIDv7 list id',
+      actual: decoded?.listId ?? 'missing',
+      passed: isUuidV7(decoded?.listId),
     },
   ];
 
@@ -97,6 +108,8 @@ export const runStorageTests = (): StorageTestResult[] => {
     const loaded = localStorageRepository.load();
     const repoPassed =
       loaded.input === STORAGE_FIXTURE_RECORD.input &&
+      loaded.listId === STORAGE_FIXTURE_RECORD.listId &&
+      loaded.serverBacked === true &&
       loaded.countryCode === STORAGE_FIXTURE_RECORD.countryCode &&
       loaded.items.length === STORAGE_FIXTURE_RECORD.items.length &&
       loaded.items[0]?.sizeValue === 'S' &&
@@ -105,8 +118,8 @@ export const runStorageTests = (): StorageTestResult[] => {
 
     results.push({
       title: 'Local storage round-trip',
-      expected: 'Persist and restore the full shopping list record',
-      actual: `input ${loaded.input.length} chars, ${loaded.items.length} items, country ${loaded.countryCode}`,
+      expected: 'Persist and restore the full shopping list backup record',
+      actual: `list ${loaded.listId ?? 'missing'}, backend ${loaded.serverBacked ? 'yes' : 'no'}, ${loaded.items.length} items`,
       passed: repoPassed,
     });
   } finally {

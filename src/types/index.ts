@@ -1,4 +1,8 @@
 export type PageKey = 'edit' | 'route' | 'settings' | 'debug';
+export type AppRoute = {
+  page: PageKey;
+  listId?: string;
+};
 export type CountryCode = 'uk' | 'us' | 'ca';
 export type ThemeMode = 'system' | 'light' | 'dark';
 
@@ -45,6 +49,8 @@ export type Item = {
 };
 
 export type ShoppingListRecord = {
+  listId?: string;
+  serverBacked?: boolean;
   input: string;
   items: Item[];
   updatedAt: string;
@@ -109,4 +115,20 @@ export type StorageTestResult = {
   expected: string;
   actual: string;
   passed: boolean;
+};
+
+export type BackendConnectionState = 'checking' | 'connected' | 'offline' | 'error';
+
+export type BackendStatus = {
+  state: BackendConnectionState;
+  health: {
+    ok: boolean;
+    mode?: string;
+  };
+  database: {
+    ok: boolean;
+    shoppingListExists?: boolean;
+    updatedAt?: string;
+    sharedListCount?: number;
+  };
 };

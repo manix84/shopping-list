@@ -1,8 +1,9 @@
-import type { MatcherTestResult, QuantityTestResult, StorageTestResult } from '../types';
+import type { BackendStatus, MatcherTestResult, QuantityTestResult, StorageTestResult } from '../types';
 import { Card } from '../components/Card';
 import { TestResultCard } from '../components/TestResultCard';
 
 type DebugPageProps = {
+  backendStatus: BackendStatus;
   matcherTests: MatcherTestResult[];
   quantityTests: QuantityTestResult[];
   storageTests: StorageTestResult[];
@@ -13,7 +14,27 @@ type DebugPageProps = {
   onBackToSettings: () => void;
 };
 
+const backendSummary = (status: BackendStatus): string => {
+  if (status.state === 'connected') return 'Backend API and database are available.';
+  if (status.state === 'checking') return 'Backend status is being checked.';
+  if (status.state === 'error') return 'Backend responded, but one or more checks failed.';
+  return 'Backend is offline; the app is using frontend-only storage.';
+};
+
+const backendTone = (status: BackendStatus) => {
+  if (status.state === 'connected') return 'success' as const;
+  if (status.state === 'error') return 'danger' as const;
+  return 'muted' as const;
+};
+
+const backendLabel = (status: BackendStatus) => {
+  if (status.state === 'connected') return 'Pass';
+  if (status.state === 'error') return 'Fail';
+  return 'Unavailable';
+};
+
 export function DebugPage({
+  backendStatus,
   matcherTests,
   quantityTests,
   storageTests,
@@ -39,6 +60,41 @@ export function DebugPage({
       }
       bodyClassName="stack"
     >
+      <Card
+        header={
+          <>
+            <h2 className="title title-sm">Backend checks</h2>
+            <p className="subtitle">{backendSummary(backendStatus)}</p>
+          </>
+        }
+        bodyClassName="stack"
+      >
+        <TestResultCard
+          title="Backend health"
+          expected="GET /api/health returns OK"
+          actual={
+            backendStatus.state === 'connected' || backendStatus.state === 'error'
+              ? `state ${backendStatus.state}, mode ${backendStatus.health.mode ?? 'unknown'}`
+              : `state ${backendStatus.state}`
+          }
+          passed={backendStatus.health.ok}
+          tone={backendTone(backendStatus)}
+          label={backendLabel(backendStatus)}
+        />
+        <TestResultCard
+          title="Database"
+          expected="GET /api/database/status can read the backend store"
+          actual={
+            backendStatus.database.ok
+              ? `available, default list ${backendStatus.database.shoppingListExists ? 'exists' : 'empty'}, shared lists ${backendStatus.database.sharedListCount ?? 0}, updated ${backendStatus.database.updatedAt ?? 'unknown'}`
+              : `state ${backendStatus.state}`
+          }
+          passed={backendStatus.database.ok}
+          tone={backendTone(backendStatus)}
+          label={backendLabel(backendStatus)}
+        />
+      </Card>
+
       <Card
         header={
           <>

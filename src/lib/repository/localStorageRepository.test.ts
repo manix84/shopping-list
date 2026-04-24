@@ -3,6 +3,7 @@ import { UK_CONFIG } from '../../config/countries/uk';
 import { STORAGE_KEY, localStorageRepository } from './localStorageRepository';
 import { parseItems } from '../parser';
 import { createWindowMock } from '../../test/testUtils';
+import { isUuidV7 } from '../uuid';
 
 describe('localStorageRepository', () => {
   afterEach(() => {
@@ -17,7 +18,9 @@ describe('localStorageRepository', () => {
     expect(loaded).toMatchObject({
       input: '',
       countryCode: 'uk',
+      serverBacked: false,
     });
+    expect(isUuidV7(loaded.listId)).toBe(true);
     expect(loaded.items).toHaveLength(0);
   });
 
@@ -27,6 +30,8 @@ describe('localStorageRepository', () => {
 
     const input = 'small milk\nbananas x2';
     const record = {
+      listId: '019dbf30-56de-7b2b-aacc-a5ae59430d7f',
+      serverBacked: true,
       input,
       items: parseItems(input, UK_CONFIG),
       updatedAt: '2026-04-22T00:00:00.000Z',
@@ -38,6 +43,8 @@ describe('localStorageRepository', () => {
 
     const loaded = localStorageRepository.load();
     expect(loaded).toMatchObject({
+      listId: record.listId,
+      serverBacked: true,
       input,
       updatedAt: record.updatedAt,
       countryCode: 'uk',

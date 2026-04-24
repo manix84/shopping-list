@@ -6,9 +6,14 @@ type TestResultCardProps = {
   expected: ReactNode;
   actual: ReactNode;
   passed: boolean;
+  tone?: 'default' | 'success' | 'danger' | 'muted';
+  label?: string;
 };
 
-export function TestResultCard({ title, expected, actual, passed }: TestResultCardProps) {
+export function TestResultCard({ title, expected, actual, passed, tone, label }: TestResultCardProps) {
+  const badgeTone = tone ?? (passed ? 'success' : 'danger');
+  const badgeLabel = label ?? (passed ? 'Pass' : 'Fail');
+
   return (
     <div className="test-card">
       <div className="card-body">
@@ -18,7 +23,7 @@ export function TestResultCard({ title, expected, actual, passed }: TestResultCa
             <div className="small-text">expected {expected}</div>
             <div className="small-text">got {actual}</div>
           </div>
-          <Badge tone={passed ? 'success' : 'danger'}>{passed ? 'Pass' : 'Fail'}</Badge>
+          <Badge tone={badgeTone}>{badgeLabel}</Badge>
         </div>
       </div>
     </div>

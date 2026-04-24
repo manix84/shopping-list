@@ -33,6 +33,72 @@ npm install
 npm run dev
 ```
 
+## Optional backend mode
+
+The app can run in two modes:
+
+- frontend-only mode uses browser `localStorage` and works as a static site
+- backend mode is enabled automatically when `/api/health` responds
+
+When backend mode is available, the app loads the browser record and the backend record, chooses the newest saved record using `updatedAt`, writes that winning record to both places, then keeps saving future edits to both local cache and the backend.
+
+Run the backend API:
+
+```bash
+npm run api
+```
+
+Run the frontend in another terminal:
+
+```bash
+npm run dev
+```
+
+The Vite dev server proxies `/api` to `http://localhost:8787`. For production backend hosting, build the frontend and run the API server:
+
+```bash
+npm run build
+npm run api
+```
+
+By default, the backend stores data in `data/shopping-list-db.json`. Set `SHOPPING_LIST_DB_PATH` to use another file path.
+
+### Home Assistant
+
+Set these environment variables before starting the backend:
+
+```bash
+HOME_ASSISTANT_URL=http://homeassistant.local:8123
+HOME_ASSISTANT_TOKEN=your-long-lived-access-token
+```
+
+Backend routes:
+
+- `GET /api/home-assistant/status`
+- `POST /api/home-assistant/sync` pushes the current backend shopping list to Home Assistant
+- `POST /api/home-assistant/add-item` with `{ "name": "Milk" }`
+- `POST /api/home-assistant/remove-item` with `{ "name": "Milk" }`
+- `POST /api/home-assistant/complete-item` with `{ "name": "Milk" }`
+- `POST /api/home-assistant/incomplete-item` with `{ "name": "Milk" }`
+- `POST /api/home-assistant/sort`
+
+## Shared lists
+
+Every browser session has an internal UUIDv7-style list id. When the backend is connected, that list id is migrated to the backend and shown in path-based URLs:
+
+```text
+/list/<uuidv7>/edit
+```
+
+Anyone with the link can edit the same list. Changes are saved to the shared backend record after each completed app state change and cached locally as an offline backup. If the backend is offline, new offline-only lists keep their UUID hidden from the URL; lists that have already been backend-backed keep the `/list/<uuidv7>` URL and render from local storage until the backend comes back.
+
+Shared list API routes:
+
+- `POST /api/shared-lists`
+- `GET /api/shared-lists/:id`
+- `PUT /api/shared-lists/:id`
+- `DELETE /api/shared-lists/:id`
+
 ## Build
 
 ```bash
