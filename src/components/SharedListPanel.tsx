@@ -624,9 +624,9 @@ export function SharedListPanel({
               <video ref={videoRef} className="share-scanner-video" muted playsInline />
               <div className="share-scanner-overlay">
                 <div className="share-scanner-target" />
-                <div className="share-scanner-status">{scannerStatusText}</div>
               </div>
             </div>
+            <div className="share-scanner-status">{scannerStatusText}</div>
           </div>
         </div>
       ) : null}

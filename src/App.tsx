@@ -790,24 +790,18 @@ export default function App() {
           {page === 'edit' ? (
             <EditPage
               input={input}
-              items={items}
               draftItem={draftItem}
               total={total}
               checkedTotal={checkedTotal}
               progress={progress}
-              config={config}
               onInputChange={setInput}
               onDraftItemChange={setDraftItem}
               onParse={handleParse}
               onResetAll={resetAll}
               onResetChecks={resetChecks}
               onAddSingleItem={handleAddSingleItem}
-              onRenameItem={handleRenameItem}
-              onToggleItem={toggleItem}
-              onDeleteItem={handleDeleteItem}
               onCreateSharedLink={handleCreateSharedLink}
               onRefreshSharedList={handleRefreshSharedList}
-              onOpenDebug={() => changePage('debug')}
               canUseBackend={canUseBackend}
               canCreateSharedLink={canCreateSharedLink}
               resolvedTheme={resolvedTheme}
@@ -857,15 +851,19 @@ export default function App() {
           {page === 'debug' ? (
             <DebugPage
               backendStatus={backendStatus}
+              items={items}
+              config={config}
               matcherTests={matcherTests}
               quantityTests={quantityTests}
               storageTests={storageTests}
               matcherHasFailures={matcherTests.some((test) => !test.passed)}
               quantityHasFailures={quantityTests.some((test) => !test.passed)}
               storageHasFailures={storageTests.some((test) => !test.passed)}
+              onRenameItem={handleRenameItem}
+              onToggleItem={toggleItem}
+              onDeleteItem={handleDeleteItem}
               onBackToEdit={() => changePage('edit')}
               onBackToSettings={() => changePage('settings')}
-              onOpenSections={() => changePage('sections')}
             />
           ) : null}
         </div>

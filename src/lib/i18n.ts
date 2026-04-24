@@ -115,6 +115,14 @@ type Messages = {
     debug: {
       title: string;
       subtitle: string;
+      parsedTitle: string;
+      parsedSubtitle: string;
+      tabParsed: string;
+      tabBackend: string;
+      tabMatcher: string;
+      tabQuantity: string;
+      tabSections: string;
+      tabStorage: string;
       backendTitle: string;
       backendConnected: string;
       backendChecking: string;
@@ -291,6 +299,14 @@ const en: Messages = {
     debug: {
       title: 'Debug tools',
       subtitle: 'Self-checks and parser diagnostics live here instead of cluttering the main flow.',
+      parsedTitle: 'Parsed items',
+      parsedSubtitle: 'Inspect and manually adjust the structured items generated from the current list.',
+      tabParsed: 'Parsed',
+      tabBackend: 'Backend',
+      tabMatcher: 'Matcher',
+      tabQuantity: 'Quantity',
+      tabSections: 'Sections',
+      tabStorage: 'Storage',
       backendTitle: 'Backend checks',
       backendConnected: 'Backend API and database are available.',
       backendChecking: 'Backend status is being checked.',
@@ -470,6 +486,14 @@ const es: Messages = {
     debug: {
       title: 'Herramientas de depuración',
       subtitle: 'Las comprobaciones y diagnósticos viven aquí en vez de saturar el flujo principal.',
+      parsedTitle: 'Artículos procesados',
+      parsedSubtitle: 'Inspecciona y ajusta manualmente los elementos estructurados generados desde la lista actual.',
+      tabParsed: 'Procesados',
+      tabBackend: 'Backend',
+      tabMatcher: 'Clasificador',
+      tabQuantity: 'Cantidad',
+      tabSections: 'Secciones',
+      tabStorage: 'Almacenamiento',
       backendTitle: 'Comprobaciones del backend',
       backendConnected: 'La API del backend y la base de datos están disponibles.',
       backendChecking: 'Se está comprobando el estado del backend.',
