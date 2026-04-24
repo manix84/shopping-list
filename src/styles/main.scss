@@ -338,6 +338,52 @@ select {
   }
 }
 
+.button-icon {
+  align-items: center;
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: 46px;
+  justify-content: center;
+  padding: 0;
+  width: 46px;
+}
+
+.button-icon-plus {
+  display: block;
+  height: 16px;
+  position: relative;
+  width: 16px;
+
+  &::before,
+  &::after {
+    background: currentColor;
+    border-radius: 999px;
+    content: '';
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  &::before {
+    height: 3px;
+    width: 16px;
+  }
+
+  &::after {
+    height: 16px;
+    width: 3px;
+  }
+}
+
+.quick-add-row {
+  flex-wrap: nowrap;
+
+  .input {
+    min-width: 0;
+  }
+}
+
 .layout-split {
   display: grid;
   grid-template-columns: 420px 1fr;
