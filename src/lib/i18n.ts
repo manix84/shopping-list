@@ -290,10 +290,10 @@ const en: Messages = {
     openNavigation: 'Open navigation menu',
   },
   backendStatus: {
-    connected: 'Backend connected',
-    checking: 'Backend checking',
-    issue: 'Backend issue',
-    frontendOnly: 'Frontend only',
+    connected: 'Online',
+    checking: 'Checking',
+    issue: 'Offline',
+    frontendOnly: 'Offline',
   },
   sharing: {
     connectBackendFirst: 'Connect the backend before creating a shared link.',
@@ -443,10 +443,10 @@ const es: Messages = {
     openNavigation: 'Abrir menú de navegación',
   },
   backendStatus: {
-    connected: 'Backend conectado',
-    checking: 'Comprobando backend',
-    issue: 'Problema con el backend',
-    frontendOnly: 'Solo frontend',
+    connected: 'En línea',
+    checking: 'Comprobando',
+    issue: 'Sin conexión',
+    frontendOnly: 'Sin conexión',
   },
   sharing: {
     connectBackendFirst: 'Conecta el backend antes de crear un enlace compartido.',

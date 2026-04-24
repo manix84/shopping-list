@@ -6,6 +6,9 @@ import { useI18n } from '../lib/i18n';
 import type { Messages } from '../lib/i18n';
 import type { BackendStatus, PageKey } from '../types';
 
+const ONLINE_BADGE_DURATION_MS = 6_000;
+const BADGE_FADE_DURATION_MS = 250;
+
 type AppHeaderProps = {
   page: PageKey;
   hasItems: boolean;
@@ -15,19 +18,47 @@ type AppHeaderProps = {
 
 const backendBadge = (status: BackendStatus, messages: Messages) => {
   if (status.state === 'connected') return { tone: 'success' as const, label: messages.backendStatus.connected };
-  if (status.state === 'checking') return { tone: 'muted' as const, label: messages.backendStatus.checking };
+  if (status.state === 'checking') return undefined;
   if (status.state === 'error') return { tone: 'danger' as const, label: messages.backendStatus.issue };
-  return { tone: 'muted' as const, label: messages.backendStatus.frontendOnly };
+  return { tone: 'danger' as const, label: messages.backendStatus.frontendOnly };
 };
 
 export function AppHeader({ page, hasItems, backendStatus, onChangePage }: AppHeaderProps) {
   const { messages } = useI18n();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [connectionBadgeVisible, setConnectionBadgeVisible] = useState(false);
+  const [connectionBadgeLeaving, setConnectionBadgeLeaving] = useState(false);
   const badge = backendBadge(backendStatus, messages);
 
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [page]);
+
+  useEffect(() => {
+    if (backendStatus.state === 'checking') {
+      setConnectionBadgeVisible(false);
+      setConnectionBadgeLeaving(false);
+      return;
+    }
+
+    setConnectionBadgeVisible(true);
+    setConnectionBadgeLeaving(false);
+
+    if (backendStatus.state !== 'connected') return;
+
+    const fadeTimer = window.setTimeout(() => {
+      setConnectionBadgeLeaving(true);
+    }, ONLINE_BADGE_DURATION_MS);
+    const removeTimer = window.setTimeout(() => {
+      setConnectionBadgeVisible(false);
+      setConnectionBadgeLeaving(false);
+    }, ONLINE_BADGE_DURATION_MS + BADGE_FADE_DURATION_MS);
+
+    return () => {
+      window.clearTimeout(fadeTimer);
+      window.clearTimeout(removeTimer);
+    };
+  }, [backendStatus.state]);
 
   const handleChangePage = (nextPage: PageKey) => {
     setMobileMenuOpen(false);
@@ -47,7 +78,14 @@ export function AppHeader({ page, hasItems, backendStatus, onChangePage }: AppHe
           </div>
 
           <div className="header-actions">
-            <Badge tone={badge.tone}>{badge.label}</Badge>
+            {badge && connectionBadgeVisible ? (
+              <Badge
+                tone={badge.tone}
+                className={`connection-badge ${connectionBadgeLeaving ? 'connection-badge-leaving' : ''}`}
+              >
+                {badge.label}
+              </Badge>
+            ) : null}
             <PageTabs page={page} hasItems={hasItems} onChange={handleChangePage} />
 
             <div className="mobile-menu-shell">
