@@ -1,5 +1,5 @@
 import type { Item, CountryConfig } from '../types';
-import { getDisplayValue, getQuantityDisplayValue, getSizeDisplayValue } from '../lib/parser';
+import { getDisplayValue, getQuantityValue, getSizeValue } from '../lib/parser';
 import { getSectionMeta } from '../lib/sections';
 import { Badge } from './Badge';
 import { useI18n } from '../lib/i18n';
@@ -41,14 +41,14 @@ export function ParsedItemCard({ item, config, onRename, onToggle, onDelete }: P
             <Badge>
               {messages.labels.group}: {meta.groupLabel}
             </Badge>
-            {getSizeDisplayValue(item) ? (
+            {getSizeValue(item) ? (
               <Badge>
-                {messages.labels.size}: {getSizeDisplayValue(item)?.replace(/^Size:\s*/i, '')}
+                {messages.labels.size}: {getSizeValue(item)}
               </Badge>
             ) : null}
-            {getQuantityDisplayValue(item) ? (
+            {getQuantityValue(item) ? (
               <Badge>
-                {messages.labels.qty}: {getQuantityDisplayValue(item)?.replace(/^Qty:\s*/i, '')}
+                {messages.labels.qty}: {getQuantityValue(item)}
               </Badge>
             ) : null}
           </div>

@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { UK_CONFIG } from '../config/countries/uk';
-import { getDisplayValue, getQuantityDisplayValue, getSizeDisplayValue, getStoredValue, parseItems } from './parser';
+import {
+  getDisplayValue,
+  getQuantityDisplayValue,
+  getQuantityValue,
+  getSizeDisplayValue,
+  getSizeValue,
+  getStoredValue,
+  parseItems,
+} from './parser';
 
 describe('parser', () => {
   it('parses quantity, size, and display metadata together', () => {
@@ -14,6 +22,7 @@ describe('parser', () => {
       matchedSection: 'chilled_milk_juice_cream',
     });
     expect(getSizeDisplayValue(items[0])).toBe('Size: S');
+    expect(getSizeValue(items[0])).toBe('S');
     expect(getDisplayValue(items[0])).toBe('Semi-Skimmed Milk');
     expect(getStoredValue(items[0])).toBe('small milk');
 
@@ -24,6 +33,7 @@ describe('parser', () => {
       matchedSection: 'produce',
     });
     expect(getQuantityDisplayValue(items[1])).toBe('Qty: 2');
+    expect(getQuantityValue(items[1])).toBe('2');
     expect(getDisplayValue(items[1])).toBe('Bananas');
 
     expect(items[2]).toMatchObject({
@@ -32,5 +42,6 @@ describe('parser', () => {
       matchedSection: 'chilled_fresh_meat',
     });
     expect(getQuantityDisplayValue(items[2])).toBe('500g');
+    expect(getQuantityValue(items[2])).toBe('500g');
   });
 });

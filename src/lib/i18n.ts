@@ -467,7 +467,7 @@ const MESSAGES: Record<LocaleCode, Messages> = {
 };
 
 export const isLocaleCode = (value: unknown): value is LocaleCode =>
-  value === 'en' || value === 'es';
+  typeof value === 'string' && SUPPORTED_LOCALES.includes(value as LocaleCode);
 
 export const resolveLocale = (value: unknown): LocaleCode => (isLocaleCode(value) ? value : 'en');
 

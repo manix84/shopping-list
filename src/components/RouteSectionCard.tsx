@@ -1,5 +1,5 @@
 import type { GroupedSectionView } from '../types';
-import { getDisplayValue, getQuantityDisplayValue, getSizeDisplayValue } from '../lib/parser';
+import { getDisplayValue, getQuantityValue, getSizeValue } from '../lib/parser';
 import { Badge } from './Badge';
 import { useI18n } from '../lib/i18n';
 
@@ -61,14 +61,14 @@ export function RouteSectionCard({ section, onToggleSection, onToggleItem }: Rou
               <div className="check-text">
                 <div className="check-text-line">
                   <div className={`check-text-main ${item.checked ? 'is-checked' : ''}`}>{getDisplayValue(item)}</div>
-                  {getSizeDisplayValue(item) ? (
+                  {getSizeValue(item) ? (
                     <div className="check-text-quantity">
-                      <Badge>{getSizeDisplayValue(item)?.replace(/^Size:\s*/i, '')}</Badge>
+                      <Badge>{getSizeValue(item)}</Badge>
                     </div>
                   ) : null}
-                  {getQuantityDisplayValue(item) ? (
+                  {getQuantityValue(item) ? (
                     <div className="check-text-quantity">
-                      <Badge>{getQuantityDisplayValue(item)?.replace(/^Qty:\s*/i, '')}</Badge>
+                      <Badge>{getQuantityValue(item)}</Badge>
                     </div>
                   ) : null}
                 </div>
