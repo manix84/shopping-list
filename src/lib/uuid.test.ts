@@ -1,7 +1,11 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createUuidV7, isUuidV7 } from './uuid';
 
 describe('uuid helpers', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   it('generates UUIDv7-style identifiers', () => {
     const id = createUuidV7();
     expect(isUuidV7(id)).toBe(true);
@@ -11,5 +15,10 @@ describe('uuid helpers', () => {
   it('rejects non-v7 identifiers', () => {
     expect(isUuidV7('not-a-uuid')).toBe(false);
     expect(isUuidV7('019dbf30-56de-4b2b-aacc-a5ae59430d7f')).toBe(false);
+  });
+
+  it('requires secure random values', () => {
+    vi.stubGlobal('crypto', {});
+    expect(() => createUuidV7()).toThrow('crypto.getRandomValues');
   });
 });

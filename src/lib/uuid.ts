@@ -1,11 +1,11 @@
 const UUID_V7_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-const randomByte = (): number => {
-  if (typeof globalThis.crypto?.getRandomValues === 'function') {
-    return globalThis.crypto.getRandomValues(new Uint8Array(1))[0];
+const randomBytes = (length: number): Uint8Array => {
+  if (typeof globalThis.crypto?.getRandomValues !== 'function') {
+    throw new Error('Secure random UUID generation requires crypto.getRandomValues.');
   }
 
-  return Math.floor(Math.random() * 256);
+  return globalThis.crypto.getRandomValues(new Uint8Array(length));
 };
 
 export const isUuidV7 = (value: unknown): value is string =>
@@ -13,7 +13,7 @@ export const isUuidV7 = (value: unknown): value is string =>
 
 export const createUuidV7 = (): string => {
   const timestamp = BigInt(Date.now());
-  const bytes = Array.from({ length: 16 }, randomByte);
+  const bytes = [...randomBytes(16)];
 
   bytes[0] = Number((timestamp >> 40n) & 0xffn);
   bytes[1] = Number((timestamp >> 32n) & 0xffn);
