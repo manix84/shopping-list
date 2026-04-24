@@ -158,7 +158,7 @@ type Messages = {
 const en: Messages = {
   app: {
     title: 'Smart Shopping List',
-    subtitle: 'Country-aware supermarket routing, with the UK setup as the default.',
+    subtitle: 'Turn a rough grocery list into an ordered route through the store.',
   },
   nav: {
     shoppingList: 'Shopping List',
@@ -311,7 +311,7 @@ const en: Messages = {
 const es: Messages = {
   app: {
     title: 'Lista de la compra inteligente',
-    subtitle: 'Rutas de supermercado por país, con la configuración del Reino Unido como valor predeterminado.',
+    subtitle: 'Convierte una lista rápida en una ruta ordenada por la tienda.',
   },
   nav: {
     shoppingList: 'Lista de la compra',
