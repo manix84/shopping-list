@@ -156,7 +156,7 @@ export default function App() {
       }
 
       if (initialBackendStatus.state !== 'connected' && nextServerBacked) {
-        setShareError('Backend is offline. Showing the local backup for this shared list.');
+        setShareError(messages.sharing.offlineBackup);
       }
 
       if (initialBackendStatus.state === 'connected') {
@@ -441,7 +441,7 @@ export default function App() {
 
   const handleCreateSharedLink = async () => {
     if (backendStatus.state !== 'connected') {
-      setShareError('Connect the backend before creating a shared link.');
+      setShareError(messages.sharing.connectBackendFirst);
       return;
     }
 
@@ -457,7 +457,7 @@ export default function App() {
       setRoute({ page: 'edit', listId: activeListId });
     } catch (error) {
       console.warn('Unable to create shared link.', error);
-      setShareError('Could not create the shared link.');
+      setShareError(messages.sharing.createFailed);
     } finally {
       setIsCreatingShareLink(false);
     }
@@ -473,10 +473,10 @@ export default function App() {
       const remotePayload = await loadSharedShoppingList(activeListId);
       applyRecord({ ...remotePayload.record, listId: activeListId, serverBacked: true });
       setStorageMode('backend');
-      setShareError(remotePayload.exists ? undefined : 'This shared list does not exist yet. Edits will create it.');
+      setShareError(remotePayload.exists ? undefined : messages.sharing.refreshMissing);
     } catch (error) {
       console.warn('Unable to refresh shared list.', error);
-      setShareError('Could not refresh the shared list.');
+      setShareError(messages.sharing.refreshFailed);
     } finally {
       setIsRefreshingSharedList(false);
     }

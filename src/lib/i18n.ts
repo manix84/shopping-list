@@ -21,9 +21,14 @@ type Messages = {
     add: string;
     backToEdit: string;
     backToSettings: string;
+    copy: string;
+    createSharedLink: string;
+    creating: string;
     fullReset: string;
     goToEditList: string;
     openDebugTools: string;
+    refresh: string;
+    refreshing: string;
     remove: string;
     resetTicks: string;
     resortFromList: string;
@@ -34,19 +39,32 @@ type Messages = {
     untickAll: string;
   };
   labels: {
+    available: string;
     cleaned: string;
+    count: string;
     countryProfile: string;
+    defaultList: string;
     done: string;
+    empty: string;
+    exists: string;
     group: string;
     items: string;
     locale: string;
+    mode: string;
     order: string;
     progress: string;
     qty: string;
+    routeOrder: string;
     section: string;
+    sharedLink: string;
+    sharedLists: string;
     size: string;
+    state: string;
     storedLocally: string;
     theme: string;
+    unavailable: string;
+    unknown: string;
+    updated: string;
   };
   pages: {
     edit: {
@@ -56,6 +74,9 @@ type Messages = {
       pastePlaceholder: string;
       quickAddLabel: string;
       quickAddPlaceholder: string;
+      sharingTitle: string;
+      sharingSubtitle: string;
+      sharingUnavailable: string;
       parsedTitle: string;
       parsedSubtitle: string;
       parsedEmpty: string;
@@ -74,9 +95,22 @@ type Messages = {
       themeLabel: string;
       localeLabel: string;
     };
+    sections: {
+      title: string;
+      subtitle: string;
+    };
     debug: {
       title: string;
       subtitle: string;
+      backendTitle: string;
+      backendConnected: string;
+      backendChecking: string;
+      backendError: string;
+      backendOffline: string;
+      backendHealthTitle: string;
+      backendHealthExpected: string;
+      databaseTitle: string;
+      databaseExpected: string;
       matcherTitle: string;
       matcherSubtitle: string;
       quantityTitle: string;
@@ -90,6 +124,7 @@ type Messages = {
       got: string;
       pass: string;
       fail: string;
+      unavailable: string;
     };
   };
   localeOptions: Record<LocaleCode, string>;
@@ -100,6 +135,19 @@ type Messages = {
   };
   mobileMenu: {
     openNavigation: string;
+  };
+  backendStatus: {
+    connected: string;
+    checking: string;
+    issue: string;
+    frontendOnly: string;
+  };
+  sharing: {
+    connectBackendFirst: string;
+    createFailed: string;
+    refreshMissing: string;
+    refreshFailed: string;
+    offlineBackup: string;
   };
   sectionToggle: {
     tickAll: string;
@@ -123,9 +171,14 @@ const en: Messages = {
     add: 'Add',
     backToEdit: 'Back to edit',
     backToSettings: 'Back to settings',
+    copy: 'Copy',
+    createSharedLink: 'Create shared link',
+    creating: 'Creating...',
     fullReset: 'Full reset',
     goToEditList: 'Go to Edit list',
     openDebugTools: 'Open debug tools',
+    refresh: 'Refresh',
+    refreshing: 'Refreshing...',
     remove: 'Remove',
     resetTicks: 'Reset ticks',
     resortFromList: 'Re-sort from list',
@@ -136,19 +189,32 @@ const en: Messages = {
     untickAll: 'Untick all items',
   },
   labels: {
+    available: 'available',
     cleaned: 'Cleaned',
+    count: 'count',
     countryProfile: 'Country profile',
+    defaultList: 'default list',
     done: 'Done',
+    empty: 'empty',
+    exists: 'exists',
     group: 'Group',
     items: 'Items',
     locale: 'Language',
+    mode: 'mode',
     order: 'Order',
     progress: 'Progress',
     qty: 'Qty',
+    routeOrder: 'Route order',
     section: 'Section',
+    sharedLink: 'Shared link',
+    sharedLists: 'shared lists',
     size: 'Size',
+    state: 'state',
     storedLocally: 'Stored locally on this device only.',
     theme: 'Theme',
+    unavailable: 'Unavailable',
+    unknown: 'unknown',
+    updated: 'updated',
   },
   pages: {
     edit: {
@@ -158,6 +224,9 @@ const en: Messages = {
       pastePlaceholder: 'milk\nbread\napples\ncoffee',
       quickAddLabel: 'Quick add single item',
       quickAddPlaceholder: 'e.g. bananas x20',
+      sharingTitle: 'Sharing',
+      sharingSubtitle: 'Anyone with the shared link can edit this list.',
+      sharingUnavailable: 'Sharing is available when the backend is connected.',
       parsedTitle: 'Parsed items',
       parsedSubtitle: 'Structured items, ready for local storage today and a database later.',
       parsedEmpty: 'Save and sort the list to generate structured shopping items.',
@@ -171,14 +240,27 @@ const en: Messages = {
     },
     settings: {
       title: 'Settings',
-      subtitle: 'Country configs are explicit, so store grouping can vary by region later.',
+      subtitle: 'Preferences that affect how this device displays and groups shopping lists.',
       countryLabel: 'Country profile',
       themeLabel: 'Theme',
       localeLabel: 'Language',
     },
+    sections: {
+      title: 'Sections',
+      subtitle: 'Read-only store grouping reference for the selected country profile.',
+    },
     debug: {
       title: 'Debug tools',
       subtitle: 'Self-checks and parser diagnostics live here instead of cluttering the main flow.',
+      backendTitle: 'Backend checks',
+      backendConnected: 'Backend API and database are available.',
+      backendChecking: 'Backend status is being checked.',
+      backendError: 'Backend responded, but one or more checks failed.',
+      backendOffline: 'Backend is offline; the app is using frontend-only storage.',
+      backendHealthTitle: 'Backend health',
+      backendHealthExpected: 'GET /api/health returns OK',
+      databaseTitle: 'Database',
+      databaseExpected: 'GET /api/database/status can read the backend store',
       matcherTitle: 'Matcher self-checks',
       matcherSubtitle: 'Lightweight checks so grouping regressions are obvious while building.',
       quantityTitle: 'Quantity self-checks',
@@ -192,6 +274,7 @@ const en: Messages = {
       got: 'got',
       pass: 'Pass',
       fail: 'Fail',
+      unavailable: 'Unavailable',
     },
   },
   localeOptions: {
@@ -205,6 +288,19 @@ const en: Messages = {
   },
   mobileMenu: {
     openNavigation: 'Open navigation menu',
+  },
+  backendStatus: {
+    connected: 'Backend connected',
+    checking: 'Backend checking',
+    issue: 'Backend issue',
+    frontendOnly: 'Frontend only',
+  },
+  sharing: {
+    connectBackendFirst: 'Connect the backend before creating a shared link.',
+    createFailed: 'Could not create the shared link.',
+    refreshMissing: 'This shared list does not exist yet. Edits will create it.',
+    refreshFailed: 'Could not refresh the shared list.',
+    offlineBackup: 'Backend is offline. Showing the local backup for this shared list.',
   },
   sectionToggle: {
     tickAll: 'Tick all items',
@@ -228,9 +324,14 @@ const es: Messages = {
     add: 'Añadir',
     backToEdit: 'Volver a editar',
     backToSettings: 'Volver a ajustes',
+    copy: 'Copiar',
+    createSharedLink: 'Crear enlace compartido',
+    creating: 'Creando...',
     fullReset: 'Restablecer todo',
     goToEditList: 'Ir a Editar lista',
     openDebugTools: 'Abrir herramientas de depuración',
+    refresh: 'Actualizar',
+    refreshing: 'Actualizando...',
     remove: 'Eliminar',
     resetTicks: 'Quitar marcas',
     resortFromList: 'Reordenar desde la lista',
@@ -241,19 +342,32 @@ const es: Messages = {
     untickAll: 'Desmarcar todo',
   },
   labels: {
+    available: 'disponible',
     cleaned: 'Limpio',
+    count: 'cantidad',
     countryProfile: 'Perfil de país',
+    defaultList: 'lista predeterminada',
     done: 'Hecho',
+    empty: 'vacía',
+    exists: 'existe',
     group: 'Grupo',
     items: 'Artículos',
     locale: 'Idioma',
+    mode: 'modo',
     order: 'Orden',
     progress: 'Progreso',
     qty: 'Cant.',
+    routeOrder: 'Orden de ruta',
     section: 'Sección',
+    sharedLink: 'Enlace compartido',
+    sharedLists: 'listas compartidas',
     size: 'Tamaño',
+    state: 'estado',
     storedLocally: 'Guardado solo en este dispositivo.',
     theme: 'Tema',
+    unavailable: 'No disponible',
+    unknown: 'desconocido',
+    updated: 'actualizado',
   },
   pages: {
     edit: {
@@ -263,6 +377,9 @@ const es: Messages = {
       pastePlaceholder: 'leche\npan\nmanzanas\ncafé',
       quickAddLabel: 'Añadir un artículo rápido',
       quickAddPlaceholder: 'p. ej. plátanos x20',
+      sharingTitle: 'Compartir',
+      sharingSubtitle: 'Cualquier persona con el enlace compartido puede editar esta lista.',
+      sharingUnavailable: 'Compartir está disponible cuando el backend está conectado.',
       parsedTitle: 'Artículos procesados',
       parsedSubtitle: 'Elementos estructurados, listos para almacenamiento local hoy y una base de datos después.',
       parsedEmpty: 'Guarda y ordena la lista para generar artículos estructurados.',
@@ -276,14 +393,27 @@ const es: Messages = {
     },
     settings: {
       title: 'Ajustes',
-      subtitle: 'Las configuraciones de país son explícitas, así que la agrupación puede variar por región más adelante.',
+      subtitle: 'Preferencias que afectan a cómo este dispositivo muestra y agrupa las listas de la compra.',
       countryLabel: 'Perfil de país',
       themeLabel: 'Tema',
       localeLabel: 'Idioma',
     },
+    sections: {
+      title: 'Secciones',
+      subtitle: 'Referencia de agrupación de tienda de solo lectura para el perfil de país seleccionado.',
+    },
     debug: {
       title: 'Herramientas de depuración',
       subtitle: 'Las comprobaciones y diagnósticos viven aquí en vez de saturar el flujo principal.',
+      backendTitle: 'Comprobaciones del backend',
+      backendConnected: 'La API del backend y la base de datos están disponibles.',
+      backendChecking: 'Se está comprobando el estado del backend.',
+      backendError: 'El backend respondió, pero una o más comprobaciones fallaron.',
+      backendOffline: 'El backend está sin conexión; la aplicación usa almacenamiento solo de frontend.',
+      backendHealthTitle: 'Estado del backend',
+      backendHealthExpected: 'GET /api/health devuelve OK',
+      databaseTitle: 'Base de datos',
+      databaseExpected: 'GET /api/database/status puede leer el almacenamiento del backend',
       matcherTitle: 'Comprobaciones del clasificador',
       matcherSubtitle: 'Pruebas ligeras para que las regresiones de agrupación se vean enseguida al construir.',
       quantityTitle: 'Comprobaciones de cantidad',
@@ -297,6 +427,7 @@ const es: Messages = {
       got: 'obtenido',
       pass: 'Pasa',
       fail: 'Falla',
+      unavailable: 'No disponible',
     },
   },
   localeOptions: {
@@ -310,6 +441,19 @@ const es: Messages = {
   },
   mobileMenu: {
     openNavigation: 'Abrir menú de navegación',
+  },
+  backendStatus: {
+    connected: 'Backend conectado',
+    checking: 'Comprobando backend',
+    issue: 'Problema con el backend',
+    frontendOnly: 'Solo frontend',
+  },
+  sharing: {
+    connectBackendFirst: 'Conecta el backend antes de crear un enlace compartido.',
+    createFailed: 'No se pudo crear el enlace compartido.',
+    refreshMissing: 'Esta lista compartida aún no existe. Las ediciones la crearán.',
+    refreshFailed: 'No se pudo actualizar la lista compartida.',
+    offlineBackup: 'El backend está sin conexión. Se muestra la copia local de esta lista compartida.',
   },
   sectionToggle: {
     tickAll: 'Marcar todo',

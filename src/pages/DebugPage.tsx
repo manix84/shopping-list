@@ -2,6 +2,7 @@ import type { BackendStatus, MatcherTestResult, QuantityTestResult, StorageTestR
 import { Card } from '../components/Card';
 import { TestResultCard } from '../components/TestResultCard';
 import { useI18n } from '../lib/i18n';
+import type { Messages } from '../lib/i18n';
 
 type DebugPageProps = {
   backendStatus: BackendStatus;
@@ -15,11 +16,11 @@ type DebugPageProps = {
   onBackToSettings: () => void;
 };
 
-const backendSummary = (status: BackendStatus): string => {
-  if (status.state === 'connected') return 'Backend API and database are available.';
-  if (status.state === 'checking') return 'Backend status is being checked.';
-  if (status.state === 'error') return 'Backend responded, but one or more checks failed.';
-  return 'Backend is offline; the app is using frontend-only storage.';
+const backendSummary = (status: BackendStatus, messages: Messages): string => {
+  if (status.state === 'connected') return messages.pages.debug.backendConnected;
+  if (status.state === 'checking') return messages.pages.debug.backendChecking;
+  if (status.state === 'error') return messages.pages.debug.backendError;
+  return messages.pages.debug.backendOffline;
 };
 
 const backendTone = (status: BackendStatus) => {
@@ -28,10 +29,17 @@ const backendTone = (status: BackendStatus) => {
   return 'muted' as const;
 };
 
-const backendLabel = (status: BackendStatus, passLabel: string, failLabel: string) => {
-  if (status.state === 'connected') return passLabel;
-  if (status.state === 'error') return failLabel;
-  return 'Unavailable';
+const backendStateLabel = (status: BackendStatus, messages: Messages) => {
+  if (status.state === 'connected') return messages.backendStatus.connected;
+  if (status.state === 'checking') return messages.backendStatus.checking;
+  if (status.state === 'error') return messages.backendStatus.issue;
+  return messages.backendStatus.frontendOnly;
+};
+
+const backendLabel = (status: BackendStatus, messages: Messages) => {
+  if (status.state === 'connected') return messages.pages.debug.pass;
+  if (status.state === 'error') return messages.pages.debug.fail;
+  return messages.pages.debug.unavailable;
 };
 
 export function DebugPage({
@@ -70,37 +78,41 @@ export function DebugPage({
       <Card
         header={
           <>
-            <h2 className="title title-sm">Backend checks</h2>
-            <p className="subtitle">{backendSummary(backendStatus)}</p>
+            <h2 className="title title-sm">{messages.pages.debug.backendTitle}</h2>
+            <p className="subtitle">{backendSummary(backendStatus, messages)}</p>
           </>
         }
         bodyClassName="stack"
       >
         <TestResultCard
-          title="Backend health"
-          expected="GET /api/health returns OK"
+          title={messages.pages.debug.backendHealthTitle}
+          expected={messages.pages.debug.backendHealthExpected}
           actual={
             backendStatus.state === 'connected' || backendStatus.state === 'error'
-              ? `state ${backendStatus.state}, mode ${backendStatus.health.mode ?? 'unknown'}`
-              : `state ${backendStatus.state}`
+              ? `${messages.labels.state} ${backendStateLabel(backendStatus, messages)}, ${messages.labels.mode} ${
+                  backendStatus.health.mode ?? messages.labels.unknown
+                }`
+              : `${messages.labels.state} ${backendStateLabel(backendStatus, messages)}`
           }
           passed={backendStatus.health.ok}
           tone={backendTone(backendStatus)}
-          label={backendLabel(backendStatus, messages.pages.debug.pass, messages.pages.debug.fail)}
+          label={backendLabel(backendStatus, messages)}
         />
         <TestResultCard
-          title="Database"
-          expected="GET /api/database/status can read the backend store"
+          title={messages.pages.debug.databaseTitle}
+          expected={messages.pages.debug.databaseExpected}
           actual={
             backendStatus.database.ok
-              ? `available, default list ${backendStatus.database.shoppingListExists ? 'exists' : 'empty'}, shared lists ${
+              ? `${messages.labels.available}, ${messages.labels.defaultList} ${
+                  backendStatus.database.shoppingListExists ? messages.labels.exists : messages.labels.empty
+                }, ${messages.labels.sharedLists} ${
                   backendStatus.database.sharedListCount ?? 0
-                }, updated ${backendStatus.database.updatedAt ?? 'unknown'}`
-              : `state ${backendStatus.state}`
+                }, ${messages.labels.updated} ${backendStatus.database.updatedAt ?? messages.labels.unknown}`
+              : `${messages.labels.state} ${backendStateLabel(backendStatus, messages)}`
           }
           passed={backendStatus.database.ok}
           tone={backendTone(backendStatus)}
-          label={backendLabel(backendStatus, messages.pages.debug.pass, messages.pages.debug.fail)}
+          label={backendLabel(backendStatus, messages)}
         />
       </Card>
 
@@ -142,14 +154,16 @@ export function DebugPage({
               <>
                 {test.expectedName}
                 {test.expectedQuantity ? ` · ${test.expectedQuantity}` : ''}
-                {typeof test.expectedQuantityValue === 'number' ? ` · count ${test.expectedQuantityValue}` : ''}
+                {typeof test.expectedQuantityValue === 'number'
+                  ? ` · ${messages.labels.count} ${test.expectedQuantityValue}`
+                  : ''}
               </>
             }
             actual={
               <>
                 {test.actualName}
                 {test.actualQuantity ? ` · ${test.actualQuantity}` : ''}
-                {typeof test.actualQuantityValue === 'number' ? ` · count ${test.actualQuantityValue}` : ''}
+                {typeof test.actualQuantityValue === 'number' ? ` · ${messages.labels.count} ${test.actualQuantityValue}` : ''}
               </>
             }
             passed={test.passed}

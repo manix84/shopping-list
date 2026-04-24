@@ -3,6 +3,7 @@ import { Badge } from './Badge';
 import { Card } from './Card';
 import { PageTabs } from './PageTabs';
 import { useI18n } from '../lib/i18n';
+import type { Messages } from '../lib/i18n';
 import type { BackendStatus, PageKey } from '../types';
 
 type AppHeaderProps = {
@@ -11,17 +12,17 @@ type AppHeaderProps = {
   onChangePage: (page: PageKey) => void;
 };
 
-const backendBadge = (status: BackendStatus) => {
-  if (status.state === 'connected') return { tone: 'success' as const, label: 'Backend connected' };
-  if (status.state === 'checking') return { tone: 'muted' as const, label: 'Backend checking' };
-  if (status.state === 'error') return { tone: 'danger' as const, label: 'Backend issue' };
-  return { tone: 'muted' as const, label: 'Frontend only' };
+const backendBadge = (status: BackendStatus, messages: Messages) => {
+  if (status.state === 'connected') return { tone: 'success' as const, label: messages.backendStatus.connected };
+  if (status.state === 'checking') return { tone: 'muted' as const, label: messages.backendStatus.checking };
+  if (status.state === 'error') return { tone: 'danger' as const, label: messages.backendStatus.issue };
+  return { tone: 'muted' as const, label: messages.backendStatus.frontendOnly };
 };
 
 export function AppHeader({ page, backendStatus, onChangePage }: AppHeaderProps) {
   const { messages } = useI18n();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const badge = backendBadge(backendStatus);
+  const badge = backendBadge(backendStatus, messages);
 
   useEffect(() => {
     setMobileMenuOpen(false);

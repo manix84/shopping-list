@@ -113,8 +113,8 @@ export function EditPage({
         <Card
           header={
             <>
-              <h2 className="title title-sm">Sharing</h2>
-              <p className="subtitle">Anyone with the shared link can edit this list.</p>
+              <h2 className="title title-sm">{messages.pages.edit.sharingTitle}</h2>
+              <p className="subtitle">{messages.pages.edit.sharingSubtitle}</p>
             </>
           }
           bodyClassName="stack"
@@ -122,11 +122,11 @@ export function EditPage({
           {shareLink ? (
             <>
               <div className="field">
-                <label htmlFor="shopping-share-link">Shared link</label>
+                <label htmlFor="shopping-share-link">{messages.labels.sharedLink}</label>
                 <div className="inline-row">
                   <input id="shopping-share-link" className="input" readOnly value={shareLink} />
                   <button type="button" className="button" onClick={() => void navigator.clipboard?.writeText(shareLink)}>
-                    Copy
+                    {messages.actions.copy}
                   </button>
                   <button
                     type="button"
@@ -134,7 +134,7 @@ export function EditPage({
                     onClick={onRefreshSharedList}
                     disabled={isRefreshingSharedList || !canUseBackend}
                   >
-                    {isRefreshingSharedList ? 'Refreshing...' : 'Refresh'}
+                    {isRefreshingSharedList ? messages.actions.refreshing : messages.actions.refresh}
                   </button>
                 </div>
               </div>
@@ -148,12 +148,12 @@ export function EditPage({
                 onClick={onCreateSharedLink}
                 disabled={isCreatingShareLink}
               >
-                {isCreatingShareLink ? 'Creating...' : 'Create shared link'}
+                {isCreatingShareLink ? messages.actions.creating : messages.actions.createSharedLink}
               </button>
               {shareError ? <div className="small-text">{shareError}</div> : null}
             </>
           ) : (
-            <div className="empty-state">Sharing is available when the backend is connected.</div>
+            <div className="empty-state">{messages.pages.edit.sharingUnavailable}</div>
           )}
         </Card>
 
