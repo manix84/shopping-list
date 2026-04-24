@@ -38,7 +38,7 @@ export function SettingsPage({ countryCode, themeMode, onCountryChange, onThemeC
             .sort((a, b) => a.label.localeCompare(b.label))
             .map((country) => (
               <option key={country.code} value={country.code}>
-                {country.label}
+                {country.flag} {country.label}
               </option>
             ))}
         </select>
