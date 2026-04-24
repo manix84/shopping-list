@@ -756,7 +756,13 @@ export default function App() {
     <I18nProvider value={{ locale, messages, setLocale }}>
       <div className="shopping-app">
         <div className="shopping-shell">
-          <AppHeader page={page} hasItems={items.length > 0} backendStatus={backendStatus} onChangePage={changePage} />
+          <AppHeader
+            page={page}
+            hasItems={items.length > 0}
+            backendStatus={backendStatus}
+            resolvedTheme={resolvedTheme}
+            onChangePage={changePage}
+          />
 
           {page === 'edit' ? (
             <EditPage

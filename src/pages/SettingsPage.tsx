@@ -1,3 +1,4 @@
+import { mdiChevronDown } from '@mdi/js';
 import { type ReactNode, useMemo, useState } from 'react';
 import { COUNTRY_CONFIGS } from '../config/countries';
 import type { CountryCode, ThemeMode } from '../types';
@@ -72,7 +73,9 @@ function SettingsSelect<T extends string>({
           {selectedOption.icon ? <span className="settings-option-icon-slot">{selectedOption.icon}</span> : null}
           <span>{selectedOption.label}</span>
         </span>
-        <span aria-hidden="true" className="settings-select-chevron" />
+        <svg aria-hidden="true" className="settings-select-chevron-svg" viewBox="0 0 24 24">
+          <path d={mdiChevronDown} fill="currentColor" />
+        </svg>
       </button>
 
       {open ? (

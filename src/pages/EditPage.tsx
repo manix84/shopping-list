@@ -1,3 +1,4 @@
+import { mdiContentSave, mdiPlus } from '@mdi/js';
 import type { CountryConfig, Item } from '../types';
 import { Card } from '../components/Card';
 import { StatsGrid } from '../components/StatsGrid';
@@ -120,15 +121,25 @@ export function EditPage({
               aria-label={messages.actions.add}
               title={messages.actions.add}
             >
-              <span aria-hidden="true" className="button-icon-plus" />
+              <svg aria-hidden="true" className="button-icon-svg" viewBox="0 0 24 24">
+                <path d={mdiPlus} fill="currentColor" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              className="button button-primary button-icon"
+              onClick={onParse}
+              aria-label={messages.actions.saveAndSort}
+              title={messages.actions.saveAndSort}
+            >
+              <svg aria-hidden="true" className="button-icon-svg" viewBox="0 0 24 24">
+                <path d={mdiContentSave} fill="currentColor" />
+              </svg>
             </button>
           </div>
         </div>
 
         <div className="button-row">
-          <button type="button" className="button button-primary" onClick={onParse}>
-            {messages.actions.saveAndSort}
-          </button>
           <button type="button" className="button" onClick={onResetAll}>
             {messages.actions.fullReset}
           </button>

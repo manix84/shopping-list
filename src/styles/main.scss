@@ -121,20 +121,6 @@ select {
   justify-content: center;
 }
 
-.mobile-menu-icon {
-  display: inline-flex;
-  flex-direction: column;
-  gap: 4px;
-
-  span {
-    display: block;
-    width: 18px;
-    height: 2px;
-    border-radius: 999px;
-    background: currentColor;
-  }
-}
-
 .mobile-menu-panel {
   position: absolute;
   top: calc(100% + 10px);
@@ -234,6 +220,12 @@ select {
   justify-content: center;
   font-size: 24px;
   background: $panel-alt;
+}
+
+.app-icon-image {
+  display: block;
+  height: 32px;
+  width: 32px;
 }
 
 .title {
@@ -362,34 +354,6 @@ select {
   width: 46px;
 }
 
-.button-icon-plus {
-  display: block;
-  height: 16px;
-  position: relative;
-  width: 16px;
-
-  &::before,
-  &::after {
-    background: currentColor;
-    border-radius: 999px;
-    content: '';
-    left: 50%;
-    position: absolute;
-    top: 50%;
-    transform: translate(-50%, -50%);
-  }
-
-  &::before {
-    height: 3px;
-    width: 16px;
-  }
-
-  &::after {
-    height: 16px;
-    width: 3px;
-  }
-}
-
 .button-icon-svg {
   display: block;
   height: 20px;
@@ -514,14 +478,12 @@ select {
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.18);
 }
 
-.settings-select-chevron {
-  border-bottom: 2px solid $muted;
-  border-right: 2px solid $muted;
-  display: inline-block;
-  height: 8px;
+.settings-select-chevron-svg {
+  color: $muted;
+  display: block;
+  height: 18px;
   margin-left: 12px;
-  transform: translateY(-2px) rotate(45deg);
-  width: 8px;
+  width: 18px;
 }
 
 .settings-select-menu {
@@ -831,11 +793,17 @@ select {
   background: $panel-alt;
   border: 1px solid $border;
   border-radius: 16px;
+  cursor: pointer;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 12px;
   min-width: 0;
   padding: 12px 14px;
+
+  &:focus-visible {
+    outline: 2px solid $primary;
+    outline-offset: 2px;
+  }
 }
 
 .shared-history-content {

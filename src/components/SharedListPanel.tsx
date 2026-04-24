@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent, type PointerEvent } from 'react';
 import { mdiDeleteOutline, mdiDownloadOutline } from '@mdi/js';
 import QRCode from 'qrcode';
 import type { SharedListHistoryEntry } from '../types';
@@ -44,6 +44,7 @@ const formatTimestamp = (value: string | undefined, locale: string): string =>
 
 const QR_CANVAS_SIZE = 320;
 const QR_LOGO_SIZE = 72;
+const HISTORY_CARD_TAP_THRESHOLD_PX = 10;
 const logoPath = (theme: 'light' | 'dark'): string =>
   `${import.meta.env.BASE_URL}${theme === 'dark' ? 'favicon-dark.svg' : 'favicon-light.svg'}`;
 
@@ -129,8 +130,12 @@ export function SharedListPanel({
   const [sharedInputStatus, setSharedInputStatus] = useState<SharedInputStatus>('idle');
   const videoRef = useRef<HTMLVideoElement>(null);
   const qrHideTimeoutRef = useRef<number>();
+  const historyPointerRef = useRef<{ listId: string; x: number; y: number; moved: boolean } | null>(null);
 
   useEffect(() => {
+    if (qrHideTimeoutRef.current) {
+      window.clearTimeout(qrHideTimeoutRef.current);
+    }
     setQrRevealed(false);
     setQrModalOpen(false);
   }, [shareLink]);
@@ -401,6 +406,37 @@ export function SharedListPanel({
         ? messages.sharing.scannerReady
         : messages.sharing.scannerInstructions;
   const showSharedInputTick = sharedInputStatus === 'valid';
+  const isActionTarget = (target: EventTarget | null): boolean =>
+    target instanceof Element && target.closest('button') !== null;
+  const handleHistoryPointerDown = (listId: string, event: PointerEvent<HTMLDivElement>) => {
+    if (isActionTarget(event.target)) return;
+    historyPointerRef.current = { listId, x: event.clientX, y: event.clientY, moved: false };
+  };
+  const handleHistoryPointerMove = (listId: string, event: PointerEvent<HTMLDivElement>) => {
+    const activePointer = historyPointerRef.current;
+    if (!activePointer || activePointer.listId !== listId) return;
+
+    const deltaX = Math.abs(event.clientX - activePointer.x);
+    const deltaY = Math.abs(event.clientY - activePointer.y);
+    if (deltaX > HISTORY_CARD_TAP_THRESHOLD_PX || deltaY > HISTORY_CARD_TAP_THRESHOLD_PX) {
+      historyPointerRef.current = { ...activePointer, moved: true };
+    }
+  };
+  const handleHistoryClick = (listId: string, event: MouseEvent<HTMLDivElement>) => {
+    if (isActionTarget(event.target)) return;
+    const activePointer = historyPointerRef.current;
+    historyPointerRef.current = null;
+    if (activePointer?.listId === listId && activePointer.moved) return;
+    void onLoadHistoryEntry(listId);
+  };
+  const handleHistoryPointerCancel = () => {
+    historyPointerRef.current = null;
+  };
+  const handleHistoryKeyDown = (listId: string, event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    void onLoadHistoryEntry(listId);
+  };
 
   return (
     <div className="stack">
@@ -495,7 +531,19 @@ export function SharedListPanel({
         ) : (
           <div className="stack">
             {historyEntries.map((entry) => (
-              <div key={entry.listId} className="shared-history-item">
+              <div
+                key={entry.listId}
+                className="shared-history-item"
+                role="button"
+                tabIndex={0}
+                aria-label={messages.actions.loadSharedList}
+                title={messages.actions.loadSharedList}
+                onKeyDown={(event) => handleHistoryKeyDown(entry.listId, event)}
+                onPointerDown={(event) => handleHistoryPointerDown(entry.listId, event)}
+                onPointerMove={(event) => handleHistoryPointerMove(entry.listId, event)}
+                onPointerCancel={handleHistoryPointerCancel}
+                onClick={(event) => handleHistoryClick(entry.listId, event)}
+              >
                 <div className="stack shared-history-content">
                   <div className="shared-history-title-wrap">
                     <div className="shared-history-title">{entry.itemPreview.join(' · ') || messages.sharing.emptyList}</div>
@@ -509,7 +557,10 @@ export function SharedListPanel({
                   <button
                     type="button"
                     className="button button-icon"
-                    onClick={() => void onLoadHistoryEntry(entry.listId)}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      void onLoadHistoryEntry(entry.listId);
+                    }}
                     disabled={isLoadingSharedList || !canUseBackend}
                     aria-label={messages.actions.loadSharedList}
                     title={messages.actions.loadSharedList}
@@ -521,7 +572,10 @@ export function SharedListPanel({
                   <button
                     type="button"
                     className="button button-icon"
-                    onClick={() => onDeleteHistoryEntry(entry.listId)}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onDeleteHistoryEntry(entry.listId);
+                    }}
                     aria-label={messages.actions.remove}
                     title={messages.actions.remove}
                   >
