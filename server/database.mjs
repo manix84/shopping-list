@@ -9,10 +9,20 @@ const DEFAULT_RECORD = {
   countryCode: 'uk',
 };
 
+const DEFAULT_SETTINGS = {
+  countryCode: 'uk',
+  updatedAt: '1970-01-01T00:00:00.000Z',
+};
+const COUNTRY_CODES = new Set(['ca', 'uk', 'us']);
+
 const databasePath = resolve(process.env.SHOPPING_LIST_DB_PATH ?? 'data/shopping-list-db.json');
 let databaseWriteQueue = Promise.resolve();
 
 const emptyDatabase = () => ({
+  settings: {
+    exists: false,
+    record: DEFAULT_SETTINGS,
+  },
   shoppingList: {
     exists: false,
     record: DEFAULT_RECORD,
@@ -23,6 +33,19 @@ const emptyDatabase = () => ({
 const normalizeDatabase = (database) => ({
   ...emptyDatabase(),
   ...database,
+  settings:
+    database?.settings && typeof database.settings === 'object'
+      ? {
+          exists: database.settings.exists === true,
+          record: {
+            ...DEFAULT_SETTINGS,
+            ...(database.settings.record && typeof database.settings.record === 'object' ? database.settings.record : {}),
+            countryCode: COUNTRY_CODES.has(database.settings.record?.countryCode)
+              ? database.settings.record.countryCode
+              : DEFAULT_SETTINGS.countryCode,
+          },
+        }
+      : emptyDatabase().settings,
   sharedLists: database?.sharedLists && typeof database.sharedLists === 'object' ? database.sharedLists : {},
 });
 
@@ -83,6 +106,22 @@ export const getShoppingList = async () => {
   const database = await readDatabase();
   return database.shoppingList;
 };
+
+export const getSettings = async () => {
+  const database = await readDatabase();
+  return database.settings;
+};
+
+export const saveSettings = async (record) =>
+  withDatabaseWriteLock(async () => {
+    const database = await readDatabase();
+    database.settings = {
+      exists: true,
+      record,
+    };
+    await writeDatabase(database);
+    return database.settings;
+  });
 
 export const saveShoppingList = async (record) =>
   withDatabaseWriteLock(async () => {
@@ -175,6 +214,9 @@ export const getDatabaseStatus = async () => {
   return {
     ok: true,
     path: databasePath,
+    settingsExists: database.settings.exists,
+    settingsCountryCode: database.settings.record.countryCode,
+    settingsUpdatedAt: database.settings.record.updatedAt,
     shoppingListExists: shoppingList.exists,
     updatedAt: shoppingList.record.updatedAt,
     sharedListCount: Object.keys(database.sharedLists).length,

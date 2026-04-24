@@ -57,6 +57,11 @@ export type ShoppingListRecord = {
   countryCode: CountryCode;
 };
 
+export type AppSettingsRecord = {
+  countryCode: CountryCode;
+  updatedAt: string;
+};
+
 export type SectionDef = {
   key: SectionKey;
   label: string;
@@ -128,6 +133,9 @@ export type BackendStatus = {
   };
   database: {
     ok: boolean;
+    settingsExists?: boolean;
+    settingsCountryCode?: CountryCode;
+    settingsUpdatedAt?: string;
     shoppingListExists?: boolean;
     updatedAt?: string;
     sharedListCount?: number;
