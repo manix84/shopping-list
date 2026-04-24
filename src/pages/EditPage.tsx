@@ -20,6 +20,7 @@ type EditPageProps = {
   onDraftItemChange: (value: string) => void;
   onParse: () => void;
   onResetAll: () => void;
+  onResetChecks: () => void;
   onAddSingleItem: () => void;
   onRenameItem: (itemId: string, nextRaw: string) => void;
   onToggleItem: (itemId: string) => void;
@@ -59,6 +60,7 @@ export function EditPage({
   onDraftItemChange,
   onParse,
   onResetAll,
+  onResetChecks,
   onAddSingleItem,
   onRenameItem,
   onToggleItem,
@@ -140,6 +142,9 @@ export function EditPage({
         </div>
 
         <div className="button-row">
+          <button type="button" className="button" onClick={onResetChecks}>
+            {messages.actions.resetTicks}
+          </button>
           <button type="button" className="button" onClick={onResetAll}>
             {messages.actions.fullReset}
           </button>

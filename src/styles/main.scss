@@ -521,9 +521,47 @@ select {
   min-width: 240px;
 }
 
+.route-page-header {
+  align-items: flex-start;
+}
+
+.route-page-header-copy {
+  flex: 1 1 320px;
+  min-width: 0;
+}
+
+.route-toolbar {
+  align-items: flex-end;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.route-toolbar-row {
+  align-items: center;
+  display: inline-flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 .route-view-controls {
   display: inline-flex;
   gap: 8px;
+}
+
+.route-tools-divider {
+  align-self: stretch;
+  background: $border;
+  border-radius: 999px;
+  flex: 0 0 1px;
+  min-height: 42px;
+}
+
+.route-filter-input {
+  max-width: 250px;
+  min-width: 0;
+  width: 250px;
 }
 
 .route-density-settings {
@@ -1443,6 +1481,30 @@ select {
   .inline-row,
   .badge-row {
     gap: 8px;
+  }
+
+  .route-tools-divider {
+    display: none;
+  }
+
+  .route-page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .route-toolbar {
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .route-toolbar-row {
+    justify-content: flex-end;
+    width: 100%;
+  }
+
+  .route-filter-input {
+    max-width: none;
+    width: 100%;
   }
 
   .stats-grid {

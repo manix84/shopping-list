@@ -12,7 +12,8 @@ type Messages = {
     subtitle: string;
   };
   nav: {
-    shoppingList: string;
+    editList: string;
+    route: string;
     sections: string;
     settings: string;
     debugTools: string;
@@ -29,6 +30,7 @@ type Messages = {
     goToEditList: string;
     loadSharedList: string;
     openDebugTools: string;
+    filterItems: string;
     refresh: string;
     refreshing: string;
     remove: string;
@@ -186,7 +188,8 @@ const en: Messages = {
     subtitle: 'Turn a rough grocery list into an ordered route through the store.',
   },
   nav: {
-    shoppingList: 'Shopping List',
+    editList: 'Edit list',
+    route: 'Route',
     sections: 'Sections',
     settings: 'Settings',
     debugTools: 'Debug tools',
@@ -203,6 +206,7 @@ const en: Messages = {
     goToEditList: 'Go to Edit list',
     loadSharedList: 'Load shared list',
     openDebugTools: 'Open debug tools',
+    filterItems: 'Filter items',
     refresh: 'Refresh',
     refreshing: 'Refreshing...',
     remove: 'Remove',
@@ -363,7 +367,8 @@ const es: Messages = {
     subtitle: 'Convierte una lista rápida en una ruta ordenada por la tienda.',
   },
   nav: {
-    shoppingList: 'Lista de la compra',
+    editList: 'Editar lista',
+    route: 'Ruta',
     sections: 'Secciones',
     settings: 'Ajustes',
     debugTools: 'Herramientas de depuración',
@@ -380,6 +385,7 @@ const es: Messages = {
     goToEditList: 'Ir a Editar lista',
     loadSharedList: 'Abrir lista compartida',
     openDebugTools: 'Abrir herramientas de depuración',
+    filterItems: 'Filtrar artículos',
     refresh: 'Actualizar',
     refreshing: 'Actualizando...',
     remove: 'Eliminar',

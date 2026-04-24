@@ -181,6 +181,7 @@ export default function App() {
   const [input, setInput] = useState('');
   const [items, setItems] = useState<Item[]>([]);
   const [query, setQuery] = useState('');
+  const [isRouteFilterVisible, setIsRouteFilterVisible] = useState(false);
   const [draftItem, setDraftItem] = useState('');
   const [isLoaded, setIsLoaded] = useState(false);
   const [storageMode, setStorageMode] = useState<StorageMode>('local');
@@ -604,6 +605,7 @@ export default function App() {
   const handleParse = () => {
     setItems((current) => parseItems(input, config, current));
     setQuery('');
+    setIsRouteFilterVisible(false);
     changePage('route');
   };
 
@@ -673,6 +675,15 @@ export default function App() {
 
   const resetChecks = () => {
     setItems((current) => current.map((item) => ({ ...item, checked: false })));
+  };
+
+  const toggleRouteFilter = () => {
+    setIsRouteFilterVisible((current) => {
+      if (current) {
+        setQuery('');
+      }
+      return !current;
+    });
   };
 
   const applyRecord = (record: ReturnType<typeof buildRecord>) => {
@@ -789,6 +800,7 @@ export default function App() {
               onDraftItemChange={setDraftItem}
               onParse={handleParse}
               onResetAll={resetAll}
+              onResetChecks={resetChecks}
               onAddSingleItem={handleAddSingleItem}
               onRenameItem={handleRenameItem}
               onToggleItem={toggleItem}
@@ -815,13 +827,13 @@ export default function App() {
           {page === 'route' ? (
             <RoutePage
               query={query}
+              isFilterVisible={isRouteFilterVisible}
               grouped={grouped}
               hasItems={items.length > 0}
               viewMode={routeViewMode}
               onQueryChange={setQuery}
+              onToggleFilter={toggleRouteFilter}
               onViewModeChange={setRouteViewMode}
-              onResetChecks={resetChecks}
-              onResort={handleParse}
               onToggleSection={toggleSection}
               onToggleItem={toggleItem}
               onOpenEdit={() => changePage('edit')}
@@ -853,6 +865,7 @@ export default function App() {
               storageHasFailures={storageTests.some((test) => !test.passed)}
               onBackToEdit={() => changePage('edit')}
               onBackToSettings={() => changePage('settings')}
+              onOpenSections={() => changePage('sections')}
             />
           ) : null}
         </div>

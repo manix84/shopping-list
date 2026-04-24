@@ -14,6 +14,7 @@ type DebugPageProps = {
   storageHasFailures: boolean;
   onBackToEdit: () => void;
   onBackToSettings: () => void;
+  onOpenSections: () => void;
 };
 
 const backendSummary = (status: BackendStatus, messages: Messages): string => {
@@ -44,6 +45,7 @@ export function DebugPage({
   storageHasFailures,
   onBackToEdit,
   onBackToSettings,
+  onOpenSections,
 }: DebugPageProps) {
   const { messages } = useI18n();
 
@@ -61,6 +63,9 @@ export function DebugPage({
             </button>
             <button type="button" className="button" onClick={onBackToSettings}>
               {messages.actions.backToSettings}
+            </button>
+            <button type="button" className="button" onClick={onOpenSections}>
+              {messages.nav.sections}
             </button>
           </div>
         </div>
