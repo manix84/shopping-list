@@ -21,7 +21,8 @@ The app uses hash-based routing so direct links work on GitHub Pages:
 
 - `#/edit` - list editor
 - `#/route` - store route
-- `#/settings` - country config and section reference
+- `#/sections` - read-only section and route-order reference
+- `#/settings` - country and theme preferences
 - `#/debug` - parser self-checks
 
 If a page needs data that is not available yet, it shows a warning and points you to the page that can populate it.

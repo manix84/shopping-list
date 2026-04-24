@@ -23,6 +23,7 @@ import { createUuidV7 } from './lib/uuid';
 import { DebugPage } from './pages/DebugPage';
 import { EditPage } from './pages/EditPage';
 import { RoutePage } from './pages/RoutePage';
+import { SectionsPage } from './pages/SectionsPage';
 import { SettingsPage } from './pages/SettingsPage';
 import type { AppRoute, BackendStatus, CountryCode, GroupedSectionView, Item, PageKey, SectionKey, ThemeMode } from './types';
 
@@ -534,13 +535,14 @@ export default function App() {
         {page === 'settings' ? (
           <SettingsPage
             countryCode={countryCode}
-            config={config}
             themeMode={themeMode}
             onCountryChange={handleCountryChange}
             onThemeChange={setThemeMode}
             onOpenDebug={() => changePage('debug')}
           />
         ) : null}
+
+        {page === 'sections' ? <SectionsPage config={config} /> : null}
 
         {page === 'debug' ? (
           <DebugPage
