@@ -36,6 +36,7 @@ import type { AppRoute, BackendStatus, CountryCode, GroupedSectionView, Item, Pa
 
 const DEFAULT_PAGE: PageKey = 'edit';
 type StorageMode = 'local' | 'backend';
+type ShareErrorKey = 'connectBackendFirst' | 'createFailed' | 'refreshMissing' | 'refreshFailed' | 'offlineBackup';
 
 const defaultBackendStatus = (): BackendStatus => ({
   state: 'checking',
@@ -105,7 +106,7 @@ export default function App() {
   const [locale, setLocale] = useState(() => loadLocale());
   const [isCreatingShareLink, setIsCreatingShareLink] = useState(false);
   const [isRefreshingSharedList, setIsRefreshingSharedList] = useState(false);
-  const [shareError, setShareError] = useState<string>();
+  const [shareError, setShareError] = useState<ShareErrorKey>();
 
   const config = useMemo(() => COUNTRY_CONFIGS[countryCode], [countryCode]);
   const messages = useMemo(() => createMessages(locale), [locale]);
@@ -115,6 +116,7 @@ export default function App() {
     typeof window === 'undefined' || !isServerBackedList
       ? undefined
       : `${window.location.origin}${appBasePath}/list/${activeListId}/edit`;
+  const shareErrorMessage = shareError ? messages.sharing[shareError] : undefined;
 
   const changePage = (nextPage: PageKey) => {
     setRoute((current) => ({ ...current, page: nextPage }));
@@ -156,7 +158,7 @@ export default function App() {
       }
 
       if (initialBackendStatus.state !== 'connected' && nextServerBacked) {
-        setShareError(messages.sharing.offlineBackup);
+        setShareError('offlineBackup');
       }
 
       if (initialBackendStatus.state === 'connected') {
@@ -441,7 +443,7 @@ export default function App() {
 
   const handleCreateSharedLink = async () => {
     if (backendStatus.state !== 'connected') {
-      setShareError(messages.sharing.connectBackendFirst);
+      setShareError('connectBackendFirst');
       return;
     }
 
@@ -457,7 +459,7 @@ export default function App() {
       setRoute({ page: 'edit', listId: activeListId });
     } catch (error) {
       console.warn('Unable to create shared link.', error);
-      setShareError(messages.sharing.createFailed);
+      setShareError('createFailed');
     } finally {
       setIsCreatingShareLink(false);
     }
@@ -473,10 +475,10 @@ export default function App() {
       const remotePayload = await loadSharedShoppingList(activeListId);
       applyRecord({ ...remotePayload.record, listId: activeListId, serverBacked: true });
       setStorageMode('backend');
-      setShareError(remotePayload.exists ? undefined : messages.sharing.refreshMissing);
+      setShareError(remotePayload.exists ? undefined : 'refreshMissing');
     } catch (error) {
       console.warn('Unable to refresh shared list.', error);
-      setShareError(messages.sharing.refreshFailed);
+      setShareError('refreshFailed');
     } finally {
       setIsRefreshingSharedList(false);
     }
@@ -532,7 +534,7 @@ export default function App() {
               shareLink={shareLink}
               isCreatingShareLink={isCreatingShareLink}
               isRefreshingSharedList={isRefreshingSharedList}
-              shareError={shareError}
+              shareError={shareErrorMessage}
             />
           ) : null}
 
