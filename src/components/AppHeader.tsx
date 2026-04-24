@@ -1,13 +1,24 @@
 import { Card } from './Card';
 import { PageTabs } from './PageTabs';
-import type { PageKey } from '../types';
+import { Badge } from './Badge';
+import type { BackendStatus, PageKey } from '../types';
 
 type AppHeaderProps = {
   page: PageKey;
+  backendStatus: BackendStatus;
   onChangePage: (page: PageKey) => void;
 };
 
-export function AppHeader({ page, onChangePage }: AppHeaderProps) {
+const backendBadge = (status: BackendStatus) => {
+  if (status.state === 'connected') return { tone: 'success' as const, label: 'Backend connected' };
+  if (status.state === 'checking') return { tone: 'muted' as const, label: 'Backend checking' };
+  if (status.state === 'error') return { tone: 'danger' as const, label: 'Backend issue' };
+  return { tone: 'muted' as const, label: 'Frontend only' };
+};
+
+export function AppHeader({ page, backendStatus, onChangePage }: AppHeaderProps) {
+  const badge = backendBadge(backendStatus);
+
   return (
     <Card
       header={
@@ -19,7 +30,10 @@ export function AppHeader({ page, onChangePage }: AppHeaderProps) {
               <p className="subtitle">Country-aware supermarket routing, with the UK setup as the default.</p>
             </div>
           </div>
-          <PageTabs page={page} onChange={onChangePage} />
+          <div className="header-actions">
+            <Badge tone={badge.tone}>{badge.label}</Badge>
+            <PageTabs page={page} onChange={onChangePage} />
+          </div>
         </div>
       }
     />

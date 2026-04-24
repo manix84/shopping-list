@@ -1,19 +1,22 @@
 import { COUNTRY_CONFIGS } from '../../config/countries';
 import type { ShoppingListRecord } from '../../types';
 import { parseItems } from '../parser';
+import { createUuidV7 } from '../uuid';
 import { decodeShoppingListRecord, encodeShoppingListRecord } from './recordCodec';
 import type { ShoppingListRepository } from './storage';
 
 export const STORAGE_KEY = 'smart-shopping-list-v1';
 
 export const defaultRecord = (): ShoppingListRecord => ({
+  listId: createUuidV7(),
+  serverBacked: false,
   input: '',
   items: [],
   updatedAt: new Date().toISOString(),
   countryCode: 'uk',
 });
 
-export const localStorageRepository: ShoppingListRepository = {
+export const localStorageRepository = {
   load: () => {
     if (typeof window === 'undefined') return defaultRecord();
 
@@ -41,4 +44,9 @@ export const localStorageRepository: ShoppingListRepository = {
     if (typeof window === 'undefined') return;
     window.localStorage.removeItem(STORAGE_KEY);
   },
+} satisfies ShoppingListRepository;
+
+export const hasStoredShoppingListRecord = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  return window.localStorage.getItem(STORAGE_KEY) !== null;
 };

@@ -3,34 +3,75 @@ import { COUNTRY_CONFIGS } from './config/countries';
 import { AppHeader } from './components/AppHeader';
 import { runMatcherTests, runQuantityTests, runStorageTests } from './lib/debugTests';
 import { getDisplayValue, getStoredValue, parseItems } from './lib/parser';
-import { defaultRecord, localStorageRepository } from './lib/repository/localStorageRepository';
+import {
+  checkBackendStatus,
+  clearSharedShoppingList,
+  loadSharedShoppingList,
+  saveSharedShoppingList,
+} from './lib/repository/apiRepository';
+import {
+  defaultRecord,
+  hasStoredShoppingListRecord,
+  localStorageRepository,
+} from './lib/repository/localStorageRepository';
+import { chooseNewestRecord } from './lib/repository/recordMerge';
+import { readRouteFromLocationParts, routeToUrl } from './lib/routing';
 import { getSectionMeta } from './lib/sections';
 import { cleanLine, stripDisplaySizeLabel } from './lib/stringUtils';
 import { getResolvedTheme, loadThemeMode, saveThemeMode } from './lib/themePreference';
+import { createUuidV7 } from './lib/uuid';
 import { DebugPage } from './pages/DebugPage';
 import { EditPage } from './pages/EditPage';
 import { RoutePage } from './pages/RoutePage';
+import { SectionsPage } from './pages/SectionsPage';
 import { SettingsPage } from './pages/SettingsPage';
-import type { CountryCode, GroupedSectionView, Item, PageKey, SectionKey, ThemeMode } from './types';
+import type { AppRoute, BackendStatus, CountryCode, GroupedSectionView, Item, PageKey, SectionKey, ThemeMode } from './types';
 
-const APP_PAGES: PageKey[] = ['edit', 'route', 'settings', 'debug'];
 const DEFAULT_PAGE: PageKey = 'edit';
+type StorageMode = 'local' | 'backend';
 
-const readPageFromHash = (): PageKey => {
-  if (typeof window === 'undefined') return DEFAULT_PAGE;
+const defaultBackendStatus = (): BackendStatus => ({
+  state: 'checking',
+  health: { ok: false },
+  database: { ok: false },
+});
 
-  const raw = window.location.hash.replace(/^#\/?/, '').toLowerCase();
-  return APP_PAGES.includes(raw as PageKey) ? (raw as PageKey) : DEFAULT_PAGE;
+const appBasePath = import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const readRouteFromLocation = (): AppRoute => {
+  if (typeof window === 'undefined') return { page: DEFAULT_PAGE };
+
+  return readRouteFromLocationParts({
+    pathname: window.location.pathname,
+    hash: window.location.hash,
+    basePath: appBasePath,
+  });
 };
 
-const syncPageToHash = (page: PageKey): void => {
+const syncRouteToUrl = ({ page, listId }: AppRoute): void => {
   if (typeof window === 'undefined') return;
 
-  const nextHash = `#/${page}`;
-  if (window.location.hash !== nextHash) {
-    window.history.replaceState(null, '', nextHash);
+  const nextUrl = routeToUrl({ page, listId }, appBasePath);
+  const currentUrl = `${window.location.pathname}${window.location.hash}`;
+  if (currentUrl !== nextUrl) {
+    window.history.replaceState(null, '', nextUrl);
   }
 };
+
+const buildRecord = (
+  input: string,
+  items: Item[],
+  countryCode: CountryCode,
+  listId: string,
+  serverBacked: boolean,
+) => ({
+  listId,
+  serverBacked,
+  input,
+  items,
+  updatedAt: new Date().toISOString(),
+  countryCode,
+});
 
 function updateItemTextInInput(input: string, previousDisplay: string, nextDisplay: string): string {
   const lines = input.split('\n');
@@ -42,16 +83,33 @@ function updateItemTextInInput(input: string, previousDisplay: string, nextDispl
 }
 
 export default function App() {
-  const [page, setPage] = useState<PageKey>(() => readPageFromHash());
+  const [route, setRoute] = useState<AppRoute>(() => readRouteFromLocation());
   const [input, setInput] = useState('');
   const [items, setItems] = useState<Item[]>([]);
   const [query, setQuery] = useState('');
   const [draftItem, setDraftItem] = useState('');
   const [isLoaded, setIsLoaded] = useState(false);
+  const [storageMode, setStorageMode] = useState<StorageMode>('local');
+  const [backendStatus, setBackendStatus] = useState<BackendStatus>(() => defaultBackendStatus());
+  const [activeListId, setActiveListId] = useState<string>(() => readRouteFromLocation().listId ?? createUuidV7());
+  const [isServerBackedList, setIsServerBackedList] = useState(false);
   const [countryCode, setCountryCode] = useState<CountryCode>('uk');
   const [themeMode, setThemeMode] = useState<ThemeMode>(() => loadThemeMode());
+  const [isCreatingShareLink, setIsCreatingShareLink] = useState(false);
+  const [isRefreshingSharedList, setIsRefreshingSharedList] = useState(false);
+  const [shareError, setShareError] = useState<string>();
 
   const config = useMemo(() => COUNTRY_CONFIGS[countryCode], [countryCode]);
+  const { page, listId } = route;
+  const canUseBackend = backendStatus.state === 'connected';
+  const shareLink =
+    typeof window === 'undefined' || !isServerBackedList
+      ? undefined
+      : `${window.location.origin}${appBasePath}/list/${activeListId}/edit`;
+
+  const changePage = (nextPage: PageKey) => {
+    setRoute((current) => ({ ...current, page: nextPage }));
+  };
 
   const applyTheme = (mode: ThemeMode) => {
     if (typeof document === 'undefined') return;
@@ -66,25 +124,158 @@ export default function App() {
   };
 
   useEffect(() => {
-    const record = localStorageRepository.load();
-    setCountryCode(record.countryCode);
-    setInput(record.input);
-    setItems(record.items.length ? record.items : parseItems(record.input, COUNTRY_CONFIGS[record.countryCode]));
-    setIsLoaded(true);
-  }, []);
+    let cancelled = false;
+    setIsLoaded(false);
+    setShareError(undefined);
+
+    const loadRecord = async () => {
+      const localRecord = localStorageRepository.load();
+      const hasLocalRecord = hasStoredShoppingListRecord();
+      const nextListId = listId ?? localRecord.listId ?? createUuidV7();
+      const localRecordWithIdentity = {
+        ...localRecord,
+        listId: nextListId,
+        serverBacked: localRecord.serverBacked === true || Boolean(listId),
+      };
+      let selectedRecord = localRecordWithIdentity;
+      let nextStorageMode: StorageMode = 'local';
+      let nextServerBacked = localRecordWithIdentity.serverBacked === true;
+
+      const initialBackendStatus = await checkBackendStatus();
+      if (!cancelled) {
+        setBackendStatus(initialBackendStatus);
+      }
+
+      if (initialBackendStatus.state !== 'connected' && nextServerBacked) {
+        setShareError('Backend is offline. Showing the local backup for this shared list.');
+      }
+
+      if (initialBackendStatus.state === 'connected') {
+        try {
+          const remotePayload = await loadSharedShoppingList(nextListId);
+          selectedRecord = {
+            ...chooseNewestRecord({
+              local: localRecordWithIdentity,
+              remote: { ...remotePayload.record, listId: nextListId, serverBacked: true },
+              hasLocalRecord,
+              hasRemoteRecord: remotePayload.exists,
+            }),
+            listId: nextListId,
+            serverBacked: true,
+          };
+
+          await saveSharedShoppingList(nextListId, selectedRecord);
+          localStorageRepository.save(selectedRecord);
+          nextStorageMode = 'backend';
+          nextServerBacked = true;
+        } catch (error) {
+          console.warn('Backend was detected but could not be loaded. Falling back to local storage.', error);
+          if (!cancelled) {
+            setBackendStatus({
+              ...initialBackendStatus,
+              state: 'error',
+            });
+          }
+        }
+      }
+
+      if (cancelled) return;
+
+      setStorageMode(nextStorageMode);
+      setActiveListId(nextListId);
+      setIsServerBackedList(nextServerBacked);
+      setRoute((current) => ({
+        page: current.page,
+        listId: nextServerBacked ? nextListId : undefined,
+      }));
+      setCountryCode(selectedRecord.countryCode);
+      setInput(selectedRecord.input);
+      setItems(
+        selectedRecord.items.length
+          ? selectedRecord.items
+          : parseItems(selectedRecord.input, COUNTRY_CONFIGS[selectedRecord.countryCode]),
+      );
+      setIsLoaded(true);
+    };
+
+    void loadRecord();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [listId]);
 
   useEffect(() => {
-    const handleHashChange = () => {
-      setPage((current) => {
-        const next = readPageFromHash();
-        return current === next ? current : next;
+    if (!isLoaded) return;
+
+    const interval = window.setInterval(() => {
+      void checkBackendStatus().then(setBackendStatus);
+    }, 30_000);
+
+    return () => window.clearInterval(interval);
+  }, [isLoaded]);
+
+  useEffect(() => {
+    if (!isLoaded || storageMode === 'backend' || backendStatus.state !== 'connected') return;
+
+    const connectBackend = async () => {
+      try {
+        const localRecord = localStorageRepository.load();
+        const remotePayload = await loadSharedShoppingList(activeListId);
+        const selectedRecord = {
+          ...chooseNewestRecord({
+            local: { ...localRecord, listId: activeListId, serverBacked: false },
+            remote: { ...remotePayload.record, listId: activeListId, serverBacked: true },
+            hasLocalRecord: hasStoredShoppingListRecord(),
+            hasRemoteRecord: remotePayload.exists,
+          }),
+          listId: activeListId,
+          serverBacked: true,
+        };
+
+        await saveSharedShoppingList(activeListId, selectedRecord);
+        localStorageRepository.save(selectedRecord);
+        setStorageMode('backend');
+        setIsServerBackedList(true);
+        setRoute((current) => ({
+          page: current.page,
+          listId: activeListId,
+        }));
+        setCountryCode(selectedRecord.countryCode);
+        setInput(selectedRecord.input);
+        setItems(
+          selectedRecord.items.length
+            ? selectedRecord.items
+            : parseItems(selectedRecord.input, COUNTRY_CONFIGS[selectedRecord.countryCode]),
+        );
+      } catch (error) {
+        console.warn('Backend reconnected but could not be merged. Staying in local storage mode.', error);
+        setBackendStatus((current) => ({
+          ...current,
+          state: 'error',
+        }));
+      }
+    };
+
+    void connectBackend();
+  }, [activeListId, backendStatus.state, isLoaded, storageMode]);
+
+  useEffect(() => {
+    const handleLocationChange = () => {
+      setRoute((current) => {
+        const next = readRouteFromLocation();
+        return current.page === next.page && current.listId === next.listId ? current : next;
       });
     };
 
-    handleHashChange();
-    window.addEventListener('hashchange', handleHashChange);
+    handleLocationChange();
+    window.addEventListener('hashchange', handleLocationChange);
+    window.addEventListener('popstate', handleLocationChange);
 
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    return () => {
+      window.removeEventListener('hashchange', handleLocationChange);
+      window.removeEventListener('popstate', handleLocationChange);
+    };
   }, []);
 
   useEffect(() => {
@@ -104,17 +295,21 @@ export default function App() {
 
   useEffect(() => {
     if (!isLoaded) return;
-    localStorageRepository.save({
-      input,
-      items,
-      updatedAt: new Date().toISOString(),
-      countryCode,
-    });
-  }, [countryCode, input, isLoaded, items]);
+    const record = buildRecord(input, items, countryCode, activeListId, isServerBackedList);
+
+    localStorageRepository.save(record);
+
+    if (storageMode === 'backend' && backendStatus.state === 'connected') {
+      const backendRecord = { ...record, serverBacked: true };
+      void saveSharedShoppingList(activeListId, backendRecord).catch((error: unknown) => {
+        console.warn('Unable to save shared shopping list to backend.', error);
+      });
+    }
+  }, [activeListId, backendStatus.state, countryCode, input, isLoaded, isServerBackedList, items, storageMode]);
 
   useEffect(() => {
-    syncPageToHash(page);
-  }, [page]);
+    syncRouteToUrl(route);
+  }, [route]);
 
   const matcherTests = useMemo(() => runMatcherTests(config), [config]);
   const quantityTests = useMemo(() => runQuantityTests(), []);
@@ -155,7 +350,7 @@ export default function App() {
   const handleParse = () => {
     setItems((current) => parseItems(input, config, current));
     setQuery('');
-    setPage('route');
+    changePage('route');
   };
 
   const handleAddSingleItem = () => {
@@ -217,21 +412,83 @@ export default function App() {
     setItems((current) => current.map((item) => ({ ...item, checked: false })));
   };
 
+  const applyRecord = (record: ReturnType<typeof buildRecord>) => {
+    if (record.listId) {
+      setActiveListId(record.listId);
+    }
+    setIsServerBackedList(record.serverBacked === true);
+    setCountryCode(record.countryCode);
+    setInput(record.input);
+    setItems(record.items.length ? record.items : parseItems(record.input, COUNTRY_CONFIGS[record.countryCode]));
+  };
+
+  const handleCreateSharedLink = async () => {
+    if (backendStatus.state !== 'connected') {
+      setShareError('Connect the backend before creating a shared link.');
+      return;
+    }
+
+    setIsCreatingShareLink(true);
+    setShareError(undefined);
+
+    try {
+      const record = buildRecord(input, items, countryCode, activeListId, true);
+      await saveSharedShoppingList(activeListId, record);
+      localStorageRepository.save(record);
+      setStorageMode('backend');
+      setIsServerBackedList(true);
+      setRoute({ page: 'edit', listId: activeListId });
+    } catch (error) {
+      console.warn('Unable to create shared link.', error);
+      setShareError('Could not create the shared link.');
+    } finally {
+      setIsCreatingShareLink(false);
+    }
+  };
+
+  const handleRefreshSharedList = async () => {
+    if (!isServerBackedList) return;
+
+    setIsRefreshingSharedList(true);
+    setShareError(undefined);
+
+    try {
+      const remotePayload = await loadSharedShoppingList(activeListId);
+      applyRecord({ ...remotePayload.record, listId: activeListId, serverBacked: true });
+      setStorageMode('backend');
+      setShareError(remotePayload.exists ? undefined : 'This shared list does not exist yet. Edits will create it.');
+    } catch (error) {
+      console.warn('Unable to refresh shared list.', error);
+      setShareError('Could not refresh the shared list.');
+    } finally {
+      setIsRefreshingSharedList(false);
+    }
+  };
+
   const resetAll = () => {
     localStorageRepository.clear();
+    if (isServerBackedList) {
+      void clearSharedShoppingList(activeListId).catch((error: unknown) => {
+        console.warn('Unable to clear shared shopping list.', error);
+      });
+    }
+
     const initial = defaultRecord();
+    setActiveListId(initial.listId ?? createUuidV7());
+    setIsServerBackedList(false);
+    setStorageMode('local');
     setCountryCode(initial.countryCode);
     setInput(initial.input);
     setItems(parseItems(initial.input, COUNTRY_CONFIGS[initial.countryCode]));
     setDraftItem('');
     setQuery('');
-    setPage('edit');
+    setRoute({ page: 'edit' });
   };
 
   return (
     <div className="shopping-app">
       <div className="shopping-shell">
-        <AppHeader page={page} onChangePage={setPage} />
+        <AppHeader page={page} backendStatus={backendStatus} onChangePage={changePage} />
 
         {page === 'edit' ? (
           <EditPage
@@ -250,7 +507,14 @@ export default function App() {
             onRenameItem={handleRenameItem}
             onToggleItem={toggleItem}
             onDeleteItem={handleDeleteItem}
-            onOpenDebug={() => setPage('debug')}
+            onCreateSharedLink={handleCreateSharedLink}
+            onRefreshSharedList={handleRefreshSharedList}
+            onOpenDebug={() => changePage('debug')}
+            canUseBackend={canUseBackend}
+            shareLink={shareLink}
+            isCreatingShareLink={isCreatingShareLink}
+            isRefreshingSharedList={isRefreshingSharedList}
+            shareError={shareError}
           />
         ) : null}
 
@@ -264,31 +528,33 @@ export default function App() {
             onResort={handleParse}
             onToggleSection={toggleSection}
             onToggleItem={toggleItem}
-            onOpenEdit={() => setPage('edit')}
+            onOpenEdit={() => changePage('edit')}
           />
         ) : null}
 
         {page === 'settings' ? (
           <SettingsPage
             countryCode={countryCode}
-            config={config}
             themeMode={themeMode}
             onCountryChange={handleCountryChange}
             onThemeChange={setThemeMode}
-            onOpenDebug={() => setPage('debug')}
+            onOpenDebug={() => changePage('debug')}
           />
         ) : null}
 
+        {page === 'sections' ? <SectionsPage config={config} /> : null}
+
         {page === 'debug' ? (
           <DebugPage
+            backendStatus={backendStatus}
             matcherTests={matcherTests}
             quantityTests={quantityTests}
             storageTests={storageTests}
             matcherHasFailures={matcherTests.some((test) => !test.passed)}
             quantityHasFailures={quantityTests.some((test) => !test.passed)}
             storageHasFailures={storageTests.some((test) => !test.passed)}
-            onBackToEdit={() => setPage('edit')}
-            onBackToSettings={() => setPage('settings')}
+            onBackToEdit={() => changePage('edit')}
+            onBackToSettings={() => changePage('settings')}
           />
         ) : null}
       </div>
