@@ -410,6 +410,131 @@ select {
   color: $text;
 }
 
+.settings-select {
+  position: relative;
+}
+
+.settings-select-button {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  text-align: left;
+}
+
+.settings-option-content {
+  align-items: center;
+  display: inline-flex;
+  gap: 10px;
+}
+
+.settings-option-icon-slot {
+  align-items: center;
+  display: inline-flex;
+  flex: 0 0 24px;
+  justify-content: center;
+  width: 24px;
+}
+
+.country-option-icon {
+  font-size: 17px;
+  line-height: 1;
+}
+
+.locale-option-icon {
+  align-items: center;
+  background: $panel-alt;
+  border: 1px solid $border;
+  border-radius: 6px;
+  color: $muted;
+  display: inline-flex;
+  font-size: 10px;
+  font-weight: 700;
+  height: 18px;
+  justify-content: center;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  width: 24px;
+}
+
+.theme-option-icon {
+  display: inline-block;
+  flex: 0 0 auto;
+  height: 18px;
+  position: relative;
+  width: 18px;
+}
+
+.theme-option-icon-light {
+  background: #facc15;
+  border-radius: 999px;
+  box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.24);
+}
+
+.theme-option-icon-dark {
+  background: #6366f1;
+  border-radius: 999px;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.24);
+
+  &::after {
+    background: $panel;
+    border-radius: 999px;
+    content: '';
+    height: 18px;
+    left: 6px;
+    position: absolute;
+    top: -2px;
+    width: 18px;
+  }
+}
+
+.theme-option-icon-system {
+  background: linear-gradient(90deg, #facc15 0 50%, #6366f1 50% 100%);
+  border-radius: 999px;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.18);
+}
+
+.settings-select-chevron {
+  border-bottom: 2px solid $muted;
+  border-right: 2px solid $muted;
+  display: inline-block;
+  height: 8px;
+  margin-left: 12px;
+  transform: translateY(-2px) rotate(45deg);
+  width: 8px;
+}
+
+.settings-select-menu {
+  background: $panel;
+  border: 1px solid $border;
+  border-radius: 14px;
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.14);
+  display: grid;
+  gap: 4px;
+  left: 0;
+  margin-top: 6px;
+  padding: 6px;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  z-index: 20;
+}
+
+.settings-select-option {
+  background: transparent;
+  border: 0;
+  border-radius: 10px;
+  color: $text;
+  cursor: pointer;
+  padding: 10px;
+  text-align: left;
+
+  &:hover,
+  &-active {
+    background: $panel-alt;
+  }
+}
+
 .input-wide {
   min-width: 240px;
 }
