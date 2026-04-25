@@ -33,6 +33,11 @@ describe('i18n', () => {
 
   it('defaults to browser language', () => {
     expect(getBrowserLocale('es-MX')).toBe('es');
+    expect(getBrowserLocale('fr-FR')).toBe('fr');
+    expect(getBrowserLocale('de-DE')).toBe('de');
+    expect(getBrowserLocale('nl-NL')).toBe('nl');
+    expect(getBrowserLocale('it-IT')).toBe('it');
+    expect(getBrowserLocale('ro-RO')).toBe('ro');
     expect(getBrowserLocale('en-GB')).toBe('en');
   });
 
@@ -73,7 +78,7 @@ describe('i18n', () => {
       expect(isLocaleCode(locale)).toBe(true);
     }
 
-    expect(isLocaleCode('fr')).toBe(false);
+    expect(isLocaleCode('xx')).toBe(false);
     expect(isLocaleCode(undefined)).toBe(false);
   });
 
@@ -84,16 +89,16 @@ describe('i18n', () => {
     expect(defaultLocale()).toBe('es');
     expect(loadLocale()).toBe('es');
 
-    saveLocale('en');
-    expect(windowMock.localStorage.getItem(LOCALE_STORAGE_KEY)).toBe('en');
+    saveLocale('fr');
+    expect(windowMock.localStorage.getItem(LOCALE_STORAGE_KEY)).toBe('fr');
   });
 
   it('applies the document language', () => {
     const documentMock = { documentElement: { lang: '' } } as Document;
     vi.stubGlobal('document', documentMock);
 
-    applyDocumentLocale('es');
+    applyDocumentLocale('pi');
 
-    expect(documentMock.documentElement.lang).toBe('es');
+    expect(documentMock.documentElement.lang).toBe('en-PI');
   });
 });
