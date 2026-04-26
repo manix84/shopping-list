@@ -113,7 +113,9 @@ type Messages = {
       subtitle: string;
       countryLabel: string;
       themeLabel: string;
+      themeSubtitle: string;
       localeLabel: string;
+      localeSubtitle: string;
       routeDensityLabel: string;
       routeDensitySubtitle: string;
     };
@@ -305,7 +307,9 @@ const en: Messages = {
         'Preferences that affect how this device displays and groups shopping lists.',
       countryLabel: 'Country profile',
       themeLabel: 'Theme',
+      themeSubtitle: 'Choose the look that feels easiest to use.',
       localeLabel: 'Language',
+      localeSubtitle: 'Choose the language you prefer for app text.',
       routeDensityLabel: 'Route density',
       routeDensitySubtitle: 'How the shopping route is spaced on this device.',
     },
@@ -517,7 +521,9 @@ const es: Messages = {
         'Preferencias que afectan a cómo este dispositivo muestra y agrupa las listas de la compra.',
       countryLabel: 'Perfil de país',
       themeLabel: 'Tema',
+      themeSubtitle: 'Elige el aspecto que te resulte más cómodo de usar.',
       localeLabel: 'Idioma',
+      localeSubtitle: 'Elige el idioma que prefieres para el texto de la app.',
       routeDensityLabel: 'Densidad de la ruta',
       routeDensitySubtitle:
         'Cómo se espacia la ruta de compra en este dispositivo.',
@@ -742,7 +748,9 @@ const fr: Messages = {
         'Préférences qui influencent la façon dont cet appareil affiche et groupe les listes de courses.',
       countryLabel: 'Profil pays',
       themeLabel: 'Thème',
+      themeSubtitle: 'Choisissez l’apparence la plus agréable à utiliser.',
       localeLabel: 'Langue',
+      localeSubtitle: 'Choisissez la langue que vous préférez pour l’interface.',
       routeDensityLabel: 'Densité du parcours',
       routeDensitySubtitle:
         'Définit l’espacement du parcours sur cet appareil.',
@@ -966,7 +974,9 @@ const de: Messages = {
         'Voreinstellungen dafür, wie dieses Gerät Einkaufslisten darstellt und gruppiert.',
       countryLabel: 'Länderprofil',
       themeLabel: 'Design',
+      themeSubtitle: 'Wähle die Darstellung, die für dich am angenehmsten ist.',
       localeLabel: 'Sprache',
+      localeSubtitle: 'Wähle die Sprache, in der du die App lesen möchtest.',
       routeDensityLabel: 'Routendichte',
       routeDensitySubtitle:
         'Legt fest, wie dicht die Einkaufsroute auf diesem Gerät dargestellt wird.',
@@ -1191,7 +1201,9 @@ const nl: Messages = {
         'Voorkeuren die bepalen hoe dit apparaat boodschappenlijsten toont en groepeert.',
       countryLabel: 'Landprofiel',
       themeLabel: 'Thema',
+      themeSubtitle: 'Kies de weergave die voor jou het prettigst werkt.',
       localeLabel: 'Taal',
+      localeSubtitle: 'Kies de taal waarin je de app het liefst leest.',
       routeDensityLabel: 'Routedichtheid',
       routeDensitySubtitle:
         'Bepaalt de spacing van de winkelroute op dit apparaat.',
@@ -1412,7 +1424,9 @@ const it: Messages = {
         'Preferenze che influenzano il modo in cui questo dispositivo mostra e raggruppa le liste della spesa.',
       countryLabel: 'Profilo paese',
       themeLabel: 'Tema',
+      themeSubtitle: 'Scegli l’aspetto più comodo da usare.',
       localeLabel: 'Lingua',
+      localeSubtitle: 'Scegli la lingua che preferisci per leggere l’app.',
       routeDensityLabel: 'Densità del percorso',
       routeDensitySubtitle:
         'Definisce la spaziatura del percorso su questo dispositivo.',
@@ -1635,7 +1649,9 @@ const ro: Messages = {
         'Preferințe care influențează cum acest dispozitiv afișează și grupează listele de cumpărături.',
       countryLabel: 'Profil de țară',
       themeLabel: 'Temă',
+      themeSubtitle: 'Alege aspectul cel mai confortabil pentru tine.',
       localeLabel: 'Limbă',
+      localeSubtitle: 'Alege limba în care preferi să citești aplicația.',
       routeDensityLabel: 'Densitatea traseului',
       routeDensitySubtitle:
         'Controlează spațierea traseului pe acest dispozitiv.',
@@ -1856,7 +1872,9 @@ const pi: Messages = {
         'Preferences fer how this device shows and groups yer shopping ledgers.',
       countryLabel: 'Waters profile',
       themeLabel: 'Look',
+      themeSubtitle: 'Choose the look that sits easiest on yer eyes.',
       localeLabel: 'Tongue',
+      localeSubtitle: 'Choose the tongue ye prefer fer the app’s words.',
       routeDensityLabel: 'Route density',
       routeDensitySubtitle:
         'How tight the shopping route be spaced on this device.',

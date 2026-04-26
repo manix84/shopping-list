@@ -398,6 +398,26 @@ select {
   position: relative;
 }
 
+.select-shell {
+  position: relative;
+}
+
+.select-with-icon {
+  appearance: none;
+  padding-right: 42px;
+}
+
+.select-chevron-svg {
+  color: $muted;
+  height: 18px;
+  pointer-events: none;
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+}
+
 .settings-select-button {
   align-items: center;
   cursor: pointer;
@@ -573,133 +593,62 @@ select {
   width: 250px;
 }
 
-.route-density-settings {
-  display: grid;
-  gap: 12px;
-  max-width: 720px;
-}
-
-.route-density-option {
-  align-items: center;
-  background: $panel-alt;
-  border: 1px solid $border;
-  border-radius: 18px;
-  color: $text;
-  cursor: pointer;
-  display: grid;
-  gap: 16px;
-  grid-template-columns: minmax(0, 1fr) auto;
-  padding: 16px 18px;
-  text-align: left;
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    transform 0.2s ease;
-
-  &:hover {
-    transform: translateY(-1px);
-  }
-
-  &:focus-visible {
-    outline: 2px solid $primary;
-    outline-offset: 2px;
-  }
-}
-
-.route-density-option-active {
-  border-color: color-mix(in srgb, $primary 70%, $border 30%);
-  box-shadow: 0 0 0 1px color-mix(in srgb, $primary 20%, transparent);
-}
-
-.route-density-option-copy {
-  align-items: center;
-  display: inline-flex;
-  gap: 12px;
-  min-width: 0;
-}
-
-.route-density-option-label {
-  font-weight: 600;
-}
-
-.route-density-radio {
-  background: $panel;
-  border: 2px solid $muted;
-  border-radius: 999px;
-  display: inline-flex;
-  flex: 0 0 20px;
-  height: 20px;
-  position: relative;
-  width: 20px;
-}
-
-.route-density-radio-active {
-  border-color: $primary;
-
-  &::after {
-    background: $primary;
-    border-radius: 999px;
-    content: '';
-    inset: 4px;
-    position: absolute;
-  }
-}
-
 .route-density-preview {
   align-items: center;
   display: inline-flex;
+  flex: 0 0 24px;
   justify-content: center;
+  width: 24px;
 }
 
 .route-density-preview-shell {
-  background: $panel;
-  border: 1px solid $border;
-  border-radius: 12px;
+  background: $panel-alt;
+  border: 1px solid color-mix(in srgb, $border 88%, transparent);
+  border-radius: 6px;
   display: grid;
-  min-width: 112px;
-  padding: 10px 12px;
+  min-width: 24px;
+  padding: 4px;
 }
 
 .route-density-preview-default .route-density-preview-shell {
-  gap: 8px;
+  gap: 3px;
 }
 
 .route-density-preview-comfortable .route-density-preview-shell {
-  gap: 12px;
-  padding-block: 12px;
+  gap: 5px;
+  padding-block: 4px;
 }
 
 .route-density-preview-compact .route-density-preview-shell {
-  gap: 5px;
-  padding-block: 8px;
+  gap: 2px;
+  padding-block: 4px;
 }
 
 .route-density-preview-row {
   align-items: center;
   display: grid;
-  gap: 8px;
-  grid-template-columns: 10px minmax(0, 1fr);
+  gap: 3px;
+  grid-template-columns: 4px minmax(0, 1fr);
 }
 
 .route-density-preview-dot {
   background: color-mix(in srgb, $muted 60%, $panel 40%);
-  border: 1px solid color-mix(in srgb, $border 88%, transparent);
-  border-radius: 3px;
+  border-radius: 2px;
   display: block;
-  height: 10px;
-  width: 10px;
+  height: 4px;
+  width: 4px;
 }
 
 .route-density-preview-line {
   background: color-mix(in srgb, $border 74%, $panel 26%);
   border-radius: 999px;
   display: block;
-  height: 4px;
+  height: 2px;
   width: 100%;
 }
 
 .route-density-preview-line-title {
-  height: 6px;
+  height: 3px;
 }
 
 .route-density-preview-line-short {
@@ -968,8 +917,7 @@ select {
   .share-qr-dialog,
   .share-scanner-modal,
   .share-scanner-dialog,
-  .share-scanner-frame-missing,
-  .route-density-option {
+  .share-scanner-frame-missing {
     animation: none;
     transition: none;
   }
@@ -1394,6 +1342,12 @@ select {
   justify-content: flex-end;
 }
 
+.settings-footnote {
+  border-top: 1px solid $border;
+  padding-top: 12px;
+  text-align: right;
+}
+
 .warning-actions {
   justify-content: center;
 }
@@ -1472,7 +1426,7 @@ select {
   .app-header .title-block {
     gap: 12px;
     flex: 1 1 auto;
-    padding-right: 58px;
+    padding-right: 150px;
   }
 
   .app-header .app-icon {
@@ -1538,7 +1492,7 @@ select {
   }
 
   .app-header .header-actions {
-    align-items: flex-start;
+    align-items: center;
     flex-direction: row;
     gap: 8px;
     position: absolute;
@@ -1547,7 +1501,12 @@ select {
   }
 
   .app-header .connection-badge {
-    display: none;
+    flex: 0 1 auto;
+    max-width: 94px;
+    overflow: hidden;
+    padding-inline: 8px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .app-header .title {
@@ -1616,14 +1575,6 @@ select {
   .share-load-row > .shared-input-shell,
   .share-link-row > .input {
     width: 100%;
-  }
-
-  .route-density-option {
-    grid-template-columns: 1fr;
-  }
-
-  .route-density-preview {
-    justify-content: flex-start;
   }
 
   .shared-history-item {

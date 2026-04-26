@@ -1,9 +1,10 @@
 import { mdiContentSave, mdiPlus } from '@mdi/js';
 import { Card } from '../components/Card';
+import { CountrySelect } from '../components/CountrySelect';
 import { StatsGrid } from '../components/StatsGrid';
 import { SharedListPanel } from '../components/SharedListPanel';
 import { useI18n } from '../lib/i18n';
-import type { SharedListHistoryEntry } from '../types';
+import type { CountryCode, SharedListHistoryEntry } from '../types';
 
 type EditPageProps = {
   input: string;
@@ -11,8 +12,10 @@ type EditPageProps = {
   total: number;
   checkedTotal: number;
   progress: number;
+  countryCode: CountryCode;
   onInputChange: (value: string) => void;
   onDraftItemChange: (value: string) => void;
+  onCountryChange: (countryCode: CountryCode) => void;
   onParse: () => void;
   onResetAll: () => void;
   onResetChecks: () => void;
@@ -45,8 +48,10 @@ export function EditPage({
   total,
   checkedTotal,
   progress,
+  countryCode,
   onInputChange,
   onDraftItemChange,
+  onCountryChange,
   onParse,
   onResetAll,
   onResetChecks,
@@ -80,6 +85,11 @@ export function EditPage({
         }
         bodyClassName="stack"
       >
+        <div className="field field-compact">
+          <label htmlFor="list-country-select">{messages.pages.settings.countryLabel}</label>
+          <CountrySelect id="list-country-select" value={countryCode} onChange={onCountryChange} />
+        </div>
+
         <div className="field">
           <label htmlFor="shopping-list-input">{messages.pages.edit.pasteLabel}</label>
           <textarea

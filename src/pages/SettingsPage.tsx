@@ -1,7 +1,6 @@
 import { mdiChevronDown } from '@mdi/js';
-import { type ReactNode, useMemo, useState } from 'react';
-import { COUNTRY_CONFIGS } from '../config/countries';
-import type { CountryCode, RouteViewMode, ThemeMode } from '../types';
+import { type ReactNode, useState } from 'react';
+import type { RouteViewMode, ThemeMode } from '../types';
 import { Card } from '../components/Card';
 import { DebugLink } from '../components/DebugLink';
 import { getRouteViewLabel, type LocaleCode, useI18n } from '../lib/i18n';
@@ -15,10 +14,8 @@ type SelectOption<T extends string> = {
 };
 
 type SettingsPageProps = {
-  countryCode: CountryCode;
   routeViewMode: RouteViewMode;
   themeMode: ThemeMode;
-  onCountryChange: (countryCode: CountryCode) => void;
   onRouteViewModeChange: (mode: RouteViewMode) => void;
   onThemeChange: (themeMode: ThemeMode) => void;
   onOpenDebug: () => void;
@@ -128,32 +125,19 @@ function SettingsSelect<T extends string>({
 }
 
 export function SettingsPage({
-  countryCode,
   routeViewMode,
   themeMode,
-  onCountryChange,
   onRouteViewModeChange,
   onThemeChange,
   onOpenDebug,
 }: SettingsPageProps) {
   const { locale, setLocale, messages } = useI18n();
   const routeViewOptions: RouteViewMode[] = ['default', 'comfortable', 'compact'];
-  const countryOptions = useMemo(
-    () =>
-      Object.values(COUNTRY_CONFIGS)
-        .slice()
-        .sort((a, b) => a.label.localeCompare(b.label))
-        .map((country): SelectOption<CountryCode> => ({
-          value: country.code,
-          label: country.label,
-          icon: (
-            <span aria-hidden="true" className="country-option-icon">
-              {country.flag}
-            </span>
-          ),
-        })),
-    [],
-  );
+  const routeDensityOptions = routeViewOptions.map((mode): SelectOption<RouteViewMode> => ({
+    value: mode,
+    label: getRouteViewLabel(mode, messages),
+    icon: <RouteDensityPreview mode={mode} />,
+  }));
   const themeOptions = THEME_OPTIONS.map((mode): SelectOption<ThemeMode> => ({
     value: mode,
     label: messages.themeOptions[mode],
@@ -178,7 +162,10 @@ export function SettingsPage({
       bodyClassName="stack"
     >
       <div className="field field-compact">
-        <label htmlFor="locale-select">{messages.pages.settings.localeLabel}</label>
+        <div>
+          <label htmlFor="locale-select">{messages.pages.settings.localeLabel}</label>
+          <div className="small-text">{messages.pages.settings.localeSubtitle}</div>
+        </div>
         <SettingsSelect
           id="locale-select"
           value={locale}
@@ -188,51 +175,28 @@ export function SettingsPage({
       </div>
 
       <div className="field field-compact">
-        <label htmlFor="country-select">{messages.pages.settings.countryLabel}</label>
-        <SettingsSelect
-          id="country-select"
-          value={countryCode}
-          options={countryOptions}
-          onChange={onCountryChange}
-        />
+        <div>
+          <label htmlFor="theme-select">{messages.pages.settings.themeLabel}</label>
+          <div className="small-text">{messages.pages.settings.themeSubtitle}</div>
+        </div>
+        <SettingsSelect id="theme-select" value={themeMode} options={themeOptions} onChange={onThemeChange} />
       </div>
 
       <div className="field field-compact">
-        <label htmlFor="theme-select">{messages.pages.settings.themeLabel}</label>
-        <SettingsSelect id="theme-select" value={themeMode} options={themeOptions} onChange={onThemeChange} />
-        <div className="small-text">{messages.labels.storedLocally}</div>
-      </div>
-
-      <div className="field">
         <div>
-          <label>{messages.pages.settings.routeDensityLabel}</label>
+          <label htmlFor="route-density-select">{messages.pages.settings.routeDensityLabel}</label>
           <div className="small-text">{messages.pages.settings.routeDensitySubtitle}</div>
         </div>
-        <div className="route-density-settings" role="radiogroup" aria-label={messages.pages.settings.routeDensityLabel}>
-          {routeViewOptions.map((mode) => (
-            <button
-              key={mode}
-              type="button"
-              role="radio"
-              aria-checked={routeViewMode === mode}
-              className={`route-density-option ${routeViewMode === mode ? 'route-density-option-active' : ''}`}
-              onClick={() => onRouteViewModeChange(mode)}
-            >
-              <span className="route-density-option-copy">
-                <span
-                  aria-hidden="true"
-                  className={`route-density-radio ${routeViewMode === mode ? 'route-density-radio-active' : ''}`}
-                />
-                <span className="route-density-option-label">{getRouteViewLabel(mode, messages)}</span>
-              </span>
-              <RouteDensityPreview mode={mode} />
-            </button>
-          ))}
-        </div>
-        <div className="small-text">{messages.labels.storedLocally}</div>
+        <SettingsSelect
+          id="route-density-select"
+          value={routeViewMode}
+          options={routeDensityOptions}
+          onChange={onRouteViewModeChange}
+        />
       </div>
 
       <DebugLink onOpen={onOpenDebug} />
+      <div className="settings-footnote small-text">{messages.labels.storedLocally}</div>
     </Card>
   );
 }

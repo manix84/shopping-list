@@ -13,9 +13,7 @@ import { getDisplayValue, getStoredValue, parseItems } from './lib/parser';
 import {
   checkBackendStatus,
   clearSharedShoppingList,
-  loadAppSettings,
   loadSharedShoppingList,
-  saveAppSettings,
   saveSharedShoppingList,
 } from './lib/repository/apiRepository';
 import {
@@ -39,9 +37,10 @@ import { RoutePage } from './pages/RoutePage';
 import { SectionsPage } from './pages/SectionsPage';
 import { SettingsPage } from './pages/SettingsPage';
 import type { AppRoute, BackendStatus, CountryCode, GroupedSectionView, Item, PageKey, RouteViewMode, SectionKey, SharedListHistoryEntry, ThemeMode } from './types';
-import type { ApiSettingsPayload } from './lib/repository/apiRepository';
 
 const DEFAULT_PAGE: PageKey = 'edit';
+const BACKEND_HEARTBEAT_CONNECTED_MS = 5_000;
+const BACKEND_HEARTBEAT_RETRY_MS = 1_500;
 type StorageMode = 'local' | 'backend';
 type ShareErrorKey =
   | 'connectBackendFirst'
@@ -112,59 +111,6 @@ const buildRecord = (
   countryCode,
 });
 
-const settingsRecord = (countryCode: CountryCode) => ({
-  countryCode,
-  updatedAt: new Date().toISOString(),
-});
-
-const chooseCountryCode = ({
-  backendSettings,
-  hasLocalRecord,
-  localCountryCode,
-  localUpdatedAt,
-}: {
-  backendSettings: ApiSettingsPayload;
-  hasLocalRecord: boolean;
-  localCountryCode: CountryCode;
-  localUpdatedAt: string;
-}) => {
-  if (!backendSettings.exists) return { countryCode: localCountryCode, shouldSave: true };
-  if (!hasLocalRecord) return { countryCode: backendSettings.record.countryCode, shouldSave: false };
-
-  const localTime = Date.parse(localUpdatedAt);
-  const backendTime = Date.parse(backendSettings.record.updatedAt);
-  if (Number.isFinite(localTime) && Number.isFinite(backendTime) && localTime > backendTime) {
-    return { countryCode: localCountryCode, shouldSave: true };
-  }
-
-  return { countryCode: backendSettings.record.countryCode, shouldSave: false };
-};
-
-const fallbackSettingsPayload = (countryCode: CountryCode, updatedAt: string): ApiSettingsPayload => ({
-  exists: false,
-  record: {
-    countryCode,
-    updatedAt,
-  },
-});
-
-const loadAppSettingsOrFallback = async (countryCode: CountryCode, updatedAt: string): Promise<ApiSettingsPayload> => {
-  try {
-    return await loadAppSettings();
-  } catch (error) {
-    console.warn('Unable to load backend settings. Using local country profile fallback.', error);
-    return fallbackSettingsPayload(countryCode, updatedAt);
-  }
-};
-
-const saveAppSettingsIfAvailable = async (countryCode: CountryCode): Promise<void> => {
-  try {
-    await saveAppSettings(settingsRecord(countryCode));
-  } catch (error) {
-    console.warn('Unable to save country profile to backend settings.', error);
-  }
-};
-
 const getSharedListPreview = (items: Item[]): string[] => items.slice(0, 6).map((item) => item.raw);
 
 function updateItemTextInInput(input: string, previousDisplay: string, nextDisplay: string): string {
@@ -205,7 +151,7 @@ export default function App() {
   const canUseBackend = backendStatus.state === 'connected';
   const canCreateSharedLink = items.length > 0 || cleanLine(input).length > 0;
   const shareLink =
-    typeof window === 'undefined' || !isServerBackedList
+    typeof window === 'undefined' || !canUseBackend || !isServerBackedList
       ? undefined
       : `${window.location.origin}${appBasePath}/list/${activeListId}/edit`;
   const shareErrorMessage = shareError ? messages.sharing[shareError] : undefined;
@@ -356,16 +302,6 @@ export default function App() {
 
       if (initialBackendStatus.state === 'connected') {
         try {
-          const backendSettings = await loadAppSettingsOrFallback(
-            localRecordWithIdentity.countryCode,
-            localRecordWithIdentity.updatedAt,
-          );
-          const selectedCountry = chooseCountryCode({
-            backendSettings,
-            hasLocalRecord,
-            localCountryCode: localRecordWithIdentity.countryCode,
-            localUpdatedAt: localRecordWithIdentity.updatedAt,
-          });
           const remotePayload = await loadSharedShoppingList(nextListId);
           selectedRecord = {
             ...chooseNewestRecord({
@@ -376,12 +312,8 @@ export default function App() {
             }),
             listId: nextListId,
             serverBacked: true,
-            countryCode: selectedCountry.countryCode,
           };
 
-          if (selectedCountry.shouldSave) {
-            void saveAppSettingsIfAvailable(selectedCountry.countryCode);
-          }
           await saveSharedShoppingList(nextListId, selectedRecord);
           localStorageRepository.save(selectedRecord);
           if (remotePayload.exists) {
@@ -430,11 +362,75 @@ export default function App() {
   useEffect(() => {
     if (!isLoaded) return;
 
-    const interval = window.setInterval(() => {
-      void checkBackendStatus().then(setBackendStatus);
-    }, 30_000);
+    let cancelled = false;
+    let inFlight = false;
+    let timeoutId: number | undefined;
+    let pendingCheck = false;
 
-    return () => window.clearInterval(interval);
+    const scheduleHeartbeat = (delay: number) => {
+      if (timeoutId) {
+        window.clearTimeout(timeoutId);
+      }
+
+      timeoutId = window.setTimeout(() => {
+        void runHeartbeat();
+      }, delay);
+    };
+
+    const runHeartbeat = async () => {
+      if (cancelled) return;
+
+      if (inFlight) {
+        pendingCheck = true;
+        return;
+      }
+
+      inFlight = true;
+
+      try {
+        const nextBackendStatus = await checkBackendStatus();
+        if (cancelled) return;
+
+        setBackendStatus(nextBackendStatus);
+        scheduleHeartbeat(
+          nextBackendStatus.state === 'connected' ? BACKEND_HEARTBEAT_CONNECTED_MS : BACKEND_HEARTBEAT_RETRY_MS,
+        );
+      } finally {
+        inFlight = false;
+
+        if (pendingCheck && !cancelled) {
+          pendingCheck = false;
+          scheduleHeartbeat(0);
+        }
+      }
+    };
+
+    const requestImmediateHeartbeat = () => {
+      scheduleHeartbeat(0);
+    };
+
+    const requestVisibleHeartbeat = () => {
+      if (document.visibilityState === 'visible') {
+        requestImmediateHeartbeat();
+      }
+    };
+
+    scheduleHeartbeat(BACKEND_HEARTBEAT_CONNECTED_MS);
+    window.addEventListener('focus', requestImmediateHeartbeat);
+    window.addEventListener('online', requestImmediateHeartbeat);
+    window.addEventListener('offline', requestImmediateHeartbeat);
+    document.addEventListener('visibilitychange', requestVisibleHeartbeat);
+
+    return () => {
+      cancelled = true;
+      if (timeoutId) {
+        window.clearTimeout(timeoutId);
+      }
+      window.removeEventListener('focus', requestImmediateHeartbeat);
+      window.removeEventListener('online', requestImmediateHeartbeat);
+      window.removeEventListener('offline', requestImmediateHeartbeat);
+      document.removeEventListener('visibilitychange', requestVisibleHeartbeat);
+    };
   }, [isLoaded]);
 
   useEffect(() => {
@@ -443,13 +439,6 @@ export default function App() {
     const connectBackend = async () => {
       try {
         const localRecord = localStorageRepository.load();
-        const backendSettings = await loadAppSettingsOrFallback(localRecord.countryCode, localRecord.updatedAt);
-        const selectedCountry = chooseCountryCode({
-          backendSettings,
-          hasLocalRecord: hasStoredShoppingListRecord(),
-          localCountryCode: localRecord.countryCode,
-          localUpdatedAt: localRecord.updatedAt,
-        });
         const remotePayload = await loadSharedShoppingList(activeListId);
         const selectedRecord = {
           ...chooseNewestRecord({
@@ -460,12 +449,8 @@ export default function App() {
           }),
           listId: activeListId,
           serverBacked: true,
-          countryCode: selectedCountry.countryCode,
         };
 
-        if (selectedCountry.shouldSave) {
-          void saveAppSettingsIfAvailable(selectedCountry.countryCode);
-        }
         await saveSharedShoppingList(activeListId, selectedRecord);
         localStorageRepository.save(selectedRecord);
         if (remotePayload.exists) {
@@ -659,10 +644,6 @@ export default function App() {
   const handleCountryChange = (nextCountryCode: CountryCode) => {
     setCountryCode(nextCountryCode);
     setItems((current) => parseItems(input, COUNTRY_CONFIGS[nextCountryCode], current));
-
-    if (backendStatus.state === 'connected') {
-      void saveAppSettingsIfAvailable(nextCountryCode);
-    }
   };
 
   const toggleItem = (id: string) => {
@@ -728,6 +709,10 @@ export default function App() {
 
   const handleRefreshSharedList = async () => {
     if (!isServerBackedList) return;
+    if (backendStatus.state !== 'connected') {
+      setShareError('connectBackendFirst');
+      return;
+    }
 
     setIsRefreshingSharedList(true);
     setShareError(undefined);
@@ -794,8 +779,10 @@ export default function App() {
               total={total}
               checkedTotal={checkedTotal}
               progress={progress}
+              countryCode={countryCode}
               onInputChange={setInput}
               onDraftItemChange={setDraftItem}
+              onCountryChange={handleCountryChange}
               onParse={handleParse}
               onResetAll={resetAll}
               onResetChecks={resetChecks}
@@ -836,10 +823,8 @@ export default function App() {
 
           {page === 'settings' ? (
             <SettingsPage
-              countryCode={countryCode}
               routeViewMode={routeViewMode}
               themeMode={themeMode}
-              onCountryChange={handleCountryChange}
               onRouteViewModeChange={setRouteViewMode}
               onThemeChange={setThemeMode}
               onOpenDebug={() => changePage('debug')}

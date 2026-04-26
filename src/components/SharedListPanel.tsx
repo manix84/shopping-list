@@ -47,8 +47,8 @@ const QR_CANVAS_SIZE = 320;
 const QR_LOGO_SIZE = 72;
 const HISTORY_CARD_TAP_THRESHOLD_PX = 10;
 const appBasePath = import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_URL.replace(/\/$/, '');
-const logoPath = (theme: 'light' | 'dark'): string =>
-  `${import.meta.env.BASE_URL}${theme === 'dark' ? 'favicon-dark.svg' : 'favicon-light.svg'}`;
+const qrLogoPath = (theme: 'light' | 'dark'): string =>
+  `${import.meta.env.BASE_URL}${theme === 'dark' ? 'qr-logo-dark.png' : 'qr-logo-light.png'}`;
 
 const loadImage = async (src: string): Promise<HTMLImageElement> =>
   await new Promise((resolve, reject) => {
@@ -97,7 +97,7 @@ const createThemedQrDataUrl = async (shareLink: string, theme: 'light' | 'dark')
   const qrOffset = Math.round((QR_CANVAS_SIZE - qrSize) / 2);
   context.drawImage(qrCanvas, qrOffset, qrOffset, qrSize, qrSize);
 
-  const logo = await loadImage(logoPath(theme));
+  const logo = await loadImage(qrLogoPath(theme));
   const logoImageOffset = Math.round((QR_CANVAS_SIZE - QR_LOGO_SIZE) / 2);
   context.drawImage(logo, logoImageOffset, logoImageOffset, QR_LOGO_SIZE, QR_LOGO_SIZE);
 
