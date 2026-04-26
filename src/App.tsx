@@ -42,6 +42,8 @@ import type { AppRoute, BackendStatus, CountryCode, GroupedSectionView, Item, Pa
 import type { ApiSettingsPayload } from './lib/repository/apiRepository';
 
 const DEFAULT_PAGE: PageKey = 'edit';
+const BACKEND_HEARTBEAT_CONNECTED_MS = 5_000;
+const BACKEND_HEARTBEAT_RETRY_MS = 1_500;
 type StorageMode = 'local' | 'backend';
 type ShareErrorKey =
   | 'connectBackendFirst'
@@ -205,7 +207,7 @@ export default function App() {
   const canUseBackend = backendStatus.state === 'connected';
   const canCreateSharedLink = items.length > 0 || cleanLine(input).length > 0;
   const shareLink =
-    typeof window === 'undefined' || !isServerBackedList
+    typeof window === 'undefined' || !canUseBackend || !isServerBackedList
       ? undefined
       : `${window.location.origin}${appBasePath}/list/${activeListId}/edit`;
   const shareErrorMessage = shareError ? messages.sharing[shareError] : undefined;
@@ -430,11 +432,75 @@ export default function App() {
   useEffect(() => {
     if (!isLoaded) return;
 
-    const interval = window.setInterval(() => {
-      void checkBackendStatus().then(setBackendStatus);
-    }, 30_000);
+    let cancelled = false;
+    let inFlight = false;
+    let timeoutId: number | undefined;
+    let pendingCheck = false;
 
-    return () => window.clearInterval(interval);
+    const scheduleHeartbeat = (delay: number) => {
+      if (timeoutId) {
+        window.clearTimeout(timeoutId);
+      }
+
+      timeoutId = window.setTimeout(() => {
+        void runHeartbeat();
+      }, delay);
+    };
+
+    const runHeartbeat = async () => {
+      if (cancelled) return;
+
+      if (inFlight) {
+        pendingCheck = true;
+        return;
+      }
+
+      inFlight = true;
+
+      try {
+        const nextBackendStatus = await checkBackendStatus();
+        if (cancelled) return;
+
+        setBackendStatus(nextBackendStatus);
+        scheduleHeartbeat(
+          nextBackendStatus.state === 'connected' ? BACKEND_HEARTBEAT_CONNECTED_MS : BACKEND_HEARTBEAT_RETRY_MS,
+        );
+      } finally {
+        inFlight = false;
+
+        if (pendingCheck && !cancelled) {
+          pendingCheck = false;
+          scheduleHeartbeat(0);
+        }
+      }
+    };
+
+    const requestImmediateHeartbeat = () => {
+      scheduleHeartbeat(0);
+    };
+
+    const requestVisibleHeartbeat = () => {
+      if (document.visibilityState === 'visible') {
+        requestImmediateHeartbeat();
+      }
+    };
+
+    scheduleHeartbeat(BACKEND_HEARTBEAT_CONNECTED_MS);
+    window.addEventListener('focus', requestImmediateHeartbeat);
+    window.addEventListener('online', requestImmediateHeartbeat);
+    window.addEventListener('offline', requestImmediateHeartbeat);
+    document.addEventListener('visibilitychange', requestVisibleHeartbeat);
+
+    return () => {
+      cancelled = true;
+      if (timeoutId) {
+        window.clearTimeout(timeoutId);
+      }
+      window.removeEventListener('focus', requestImmediateHeartbeat);
+      window.removeEventListener('online', requestImmediateHeartbeat);
+      window.removeEventListener('offline', requestImmediateHeartbeat);
+      document.removeEventListener('visibilitychange', requestVisibleHeartbeat);
+    };
   }, [isLoaded]);
 
   useEffect(() => {
@@ -728,6 +794,10 @@ export default function App() {
 
   const handleRefreshSharedList = async () => {
     if (!isServerBackedList) return;
+    if (backendStatus.state !== 'connected') {
+      setShareError('connectBackendFirst');
+      return;
+    }
 
     setIsRefreshingSharedList(true);
     setShareError(undefined);
