@@ -1,10 +1,22 @@
-const CACHE_NAME = 'smart-shopping-list-pwa-v1';
+const CACHE_NAME = 'smart-shopping-list-pwa-v4';
 
 const assetUrls = () => [
   new URL('index.html', self.registration.scope).href,
   new URL('manifest.webmanifest', self.registration.scope).href,
+  new URL('favicon-light.png', self.registration.scope).href,
+  new URL('favicon-dark.png', self.registration.scope).href,
+  new URL('favicon-16.png', self.registration.scope).href,
+  new URL('favicon-32.png', self.registration.scope).href,
+  new URL('logo-mark.png', self.registration.scope).href,
+  new URL('logo-light.png', self.registration.scope).href,
+  new URL('logo-dark.png', self.registration.scope).href,
+  new URL('logo-universal.png', self.registration.scope).href,
+  new URL('qr-logo-light.png', self.registration.scope).href,
+  new URL('qr-logo-dark.png', self.registration.scope).href,
   new URL('icon-192.png', self.registration.scope).href,
   new URL('icon-512.png', self.registration.scope).href,
+  new URL('icon-192-maskable.png', self.registration.scope).href,
+  new URL('icon-512-maskable.png', self.registration.scope).href,
   new URL('apple-touch-icon.png', self.registration.scope).href,
 ];
 

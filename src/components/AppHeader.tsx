@@ -25,7 +25,7 @@ const backendBadge = (status: BackendStatus, messages: Messages) => {
   return { tone: 'danger' as const, label: messages.backendStatus.frontendOnly };
 };
 
-export function AppHeader({ page, hasItems, backendStatus, resolvedTheme, onChangePage }: AppHeaderProps) {
+export function AppHeader({ page, hasItems, backendStatus, onChangePage }: AppHeaderProps) {
   const { messages } = useI18n();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [connectionBadgeVisible, setConnectionBadgeVisible] = useState(false);
@@ -67,7 +67,7 @@ export function AppHeader({ page, hasItems, backendStatus, resolvedTheme, onChan
     onChangePage(nextPage);
   };
 
-  const logoHref = `${import.meta.env.BASE_URL}${resolvedTheme === 'dark' ? 'favicon-dark.svg' : 'favicon-light.svg'}`;
+  const logoHref = `${import.meta.env.BASE_URL}logo-mark.png`;
 
   return (
     <header className="app-header">
