@@ -1472,7 +1472,7 @@ select {
   .app-header .title-block {
     gap: 12px;
     flex: 1 1 auto;
-    padding-right: 58px;
+    padding-right: 150px;
   }
 
   .app-header .app-icon {
@@ -1538,7 +1538,7 @@ select {
   }
 
   .app-header .header-actions {
-    align-items: flex-start;
+    align-items: center;
     flex-direction: row;
     gap: 8px;
     position: absolute;
@@ -1547,7 +1547,12 @@ select {
   }
 
   .app-header .connection-badge {
-    display: none;
+    flex: 0 1 auto;
+    max-width: 94px;
+    overflow: hidden;
+    padding-inline: 8px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .app-header .title {
