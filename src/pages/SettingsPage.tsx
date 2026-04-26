@@ -133,6 +133,11 @@ export function SettingsPage({
 }: SettingsPageProps) {
   const { locale, setLocale, messages } = useI18n();
   const routeViewOptions: RouteViewMode[] = ['default', 'comfortable', 'compact'];
+  const routeDensityOptions = routeViewOptions.map((mode): SelectOption<RouteViewMode> => ({
+    value: mode,
+    label: getRouteViewLabel(mode, messages),
+    icon: <RouteDensityPreview mode={mode} />,
+  }));
   const themeOptions = THEME_OPTIONS.map((mode): SelectOption<ThemeMode> => ({
     value: mode,
     label: messages.themeOptions[mode],
@@ -157,7 +162,10 @@ export function SettingsPage({
       bodyClassName="stack"
     >
       <div className="field field-compact">
-        <label htmlFor="locale-select">{messages.pages.settings.localeLabel}</label>
+        <div>
+          <label htmlFor="locale-select">{messages.pages.settings.localeLabel}</label>
+          <div className="small-text">{messages.pages.settings.localeSubtitle}</div>
+        </div>
         <SettingsSelect
           id="locale-select"
           value={locale}
@@ -167,41 +175,28 @@ export function SettingsPage({
       </div>
 
       <div className="field field-compact">
-        <label htmlFor="theme-select">{messages.pages.settings.themeLabel}</label>
+        <div>
+          <label htmlFor="theme-select">{messages.pages.settings.themeLabel}</label>
+          <div className="small-text">{messages.pages.settings.themeSubtitle}</div>
+        </div>
         <SettingsSelect id="theme-select" value={themeMode} options={themeOptions} onChange={onThemeChange} />
-        <div className="small-text">{messages.labels.storedLocally}</div>
       </div>
 
-      <div className="field">
+      <div className="field field-compact">
         <div>
-          <label>{messages.pages.settings.routeDensityLabel}</label>
+          <label htmlFor="route-density-select">{messages.pages.settings.routeDensityLabel}</label>
           <div className="small-text">{messages.pages.settings.routeDensitySubtitle}</div>
         </div>
-        <div className="route-density-settings" role="radiogroup" aria-label={messages.pages.settings.routeDensityLabel}>
-          {routeViewOptions.map((mode) => (
-            <button
-              key={mode}
-              type="button"
-              role="radio"
-              aria-checked={routeViewMode === mode}
-              className={`route-density-option ${routeViewMode === mode ? 'route-density-option-active' : ''}`}
-              onClick={() => onRouteViewModeChange(mode)}
-            >
-              <span className="route-density-option-copy">
-                <span
-                  aria-hidden="true"
-                  className={`route-density-radio ${routeViewMode === mode ? 'route-density-radio-active' : ''}`}
-                />
-                <span className="route-density-option-label">{getRouteViewLabel(mode, messages)}</span>
-              </span>
-              <RouteDensityPreview mode={mode} />
-            </button>
-          ))}
-        </div>
-        <div className="small-text">{messages.labels.storedLocally}</div>
+        <SettingsSelect
+          id="route-density-select"
+          value={routeViewMode}
+          options={routeDensityOptions}
+          onChange={onRouteViewModeChange}
+        />
       </div>
 
       <DebugLink onOpen={onOpenDebug} />
+      <div className="settings-footnote small-text">{messages.labels.storedLocally}</div>
     </Card>
   );
 }
