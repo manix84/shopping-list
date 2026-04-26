@@ -1,7 +1,6 @@
 import { mdiChevronDown } from '@mdi/js';
-import { type ReactNode, useMemo, useState } from 'react';
-import { COUNTRY_CONFIGS } from '../config/countries';
-import type { CountryCode, RouteViewMode, ThemeMode } from '../types';
+import { type ReactNode, useState } from 'react';
+import type { RouteViewMode, ThemeMode } from '../types';
 import { Card } from '../components/Card';
 import { DebugLink } from '../components/DebugLink';
 import { getRouteViewLabel, type LocaleCode, useI18n } from '../lib/i18n';
@@ -15,10 +14,8 @@ type SelectOption<T extends string> = {
 };
 
 type SettingsPageProps = {
-  countryCode: CountryCode;
   routeViewMode: RouteViewMode;
   themeMode: ThemeMode;
-  onCountryChange: (countryCode: CountryCode) => void;
   onRouteViewModeChange: (mode: RouteViewMode) => void;
   onThemeChange: (themeMode: ThemeMode) => void;
   onOpenDebug: () => void;
@@ -128,32 +125,14 @@ function SettingsSelect<T extends string>({
 }
 
 export function SettingsPage({
-  countryCode,
   routeViewMode,
   themeMode,
-  onCountryChange,
   onRouteViewModeChange,
   onThemeChange,
   onOpenDebug,
 }: SettingsPageProps) {
   const { locale, setLocale, messages } = useI18n();
   const routeViewOptions: RouteViewMode[] = ['default', 'comfortable', 'compact'];
-  const countryOptions = useMemo(
-    () =>
-      Object.values(COUNTRY_CONFIGS)
-        .slice()
-        .sort((a, b) => a.label.localeCompare(b.label))
-        .map((country): SelectOption<CountryCode> => ({
-          value: country.code,
-          label: country.label,
-          icon: (
-            <span aria-hidden="true" className="country-option-icon">
-              {country.flag}
-            </span>
-          ),
-        })),
-    [],
-  );
   const themeOptions = THEME_OPTIONS.map((mode): SelectOption<ThemeMode> => ({
     value: mode,
     label: messages.themeOptions[mode],
@@ -184,16 +163,6 @@ export function SettingsPage({
           value={locale}
           options={localeOptions}
           onChange={setLocale}
-        />
-      </div>
-
-      <div className="field field-compact">
-        <label htmlFor="country-select">{messages.pages.settings.countryLabel}</label>
-        <SettingsSelect
-          id="country-select"
-          value={countryCode}
-          options={countryOptions}
-          onChange={onCountryChange}
         />
       </div>
 

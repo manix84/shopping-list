@@ -398,6 +398,26 @@ select {
   position: relative;
 }
 
+.select-shell {
+  position: relative;
+}
+
+.select-with-icon {
+  appearance: none;
+  padding-right: 42px;
+}
+
+.select-chevron-svg {
+  color: $muted;
+  height: 18px;
+  pointer-events: none;
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+}
+
 .settings-select-button {
   align-items: center;
   cursor: pointer;
