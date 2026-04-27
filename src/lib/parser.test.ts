@@ -9,6 +9,8 @@ import {
   getStoredValue,
   getUnitQuantityDisplayValue,
   getUnitQuantityValue,
+  getVariantDisplayValue,
+  getVariantValue,
   parseItems,
 } from './parser';
 
@@ -19,6 +21,7 @@ describe('parser', () => {
     expect(items).toHaveLength(3);
     expect(items[0]).toMatchObject({
       raw: 'milk',
+      variant: 'semi skimmed',
       size: 'small',
       sizeValue: 'S',
       matchedSection: 'chilled_milk_juice_cream',
@@ -26,7 +29,7 @@ describe('parser', () => {
     expect(getSizeDisplayValue(items[0])).toBe('Size: S');
     expect(getSizeValue(items[0])).toBe('S');
     expect(getDisplayValue(items[0])).toBe('Semi-Skimmed Milk');
-    expect(getStoredValue(items[0])).toBe('small milk');
+    expect(getStoredValue(items[0])).toBe('small semi skimmed milk');
 
     expect(items[1]).toMatchObject({
       raw: 'bananas',
@@ -78,5 +81,155 @@ describe('parser', () => {
     expect(getQuantityDisplayValue(items[0])).toBe('Qty: 2');
     expect(getUnitQuantityDisplayValue(items[0])).toBe('500g');
     expect(getStoredValue(items[0])).toBe('x2 basmati rice 500g');
+  });
+
+  it('parses leading product variants from known section keywords', () => {
+    const items = parseItems('strawberry ice-cream\nlemon and lime ice cream\nstrawberry & banana yogurt', UK_CONFIG);
+
+    expect(items).toHaveLength(3);
+    expect(items[0]).toMatchObject({
+      raw: 'ice cream',
+      variant: 'strawberry',
+      matchedSection: 'frozen_ice_cream',
+    });
+    expect(getDisplayValue(items[0])).toBe('Ice Cream');
+    expect(getVariantDisplayValue(items[0])).toBe('Variant: Strawberry');
+    expect(getVariantValue(items[0])).toBe('Strawberry');
+    expect(getStoredValue(items[0])).toBe('strawberry ice cream');
+
+    expect(items[1]).toMatchObject({
+      raw: 'ice cream',
+      variant: 'lemon and lime',
+      matchedSection: 'frozen_ice_cream',
+    });
+    expect(getVariantValue(items[1])).toBe('Lemon and Lime');
+
+    expect(items[2]).toMatchObject({
+      raw: 'yogurt',
+      variant: 'strawberry and banana',
+      matchedSection: 'chilled_milk_juice_cream',
+    });
+    expect(getVariantValue(items[2])).toBe('Strawberry and Banana');
+  });
+
+  it('parses milk styles as variants of milk', () => {
+    const items = parseItems('milk\nwhole milk\nskimmed milk\ngold milk\nsoy milk\noat milk', UK_CONFIG);
+
+    expect(items).toHaveLength(6);
+    expect(items.map((item) => item.raw)).toEqual(['milk', 'milk', 'milk', 'milk', 'milk', 'milk']);
+    expect(items.map((item) => item.variant)).toEqual([
+      'semi skimmed',
+      'whole',
+      'skimmed',
+      'gold',
+      'soy',
+      'oat',
+    ]);
+    expect(items.every((item) => item.matchedSection === 'chilled_milk_juice_cream')).toBe(true);
+    expect(getDisplayValue(items[0])).toBe('Semi-Skimmed Milk');
+    expect(getStoredValue(items[0])).toBe('semi skimmed milk');
+  });
+
+  it('parses cream styles as variants without treating whipped cream as a variant', () => {
+    const items = parseItems('single cream\ndouble cream\nwhipping cream\nwhipped cream', UK_CONFIG);
+
+    expect(items).toHaveLength(4);
+    expect(items[0]).toMatchObject({
+      raw: 'cream',
+      variant: 'single',
+      matchedSection: 'chilled_milk_juice_cream',
+    });
+    expect(items[1]).toMatchObject({
+      raw: 'cream',
+      variant: 'double',
+      matchedSection: 'chilled_milk_juice_cream',
+    });
+    expect(items[2]).toMatchObject({
+      raw: 'cream',
+      variant: 'whipping',
+      matchedSection: 'chilled_milk_juice_cream',
+    });
+    expect(items[3]).toMatchObject({
+      raw: 'whipped cream',
+      variant: undefined,
+      matchedSection: 'chilled_milk_juice_cream',
+    });
+    expect(getStoredValue(items[0])).toBe('single cream');
+    expect(getStoredValue(items[3])).toBe('whipped cream');
+  });
+
+  it('parses drink and alcohol flavours as variants of the base drink', () => {
+    const items = parseItems(
+      [
+        'pepsi max cherry',
+        'cherry pepsi max',
+        'mango coke zero',
+        'kopparberg pear cider',
+        'kopparberg strawberry and lime',
+        'rekorderlig wild berries',
+        'kopparberg lemon vodka',
+        'jack daniels honey',
+      ].join('\n'),
+      UK_CONFIG,
+    );
+
+    expect(items).toHaveLength(7);
+    expect(items[0]).toMatchObject({
+      raw: 'pepsi max',
+      variant: 'cherry',
+      matchedSection: 'drinks',
+    });
+    expect(items[1]).toMatchObject({
+      raw: 'coke zero',
+      variant: 'mango',
+      matchedSection: 'drinks',
+    });
+    expect(items[2]).toMatchObject({
+      raw: 'kopparberg cider',
+      variant: 'pear',
+      matchedSection: 'alcohol',
+    });
+    expect(items[3]).toMatchObject({
+      raw: 'kopparberg cider',
+      variant: 'strawberry and lime',
+      matchedSection: 'alcohol',
+    });
+    expect(items[4]).toMatchObject({
+      raw: 'rekorderlig cider',
+      variant: 'wild berries',
+      matchedSection: 'alcohol',
+    });
+    expect(items[5]).toMatchObject({
+      raw: 'kopparberg vodka',
+      variant: 'lemon',
+      matchedSection: 'alcohol',
+    });
+    expect(items[6]).toMatchObject({
+      raw: 'jack daniels',
+      variant: 'honey',
+      matchedSection: 'alcohol',
+    });
+    expect(getStoredValue(items[0])).toBe('cherry pepsi max');
+    expect(getStoredValue(items[2])).toBe('pear kopparberg cider');
+  });
+
+  it('preserves checked state from previously saved combined variant names', () => {
+    const items = parseItems('strawberry ice cream', UK_CONFIG, [
+      {
+        id: 'saved-item',
+        raw: 'strawberry ice cream',
+        normalized: 'strawberry ice cream',
+        cleaned: 'strawberry ice cream',
+        checked: true,
+        matchedSection: 'frozen_ice_cream',
+      },
+    ]);
+
+    expect(items[0]).toMatchObject({
+      id: 'saved-item',
+      raw: 'ice cream',
+      variant: 'strawberry',
+      checked: true,
+    });
   });
 });

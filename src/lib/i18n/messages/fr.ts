@@ -74,6 +74,7 @@ export const fr: Messages = {
     unavailable: 'Indisponible',
     unknown: 'inconnu',
     updated: 'mis à jour',
+    variant: 'Variante',
   },
   pages: {
     ...en.pages,
@@ -135,10 +136,12 @@ export const fr: Messages = {
       parsedSubtitle:
         'Inspectez et ajustez manuellement les articles structurés générés depuis la liste actuelle.',
       tabParsed: 'Analysés',
+      tabState: 'État',
       tabBackend: 'Backend',
       tabMatcher: 'Correspondance',
       tabQuantity: 'Quantités',
       tabWeights: 'Poids',
+      tabVariants: 'Variantes',
       tabSections: 'Sections',
       tabStorage: 'Stockage',
       backendTitle: 'Vérifications backend',
@@ -162,16 +165,24 @@ export const fr: Messages = {
       weightTitle: 'Auto-vérifications des poids et unités',
       weightSubtitle:
         'Les poids et unités comme 500g ou 1.5kg restent attachés à l’article, même avec une quantité.',
+      variantTitle: 'Auto-vérifications des variantes',
+      variantSubtitle:
+        'Les parfums, styles de lait et descripteurs similaires restent séparés du produit de base.',
       storageTitle: 'Auto-vérifications du stockage',
       storageSubtitle:
         'Les données doivent se relire proprement depuis le stockage local et toute future base.',
+      stateTitle: 'Auto-vérifications de l’état',
+      stateSubtitle:
+        'Validez la liste actuelle avec le parseur, la correspondance, les variantes, la progression et l’identité.',
       allMatcherPass:
         'Toutes les vérifications du moteur de correspondance sont valides.',
       allQuantityPass:
         'Toutes les vérifications de quantités comptées sont valides.',
       allWeightPass:
         'Toutes les vérifications de poids et unités sont valides.',
+      allVariantPass: 'Toutes les vérifications de variantes sont valides.',
       allStoragePass: 'Toutes les vérifications de stockage sont valides.',
+      allStatePass: 'Toutes les vérifications d’état sont valides.',
       expected: 'attendu',
       got: 'obtenu',
       pass: 'Réussi',

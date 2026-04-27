@@ -73,6 +73,7 @@ export const it: Messages = {
     unavailable: 'Non disponibile',
     unknown: 'sconosciuto',
     updated: 'aggiornato',
+    variant: 'Variante',
   },
   pages: {
     ...en.pages,
@@ -133,10 +134,12 @@ export const it: Messages = {
       parsedSubtitle:
         'Ispeziona e regola manualmente gli articoli strutturati generati dalla lista corrente.',
       tabParsed: 'Analizzati',
+      tabState: 'Stato',
       tabBackend: 'Backend',
       tabMatcher: 'Matcher',
       tabQuantity: 'Quantità',
       tabWeights: 'Pesi',
+      tabVariants: 'Varianti',
       tabSections: 'Sezioni',
       tabStorage: 'Archiviazione',
       backendTitle: 'Controlli backend',
@@ -160,13 +163,21 @@ export const it: Messages = {
       weightTitle: 'Autocontrolli pesi e unità',
       weightSubtitle:
         'Pesi e unità come 500g o 1.5kg restano collegati all’articolo, anche quando c’è una quantità.',
+      variantTitle: 'Autocontrolli varianti',
+      variantSubtitle:
+        'Gusti, tipi di latte e descrittori simili restano separati dal prodotto base.',
       storageTitle: 'Autocontrolli archiviazione',
       storageSubtitle:
         'I dati devono attraversare correttamente lo storage locale e qualsiasi database futuro.',
+      stateTitle: 'Autocontrolli stato',
+      stateSubtitle:
+        'Convalida la lista corrente contro parser, matcher, varianti, avanzamento e identità lista.',
       allMatcherPass: 'Tutti i controlli matcher sono superati.',
       allQuantityPass: 'Tutti i controlli quantità numeriche sono superati.',
       allWeightPass: 'Tutti i controlli pesi e unità sono superati.',
+      allVariantPass: 'Tutti i controlli varianti sono superati.',
       allStoragePass: 'Tutti i controlli archiviazione sono superati.',
+      allStatePass: 'Tutti i controlli stato sono superati.',
       expected: 'atteso',
       got: 'ottenuto',
       pass: 'OK',

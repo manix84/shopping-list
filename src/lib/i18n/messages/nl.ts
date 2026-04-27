@@ -74,6 +74,7 @@ export const nl: Messages = {
     unavailable: 'Niet beschikbaar',
     unknown: 'onbekend',
     updated: 'bijgewerkt',
+    variant: 'Variant',
   },
   pages: {
     ...en.pages,
@@ -134,10 +135,12 @@ export const nl: Messages = {
       parsedSubtitle:
         'Controleer en pas handmatig de gestructureerde artikelen van de huidige lijst aan.',
       tabParsed: 'Geparseerd',
+      tabState: 'Status',
       tabBackend: 'Backend',
       tabMatcher: 'Matcher',
       tabQuantity: 'Hoeveelheden',
       tabWeights: 'Gewichten',
+      tabVariants: 'Varianten',
       tabSections: 'Secties',
       tabStorage: 'Opslag',
       backendTitle: 'Backendcontroles',
@@ -160,13 +163,21 @@ export const nl: Messages = {
       weightTitle: 'Gewicht- en eenheid-zelftests',
       weightSubtitle:
         'Gewichten en eenheden zoals 500g of 1.5kg blijven aan het artikel gekoppeld, ook met een telhoeveelheid.',
+      variantTitle: 'Variant-zelftests',
+      variantSubtitle:
+        'Smaken, melksoorten en vergelijkbare omschrijvingen blijven apart van het basisproduct.',
       storageTitle: 'Opslag-zelftests',
       storageSubtitle:
         'Gegevens moeten netjes heen en weer gaan door lokale opslag en latere databases.',
+      stateTitle: 'Status-zelftests',
+      stateSubtitle:
+        'Controleer de huidige lijst tegen parser, matcher, varianten, voortgang en lijstidentiteit.',
       allMatcherPass: 'Alle matcher-controles slagen.',
       allQuantityPass: 'Alle telhoeveelheidscontroles slagen.',
       allWeightPass: 'Alle gewicht- en eenheidcontroles slagen.',
+      allVariantPass: 'Alle variantcontroles slagen.',
       allStoragePass: 'Alle opslagcontroles slagen.',
+      allStatePass: 'Alle statuscontroles slagen.',
       expected: 'verwacht',
       got: 'gekregen',
       pass: 'Geslaagd',

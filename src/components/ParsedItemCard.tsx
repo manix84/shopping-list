@@ -1,5 +1,5 @@
 import type { Item, CountryConfig } from '../types';
-import { getDisplayValue, getQuantityValue, getSizeValue, getUnitQuantityValue } from '../lib/parser';
+import { getDisplayValue, getQuantityValue, getSizeValue, getUnitQuantityValue, getVariantValue } from '../lib/parser';
 import { getSectionMeta } from '../lib/sections';
 import { Badge } from './Badge';
 import { useI18n } from '../lib/i18n';
@@ -16,6 +16,7 @@ export function ParsedItemCard({ item, config, onRename, onToggle, onDelete }: P
   const { messages } = useI18n();
   const meta = getSectionMeta(config, item.matchedSection);
   const displayValue = getDisplayValue(item);
+  const variantValue = getVariantValue(item);
 
   return (
     <div className="item-card">
@@ -36,6 +37,11 @@ export function ParsedItemCard({ item, config, onRename, onToggle, onDelete }: P
             <Badge>
               {messages.labels.cleaned}: {item.cleaned}
             </Badge>
+            {variantValue ? (
+              <Badge>
+                {messages.labels.variant}: {variantValue}
+              </Badge>
+            ) : null}
             <Badge>
               {messages.labels.section}: {meta.label}
             </Badge>

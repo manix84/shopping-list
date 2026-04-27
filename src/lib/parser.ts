@@ -4,14 +4,16 @@ import { extractSize } from './size';
 import { detectSection } from './sections';
 import { cleanEntryName, ensureString, normalize, cleanLine, formatDisplayName, stripDisplaySizeLabel, unwrapContainerName } from './stringUtils';
 import { splitInputLines } from './splitters';
+import { extractVariant } from './variant';
 
-export const dedupeKey = (name: unknown, quantity?: unknown, size?: unknown, quantityValue?: unknown): string =>
-  `${cleanEntryName(name)}|${normalize(quantity ?? '')}|${normalize(size ?? '')}|${normalize(quantityValue ?? '')}`;
+export const dedupeKey = (name: unknown, quantity?: unknown, size?: unknown, quantityValue?: unknown, variant?: unknown): string =>
+  `${cleanEntryName(name)}|${normalize(quantity ?? '')}|${normalize(size ?? '')}|${normalize(quantityValue ?? '')}|${normalize(variant ?? '')}`;
 
 export const getStoredValue = (item: Item): string => {
   const parts = [
     item.size,
     typeof item.quantityValue === 'number' ? formatCountQuantity(item.quantityValue) : undefined,
+    item.variant,
     item.raw,
     item.quantity,
   ].filter(Boolean);
@@ -41,8 +43,26 @@ export const getUnitQuantityDisplayValue = (item: Item): string | undefined => i
 
 export const getUnitQuantityValue = (item: Item): string | undefined => item.quantity;
 
+export const getVariantDisplayValue = (item: Item): string | undefined =>
+  item.variant ? `Variant: ${formatDisplayName(item.variant)}` : undefined;
+
+export const getVariantValue = (item: Item): string | undefined =>
+  item.variant ? formatDisplayName(item.variant) : undefined;
+
 export const parseItems = (input: unknown, config: CountryConfig | undefined, previousItems: Item[] = []): Item[] => {
-  const previousMap = new Map(previousItems.map((item) => [dedupeKey(item.raw, item.quantity, item.size, item.quantityValue), item]));
+  const previousMap = new Map<string, Item>();
+  for (const item of previousItems) {
+    previousMap.set(dedupeKey(item.raw, item.quantity, item.size, item.quantityValue, item.variant), item);
+    if (!item.variant) {
+      const previousVariant = extractVariant(item.raw, config);
+      if (previousVariant.variant) {
+        previousMap.set(
+          dedupeKey(previousVariant.name, item.quantity, item.size, item.quantityValue, previousVariant.variant),
+          item,
+        );
+      }
+    }
+  }
   const seen = new Set<string>();
   const rawInput = ensureString(input);
 
@@ -53,24 +73,26 @@ export const parseItems = (input: unknown, config: CountryConfig | undefined, pr
       const normalizedLine = stripDisplaySizeLabel(line);
       const { quantity, quantityValue, name } = extractQuantifiedItem(normalizedLine);
       const sizeResult = extractSize(unwrapContainerName(name));
-      const key = dedupeKey(sizeResult.name, quantity, sizeResult.size, quantityValue);
+      const variantResult = extractVariant(sizeResult.name, config);
+      const key = dedupeKey(variantResult.name, quantity, sizeResult.size, quantityValue, variantResult.variant);
       if (seen.has(key)) return null;
       seen.add(key);
 
       const previous = previousMap.get(key);
-      const cleaned = cleanEntryName(sizeResult.name);
+      const cleaned = cleanEntryName(variantResult.name);
 
       return {
         id: previous?.id ?? `${Date.now()}-${index}-${cleaned || 'item'}`,
-        raw: sizeResult.name,
-        normalized: normalize(sizeResult.name),
+        raw: variantResult.name,
+        normalized: normalize(variantResult.name),
         cleaned,
         size: sizeResult.size,
         sizeValue: sizeResult.sizeValue,
         quantity,
         quantityValue,
+        variant: variantResult.variant,
         checked: previous?.checked ?? false,
-        matchedSection: detectSection(sizeResult.name, config),
+        matchedSection: detectSection(variantResult.name, config),
       } satisfies Item;
     })
     .filter(Boolean) as Item[];

@@ -74,6 +74,7 @@ export const pi: Messages = {
     unavailable: 'Unavailable',
     unknown: 'unknown',
     updated: 'updated',
+    variant: 'Variant',
   },
   pages: {
     ...en.pages,
@@ -132,10 +133,12 @@ export const pi: Messages = {
       parsedSubtitle:
         'Inspect and adjust the structured cargo made from the current ledger.',
       tabParsed: 'Parsed',
+      tabState: 'State',
       tabBackend: 'Backend',
       tabMatcher: 'Matcher',
       tabQuantity: 'Quantities',
       tabWeights: 'Weights',
+      tabVariants: 'Variants',
       tabSections: 'Decks',
       tabStorage: 'Stowage',
       backendTitle: 'Backend checks',
@@ -158,13 +161,21 @@ export const pi: Messages = {
       weightTitle: 'Weight and unit self-checks',
       weightSubtitle:
         'Weights and units like 500g or 1.5kg stay tied to the cargo, even with a count.',
+      variantTitle: 'Variant self-checks',
+      variantSubtitle:
+        'Flavours, milk styles, and such marks stay apart from the base cargo.',
       storageTitle: 'Stowage self-checks',
       storageSubtitle:
         'Record data should round-trip clean through local stowage and any future hold.',
+      stateTitle: 'State self-checks',
+      stateSubtitle:
+        'Check the current ledger against parser, matcher, variants, progress, and list mark.',
       allMatcherPass: 'All matcher checks be passin’.',
       allQuantityPass: 'All count quantity checks be passin’.',
       allWeightPass: 'All weight and unit checks be passin’.',
+      allVariantPass: 'All variant checks be passin’.',
       allStoragePass: 'All stowage checks be passin’.',
+      allStatePass: 'All state checks be passin’.',
       expected: 'expected',
       got: 'got',
       pass: 'Pass',

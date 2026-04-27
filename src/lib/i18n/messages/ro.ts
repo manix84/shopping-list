@@ -73,6 +73,7 @@ export const ro: Messages = {
     unavailable: 'Indisponibil',
     unknown: 'necunoscut',
     updated: 'actualizat',
+    variant: 'Variantă',
   },
   pages: {
     ...en.pages,
@@ -133,10 +134,12 @@ export const ro: Messages = {
       parsedSubtitle:
         'Inspectează și ajustează manual articolele structurate generate din lista curentă.',
       tabParsed: 'Analizate',
+      tabState: 'Stare',
       tabBackend: 'Backend',
       tabMatcher: 'Potrivire',
       tabQuantity: 'Cantități',
       tabWeights: 'Greutăți',
+      tabVariants: 'Variante',
       tabSections: 'Secțiuni',
       tabStorage: 'Stocare',
       backendTitle: 'Verificări backend',
@@ -159,13 +162,21 @@ export const ro: Messages = {
       weightTitle: 'Autoverificări de greutăți și unități',
       weightSubtitle:
         'Greutățile și unitățile precum 500g sau 1.5kg rămân atașate articolului, chiar și cu o cantitate.',
+      variantTitle: 'Autoverificări de variante',
+      variantSubtitle:
+        'Aromele, stilurile de lapte și descriptorii similari rămân separate de produsul de bază.',
       storageTitle: 'Autoverificări de stocare',
       storageSubtitle:
         'Datele trebuie să treacă curat prin stocarea locală și orice bază viitoare.',
+      stateTitle: 'Autoverificări de stare',
+      stateSubtitle:
+        'Validează lista curentă cu parserul, potrivirea, variantele, progresul și identitatea listei.',
       allMatcherPass: 'Toate verificările de potrivire trec.',
       allQuantityPass: 'Toate verificările de cantități numărate trec.',
       allWeightPass: 'Toate verificările de greutăți și unități trec.',
+      allVariantPass: 'Toate verificările de variante trec.',
       allStoragePass: 'Toate verificările de stocare trec.',
+      allStatePass: 'Toate verificările de stare trec.',
       expected: 'așteptat',
       got: 'obținut',
       pass: 'Trece',

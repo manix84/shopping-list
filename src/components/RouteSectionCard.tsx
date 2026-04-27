@@ -1,5 +1,5 @@
 import type { GroupedSectionView, RouteViewMode } from '../types';
-import { getDisplayValue, getQuantityDisplayValue, getSizeValue, getUnitQuantityDisplayValue } from '../lib/parser';
+import { getDisplayValue, getQuantityDisplayValue, getSizeValue, getUnitQuantityDisplayValue, getVariantValue } from '../lib/parser';
 import { Badge } from './Badge';
 import { useI18n } from '../lib/i18n';
 
@@ -71,6 +71,11 @@ export function RouteSectionCard({ section, viewMode, onToggleSection, onToggleI
                   {getSizeValue(item) ? (
                     <div className="check-text-quantity">
                       <Badge>{getSizeValue(item)}</Badge>
+                    </div>
+                  ) : null}
+                  {getVariantValue(item) ? (
+                    <div className="check-text-quantity">
+                      <Badge>{getVariantValue(item)}</Badge>
                     </div>
                   ) : null}
                   {getQuantityDisplayValue(item) ? (

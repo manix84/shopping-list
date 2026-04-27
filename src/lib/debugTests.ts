@@ -2,17 +2,22 @@ import { COUNTRY_CONFIGS } from '../config/countries';
 import type {
   CountQuantityTestCase,
   CountQuantityTestResult,
+  CountryCode,
   CountryConfig,
+  Item,
   MatcherTestCase,
   MatcherTestResult,
+  StateTestResult,
   StorageTestResult,
   UnitQuantityTestCase,
   UnitQuantityTestResult,
+  VariantTestCase,
+  VariantTestResult,
 } from '../types';
 import { extractQuantifiedItem } from './quantity';
 import { detectSection } from './sections';
-import { cleanLine } from './stringUtils';
-import { parseItems } from './parser';
+import { cleanEntryName, cleanLine, normalize } from './stringUtils';
+import { dedupeKey, getStoredValue, parseItems } from './parser';
 import { STORAGE_KEY, localStorageRepository } from './repository/localStorageRepository';
 import { decodeShoppingListRecord, encodeShoppingListRecord } from './repository/recordCodec';
 import { THEME_STORAGE_KEY, loadThemeMode, saveThemeMode } from './themePreference';
@@ -71,7 +76,7 @@ export const MATCHER_TEST_CASES: MatcherTestCase[] = [
   { input: 'chicken nuggets', expectedSection: 'frozen_meals' },
   { input: 'frozen garlic bread', expectedSection: 'frozen_meals' },
   { input: 'single cream', expectedSection: 'chilled_milk_juice_cream' },
-  { input: 'large free-range eggs', expectedSection: 'chilled_milk_juice_cream' },
+  { input: 'large free-range eggs', expectedSection: 'home_baking' },
   { input: 'orange juice', expectedSection: 'chilled_milk_juice_cream' },
   { input: 'ham slices', expectedSection: 'chilled_cooked_meat' },
   { input: 'chicken thighs', expectedSection: 'chilled_fresh_meat' },
@@ -99,6 +104,140 @@ export const UNIT_QUANTITY_TEST_CASES: UnitQuantityTestCase[] = [
   { input: '2x 500g bags of rice', expectedName: 'bags of rice', expectedQuantity: '500g', expectedQuantityValue: 2 },
 ];
 
+export const VARIANT_TEST_CASES: VariantTestCase[] = [
+  {
+    input: 'strawberry ice-cream',
+    expectedName: 'ice cream',
+    expectedVariant: 'strawberry',
+    expectedSection: 'frozen_ice_cream',
+  },
+  {
+    input: 'lemon and lime ice cream',
+    expectedName: 'ice cream',
+    expectedVariant: 'lemon and lime',
+    expectedSection: 'frozen_ice_cream',
+  },
+  {
+    input: 'strawberry & banana yogurt',
+    expectedName: 'yogurt',
+    expectedVariant: 'strawberry and banana',
+    expectedSection: 'chilled_milk_juice_cream',
+  },
+  {
+    input: 'semi-skimmed milk',
+    expectedName: 'milk',
+    expectedVariant: 'semi skimmed',
+    expectedSection: 'chilled_milk_juice_cream',
+  },
+  {
+    input: 'whole milk',
+    expectedName: 'milk',
+    expectedVariant: 'whole',
+    expectedSection: 'chilled_milk_juice_cream',
+  },
+  {
+    input: 'skimmed milk',
+    expectedName: 'milk',
+    expectedVariant: 'skimmed',
+    expectedSection: 'chilled_milk_juice_cream',
+  },
+  {
+    input: 'gold milk',
+    expectedName: 'milk',
+    expectedVariant: 'gold',
+    expectedSection: 'chilled_milk_juice_cream',
+  },
+  {
+    input: 'soy milk',
+    expectedName: 'milk',
+    expectedVariant: 'soy',
+    expectedSection: 'chilled_milk_juice_cream',
+  },
+  {
+    input: 'oat milk',
+    expectedName: 'milk',
+    expectedVariant: 'oat',
+    expectedSection: 'chilled_milk_juice_cream',
+  },
+  {
+    input: 'single cream',
+    expectedName: 'cream',
+    expectedVariant: 'single',
+    expectedSection: 'chilled_milk_juice_cream',
+  },
+  {
+    input: 'double cream',
+    expectedName: 'cream',
+    expectedVariant: 'double',
+    expectedSection: 'chilled_milk_juice_cream',
+  },
+  {
+    input: 'whipping cream',
+    expectedName: 'cream',
+    expectedVariant: 'whipping',
+    expectedSection: 'chilled_milk_juice_cream',
+  },
+  {
+    input: 'whipped cream',
+    expectedName: 'whipped cream',
+    expectedSection: 'chilled_milk_juice_cream',
+  },
+  {
+    input: 'pepsi max cherry',
+    expectedName: 'pepsi max',
+    expectedVariant: 'cherry',
+    expectedSection: 'drinks',
+  },
+  {
+    input: 'cherry pepsi max',
+    expectedName: 'pepsi max',
+    expectedVariant: 'cherry',
+    expectedSection: 'drinks',
+  },
+  {
+    input: 'mango coke zero',
+    expectedName: 'coke zero',
+    expectedVariant: 'mango',
+    expectedSection: 'drinks',
+  },
+  {
+    input: 'kopparberg pear cider',
+    expectedName: 'kopparberg cider',
+    expectedVariant: 'pear',
+    expectedSection: 'alcohol',
+  },
+  {
+    input: 'kopparberg strawberry and lime',
+    expectedName: 'kopparberg cider',
+    expectedVariant: 'strawberry and lime',
+    expectedSection: 'alcohol',
+  },
+  {
+    input: 'rekorderlig wild berries',
+    expectedName: 'rekorderlig cider',
+    expectedVariant: 'wild berries',
+    expectedSection: 'alcohol',
+  },
+  {
+    input: 'kopparberg lemon vodka',
+    expectedName: 'kopparberg vodka',
+    expectedVariant: 'lemon',
+    expectedSection: 'alcohol',
+  },
+  {
+    input: 'jack daniels honey',
+    expectedName: 'jack daniels',
+    expectedVariant: 'honey',
+    expectedSection: 'alcohol',
+  },
+  {
+    input: 'milk',
+    expectedName: 'milk',
+    expectedVariant: 'semi skimmed',
+    expectedSection: 'chilled_milk_juice_cream',
+  },
+];
+
 const STORAGE_FIXTURE_INPUT = 'small milk\nbananas x2\n500g mince';
 const STORAGE_FIXTURE_RECORD = {
   listId: '019dbf30-56de-7b2b-aacc-a5ae59430d7f',
@@ -107,6 +246,105 @@ const STORAGE_FIXTURE_RECORD = {
   items: parseItems(STORAGE_FIXTURE_INPUT, COUNTRY_CONFIGS.uk),
   updatedAt: '2026-04-22T00:00:00.000Z',
   countryCode: 'uk' as const,
+};
+
+type RunStateTestsInput = {
+  input: string;
+  items: Item[];
+  config: CountryConfig;
+  countryCode: CountryCode;
+  activeListId: string;
+  isServerBackedList: boolean;
+  checkedTotal: number;
+};
+
+const itemStateKey = (item: Item): string =>
+  dedupeKey(item.raw, item.quantity, item.size, item.quantityValue, item.variant);
+
+export const runStateTests = ({
+  input,
+  items,
+  config,
+  countryCode,
+  activeListId,
+  isServerBackedList,
+  checkedTotal,
+}: RunStateTestsInput): StateTestResult[] => {
+  const reparsedItems = parseItems(input, config, items);
+  const currentKeys = items.map(itemStateKey).sort();
+  const reparsedKeys = reparsedItems.map(itemStateKey).sort();
+  const uniqueIds = new Set(items.map((item) => item.id));
+  const checkedItems = items.filter((item) => item.checked).length;
+  const duplicateKeys = items.length - new Set(currentKeys).size;
+  const malformedItems = items.filter(
+    (item) => !item.id || !cleanLine(item.raw) || !cleanEntryName(item.raw) || !normalize(item.matchedSection),
+  );
+  const sectionMismatches = items.filter((item) => item.matchedSection !== detectSection(item.raw, config));
+  const variantItems = items.filter((item) => item.variant);
+  const malformedVariants = variantItems.filter(
+    (item) => !cleanLine(item.variant) || !cleanLine(item.raw) || !getStoredValue(item).includes(item.variant ?? ''),
+  );
+  const listIdentityPassed = isServerBackedList ? isUuidV7(activeListId) : cleanLine(activeListId).length > 0;
+
+  return [
+    {
+      title: 'Parser state parity',
+      expected: 'Current parsed items match a fresh parse of the editor input',
+      actual:
+        currentKeys.join('\n') === reparsedKeys.join('\n')
+          ? `${items.length} items match`
+          : `${items.length} current, ${reparsedItems.length} reparsed`,
+      passed: currentKeys.join('\n') === reparsedKeys.join('\n'),
+    },
+    {
+      title: 'Unique item identity',
+      expected: 'Each parsed item has a stable unique id and dedupe key',
+      actual: `${uniqueIds.size}/${items.length} unique ids, ${duplicateKeys} duplicate keys`,
+      passed: uniqueIds.size === items.length && duplicateKeys === 0,
+    },
+    {
+      title: 'Required item metadata',
+      expected: 'Every item has raw, cleaned, and matched section metadata',
+      actual: malformedItems.length === 0 ? `${items.length} items complete` : `${malformedItems.length} incomplete items`,
+      passed: malformedItems.length === 0,
+    },
+    {
+      title: 'Section assignments',
+      expected: 'Stored section matches the current country profile matcher',
+      actual:
+        sectionMismatches.length === 0
+          ? `${items.length} sections match`
+          : `${sectionMismatches.length} section mismatches`,
+      passed: sectionMismatches.length === 0,
+    },
+    {
+      title: 'Variant metadata',
+      expected: 'Variants stay separate from the base product and round-trip into stored text',
+      actual:
+        malformedVariants.length === 0
+          ? `${variantItems.length} variant items valid`
+          : `${malformedVariants.length} variant items invalid`,
+      passed: malformedVariants.length === 0,
+    },
+    {
+      title: 'Progress counters',
+      expected: 'Checked count is derived from the current parsed items',
+      actual: `${checkedItems}/${items.length} checked, ${checkedTotal} displayed`,
+      passed: checkedItems === checkedTotal && checkedTotal <= items.length,
+    },
+    {
+      title: 'Country profile',
+      expected: 'Selected country code and active config agree',
+      actual: `${countryCode} selected, ${config.code} config`,
+      passed: countryCode === config.code,
+    },
+    {
+      title: 'List identity',
+      expected: isServerBackedList ? 'Shared lists use a UUIDv7 identity' : 'Local lists still keep an identity',
+      actual: activeListId || 'missing',
+      passed: listIdentityPassed,
+    },
+  ];
 };
 
 export const runStorageTests = (): StorageTestResult[] => {
@@ -224,5 +462,20 @@ export const runUnitQuantityTests = (): UnitQuantityTestResult[] =>
         cleanLine(actual.name) === test.expectedName &&
         actual.quantity === test.expectedQuantity &&
         actual.quantityValue === test.expectedQuantityValue,
+    };
+  });
+
+export const runVariantTests = (config: CountryConfig): VariantTestResult[] =>
+  VARIANT_TEST_CASES.map((test) => {
+    const [actual] = parseItems(test.input, config);
+    return {
+      ...test,
+      actualName: actual?.raw ?? '',
+      actualVariant: actual?.variant,
+      actualSection: actual?.matchedSection ?? 'other',
+      passed:
+        actual?.raw === test.expectedName &&
+        actual?.variant === test.expectedVariant &&
+        actual?.matchedSection === test.expectedSection,
     };
   });

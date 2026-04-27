@@ -81,6 +81,7 @@ export type Messages = {
     unavailable: string;
     unknown: string;
     updated: string;
+    variant: string;
   };
   pages: {
     edit: {
@@ -128,10 +129,12 @@ export type Messages = {
       parsedTitle: string;
       parsedSubtitle: string;
       tabParsed: string;
+      tabState: string;
       tabBackend: string;
       tabMatcher: string;
       tabQuantity: string;
       tabWeights: string;
+      tabVariants: string;
       tabSections: string;
       tabStorage: string;
       backendTitle: string;
@@ -149,12 +152,18 @@ export type Messages = {
       quantitySubtitle: string;
       weightTitle: string;
       weightSubtitle: string;
+      variantTitle: string;
+      variantSubtitle: string;
       storageTitle: string;
       storageSubtitle: string;
+      stateTitle: string;
+      stateSubtitle: string;
       allMatcherPass: string;
       allQuantityPass: string;
       allWeightPass: string;
+      allVariantPass: string;
       allStoragePass: string;
+      allStatePass: string;
       expected: string;
       got: string;
       pass: string;
