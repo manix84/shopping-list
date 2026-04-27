@@ -7,6 +7,7 @@ describe('Canada config', () => {
     const snacks = pantry?.sections.find((section) => section.key === 'snacks');
     const cereal = pantry?.sections.find((section) => section.key === 'cereal');
     const drinks = pantry?.sections.find((section) => section.key === 'drinks');
+    const alcohol = pantry?.sections.find((section) => section.key === 'alcohol');
     const freezers = CA_CONFIG.groups.find((group) => group.key === 'food_freezers');
     const frozenTreats = freezers?.sections.find((section) => section.key === 'frozen_ice_cream');
     const frozenFruit = freezers?.sections.find((section) => section.key === 'frozen_fruit');
@@ -22,6 +23,9 @@ describe('Canada config', () => {
     expect(drinks?.keywords).toContain('lemon pepsi zero');
     expect(drinks?.keywords).not.toContain('lemon pepsi max');
     expect(drinks?.keywords).toContain('coke zero cherry');
+    expect(alcohol?.keywords).toContain('cider');
+    expect(alcohol?.keywords).toContain('kopparberg alcohol free pear');
+    expect(alcohol?.keywords).toContain('rekorderlig pear and apple');
     expect(frozenTreats?.keywords).toContain('frozen yogurt');
     expect(frozenFruit?.keywords).toContain('summer fruits');
     expect(frozenMeals?.keywords).toContain('frozen perogies');

@@ -7,6 +7,7 @@ describe('UK config', () => {
     const babyFood = cupboard?.sections.find((section) => section.key === 'baby_food');
     const cereal = cupboard?.sections.find((section) => section.key === 'cereal');
     const drinks = cupboard?.sections.find((section) => section.key === 'drinks');
+    const alcohol = cupboard?.sections.find((section) => section.key === 'alcohol');
     const freezers = UK_CONFIG.groups.find((group) => group.key === 'food_freezers');
     const frozenTreats = freezers?.sections.find((section) => section.key === 'frozen_ice_cream');
     const frozenFruit = freezers?.sections.find((section) => section.key === 'frozen_fruit');
@@ -23,6 +24,11 @@ describe('UK config', () => {
     expect(drinks?.keywords).toContain('zero sprite');
     expect(drinks?.keywords).toContain('cherry pepsi max');
     expect(drinks?.keywords).toContain('lime coke zero');
+    expect(alcohol?.label).toBe('Alcohol');
+    expect(alcohol?.keywords).toContain('jack daniels');
+    expect(alcohol?.keywords).toContain('kopparberg sweet vintage apple');
+    expect(alcohol?.keywords).toContain('rekorderlig wild berries');
+    expect(alcohol?.keywords).toContain('kopparberg strawberry and lime gin and lemonade');
     expect(frozenTreats?.keywords).toContain('ice lollies');
     expect(frozenFruit?.keywords).toContain('frozen summer fruits');
     expect(frozenFruit?.keywords).toContain('frozen cherries');

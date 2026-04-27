@@ -28,6 +28,7 @@ export type SectionKey =
   | 'pantry'
   | 'snacks'
   | 'drinks'
+  | 'alcohol'
   | 'baby'
   | 'clothing'
   | 'household'

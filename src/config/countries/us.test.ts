@@ -12,6 +12,7 @@ describe('US config', () => {
     const pantry = US_CONFIG.groups.find((group) => group.key === 'food_pantry');
     const cereal = pantry?.sections.find((section) => section.key === 'cereal');
     const drinks = pantry?.sections.find((section) => section.key === 'drinks');
+    const alcohol = pantry?.sections.find((section) => section.key === 'alcohol');
 
     expect(US_CONFIG.code).toBe('us');
     expect(US_CONFIG.label).toBe('United States');
@@ -23,6 +24,9 @@ describe('US config', () => {
     expect(drinks?.keywords).toContain('mango pepsi zero');
     expect(drinks?.keywords).not.toContain('mango pepsi max');
     expect(drinks?.keywords).toContain('tropical coke zero');
+    expect(alcohol?.keywords).toContain('whiskey');
+    expect(alcohol?.keywords).toContain('jack daniels honey');
+    expect(alcohol?.keywords).toContain('rekorderlig watermelon citrus');
     expect(frozenTreats?.keywords).toContain('popsicles');
     expect(frozenFruit?.keywords).toContain('frozen blueberries');
     expect(frozenMeals?.keywords).toContain('frozen dumplings');
