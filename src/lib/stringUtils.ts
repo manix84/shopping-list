@@ -17,6 +17,54 @@ export const normalize = (value: unknown): string =>
     .replace(/\s+/g, ' ')
     .trim();
 
+const spellingAliases = new Map<string, string>([
+  ['avacado', 'avocado'],
+  ['bannana', 'banana'],
+  ['bananna', 'banana'],
+  ['brocoli', 'broccoli'],
+  ['brocolli', 'broccoli'],
+  ['chease', 'cheese'],
+  ['cheeze', 'cheese'],
+  ['cheedar', 'cheddar'],
+  ['choclate', 'chocolate'],
+  ['cinamon', 'cinnamon'],
+  ['cocacola', 'coca cola'],
+  ['cocnut', 'coconut'],
+  ['courget', 'courgette'],
+  ['cucumberr', 'cucumber'],
+  ['detergant', 'detergent'],
+  ['fettucine', 'fettuccine'],
+  ['fettucini', 'fettuccine'],
+  ['fetuccine', 'fettuccine'],
+  ['garlick', 'garlic'],
+  ['ibuprophen', 'ibuprofen'],
+  ['ketchup chip', 'ketchup chips'],
+  ['kopperberg', 'kopparberg'],
+  ['linguini', 'linguine'],
+  ['mozarella', 'mozzarella'],
+  ['paracetemol', 'paracetamol'],
+  ['parmezan', 'parmesan'],
+  ['pinapple', 'pineapple'],
+  ['potatos', 'potatoes'],
+  ['rasberry', 'raspberry'],
+  ['spagetti', 'spaghetti'],
+  ['strawbery', 'strawberry'],
+  ['tomatos', 'tomatoes'],
+  ['yoghert', 'yoghurt'],
+  ['yogourt', 'yogurt'],
+  ['yougurt', 'yogurt'],
+]);
+
+export const correctSpelling = (value: unknown): string => {
+  const normalizedValue = normalize(value);
+  if (!normalizedValue) return '';
+
+  return normalizedValue
+    .split(' ')
+    .map((word) => spellingAliases.get(word) ?? word)
+    .join(' ');
+};
+
 const singularizeWord = (word: string): string => {
   if (word.length <= 3) return word;
   if (word === 'cheeses') return 'cheese';
@@ -111,7 +159,7 @@ export const formatDisplayName = (value: unknown, quantityValue?: number): strin
 };
 
 export const removeLeadingDescriptors = (value: unknown): string =>
-  normalize(value)
+  correctSpelling(value)
     .replace(/^(fresh|large|small|medium|organic|british|free range|free-range|extra large|extra-large)\s+/i, '')
     .trim();
 

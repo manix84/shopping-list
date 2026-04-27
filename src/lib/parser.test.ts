@@ -60,7 +60,7 @@ describe('parser', () => {
 
     expect(items).toHaveLength(1);
     expect(items[0]).toMatchObject({
-      raw: 'Chicken Thighs',
+      raw: 'chicken thighs',
       quantity: '500g',
     });
     expect(getDisplayValue(items[0])).toBe('Chicken Thighs');
@@ -115,20 +115,24 @@ describe('parser', () => {
   });
 
   it('parses milk styles as variants of milk', () => {
-    const items = parseItems('milk\nwhole milk\nskimmed milk\ngold milk\nsoy milk\noat milk', UK_CONFIG);
+    const items = parseItems('milk\nwhole milk\nskimmed milk\ngold milk\ngreen milk\nblue milk\nred milk\nsoy milk\noat milk', UK_CONFIG);
 
-    expect(items).toHaveLength(6);
-    expect(items.map((item) => item.raw)).toEqual(['milk', 'milk', 'milk', 'milk', 'milk', 'milk']);
+    expect(items).toHaveLength(5);
+    expect(items.map((item) => item.raw)).toEqual(['milk', 'milk', 'milk', 'milk', 'milk']);
     expect(items.map((item) => item.variant)).toEqual([
       'semi skimmed',
       'whole',
       'skimmed',
-      'gold',
       'soy',
       'oat',
     ]);
     expect(items.every((item) => item.matchedSection === 'chilled_milk_juice_cream')).toBe(true);
     expect(getDisplayValue(items[0])).toBe('Semi-Skimmed Milk');
+    expect(getVariantPrefixedDisplayValue(items[0])).toBe('Semi-Skimmed Milk');
+    expect(getVariantPrefixedDisplayValue(items[1])).toBe('Whole Milk');
+    expect(getVariantPrefixedDisplayValue(items[2])).toBe('Skimmed Milk');
+    expect(getVariantPrefixedDisplayValue(items[3])).toBe('Soy Milk');
+    expect(getVariantPrefixedDisplayValue(items[4])).toBe('Oat Milk');
     expect(getStoredValue(items[0])).toBe('semi skimmed milk');
   });
 
@@ -215,6 +219,35 @@ describe('parser', () => {
     expect(getVariantPrefixedDisplayValue(items[0])).toBe('Cherry Pepsi Max');
     expect(getStoredValue(items[2])).toBe('pear kopparberg cider');
     expect(getVariantPrefixedDisplayValue(items[2])).toBe('Pear Kopparberg Cider');
+  });
+
+  it('corrects common misspellings before matching and display', () => {
+    const items = parseItems('spagetti\nbrocoli\nstrawbery yogurt\nkopperberg pear cider\nparacetemol', UK_CONFIG);
+
+    expect(items).toHaveLength(5);
+    expect(items[0]).toMatchObject({
+      raw: 'spaghetti',
+      matchedSection: 'pasta',
+    });
+    expect(getDisplayValue(items[0])).toBe('Spaghetti');
+    expect(items[1]).toMatchObject({
+      raw: 'broccoli',
+      matchedSection: 'produce',
+    });
+    expect(items[2]).toMatchObject({
+      raw: 'yogurt',
+      variant: 'strawberry',
+      matchedSection: 'chilled_milk_juice_cream',
+    });
+    expect(items[3]).toMatchObject({
+      raw: 'kopparberg cider',
+      variant: 'pear',
+      matchedSection: 'alcohol',
+    });
+    expect(items[4]).toMatchObject({
+      raw: 'paracetamol',
+      matchedSection: 'health_beauty',
+    });
   });
 
   it('preserves checked state from previously saved combined variant names', () => {

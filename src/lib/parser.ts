@@ -2,7 +2,7 @@ import type { CountryConfig, Item } from '../types';
 import { extractQuantifiedItem, formatCountQuantity } from './quantity';
 import { extractSize } from './size';
 import { detectSection } from './sections';
-import { cleanEntryName, ensureString, normalize, cleanLine, formatDisplayName, stripDisplaySizeLabel, unwrapContainerName } from './stringUtils';
+import { cleanEntryName, correctSpelling, ensureString, normalize, cleanLine, formatDisplayName, stripDisplaySizeLabel, unwrapContainerName } from './stringUtils';
 import { splitInputLines } from './splitters';
 import { extractVariant } from './variant';
 
@@ -28,6 +28,15 @@ export const getVariantPrefixedDisplayValue = (item: Item): string => {
   const displayValue = getDisplayValue(item);
   const variantValue = getVariantValue(item);
   if (!variantValue) return displayValue;
+
+  if (normalize(item.raw) === 'milk') {
+    const milkVariantLabels = new Map([
+      ['semi skimmed', 'Semi-Skimmed Milk'],
+      ['whole', 'Whole Milk'],
+      ['skimmed', 'Skimmed Milk'],
+    ]);
+    return milkVariantLabels.get(normalize(variantValue)) ?? `${variantValue} Milk`;
+  }
 
   const normalizedDisplay = normalize(displayValue);
   const normalizedVariant = normalize(variantValue);
@@ -84,7 +93,8 @@ export const parseItems = (input: unknown, config: CountryConfig | undefined, pr
     .map((line, index) => {
       const normalizedLine = stripDisplaySizeLabel(line);
       const { quantity, quantityValue, name } = extractQuantifiedItem(normalizedLine);
-      const sizeResult = extractSize(unwrapContainerName(name));
+      const correctedName = correctSpelling(unwrapContainerName(name));
+      const sizeResult = extractSize(correctedName);
       const variantResult = extractVariant(sizeResult.name, config);
       const key = dedupeKey(variantResult.name, quantity, sizeResult.size, quantityValue, variantResult.variant);
       if (seen.has(key)) return null;
