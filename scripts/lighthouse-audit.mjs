@@ -1,5 +1,5 @@
 import { existsSync } from 'node:fs';
-import { mkdir, readFile, rm } from 'node:fs/promises';
+import { mkdir, readFile, rename, rm } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
@@ -10,6 +10,9 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const reportDir = resolve(root, 'lighthouse');
 const reportJson = resolve(reportDir, 'report.json');
 const reportHtml = resolve(reportDir, 'report.html');
+const reportBase = resolve(reportDir, 'report');
+const generatedReportJson = resolve(reportDir, 'report.report.json');
+const generatedReportHtml = resolve(reportDir, 'report.report.html');
 const defaultUrl = 'http://127.0.0.1:4173/';
 const lighthousePreset = process.env.LIGHTHOUSE_PRESET ?? 'desktop';
 
@@ -46,12 +49,13 @@ const run = (command, args) =>
     });
   });
 
-const runLighthouse = async (url, output, outputPath) => {
+const runLighthouse = async (url) => {
   await run(lighthouseBin, [
     url,
     '--quiet',
-    `--output=${output}`,
-    `--output-path=${outputPath}`,
+    '--output=json',
+    '--output=html',
+    `--output-path=${reportBase}`,
     '--only-categories=performance,accessibility,best-practices,seo',
     `--preset=${lighthousePreset}`,
     '--chrome-flags=--headless=new --no-sandbox',
@@ -95,8 +99,9 @@ const main = async () => {
       });
 
   try {
-    await runLighthouse(url, 'json', reportJson);
-    await runLighthouse(url, 'html', reportHtml);
+    await runLighthouse(url);
+    await rename(generatedReportJson, reportJson);
+    await rename(generatedReportHtml, reportHtml);
 
     const scores = await readScores();
     const failures = Object.entries(thresholds).filter(([category, threshold]) => {

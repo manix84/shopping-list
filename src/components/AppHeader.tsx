@@ -102,7 +102,7 @@ export function AppHeader({ page, hasItems, backendStatus, onChangePage }: AppHe
                       type="button"
                       className="connection-badge-button"
                       aria-expanded={canShowOfflineInfo ? offlineInfoOpen : undefined}
-                      aria-describedby={canShowOfflineInfo ? 'offline-status-popover' : undefined}
+                      aria-describedby={canShowOfflineInfo && offlineInfoOpen ? 'offline-status-popover' : undefined}
                       disabled={!canShowOfflineInfo}
                       onClick={() => {
                         if (canShowOfflineInfo) {

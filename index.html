@@ -76,8 +76,9 @@
 
         const resolved = mode === 'system' ? (isDarkMode() ? 'dark' : 'light') : mode;
         const themeColorValue = resolved === 'dark' ? '#0b1220' : '#f6f7fb';
+        const documentLocale = locale === 'en' ? 'en-GB' : locale === 'pi' ? 'en-PI' : locale;
         document.documentElement.dataset.theme = resolved;
-        document.documentElement.lang = locale === 'en' ? 'en-GB' : locale;
+        document.documentElement.lang = documentLocale;
 
         const themeColor = document.querySelector('meta[name="theme-color"]');
         if (themeColor) {
