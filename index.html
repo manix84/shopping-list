@@ -76,7 +76,7 @@
 
         const resolved = mode === 'system' ? (isDarkMode() ? 'dark' : 'light') : mode;
         const themeColorValue = resolved === 'dark' ? '#0b1220' : '#f6f7fb';
-        const documentLocale = locale === 'en' ? 'en-GB' : locale === 'pi' ? 'en-PI' : locale;
+        const documentLocale = locale === 'en' ? 'en-GB' : locale === 'pi' ? 'en-x-pirate' : locale;
         document.documentElement.dataset.theme = resolved;
         document.documentElement.lang = documentLocale;
 

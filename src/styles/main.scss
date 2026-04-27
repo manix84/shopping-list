@@ -233,6 +233,12 @@ select {
   gap: 24px;
 
   &:focus {
+    outline: 2px solid $primary;
+    outline-offset: 6px;
+    border-radius: 10px;
+  }
+
+  &:focus:not(:focus-visible) {
     outline: none;
   }
 }

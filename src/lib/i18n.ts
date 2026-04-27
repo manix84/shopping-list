@@ -73,7 +73,7 @@ export const saveLocale = (locale: LocaleCode): void => {
 };
 
 export const getDocumentLocale = (locale: LocaleCode): string =>
-  locale === 'en' ? 'en-GB' : locale === 'pi' ? 'en-PI' : locale;
+  locale === 'en' ? 'en-GB' : locale === 'pi' ? 'en-x-pirate' : locale;
 
 export const applyDocumentLocale = (locale: LocaleCode): void => {
   if (typeof document === 'undefined') return;
