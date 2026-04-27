@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { COUNTRY_CONFIGS } from './config/countries';
 import { AppHeader } from './components/AppHeader';
 import { PwaSplashScreen } from './components/PwaSplashScreen';
-import { runMatcherTests, runQuantityTests, runStorageTests } from './lib/debugTests';
+import { runCountQuantityTests, runMatcherTests, runStorageTests, runUnitQuantityTests } from './lib/debugTests';
 import {
   applyDocumentLocale,
   createMessages,
@@ -553,7 +553,8 @@ export default function App() {
   }, [isLoaded, items.length, page]);
 
   const matcherTests = useMemo(() => runMatcherTests(config), [config]);
-  const quantityTests = useMemo(() => runQuantityTests(), []);
+  const countQuantityTests = useMemo(() => runCountQuantityTests(), []);
+  const unitQuantityTests = useMemo(() => runUnitQuantityTests(), []);
   const storageTests = useMemo(() => runStorageTests(), []);
 
   const grouped = useMemo((): GroupedSectionView[] => {
@@ -841,10 +842,12 @@ export default function App() {
               items={items}
               config={config}
               matcherTests={matcherTests}
-              quantityTests={quantityTests}
+              countQuantityTests={countQuantityTests}
+              unitQuantityTests={unitQuantityTests}
               storageTests={storageTests}
               matcherHasFailures={matcherTests.some((test) => !test.passed)}
-              quantityHasFailures={quantityTests.some((test) => !test.passed)}
+              countQuantityHasFailures={countQuantityTests.some((test) => !test.passed)}
+              unitQuantityHasFailures={unitQuantityTests.some((test) => !test.passed)}
               storageHasFailures={storageTests.some((test) => !test.passed)}
               onRenameItem={handleRenameItem}
               onToggleItem={toggleItem}

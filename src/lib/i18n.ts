@@ -132,6 +132,7 @@ type Messages = {
       tabBackend: string;
       tabMatcher: string;
       tabQuantity: string;
+      tabWeights: string;
       tabSections: string;
       tabStorage: string;
       backendTitle: string;
@@ -147,10 +148,13 @@ type Messages = {
       matcherSubtitle: string;
       quantityTitle: string;
       quantitySubtitle: string;
+      weightTitle: string;
+      weightSubtitle: string;
       storageTitle: string;
       storageSubtitle: string;
       allMatcherPass: string;
       allQuantityPass: string;
+      allWeightPass: string;
       allStoragePass: string;
       expected: string;
       got: string;
@@ -328,7 +332,8 @@ const en: Messages = {
       tabParsed: 'Parsed',
       tabBackend: 'Backend',
       tabMatcher: 'Matcher',
-      tabQuantity: 'Quantity',
+      tabQuantity: 'Quantities',
+      tabWeights: 'Weights',
       tabSections: 'Sections',
       tabStorage: 'Storage',
       backendTitle: 'Backend checks',
@@ -344,14 +349,18 @@ const en: Messages = {
       matcherTitle: 'Matcher self-checks',
       matcherSubtitle:
         'Lightweight checks so grouping regressions are obvious while building.',
-      quantityTitle: 'Quantity self-checks',
+      quantityTitle: 'Count quantity self-checks',
       quantitySubtitle:
-        'Count-style quantities stay as one checkable item, with quantity metadata attached.',
+        'Count-style quantities like x2 and 4 carrots stay attached to one checkable item.',
+      weightTitle: 'Weight and unit self-checks',
+      weightSubtitle:
+        'Weights and units like 500g or 1.5kg stay attached as item metadata, even when a count is present.',
       storageTitle: 'Storage self-checks',
       storageSubtitle:
         'Record data should round-trip cleanly through local storage and any future database store.',
       allMatcherPass: 'All matcher checks are passing.',
-      allQuantityPass: 'All quantity checks are passing.',
+      allQuantityPass: 'All count quantity checks are passing.',
+      allWeightPass: 'All weight and unit checks are passing.',
       allStoragePass: 'All storage checks are passing.',
       expected: 'expected',
       got: 'got',
@@ -543,7 +552,8 @@ const es: Messages = {
       tabParsed: 'Procesados',
       tabBackend: 'Backend',
       tabMatcher: 'Clasificador',
-      tabQuantity: 'Cantidad',
+      tabQuantity: 'Cantidades',
+      tabWeights: 'Pesos',
       tabSections: 'Secciones',
       tabStorage: 'Almacenamiento',
       backendTitle: 'Comprobaciones del backend',
@@ -562,14 +572,18 @@ const es: Messages = {
       matcherTitle: 'Comprobaciones del clasificador',
       matcherSubtitle:
         'Pruebas ligeras para que las regresiones de agrupación se vean enseguida al construir.',
-      quantityTitle: 'Comprobaciones de cantidad',
+      quantityTitle: 'Comprobaciones de cantidades contadas',
       quantitySubtitle:
-        'Las cantidades numéricas siguen siendo un solo artículo comprobable, con metadatos de cantidad.',
+        'Las cantidades como x2 y 4 zanahorias siguen unidas a un solo artículo comprobable.',
+      weightTitle: 'Comprobaciones de pesos y unidades',
+      weightSubtitle:
+        'Los pesos y unidades como 500g o 1.5kg siguen unidos al artículo, incluso cuando también hay una cantidad.',
       storageTitle: 'Comprobaciones de almacenamiento',
       storageSubtitle:
         'Los datos deben redondearse limpiamente a través del almacenamiento local y cualquier futura base de datos.',
       allMatcherPass: 'Todas las comprobaciones del clasificador pasan.',
-      allQuantityPass: 'Todas las comprobaciones de cantidad pasan.',
+      allQuantityPass: 'Todas las comprobaciones de cantidades contadas pasan.',
+      allWeightPass: 'Todas las comprobaciones de pesos y unidades pasan.',
       allStoragePass: 'Todas las comprobaciones de almacenamiento pasan.',
       expected: 'esperado',
       got: 'obtenido',
@@ -770,7 +784,8 @@ const fr: Messages = {
       tabParsed: 'Analysés',
       tabBackend: 'Backend',
       tabMatcher: 'Correspondance',
-      tabQuantity: 'Quantité',
+      tabQuantity: 'Quantités',
+      tabWeights: 'Poids',
       tabSections: 'Sections',
       tabStorage: 'Stockage',
       backendTitle: 'Vérifications backend',
@@ -788,15 +803,21 @@ const fr: Messages = {
       matcherTitle: 'Auto-vérifications du moteur de correspondance',
       matcherSubtitle:
         'Des vérifications légères pour rendre évidentes les régressions de regroupement.',
-      quantityTitle: 'Auto-vérifications des quantités',
+      quantityTitle: 'Auto-vérifications des quantités comptées',
       quantitySubtitle:
-        'Les quantités de type nombre restent attachées à un seul article cochable.',
+        'Les quantités comme x2 et 4 carottes restent attachées à un seul article cochable.',
+      weightTitle: 'Auto-vérifications des poids et unités',
+      weightSubtitle:
+        'Les poids et unités comme 500g ou 1.5kg restent attachés à l’article, même avec une quantité.',
       storageTitle: 'Auto-vérifications du stockage',
       storageSubtitle:
         'Les données doivent se relire proprement depuis le stockage local et toute future base.',
       allMatcherPass:
         'Toutes les vérifications du moteur de correspondance sont valides.',
-      allQuantityPass: 'Toutes les vérifications de quantité sont valides.',
+      allQuantityPass:
+        'Toutes les vérifications de quantités comptées sont valides.',
+      allWeightPass:
+        'Toutes les vérifications de poids et unités sont valides.',
       allStoragePass: 'Toutes les vérifications de stockage sont valides.',
       expected: 'attendu',
       got: 'obtenu',
@@ -996,7 +1017,8 @@ const de: Messages = {
       tabParsed: 'Analysiert',
       tabBackend: 'Backend',
       tabMatcher: 'Matcher',
-      tabQuantity: 'Menge',
+      tabQuantity: 'Mengen',
+      tabWeights: 'Gewichte',
       tabSections: 'Bereiche',
       tabStorage: 'Speicher',
       backendTitle: 'Backend-Prüfungen',
@@ -1014,14 +1036,18 @@ const de: Messages = {
       matcherTitle: 'Matcher-Selbsttests',
       matcherSubtitle:
         'Leichte Prüfungen, damit Gruppierungsfehler sofort sichtbar werden.',
-      quantityTitle: 'Mengen-Selbsttests',
+      quantityTitle: 'Zählmengen-Selbsttests',
       quantitySubtitle:
-        'Zählmengen bleiben an genau einem abhackbaren Artikel hängen.',
+        'Zählmengen wie x2 und 4 Karotten bleiben an einem abhackbaren Artikel hängen.',
+      weightTitle: 'Gewichts- und Einheiten-Selbsttests',
+      weightSubtitle:
+        'Gewichte und Einheiten wie 500g oder 1.5kg bleiben am Artikel hängen, auch wenn eine Zählmenge vorhanden ist.',
       storageTitle: 'Speicher-Selbsttests',
       storageSubtitle:
         'Daten sollten sauber durch lokalen Speicher und spätere Datenbanken laufen.',
       allMatcherPass: 'Alle Matcher-Prüfungen bestehen.',
-      allQuantityPass: 'Alle Mengen-Prüfungen bestehen.',
+      allQuantityPass: 'Alle Zählmengen-Prüfungen bestehen.',
+      allWeightPass: 'Alle Gewichts- und Einheiten-Prüfungen bestehen.',
       allStoragePass: 'Alle Speicher-Prüfungen bestehen.',
       expected: 'erwartet',
       got: 'erhalten',
@@ -1223,7 +1249,8 @@ const nl: Messages = {
       tabParsed: 'Geparseerd',
       tabBackend: 'Backend',
       tabMatcher: 'Matcher',
-      tabQuantity: 'Hoeveelheid',
+      tabQuantity: 'Hoeveelheden',
+      tabWeights: 'Gewichten',
       tabSections: 'Secties',
       tabStorage: 'Opslag',
       backendTitle: 'Backendcontroles',
@@ -1240,14 +1267,18 @@ const nl: Messages = {
       matcherTitle: 'Matcher-zelftests',
       matcherSubtitle:
         'Lichte controles zodat regressies in groepering snel zichtbaar zijn.',
-      quantityTitle: 'Hoeveelheids-zelftests',
+      quantityTitle: 'Telhoeveelheids-zelftests',
       quantitySubtitle:
-        'Telhoeveelheden blijven gekoppeld aan één afvinkbaar artikel.',
+        'Telhoeveelheden zoals x2 en 4 wortels blijven gekoppeld aan één afvinkbaar artikel.',
+      weightTitle: 'Gewicht- en eenheid-zelftests',
+      weightSubtitle:
+        'Gewichten en eenheden zoals 500g of 1.5kg blijven aan het artikel gekoppeld, ook met een telhoeveelheid.',
       storageTitle: 'Opslag-zelftests',
       storageSubtitle:
         'Gegevens moeten netjes heen en weer gaan door lokale opslag en latere databases.',
       allMatcherPass: 'Alle matcher-controles slagen.',
-      allQuantityPass: 'Alle hoeveelheidscontroles slagen.',
+      allQuantityPass: 'Alle telhoeveelheidscontroles slagen.',
+      allWeightPass: 'Alle gewicht- en eenheidcontroles slagen.',
       allStoragePass: 'Alle opslagcontroles slagen.',
       expected: 'verwacht',
       got: 'gekregen',
@@ -1447,6 +1478,7 @@ const it: Messages = {
       tabBackend: 'Backend',
       tabMatcher: 'Matcher',
       tabQuantity: 'Quantità',
+      tabWeights: 'Pesi',
       tabSections: 'Sezioni',
       tabStorage: 'Archiviazione',
       backendTitle: 'Controlli backend',
@@ -1464,14 +1496,18 @@ const it: Messages = {
       matcherTitle: 'Autocontrolli matcher',
       matcherSubtitle:
         'Controlli leggeri per rendere evidenti le regressioni di raggruppamento.',
-      quantityTitle: 'Autocontrolli quantità',
+      quantityTitle: 'Autocontrolli quantità numeriche',
       quantitySubtitle:
-        'Le quantità numeriche restano collegate a un solo articolo selezionabile.',
+        'Le quantità come x2 e 4 carote restano collegate a un solo articolo selezionabile.',
+      weightTitle: 'Autocontrolli pesi e unità',
+      weightSubtitle:
+        'Pesi e unità come 500g o 1.5kg restano collegati all’articolo, anche quando c’è una quantità.',
       storageTitle: 'Autocontrolli archiviazione',
       storageSubtitle:
         'I dati devono attraversare correttamente lo storage locale e qualsiasi database futuro.',
       allMatcherPass: 'Tutti i controlli matcher sono superati.',
-      allQuantityPass: 'Tutti i controlli quantità sono superati.',
+      allQuantityPass: 'Tutti i controlli quantità numeriche sono superati.',
+      allWeightPass: 'Tutti i controlli pesi e unità sono superati.',
       allStoragePass: 'Tutti i controlli archiviazione sono superati.',
       expected: 'atteso',
       got: 'ottenuto',
@@ -1671,7 +1707,8 @@ const ro: Messages = {
       tabParsed: 'Analizate',
       tabBackend: 'Backend',
       tabMatcher: 'Potrivire',
-      tabQuantity: 'Cantitate',
+      tabQuantity: 'Cantități',
+      tabWeights: 'Greutăți',
       tabSections: 'Secțiuni',
       tabStorage: 'Stocare',
       backendTitle: 'Verificări backend',
@@ -1688,14 +1725,18 @@ const ro: Messages = {
       matcherTitle: 'Autoverificări de potrivire',
       matcherSubtitle:
         'Verificări ușoare pentru a face regresiile de grupare evidente.',
-      quantityTitle: 'Autoverificări de cantitate',
+      quantityTitle: 'Autoverificări de cantități numărate',
       quantitySubtitle:
-        'Cantitățile numerice rămân atașate unui singur articol bifabil.',
+        'Cantitățile precum x2 și 4 morcovi rămân atașate unui singur articol bifabil.',
+      weightTitle: 'Autoverificări de greutăți și unități',
+      weightSubtitle:
+        'Greutățile și unitățile precum 500g sau 1.5kg rămân atașate articolului, chiar și cu o cantitate.',
       storageTitle: 'Autoverificări de stocare',
       storageSubtitle:
         'Datele trebuie să treacă curat prin stocarea locală și orice bază viitoare.',
       allMatcherPass: 'Toate verificările de potrivire trec.',
-      allQuantityPass: 'Toate verificările de cantitate trec.',
+      allQuantityPass: 'Toate verificările de cantități numărate trec.',
+      allWeightPass: 'Toate verificările de greutăți și unități trec.',
       allStoragePass: 'Toate verificările de stocare trec.',
       expected: 'așteptat',
       got: 'obținut',
@@ -1893,7 +1934,8 @@ const pi: Messages = {
       tabParsed: 'Parsed',
       tabBackend: 'Backend',
       tabMatcher: 'Matcher',
-      tabQuantity: 'Quantity',
+      tabQuantity: 'Quantities',
+      tabWeights: 'Weights',
       tabSections: 'Decks',
       tabStorage: 'Stowage',
       backendTitle: 'Backend checks',
@@ -1910,14 +1952,18 @@ const pi: Messages = {
       matcherTitle: 'Matcher self-checks',
       matcherSubtitle:
         'Light checks so grouping mishaps be obvious while buildin’.',
-      quantityTitle: 'Quantity self-checks',
+      quantityTitle: 'Count quantity self-checks',
       quantitySubtitle:
-        'Count-style quantities stay tied to one checkable bit o’ cargo.',
+        'Count-style quantities like x2 and 4 carrots stay tied to one checkable bit o’ cargo.',
+      weightTitle: 'Weight and unit self-checks',
+      weightSubtitle:
+        'Weights and units like 500g or 1.5kg stay tied to the cargo, even with a count.',
       storageTitle: 'Stowage self-checks',
       storageSubtitle:
         'Record data should round-trip clean through local stowage and any future hold.',
       allMatcherPass: 'All matcher checks be passin’.',
-      allQuantityPass: 'All quantity checks be passin’.',
+      allQuantityPass: 'All count quantity checks be passin’.',
+      allWeightPass: 'All weight and unit checks be passin’.',
       allStoragePass: 'All stowage checks be passin’.',
       expected: 'expected',
       got: 'got',

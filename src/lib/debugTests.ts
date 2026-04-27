@@ -1,6 +1,15 @@
 import { COUNTRY_CONFIGS } from '../config/countries';
-import type { CountryConfig, MatcherTestCase, MatcherTestResult, QuantityTestCase, QuantityTestResult, StorageTestResult } from '../types';
-import { extractQuantity } from './quantity';
+import type {
+  CountQuantityTestCase,
+  CountQuantityTestResult,
+  CountryConfig,
+  MatcherTestCase,
+  MatcherTestResult,
+  StorageTestResult,
+  UnitQuantityTestCase,
+  UnitQuantityTestResult,
+} from '../types';
+import { extractQuantifiedItem } from './quantity';
 import { detectSection } from './sections';
 import { cleanLine } from './stringUtils';
 import { parseItems } from './parser';
@@ -61,16 +70,20 @@ export const MATCHER_TEST_CASES: MatcherTestCase[] = [
   { input: 'paracetamol', expectedSection: 'health_beauty' },
 ];
 
-export const QUANTITY_TEST_CASES: QuantityTestCase[] = [
-  { input: 'bananas x2', expectedName: 'bananas', expectedQuantity: 'x2', expectedQuantityValue: 2 },
-  { input: 'milk x 2', expectedName: 'milk', expectedQuantity: 'x2', expectedQuantityValue: 2 },
-  { input: '2x apples', expectedName: 'apples', expectedQuantity: 'x2', expectedQuantityValue: 2 },
-  { input: '4 carrots', expectedName: 'carrots', expectedQuantity: 'x4', expectedQuantityValue: 4 },
+export const COUNT_QUANTITY_TEST_CASES: CountQuantityTestCase[] = [
+  { input: 'bananas x2', expectedName: 'bananas', expectedQuantityValue: 2 },
+  { input: 'milk x 2', expectedName: 'milk', expectedQuantityValue: 2 },
+  { input: '2x apples', expectedName: 'apples', expectedQuantityValue: 2 },
+  { input: '4 carrots', expectedName: 'carrots', expectedQuantityValue: 4 },
+  { input: 'x3 bananas', expectedName: 'bananas', expectedQuantityValue: 3 },
+  { input: '2x 500g bags of rice', expectedName: 'bags of rice', expectedQuantityValue: 2 },
+];
+
+export const UNIT_QUANTITY_TEST_CASES: UnitQuantityTestCase[] = [
   { input: '500g mince', expectedName: 'mince', expectedQuantity: '500g' },
   { input: '1.5kg potatoes', expectedName: 'potatoes', expectedQuantity: '1.5kg' },
-  { input: 'ice-cream', expectedName: 'ice-cream' },
-  { input: 'x3 bananas', expectedName: 'bananas', expectedQuantity: 'x3', expectedQuantityValue: 3 },
-  { input: '2x 500g bags of rice', expectedName: 'bags of rice', expectedQuantity: 'x2', expectedQuantityValue: 2 },
+  { input: 'olive oil 750ml', expectedName: 'olive oil', expectedQuantity: '750ml' },
+  { input: '2x 500g bags of rice', expectedName: 'bags of rice', expectedQuantity: '500g', expectedQuantityValue: 2 },
 ];
 
 const STORAGE_FIXTURE_INPUT = 'small milk\nbananas x2\n500g mince';
@@ -173,9 +186,22 @@ export const runMatcherTests = (config: CountryConfig): MatcherTestResult[] =>
     passed: detectSection(test.input, config) === test.expectedSection,
   }));
 
-export const runQuantityTests = (): QuantityTestResult[] =>
-  QUANTITY_TEST_CASES.map((test) => {
-    const actual = extractQuantity(test.input);
+export const runCountQuantityTests = (): CountQuantityTestResult[] =>
+  COUNT_QUANTITY_TEST_CASES.map((test) => {
+    const actual = extractQuantifiedItem(test.input);
+    return {
+      ...test,
+      actualName: cleanLine(actual.name),
+      actualQuantityValue: actual.quantityValue,
+      passed:
+        cleanLine(actual.name) === test.expectedName &&
+        actual.quantityValue === test.expectedQuantityValue,
+    };
+  });
+
+export const runUnitQuantityTests = (): UnitQuantityTestResult[] =>
+  UNIT_QUANTITY_TEST_CASES.map((test) => {
+    const actual = extractQuantifiedItem(test.input);
     return {
       ...test,
       actualName: cleanLine(actual.name),

@@ -108,10 +108,16 @@ export type MatcherTestCase = {
   expectedSection: SectionKey;
 };
 
-export type QuantityTestCase = {
+export type CountQuantityTestCase = {
   input: string;
   expectedName: string;
-  expectedQuantity?: string;
+  expectedQuantityValue: number;
+};
+
+export type UnitQuantityTestCase = {
+  input: string;
+  expectedName: string;
+  expectedQuantity: string;
   expectedQuantityValue?: number;
 };
 
@@ -120,7 +126,13 @@ export type MatcherTestResult = MatcherTestCase & {
   passed: boolean;
 };
 
-export type QuantityTestResult = QuantityTestCase & {
+export type CountQuantityTestResult = CountQuantityTestCase & {
+  actualName: string;
+  actualQuantityValue?: number;
+  passed: boolean;
+};
+
+export type UnitQuantityTestResult = UnitQuantityTestCase & {
   actualName: string;
   actualQuantity?: string;
   actualQuantityValue?: number;
