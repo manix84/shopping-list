@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent, type PointerEvent } from 'react';
+import { useEffect, useRef, useState, type MouseEvent, type PointerEvent } from 'react';
 import { mdiDeleteOutline, mdiDownloadOutline } from '@mdi/js';
 import QRCode from 'qrcode';
 import type { SharedListHistoryEntry } from '../types';
@@ -407,6 +407,22 @@ export function SharedListPanel({
     setScannerState('scanning');
     setScannerMessage(undefined);
   };
+  useEffect(() => {
+    if (!scannerOpen && !qrModalOpen) return;
+
+    const handleEscape = (event: globalThis.KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      if (scannerOpen) {
+        closeScanner();
+        return;
+      }
+      closeQrModal();
+    };
+
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [qrModalOpen, scannerOpen]);
+
   const scannerStatusText =
     scannerState === 'missing'
       ? messages.sharing.scannerListMissing
@@ -414,6 +430,17 @@ export function SharedListPanel({
         ? messages.sharing.scannerReady
         : messages.sharing.scannerInstructions;
   const showSharedInputTick = sharedInputStatus === 'valid';
+  const sharedInputStatusId = 'shared-list-load-status';
+  const sharedInputStatusText =
+    sharedInputStatus === 'checking'
+      ? messages.backendStatus.checking
+      : sharedInputStatus === 'valid'
+        ? messages.labels.available
+        : sharedInputStatus === 'missing'
+          ? messages.sharing.loadMissing
+          : sharedInputStatus === 'invalid'
+            ? messages.sharing.invalidLink
+            : '';
   const isActionTarget = (target: EventTarget | null): boolean =>
     target instanceof Element && target.closest('button') !== null;
   const handleHistoryPointerDown = (listId: string, event: PointerEvent<HTMLDivElement>) => {
@@ -439,11 +466,6 @@ export function SharedListPanel({
   };
   const handleHistoryPointerCancel = () => {
     historyPointerRef.current = null;
-  };
-  const handleHistoryKeyDown = (listId: string, event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key !== 'Enter' && event.key !== ' ') return;
-    event.preventDefault();
-    void onLoadHistoryEntry(listId);
   };
   const normalizeSharedInput = (value: string): string => {
     const normalized = extractSharedListId(value, appBasePath, window.location.origin);
@@ -477,8 +499,9 @@ export function SharedListPanel({
               type="button"
               className={`share-qr-card ${qrRevealed ? '' : 'share-qr-card-blurred'}`.trim()}
               onClick={handleQrCardClick}
+              aria-label={qrRevealed ? messages.labels.sharedLink : messages.actions.revealQrCode}
             >
-              <img className="share-qr-image" src={qrDataUrl} alt={messages.actions.revealQrCode} />
+              <img className="share-qr-image" src={qrDataUrl} alt={messages.labels.sharedLink} />
               {!qrRevealed ? <span className="share-qr-overlay">{messages.actions.revealQrCode}</span> : null}
             </button>
           ) : null}
@@ -508,6 +531,8 @@ export function SharedListPanel({
                   id="shared-list-load-input"
                   className="input shared-input"
                   value={sharedInput}
+                  aria-describedby={sharedInputStatus !== 'idle' ? sharedInputStatusId : undefined}
+                  aria-invalid={sharedInputStatus === 'missing' || sharedInputStatus === 'invalid'}
                   onChange={(event) => setSharedInput(normalizeSharedInput(event.target.value))}
                   onPaste={(event) => {
                     const pastedText = event.clipboardData.getData('text');
@@ -542,8 +567,17 @@ export function SharedListPanel({
         </>
       ) : null}
 
-      {shareError ? <div className="small-text">{shareError}</div> : null}
-      {scannerMessage && !scannerOpen ? <div className="small-text">{scannerMessage}</div> : null}
+      {sharedInputStatus !== 'idle' ? (
+        <div id={sharedInputStatusId} className="sr-only" role="status" aria-live="polite">
+          {sharedInputStatusText}
+        </div>
+      ) : null}
+      {shareError ? <div className="small-text" role="alert">{shareError}</div> : null}
+      {scannerMessage && !scannerOpen ? (
+        <div className="small-text" role="status" aria-live="polite">
+          {scannerMessage}
+        </div>
+      ) : null}
 
       <div className="stack">
         <h3 className="title title-xs">{messages.sharing.recentListsTitle}</h3>
@@ -555,11 +589,7 @@ export function SharedListPanel({
               <div
                 key={entry.listId}
                 className="shared-history-item"
-                role="button"
-                tabIndex={0}
-                aria-label={messages.actions.loadSharedList}
                 title={messages.actions.loadSharedList}
-                onKeyDown={(event) => handleHistoryKeyDown(entry.listId, event)}
                 onPointerDown={(event) => handleHistoryPointerDown(entry.listId, event)}
                 onPointerMove={(event) => handleHistoryPointerMove(entry.listId, event)}
                 onPointerCancel={handleHistoryPointerCancel}
@@ -583,7 +613,9 @@ export function SharedListPanel({
                       void onLoadHistoryEntry(entry.listId);
                     }}
                     disabled={isLoadingSharedList || !canUseBackend}
-                    aria-label={messages.actions.loadSharedList}
+                    aria-label={`${messages.actions.loadSharedList}: ${
+                      entry.itemPreview.join(', ') || messages.sharing.emptyList
+                    }`}
                     title={messages.actions.loadSharedList}
                   >
                     <svg aria-hidden="true" className="button-icon-svg" viewBox="0 0 24 24">
@@ -613,27 +645,42 @@ export function SharedListPanel({
 
       {scannerOpen ? (
         <div className="share-scanner-modal" onClick={closeScanner} role="presentation">
-          <div className="share-scanner-dialog stack" onClick={(event) => event.stopPropagation()}>
+          <div
+            className="share-scanner-dialog stack"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="share-scanner-title"
+            onClick={(event) => event.stopPropagation()}
+          >
             <div className="share-scanner-toolbar">
-              <h3 className="title title-xs">{messages.actions.scanQrCode}</h3>
-              <button type="button" className="button" onClick={closeScanner}>
+              <h3 id="share-scanner-title" className="title title-xs">{messages.actions.scanQrCode}</h3>
+              <button type="button" className="button" onClick={closeScanner} autoFocus>
                 {messages.actions.stopScanning}
               </button>
             </div>
             <div className={`share-scanner-frame share-scanner-frame-${scannerState}`}>
-              <video ref={videoRef} className="share-scanner-video" muted playsInline />
+              <video ref={videoRef} className="share-scanner-video" muted playsInline aria-label={messages.actions.scanQrCode} />
               <div className="share-scanner-overlay">
                 <div className="share-scanner-target" />
               </div>
             </div>
-            <div className="share-scanner-status">{scannerStatusText}</div>
+            <div className="share-scanner-status" role="status" aria-live="polite">{scannerStatusText}</div>
           </div>
         </div>
       ) : null}
 
       {qrModalOpen && qrDataUrl ? (
         <div className="share-scanner-modal" onClick={closeQrModal} role="presentation">
-          <div className="share-qr-dialog" onClick={(event) => event.stopPropagation()}>
+          <div
+            className="share-qr-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-label={messages.labels.sharedLink}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button type="button" className="button" onClick={closeQrModal} autoFocus>
+              {messages.actions.close}
+            </button>
             <img className="share-qr-image share-qr-image-large" src={qrDataUrl} alt={messages.labels.sharedLink} />
           </div>
         </div>

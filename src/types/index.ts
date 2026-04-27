@@ -22,11 +22,16 @@ export type SectionKey =
   | 'frozen_fruit'
   | 'frozen_meals'
   | 'pasta'
+  | 'cereal'
   | 'baby_food'
+  | 'tinned_jarred'
+  | 'cooking_ingredients'
+  | 'hot_drinks'
   | 'seafood_counter'
   | 'pantry'
   | 'snacks'
   | 'drinks'
+  | 'alcohol'
   | 'baby'
   | 'clothing'
   | 'household'
@@ -106,10 +111,16 @@ export type MatcherTestCase = {
   expectedSection: SectionKey;
 };
 
-export type QuantityTestCase = {
+export type CountQuantityTestCase = {
   input: string;
   expectedName: string;
-  expectedQuantity?: string;
+  expectedQuantityValue: number;
+};
+
+export type UnitQuantityTestCase = {
+  input: string;
+  expectedName: string;
+  expectedQuantity: string;
   expectedQuantityValue?: number;
 };
 
@@ -118,7 +129,13 @@ export type MatcherTestResult = MatcherTestCase & {
   passed: boolean;
 };
 
-export type QuantityTestResult = QuantityTestCase & {
+export type CountQuantityTestResult = CountQuantityTestCase & {
+  actualName: string;
+  actualQuantityValue?: number;
+  passed: boolean;
+};
+
+export type UnitQuantityTestResult = UnitQuantityTestCase & {
   actualName: string;
   actualQuantity?: string;
   actualQuantityValue?: number;

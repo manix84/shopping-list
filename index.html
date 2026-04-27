@@ -8,6 +8,7 @@
       name="description"
       content="Paste a shopping list, auto-sort it into store sections, and share a cleaner shopping plan with quantities, sizes, and route metadata."
     />
+    <meta name="robots" content="index,follow" />
     <meta name="theme-color" content="#f6f7fb" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -27,6 +28,7 @@
     <link rel="apple-touch-icon" href="%BASE_URL%apple-touch-icon.png" />
     <link rel="mask-icon" href="%BASE_URL%mask-icon.svg" color="#2563eb" />
     <link rel="manifest" href="%BASE_URL%manifest.webmanifest" />
+    <link rel="preload" as="image" href="%BASE_URL%logo-mark.png" />
 
     <script>
       (() => {
@@ -43,10 +45,29 @@
           }
 
           const storedLocale = localStorage.getItem(localeKey);
-          if (storedLocale === 'es' || storedLocale === 'en') {
+          if (
+            storedLocale === 'en' ||
+            storedLocale === 'es' ||
+            storedLocale === 'fr' ||
+            storedLocale === 'de' ||
+            storedLocale === 'nl' ||
+            storedLocale === 'it' ||
+            storedLocale === 'ro' ||
+            storedLocale === 'pi'
+          ) {
             locale = storedLocale;
           } else if (navigator.language && navigator.language.toLowerCase().startsWith('es')) {
             locale = 'es';
+          } else if (navigator.language && navigator.language.toLowerCase().startsWith('fr')) {
+            locale = 'fr';
+          } else if (navigator.language && navigator.language.toLowerCase().startsWith('de')) {
+            locale = 'de';
+          } else if (navigator.language && navigator.language.toLowerCase().startsWith('nl')) {
+            locale = 'nl';
+          } else if (navigator.language && navigator.language.toLowerCase().startsWith('it')) {
+            locale = 'it';
+          } else if (navigator.language && navigator.language.toLowerCase().startsWith('ro')) {
+            locale = 'ro';
           }
         } catch (error) {
           mode = 'system';
@@ -55,8 +76,9 @@
 
         const resolved = mode === 'system' ? (isDarkMode() ? 'dark' : 'light') : mode;
         const themeColorValue = resolved === 'dark' ? '#0b1220' : '#f6f7fb';
+        const documentLocale = locale === 'en' ? 'en-GB' : locale === 'pi' ? 'en-x-pirate' : locale;
         document.documentElement.dataset.theme = resolved;
-        document.documentElement.lang = locale === 'en' ? 'en-GB' : locale;
+        document.documentElement.lang = documentLocale;
 
         const themeColor = document.querySelector('meta[name="theme-color"]');
         if (themeColor) {

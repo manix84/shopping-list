@@ -99,6 +99,6 @@ describe('i18n', () => {
 
     applyDocumentLocale('pi');
 
-    expect(documentMock.documentElement.lang).toBe('en-PI');
+    expect(documentMock.documentElement.lang).toBe('en-x-pirate');
   });
 });

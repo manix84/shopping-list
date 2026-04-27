@@ -208,6 +208,41 @@ select {
   border: 0;
 }
 
+.skip-link {
+  background: $panel;
+  border: 2px solid $primary;
+  border-radius: 8px;
+  color: $text;
+  font-weight: 700;
+  left: 24px;
+  padding: 10px 14px;
+  position: fixed;
+  top: 16px;
+  transform: translateY(-160%);
+  transition: transform 0.16s ease;
+  z-index: 1200;
+
+  &:focus {
+    transform: translateY(0);
+  }
+}
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  &:focus {
+    outline: 2px solid $primary;
+    outline-offset: 6px;
+    border-radius: 10px;
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+}
+
 .shopping-shell {
   max-width: 1240px;
   margin: 0 auto;
@@ -363,6 +398,11 @@ select {
     transform: translateY(-1px);
   }
 
+  &:focus-visible {
+    outline: 2px solid $primary;
+    outline-offset: 2px;
+  }
+
   &-primary {
     background: $primary;
     border-color: $primary;
@@ -446,6 +486,11 @@ select {
   border-radius: 14px;
   padding: 12px 14px;
   color: $text;
+
+  &:focus-visible {
+    outline: 2px solid $primary;
+    outline-offset: 2px;
+  }
 }
 
 .settings-select {
@@ -777,6 +822,8 @@ select {
   border-radius: 22px;
   box-shadow: $shadow;
   display: flex;
+  flex-direction: column;
+  gap: 16px;
   justify-content: center;
   max-width: 560px;
   padding: 20px;
@@ -970,6 +1017,8 @@ select {
     animation: none;
   }
 
+  .button,
+  .skip-link,
   .share-qr-card,
   .share-qr-image,
   .share-qr-overlay,
@@ -979,6 +1028,11 @@ select {
   .share-scanner-frame-missing {
     animation: none;
     transition: none;
+  }
+
+  .button:hover,
+  .section-toggle:hover {
+    transform: none;
   }
 }
 
@@ -1127,6 +1181,51 @@ select {
 .connection-badge {
   animation: connection-badge-fade-in 0.25s ease-out both;
   will-change: opacity;
+}
+
+.connection-badge-shell {
+  position: relative;
+}
+
+.connection-badge-button {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+}
+
+.connection-badge-button:disabled {
+  cursor: default;
+}
+
+.connection-badge-button:focus-visible {
+  border-radius: 999px;
+  outline: 2px solid $primary;
+  outline-offset: 3px;
+}
+
+.connection-popover {
+  background: $panel;
+  border: 1px solid $border;
+  border-radius: 8px;
+  box-shadow: $shadow;
+  color: $text;
+  font-size: 13px;
+  inline-size: min(280px, calc(100vw - 32px));
+  line-height: 1.45;
+  padding: 12px;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: 20;
+}
+
+.connection-popover p {
+  color: $muted;
+  margin: 6px 0 0;
 }
 
 .connection-badge-leaving {

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { COUNTRY_CONFIGS } from './config/countries';
 import { AppHeader } from './components/AppHeader';
 import { PwaSplashScreen } from './components/PwaSplashScreen';
-import { runMatcherTests, runQuantityTests, runStorageTests } from './lib/debugTests';
+import { runCountQuantityTests, runMatcherTests, runStorageTests, runUnitQuantityTests } from './lib/debugTests';
 import {
   applyDocumentLocale,
   createMessages,
@@ -553,7 +553,8 @@ export default function App() {
   }, [isLoaded, items.length, page]);
 
   const matcherTests = useMemo(() => runMatcherTests(config), [config]);
-  const quantityTests = useMemo(() => runQuantityTests(), []);
+  const countQuantityTests = useMemo(() => runCountQuantityTests(), []);
+  const unitQuantityTests = useMemo(() => runUnitQuantityTests(), []);
   const storageTests = useMemo(() => runStorageTests(), []);
 
   const grouped = useMemo((): GroupedSectionView[] => {
@@ -766,6 +767,9 @@ export default function App() {
       <PwaSplashScreen />
       <div className="shopping-app">
         <div className="shopping-shell">
+          <a className="skip-link" href="#main-content">
+            {messages.actions.skipToMainContent}
+          </a>
           <AppHeader
             page={page}
             hasItems={items.length > 0}
@@ -774,85 +778,89 @@ export default function App() {
             onChangePage={changePage}
           />
 
-          {page === 'edit' ? (
-            <EditPage
-              input={input}
-              draftItem={draftItem}
-              total={total}
-              checkedTotal={checkedTotal}
-              progress={progress}
-              countryCode={countryCode}
-              onInputChange={setInput}
-              onDraftItemChange={setDraftItem}
-              onCountryChange={handleCountryChange}
-              onParse={handleParse}
-              onResetAll={resetAll}
-              onResetChecks={resetChecks}
-              onAddSingleItem={handleAddSingleItem}
-              onCreateSharedLink={handleCreateSharedLink}
-              onRefreshSharedList={handleRefreshSharedList}
-              canUseBackend={canUseBackend}
-              canCreateSharedLink={canCreateSharedLink}
-              resolvedTheme={resolvedTheme}
-              shareLink={shareLink}
-              isCreatingShareLink={isCreatingShareLink}
-              isRefreshingSharedList={isRefreshingSharedList}
-              isLoadingSharedList={isLoadingSharedList}
-              shareError={shareErrorMessage}
-              sharedListHistory={sharedListHistory}
-              onLoadSharedInput={handleLoadSharedInput}
-              onValidateSharedInput={validateSharedInput}
-              onLoadSharedListFromHistory={loadSharedListById}
-              onDeleteSharedListFromHistory={removeSharedListFromHistory}
-            />
-          ) : null}
+          <main id="main-content" className="main-content" tabIndex={-1}>
+            {page === 'edit' ? (
+              <EditPage
+                input={input}
+                draftItem={draftItem}
+                total={total}
+                checkedTotal={checkedTotal}
+                progress={progress}
+                countryCode={countryCode}
+                onInputChange={setInput}
+                onDraftItemChange={setDraftItem}
+                onCountryChange={handleCountryChange}
+                onParse={handleParse}
+                onResetAll={resetAll}
+                onResetChecks={resetChecks}
+                onAddSingleItem={handleAddSingleItem}
+                onCreateSharedLink={handleCreateSharedLink}
+                onRefreshSharedList={handleRefreshSharedList}
+                canUseBackend={canUseBackend}
+                canCreateSharedLink={canCreateSharedLink}
+                resolvedTheme={resolvedTheme}
+                shareLink={shareLink}
+                isCreatingShareLink={isCreatingShareLink}
+                isRefreshingSharedList={isRefreshingSharedList}
+                isLoadingSharedList={isLoadingSharedList}
+                shareError={shareErrorMessage}
+                sharedListHistory={sharedListHistory}
+                onLoadSharedInput={handleLoadSharedInput}
+                onValidateSharedInput={validateSharedInput}
+                onLoadSharedListFromHistory={loadSharedListById}
+                onDeleteSharedListFromHistory={removeSharedListFromHistory}
+              />
+            ) : null}
 
-          {page === 'route' ? (
-            <RoutePage
-              query={query}
-              isFilterVisible={isRouteFilterVisible}
-              grouped={grouped}
-              hasItems={items.length > 0}
-              viewMode={routeViewMode}
-              onQueryChange={setQuery}
-              onToggleFilter={toggleRouteFilter}
-              onViewModeChange={setRouteViewMode}
-              onToggleSection={toggleSection}
-              onToggleItem={toggleItem}
-              onOpenEdit={() => changePage('edit')}
-            />
-          ) : null}
+            {page === 'route' ? (
+              <RoutePage
+                query={query}
+                isFilterVisible={isRouteFilterVisible}
+                grouped={grouped}
+                hasItems={items.length > 0}
+                viewMode={routeViewMode}
+                onQueryChange={setQuery}
+                onToggleFilter={toggleRouteFilter}
+                onViewModeChange={setRouteViewMode}
+                onToggleSection={toggleSection}
+                onToggleItem={toggleItem}
+                onOpenEdit={() => changePage('edit')}
+              />
+            ) : null}
 
-          {page === 'settings' ? (
-            <SettingsPage
-              routeViewMode={routeViewMode}
-              themeMode={themeMode}
-              onRouteViewModeChange={setRouteViewMode}
-              onThemeChange={setThemeMode}
-              onOpenDebug={() => changePage('debug')}
-            />
-          ) : null}
+            {page === 'settings' ? (
+              <SettingsPage
+                routeViewMode={routeViewMode}
+                themeMode={themeMode}
+                onRouteViewModeChange={setRouteViewMode}
+                onThemeChange={setThemeMode}
+                onOpenDebug={() => changePage('debug')}
+              />
+            ) : null}
 
-          {page === 'sections' ? <SectionsPage config={config} /> : null}
+            {page === 'sections' ? <SectionsPage config={config} /> : null}
 
-          {page === 'debug' ? (
-            <DebugPage
-              backendStatus={backendStatus}
-              items={items}
-              config={config}
-              matcherTests={matcherTests}
-              quantityTests={quantityTests}
-              storageTests={storageTests}
-              matcherHasFailures={matcherTests.some((test) => !test.passed)}
-              quantityHasFailures={quantityTests.some((test) => !test.passed)}
-              storageHasFailures={storageTests.some((test) => !test.passed)}
-              onRenameItem={handleRenameItem}
-              onToggleItem={toggleItem}
-              onDeleteItem={handleDeleteItem}
-              onBackToEdit={() => changePage('edit')}
-              onBackToSettings={() => changePage('settings')}
-            />
-          ) : null}
+            {page === 'debug' ? (
+              <DebugPage
+                backendStatus={backendStatus}
+                items={items}
+                config={config}
+                matcherTests={matcherTests}
+                countQuantityTests={countQuantityTests}
+                unitQuantityTests={unitQuantityTests}
+                storageTests={storageTests}
+                matcherHasFailures={matcherTests.some((test) => !test.passed)}
+                countQuantityHasFailures={countQuantityTests.some((test) => !test.passed)}
+                unitQuantityHasFailures={unitQuantityTests.some((test) => !test.passed)}
+                storageHasFailures={storageTests.some((test) => !test.passed)}
+                onRenameItem={handleRenameItem}
+                onToggleItem={toggleItem}
+                onDeleteItem={handleDeleteItem}
+                onBackToEdit={() => changePage('edit')}
+                onBackToSettings={() => changePage('settings')}
+              />
+            ) : null}
+          </main>
         </div>
       </div>
     </I18nProvider>

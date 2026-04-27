@@ -1,6 +1,15 @@
 import { COUNTRY_CONFIGS } from '../config/countries';
-import type { CountryConfig, MatcherTestCase, MatcherTestResult, QuantityTestCase, QuantityTestResult, StorageTestResult } from '../types';
-import { extractQuantity } from './quantity';
+import type {
+  CountQuantityTestCase,
+  CountQuantityTestResult,
+  CountryConfig,
+  MatcherTestCase,
+  MatcherTestResult,
+  StorageTestResult,
+  UnitQuantityTestCase,
+  UnitQuantityTestResult,
+} from '../types';
+import { extractQuantifiedItem } from './quantity';
 import { detectSection } from './sections';
 import { cleanLine } from './stringUtils';
 import { parseItems } from './parser';
@@ -14,6 +23,34 @@ export const MATCHER_TEST_CASES: MatcherTestCase[] = [
   { input: 'fettuccine', expectedSection: 'pasta' },
   { input: 'macaroni', expectedSection: 'pasta' },
   { input: 'ravioli', expectedSection: 'pasta' },
+  { input: 'corn flakes', expectedSection: 'cereal' },
+  { input: 'weetos', expectedSection: 'cereal' },
+  { input: 'crunch clusters', expectedSection: 'cereal' },
+  { input: 'porridge oats', expectedSection: 'cereal' },
+  { input: 'crisps', expectedSection: 'snacks' },
+  { input: 'chocolate bars', expectedSection: 'snacks' },
+  { input: 'baked beans', expectedSection: 'tinned_jarred' },
+  { input: 'tinned tomatoes', expectedSection: 'tinned_jarred' },
+  { input: 'soy sauce', expectedSection: 'cooking_ingredients' },
+  { input: 'fajita kit', expectedSection: 'cooking_ingredients' },
+  { input: 'tea bags', expectedSection: 'hot_drinks' },
+  { input: 'coffee pods', expectedSection: 'hot_drinks' },
+  { input: 'diet coke', expectedSection: 'drinks' },
+  { input: 'cherry pepsi', expectedSection: 'drinks' },
+  { input: 'pepsi max', expectedSection: 'drinks' },
+  { input: 'cherry pepsi max', expectedSection: 'drinks' },
+  { input: 'lime pepsi max', expectedSection: 'drinks' },
+  { input: 'pepsi zero', expectedSection: 'drinks' },
+  { input: 'mango pepsi zero', expectedSection: 'drinks' },
+  { input: 'tropical pepsi zero', expectedSection: 'drinks' },
+  { input: 'mango coke zero', expectedSection: 'drinks' },
+  { input: 'tropical coke', expectedSection: 'drinks' },
+  { input: 'zero sprite', expectedSection: 'drinks' },
+  { input: 'jack daniels', expectedSection: 'alcohol' },
+  { input: 'whisky', expectedSection: 'alcohol' },
+  { input: 'kopparberg strawberry and lime', expectedSection: 'alcohol' },
+  { input: 'rekorderlig wild berries', expectedSection: 'alcohol' },
+  { input: 'kopparberg lemon vodka', expectedSection: 'alcohol' },
   { input: 'baby food', expectedSection: 'baby_food' },
   { input: 'blue milk', expectedSection: 'chilled_milk_juice_cream' },
   { input: 'gold milk', expectedSection: 'chilled_milk_juice_cream' },
@@ -23,28 +60,43 @@ export const MATCHER_TEST_CASES: MatcherTestCase[] = [
   { input: 'milk', expectedSection: 'chilled_milk_juice_cream' },
   { input: 'banana', expectedSection: 'produce' },
   { input: 'bananas', expectedSection: 'produce' },
+  { input: 'tomatoes', expectedSection: 'produce' },
+  { input: 'stir-fry mix', expectedSection: 'produce' },
   { input: 'ice-cream', expectedSection: 'frozen_ice_cream' },
   { input: 'Ice Cream', expectedSection: 'frozen_ice_cream' },
+  { input: 'ice lollies', expectedSection: 'frozen_ice_cream' },
+  { input: 'frozen summer fruits', expectedSection: 'frozen_fruit' },
+  { input: 'frozen blueberries', expectedSection: 'frozen_fruit' },
+  { input: 'frozen cherries', expectedSection: 'frozen_fruit' },
+  { input: 'chicken nuggets', expectedSection: 'frozen_meals' },
+  { input: 'frozen garlic bread', expectedSection: 'frozen_meals' },
   { input: 'single cream', expectedSection: 'chilled_milk_juice_cream' },
   { input: 'large free-range eggs', expectedSection: 'chilled_milk_juice_cream' },
   { input: 'orange juice', expectedSection: 'chilled_milk_juice_cream' },
   { input: 'ham slices', expectedSection: 'chilled_cooked_meat' },
   { input: 'chicken thighs', expectedSection: 'chilled_fresh_meat' },
   { input: 'washing up liquid', expectedSection: 'household' },
+  { input: 'laundry detergent', expectedSection: 'household' },
+  { input: 'nappies', expectedSection: 'baby' },
   { input: 'cat food', expectedSection: 'pet_supplies' },
   { input: 'paracetamol', expectedSection: 'health_beauty' },
+  { input: 'stationery', expectedSection: 'seasonal' },
 ];
 
-export const QUANTITY_TEST_CASES: QuantityTestCase[] = [
-  { input: 'bananas x2', expectedName: 'bananas', expectedQuantity: 'x2', expectedQuantityValue: 2 },
-  { input: 'milk x 2', expectedName: 'milk', expectedQuantity: 'x2', expectedQuantityValue: 2 },
-  { input: '2x apples', expectedName: 'apples', expectedQuantity: 'x2', expectedQuantityValue: 2 },
-  { input: '4 carrots', expectedName: 'carrots', expectedQuantity: 'x4', expectedQuantityValue: 4 },
+export const COUNT_QUANTITY_TEST_CASES: CountQuantityTestCase[] = [
+  { input: 'bananas x2', expectedName: 'bananas', expectedQuantityValue: 2 },
+  { input: 'milk x 2', expectedName: 'milk', expectedQuantityValue: 2 },
+  { input: '2x apples', expectedName: 'apples', expectedQuantityValue: 2 },
+  { input: '4 carrots', expectedName: 'carrots', expectedQuantityValue: 4 },
+  { input: 'x3 bananas', expectedName: 'bananas', expectedQuantityValue: 3 },
+  { input: '2x 500g bags of rice', expectedName: 'bags of rice', expectedQuantityValue: 2 },
+];
+
+export const UNIT_QUANTITY_TEST_CASES: UnitQuantityTestCase[] = [
   { input: '500g mince', expectedName: 'mince', expectedQuantity: '500g' },
   { input: '1.5kg potatoes', expectedName: 'potatoes', expectedQuantity: '1.5kg' },
-  { input: 'ice-cream', expectedName: 'ice-cream' },
-  { input: 'x3 bananas', expectedName: 'bananas', expectedQuantity: 'x3', expectedQuantityValue: 3 },
-  { input: '2x 500g bags of rice', expectedName: 'bags of rice', expectedQuantity: 'x2', expectedQuantityValue: 2 },
+  { input: 'olive oil 750ml', expectedName: 'olive oil', expectedQuantity: '750ml' },
+  { input: '2x 500g bags of rice', expectedName: 'bags of rice', expectedQuantity: '500g', expectedQuantityValue: 2 },
 ];
 
 const STORAGE_FIXTURE_INPUT = 'small milk\nbananas x2\n500g mince';
@@ -147,9 +199,22 @@ export const runMatcherTests = (config: CountryConfig): MatcherTestResult[] =>
     passed: detectSection(test.input, config) === test.expectedSection,
   }));
 
-export const runQuantityTests = (): QuantityTestResult[] =>
-  QUANTITY_TEST_CASES.map((test) => {
-    const actual = extractQuantity(test.input);
+export const runCountQuantityTests = (): CountQuantityTestResult[] =>
+  COUNT_QUANTITY_TEST_CASES.map((test) => {
+    const actual = extractQuantifiedItem(test.input);
+    return {
+      ...test,
+      actualName: cleanLine(actual.name),
+      actualQuantityValue: actual.quantityValue,
+      passed:
+        cleanLine(actual.name) === test.expectedName &&
+        actual.quantityValue === test.expectedQuantityValue,
+    };
+  });
+
+export const runUnitQuantityTests = (): UnitQuantityTestResult[] =>
+  UNIT_QUANTITY_TEST_CASES.map((test) => {
+    const actual = extractQuantifiedItem(test.input);
     return {
       ...test,
       actualName: cleanLine(actual.name),

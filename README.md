@@ -1,6 +1,6 @@
 # 🛒 Smart Shopping List
 
-[![Deploy to GitHub Pages](https://github.com/manix84/shopping-list/actions/workflows/deploy-gh-pages.yml/badge.svg)](https://github.com/manix84/shopping-list/actions/workflows/deploy-gh-pages.yml) [![CI](https://github.com/manix84/shopping-list/actions/workflows/ci.yml/badge.svg)](https://github.com/manix84/shopping-list/actions/workflows/ci.yml)
+[![Deploy to GitHub Pages](https://github.com/manix84/shopping-list/actions/workflows/deploy-gh-pages.yml/badge.svg)](https://github.com/manix84/shopping-list/actions/workflows/deploy-gh-pages.yml) [![Lint](https://github.com/manix84/shopping-list/actions/workflows/lint.yml/badge.svg)](https://github.com/manix84/shopping-list/actions/workflows/lint.yml) [![Type Check](https://github.com/manix84/shopping-list/actions/workflows/typecheck.yml/badge.svg)](https://github.com/manix84/shopping-list/actions/workflows/typecheck.yml) [![Test](https://github.com/manix84/shopping-list/actions/workflows/test.yml/badge.svg)](https://github.com/manix84/shopping-list/actions/workflows/test.yml) [![Build](https://github.com/manix84/shopping-list/actions/workflows/build.yml/badge.svg)](https://github.com/manix84/shopping-list/actions/workflows/build.yml) [![Accessibility](https://github.com/manix84/shopping-list/actions/workflows/accessibility.yml/badge.svg)](https://github.com/manix84/shopping-list/actions/workflows/accessibility.yml) [![Lighthouse](https://github.com/manix84/shopping-list/actions/workflows/lighthouse.yml/badge.svg)](https://github.com/manix84/shopping-list/actions/workflows/lighthouse.yml)
 
 A React + TypeScript shopping list app that turns a rough grocery list into an ordered route through the store. It runs as a static frontend by default, can install as a PWA, and can use an optional backend for shared lists and durable settings.
 
@@ -161,6 +161,14 @@ On supported browsers you can install the app with the browser's install action:
 npm run build
 npm run preview
 ```
+
+Run a local Lighthouse audit against the production build:
+
+```bash
+npm run lighthouse
+```
+
+The audit writes `lighthouse/report.json` and `lighthouse/report.html`, and fails if the main Lighthouse category scores fall below the configured thresholds. You can audit an already deployed URL with `LIGHTHOUSE_URL=https://example.com npm run lighthouse`. On Apple Silicon, run this with an arm64 Node install; x64 Node under Rosetta is blocked by Lighthouse because it makes Chrome performance results unreliable.
 
 ## 🚢 Deployment
 

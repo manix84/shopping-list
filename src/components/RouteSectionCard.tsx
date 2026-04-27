@@ -18,13 +18,14 @@ export function RouteSectionCard({ section, viewMode, onToggleSection, onToggleI
   const toggleTarget = allChecked;
   const state = allChecked ? 'checked' : noneChecked ? 'unchecked' : 'mixed';
   const actionLabel = toggleTarget ? messages.sectionToggle.untickAll : messages.sectionToggle.tickAll;
+  const sectionTitleId = `route-section-${section.key}-title`;
 
   return (
-    <div className={`section-card section-card-${viewMode}`}>
+    <section className={`section-card section-card-${viewMode}`} aria-labelledby={sectionTitleId}>
       <div className="section-header">
         <div className="section-heading">
           <div className="section-group">{section.groupLabel}</div>
-          <h3 className="section-title">{section.label}</h3>
+          <h3 id={sectionTitleId} className="section-title">{section.label}</h3>
           {!isCompact ? (
             <div className="badge-row">
               <Badge>
@@ -39,7 +40,7 @@ export function RouteSectionCard({ section, viewMode, onToggleSection, onToggleI
             type="button"
             className={`section-toggle section-toggle-${state}`}
             onClick={() => onToggleSection(section.key, toggleTarget)}
-            aria-label={actionLabel}
+            aria-label={`${actionLabel}: ${section.label}`}
             title={actionLabel}
           >
             {state === 'checked' ? (
@@ -89,6 +90,6 @@ export function RouteSectionCard({ section, viewMode, onToggleSection, onToggleI
           </label>
         ))}
       </div>
-    </div>
+    </section>
   );
 }

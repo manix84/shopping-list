@@ -1,5 +1,13 @@
 import { useState } from 'react';
-import type { BackendStatus, CountryConfig, Item, MatcherTestResult, QuantityTestResult, StorageTestResult } from '../types';
+import type {
+  BackendStatus,
+  CountQuantityTestResult,
+  CountryConfig,
+  Item,
+  MatcherTestResult,
+  StorageTestResult,
+  UnitQuantityTestResult,
+} from '../types';
 import { Card } from '../components/Card';
 import { ParsedItemCard } from '../components/ParsedItemCard';
 import { TestResultCard } from '../components/TestResultCard';
@@ -12,10 +20,12 @@ type DebugPageProps = {
   items: Item[];
   config: CountryConfig;
   matcherTests: MatcherTestResult[];
-  quantityTests: QuantityTestResult[];
+  countQuantityTests: CountQuantityTestResult[];
+  unitQuantityTests: UnitQuantityTestResult[];
   storageTests: StorageTestResult[];
   matcherHasFailures: boolean;
-  quantityHasFailures: boolean;
+  countQuantityHasFailures: boolean;
+  unitQuantityHasFailures: boolean;
   storageHasFailures: boolean;
   onRenameItem: (itemId: string, nextRaw: string) => void;
   onToggleItem: (itemId: string) => void;
@@ -42,17 +52,19 @@ const backendStateLabel = (status: BackendStatus, messages: Messages) => {
 
 const checkLabel = (passed: boolean, messages: Messages) => (passed ? messages.pages.debug.pass : messages.pages.debug.fail);
 
-type DebugTabKey = 'parsed' | 'backend' | 'matcher' | 'quantity' | 'sections' | 'storage';
+type DebugTabKey = 'parsed' | 'backend' | 'matcher' | 'quantity' | 'weights' | 'sections' | 'storage';
 
 export function DebugPage({
   backendStatus,
   items,
   config,
   matcherTests,
-  quantityTests,
+  countQuantityTests,
+  unitQuantityTests,
   storageTests,
   matcherHasFailures,
-  quantityHasFailures,
+  countQuantityHasFailures,
+  unitQuantityHasFailures,
   storageHasFailures,
   onRenameItem,
   onToggleItem,
@@ -67,6 +79,7 @@ export function DebugPage({
     { key: 'backend', label: messages.pages.debug.tabBackend },
     { key: 'matcher', label: messages.pages.debug.tabMatcher },
     { key: 'quantity', label: messages.pages.debug.tabQuantity },
+    { key: 'weights', label: messages.pages.debug.tabWeights },
     { key: 'sections', label: messages.pages.debug.tabSections },
     { key: 'storage', label: messages.pages.debug.tabStorage },
   ];
@@ -212,14 +225,49 @@ export function DebugPage({
           }
           bodyClassName="stack"
         >
-          {quantityTests.map((test) => (
+          {countQuantityTests.map((test) => (
             <TestResultCard
               key={`${test.input}-${test.expectedName}`}
               title={test.input}
               expected={
                 <>
                   {test.expectedName}
-                  {test.expectedQuantity ? ` · ${test.expectedQuantity}` : ''}
+                  {` · ${messages.labels.count} ${test.expectedQuantityValue}`}
+                </>
+              }
+              actual={
+                <>
+                  {test.actualName}
+                  {typeof test.actualQuantityValue === 'number'
+                    ? ` · ${messages.labels.count} ${test.actualQuantityValue}`
+                    : ''}
+                </>
+              }
+              passed={test.passed}
+            />
+          ))}
+          {!countQuantityHasFailures ? <div className="empty-state">{messages.pages.debug.allQuantityPass}</div> : null}
+        </Card>
+      ) : null}
+
+      {activeTab === 'weights' ? (
+        <Card
+          header={
+            <>
+              <h2 className="title title-sm">{messages.pages.debug.weightTitle}</h2>
+              <p className="subtitle">{messages.pages.debug.weightSubtitle}</p>
+            </>
+          }
+          bodyClassName="stack"
+        >
+          {unitQuantityTests.map((test) => (
+            <TestResultCard
+              key={`${test.input}-${test.expectedName}`}
+              title={test.input}
+              expected={
+                <>
+                  {test.expectedName}
+                  {` · ${test.expectedQuantity}`}
                   {typeof test.expectedQuantityValue === 'number'
                     ? ` · ${messages.labels.count} ${test.expectedQuantityValue}`
                     : ''}
@@ -237,7 +285,7 @@ export function DebugPage({
               passed={test.passed}
             />
           ))}
-          {!quantityHasFailures ? <div className="empty-state">{messages.pages.debug.allQuantityPass}</div> : null}
+          {!unitQuantityHasFailures ? <div className="empty-state">{messages.pages.debug.allWeightPass}</div> : null}
         </Card>
       ) : null}
 

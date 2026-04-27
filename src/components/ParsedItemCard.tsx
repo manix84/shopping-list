@@ -24,6 +24,7 @@ export function ParsedItemCard({ item, config, onRename, onToggle, onDelete }: P
           <input
             className="input"
             defaultValue={displayValue}
+            aria-label={`${messages.actions.editList}: ${displayValue}`}
             onBlur={(event) => {
               const nextValue = event.target.value.trim().replace(/\s+/g, ' ');
               if (nextValue !== displayValue) {

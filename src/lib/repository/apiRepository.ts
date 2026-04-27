@@ -16,6 +16,7 @@ export type ApiSettingsPayload = {
 
 const DEFAULT_TIMEOUT_MS = 800;
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? '';
+const skipBackendChecks = import.meta.env.VITE_SKIP_BACKEND_CHECKS === 'true';
 
 const apiUrl = (path: string): string => `${apiBaseUrl}${path}`;
 
@@ -38,6 +39,14 @@ const fetchWithTimeout = async (path: string, init: RequestInit = {}, timeoutMs 
 };
 
 export const checkBackendStatus = async (): Promise<BackendStatus> => {
+  if (skipBackendChecks) {
+    return {
+      state: 'offline',
+      health: { ok: false },
+      database: { ok: false },
+    };
+  }
+
   try {
     const healthResponse = await fetchWithTimeout('/api/health');
     if (!healthResponse.ok) {

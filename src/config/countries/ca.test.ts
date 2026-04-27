@@ -1,13 +1,74 @@
 import { describe, expect, it } from 'vitest';
+import { detectSection } from '../../lib/sections';
 import { CA_CONFIG } from './ca';
 
 describe('Canada config', () => {
   it('includes the Canadian-specific aisles', () => {
     const pantry = CA_CONFIG.groups.find((group) => group.key === 'food_pantry');
     const snacks = pantry?.sections.find((section) => section.key === 'snacks');
+    const cereal = pantry?.sections.find((section) => section.key === 'cereal');
+    const tinnedJarred = pantry?.sections.find((section) => section.key === 'tinned_jarred');
+    const cookingIngredients = pantry?.sections.find((section) => section.key === 'cooking_ingredients');
+    const hotDrinks = pantry?.sections.find((section) => section.key === 'hot_drinks');
+    const drinks = pantry?.sections.find((section) => section.key === 'drinks');
+    const alcohol = pantry?.sections.find((section) => section.key === 'alcohol');
+    const fresh = CA_CONFIG.groups.find((group) => group.key === 'food_fresh');
+    const dairy = fresh?.sections.find((section) => section.key === 'chilled_milk_juice_cream');
+    const nonFood = CA_CONFIG.groups.find((group) => group.key === 'non_food_general');
+    const babyFood = nonFood?.sections.find((section) => section.key === 'baby_food');
+    const baby = nonFood?.sections.find((section) => section.key === 'baby');
+    const healthBeauty = nonFood?.sections.find((section) => section.key === 'health_beauty');
+    const seasonal = nonFood?.sections.find((section) => section.key === 'seasonal');
+    const freezers = CA_CONFIG.groups.find((group) => group.key === 'food_freezers');
+    const frozenTreats = freezers?.sections.find((section) => section.key === 'frozen_ice_cream');
+    const frozenFruit = freezers?.sections.find((section) => section.key === 'frozen_fruit');
+    const frozenMeals = freezers?.sections.find((section) => section.key === 'frozen_meals');
 
     expect(CA_CONFIG.code).toBe('ca');
     expect(CA_CONFIG.label).toBe('Canada');
+    expect(dairy?.keywords).toContain('bagged milk');
+    expect(cereal?.keywords).toContain('shreddies');
+    expect(cereal?.keywords).toContain('vector cereal');
+    expect(cereal?.keywords).toContain('pancake mix');
+    expect(tinnedJarred?.label).toBe('Canned & Packaged Goods');
+    expect(tinnedJarred?.keywords).toContain('black beans');
+    expect(tinnedJarred?.keywords).toContain('ketchup');
+    expect(cookingIngredients?.label).toBe('Baking & Cooking Ingredients');
+    expect(cookingIngredients?.keywords).toContain('canola oil');
+    expect(cookingIngredients?.keywords).toContain('taco kit');
+    expect(hotDrinks?.label).toBe('Coffee, Tea & Hot Drinks');
+    expect(hotDrinks?.keywords).toContain('coffee pods');
+    expect(hotDrinks?.keywords).toContain('tea bags');
+    expect(snacks?.label).toBe('Snacks, Candy & Sweets');
     expect(snacks?.keywords).toContain('ketchup chips');
+    expect(snacks?.keywords).toContain('gum');
+    expect(drinks?.keywords).toContain('pop');
+    expect(drinks?.keywords).toContain('canada dry');
+    expect(drinks?.keywords).toContain('lemon pepsi zero');
+    expect(drinks?.keywords).not.toContain('lemon pepsi max');
+    expect(drinks?.keywords).toContain('coke zero cherry');
+    expect(alcohol?.keywords).toContain('cider');
+    expect(alcohol?.keywords).toContain('kopparberg alcohol free pear');
+    expect(alcohol?.keywords).toContain('rekorderlig pear and apple');
+    expect(frozenTreats?.keywords).toContain('frozen yogurt');
+    expect(frozenFruit?.keywords).toContain('summer fruits');
+    expect(frozenMeals?.keywords).toContain('frozen perogies');
+    expect(babyFood?.label).toBe('Baby Food & Formula');
+    expect(babyFood?.keywords).toContain('infant formula');
+    expect(baby?.keywords).toContain('diapers');
+    expect(healthBeauty?.label).toBe('Personal Care / Pharmacy');
+    expect(healthBeauty?.keywords).toContain('first aid items');
+    expect(seasonal?.keywords).toContain('school supplies');
+  });
+
+  it('routes common Canadian grocery items to the expected aisles', () => {
+    expect(detectSection('black beans', CA_CONFIG)).toBe('tinned_jarred');
+    expect(detectSection('tomatoes', CA_CONFIG)).toBe('produce');
+    expect(detectSection('canola oil', CA_CONFIG)).toBe('cooking_ingredients');
+    expect(detectSection('coffee pods', CA_CONFIG)).toBe('hot_drinks');
+    expect(detectSection('ketchup chips', CA_CONFIG)).toBe('snacks');
+    expect(detectSection('baby formula', CA_CONFIG)).toBe('baby_food');
+    expect(detectSection('diapers', CA_CONFIG)).toBe('baby');
+    expect(detectSection('school supplies', CA_CONFIG)).toBe('seasonal');
   });
 });

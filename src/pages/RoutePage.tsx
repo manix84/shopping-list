@@ -58,6 +58,7 @@ export function RoutePage({
                     className={`button button-icon ${viewMode === option.mode ? 'button-active' : ''}`}
                     onClick={() => onViewModeChange(option.mode)}
                     aria-label={getRouteViewLabel(option.mode, messages)}
+                    aria-pressed={viewMode === option.mode}
                     title={getRouteViewLabel(option.mode, messages)}
                   >
                     <svg aria-hidden="true" className="button-icon-svg" viewBox="0 0 24 24">
@@ -72,6 +73,9 @@ export function RoutePage({
                 className={`button button-icon ${isFilterVisible ? 'button-active' : ''}`}
                 onClick={onToggleFilter}
                 aria-label={messages.actions.filterItems}
+                aria-pressed={isFilterVisible}
+                aria-expanded={isFilterVisible}
+                aria-controls={isFilterVisible ? 'route-filter-input' : undefined}
                 title={messages.actions.filterItems}
               >
                 <svg aria-hidden="true" className="button-icon-svg" viewBox="0 0 24 24">
@@ -81,9 +85,11 @@ export function RoutePage({
             </div>
             {isFilterVisible ? (
               <input
+                id="route-filter-input"
                 className="input route-filter-input"
                 value={query}
                 onChange={(event) => onQueryChange(event.target.value)}
+                aria-label={messages.actions.filterItems}
                 placeholder={messages.pages.route.filterPlaceholder}
               />
             ) : null}

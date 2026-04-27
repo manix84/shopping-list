@@ -11,10 +11,11 @@ export function PageTabs({ page, hasItems, onChange }: PageTabsProps) {
   const { messages } = useI18n();
 
   return (
-    <div className="button-row">
+    <nav className="button-row" aria-label={messages.app.title}>
       <button
         type="button"
         className={`button ${page === 'edit' ? 'button-active' : ''}`}
+        aria-current={page === 'edit' ? 'page' : undefined}
         onClick={() => onChange('edit')}
       >
         {messages.nav.editList}
@@ -22,13 +23,20 @@ export function PageTabs({ page, hasItems, onChange }: PageTabsProps) {
       <button
         type="button"
         className={`button ${page === 'route' ? 'button-active' : ''}`}
+        aria-current={page === 'route' ? 'page' : undefined}
+        aria-disabled={!hasItems}
         onClick={() => onChange(hasItems ? 'route' : 'edit')}
       >
         {messages.nav.route}
       </button>
-      <button type="button" className={`button ${page === 'settings' ? 'button-active' : ''}`} onClick={() => onChange('settings')}>
+      <button
+        type="button"
+        className={`button ${page === 'settings' ? 'button-active' : ''}`}
+        aria-current={page === 'settings' ? 'page' : undefined}
+        onClick={() => onChange('settings')}
+      >
         {messages.nav.settings}
       </button>
-    </div>
+    </nav>
   );
 }
