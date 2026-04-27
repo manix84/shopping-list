@@ -195,6 +195,11 @@ export const nl: Messages = {
     checking: 'Controleren',
     issue: 'Offline',
     frontendOnly: 'Offline',
+    offlineTitle: 'Offline werken',
+    offlineDescription:
+      'Offline betekent niet dat er iets stuk is. Je kunt de app op dit apparaat blijven gebruiken zonder server.',
+    offlineSyncDescription:
+      'Wanneer de backend weer bereikbaar is, wordt je lijst automatisch gesynchroniseerd.',
   },
   sharing: {
     cameraUnavailable: 'Camera-toegang is niet beschikbaar op dit apparaat.',

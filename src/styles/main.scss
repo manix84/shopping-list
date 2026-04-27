@@ -1129,6 +1129,51 @@ select {
   will-change: opacity;
 }
 
+.connection-badge-shell {
+  position: relative;
+}
+
+.connection-badge-button {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+}
+
+.connection-badge-button:disabled {
+  cursor: default;
+}
+
+.connection-badge-button:focus-visible {
+  border-radius: 999px;
+  outline: 2px solid $primary;
+  outline-offset: 3px;
+}
+
+.connection-popover {
+  background: $panel;
+  border: 1px solid $border;
+  border-radius: 8px;
+  box-shadow: $shadow;
+  color: $text;
+  font-size: 13px;
+  inline-size: min(280px, calc(100vw - 32px));
+  line-height: 1.45;
+  padding: 12px;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: 20;
+}
+
+.connection-popover p {
+  color: $muted;
+  margin: 6px 0 0;
+}
+
 .connection-badge-leaving {
   animation: connection-badge-fade-out 0.25s ease-in both;
 }

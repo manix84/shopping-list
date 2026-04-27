@@ -194,6 +194,11 @@ export const ro: Messages = {
     checking: 'Se verifică',
     issue: 'Offline',
     frontendOnly: 'Offline',
+    offlineTitle: 'Lucru offline',
+    offlineDescription:
+      'Offline nu înseamnă că ceva este stricat. Poți continua să folosești aplicația pe acest dispozitiv fără server.',
+    offlineSyncDescription:
+      'Când backendul devine din nou disponibil, lista se va sincroniza automat.',
   },
   sharing: {
     cameraUnavailable:

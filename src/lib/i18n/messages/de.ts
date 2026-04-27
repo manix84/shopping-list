@@ -197,6 +197,11 @@ export const de: Messages = {
     checking: 'Prüfung',
     issue: 'Offline',
     frontendOnly: 'Offline',
+    offlineTitle: 'Offline arbeiten',
+    offlineDescription:
+      'Offline heißt nicht kaputt. Du kannst die App auf diesem Gerät weiter ohne Server verwenden.',
+    offlineSyncDescription:
+      'Wenn das Backend wieder erreichbar ist, wird deine Liste automatisch synchronisiert.',
   },
   sharing: {
     cameraUnavailable: 'Kamerazugriff ist auf diesem Gerät nicht verfügbar.',

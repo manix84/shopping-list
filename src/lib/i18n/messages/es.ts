@@ -192,6 +192,11 @@ export const es: Messages = {
     checking: 'Comprobando',
     issue: 'Sin conexión',
     frontendOnly: 'Sin conexión',
+    offlineTitle: 'Funcionando sin conexión',
+    offlineDescription:
+      'Sin conexión no significa que esté roto. Puedes seguir usando la app en este dispositivo sin el servidor.',
+    offlineSyncDescription:
+      'Cuando el backend vuelva a estar disponible, tu lista se sincronizará automáticamente.',
   },
   sharing: {
     cameraUnavailable:

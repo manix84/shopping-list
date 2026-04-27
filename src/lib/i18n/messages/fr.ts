@@ -200,6 +200,11 @@ export const fr: Messages = {
     checking: 'Vérification',
     issue: 'Hors ligne',
     frontendOnly: 'Hors ligne',
+    offlineTitle: 'Fonctionnement hors ligne',
+    offlineDescription:
+      'Hors ligne ne veut pas dire cassé. Vous pouvez continuer à utiliser l’application sur cet appareil sans le serveur.',
+    offlineSyncDescription:
+      'Quand le backend sera de nouveau disponible, votre liste se synchronisera automatiquement.',
   },
   sharing: {
     cameraUnavailable:

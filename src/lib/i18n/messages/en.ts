@@ -187,6 +187,11 @@ export const en: Messages = {
     checking: 'Checking',
     issue: 'Offline',
     frontendOnly: 'Offline',
+    offlineTitle: 'Working offline',
+    offlineDescription:
+      'Offline does not mean broken. You can keep using the app on this device without the server.',
+    offlineSyncDescription:
+      'When the backend is reachable again, your list will sync back up automatically.',
   },
   sharing: {
     cameraUnavailable: 'Camera access is not available on this device.',

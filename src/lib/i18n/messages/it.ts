@@ -195,6 +195,11 @@ export const it: Messages = {
     checking: 'Controllo',
     issue: 'Offline',
     frontendOnly: 'Offline',
+    offlineTitle: 'Uso offline',
+    offlineDescription:
+      'Offline non significa rotto. Puoi continuare a usare l’app su questo dispositivo senza il server.',
+    offlineSyncDescription:
+      'Quando il backend sarà di nuovo raggiungibile, la lista verrà sincronizzata automaticamente.',
   },
   sharing: {
     cameraUnavailable:

@@ -174,6 +174,9 @@ export type Messages = {
     checking: string;
     issue: string;
     frontendOnly: string;
+    offlineTitle: string;
+    offlineDescription: string;
+    offlineSyncDescription: string;
   };
   sharing: {
     cameraUnavailable: string;

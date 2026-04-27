@@ -193,6 +193,11 @@ export const pi: Messages = {
     checking: 'Lookout',
     issue: 'Adrift',
     frontendOnly: 'Adrift',
+    offlineTitle: 'Sailin’ offline',
+    offlineDescription:
+      'Offline does not mean broken. Ye can keep using the app on this device without the backend hold.',
+    offlineSyncDescription:
+      'When the backend be reachable again, yer list will sync back up automatically.',
   },
   sharing: {
     cameraUnavailable: 'Camera access be unavailable on this device.',
