@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { detectSection } from '../../lib/sections';
 import { US_CONFIG } from './us';
 
 describe('US config', () => {
@@ -11,14 +12,37 @@ describe('US config', () => {
     const frozenMeals = freezers?.sections.find((section) => section.key === 'frozen_meals');
     const pantry = US_CONFIG.groups.find((group) => group.key === 'food_pantry');
     const cereal = pantry?.sections.find((section) => section.key === 'cereal');
+    const tinnedJarred = pantry?.sections.find((section) => section.key === 'tinned_jarred');
+    const cookingIngredients = pantry?.sections.find((section) => section.key === 'cooking_ingredients');
+    const hotDrinks = pantry?.sections.find((section) => section.key === 'hot_drinks');
+    const snacks = pantry?.sections.find((section) => section.key === 'snacks');
     const drinks = pantry?.sections.find((section) => section.key === 'drinks');
     const alcohol = pantry?.sections.find((section) => section.key === 'alcohol');
+    const nonFood = US_CONFIG.groups.find((group) => group.key === 'non_food_general');
+    const babyFood = nonFood?.sections.find((section) => section.key === 'baby_food');
+    const baby = nonFood?.sections.find((section) => section.key === 'baby');
+    const healthBeauty = nonFood?.sections.find((section) => section.key === 'health_beauty');
+    const seasonal = nonFood?.sections.find((section) => section.key === 'seasonal');
 
     expect(US_CONFIG.code).toBe('us');
     expect(US_CONFIG.label).toBe('United States');
     expect(seafood?.keywords).toContain('shrimp');
+    expect(seafood?.keywords).toContain('smoked salmon');
     expect(cereal?.keywords).toContain('frosted flakes');
     expect(cereal?.keywords).toContain('lucky charms');
+    expect(cereal?.keywords).toContain('pancake mix');
+    expect(tinnedJarred?.label).toBe('Canned & Packaged Goods');
+    expect(tinnedJarred?.keywords).toContain('black beans');
+    expect(tinnedJarred?.keywords).toContain('ketchup');
+    expect(cookingIngredients?.label).toBe('Baking & Cooking Ingredients');
+    expect(cookingIngredients?.keywords).toContain('cake mix');
+    expect(cookingIngredients?.keywords).toContain('taco kit');
+    expect(hotDrinks?.label).toBe('Coffee, Tea & Hot Drinks');
+    expect(hotDrinks?.keywords).toContain('coffee pods');
+    expect(hotDrinks?.keywords).toContain('tea bags');
+    expect(snacks?.label).toBe('Snacks, Candy & Sweets');
+    expect(snacks?.keywords).toContain('candy bars');
+    expect(snacks?.keywords).toContain('gum');
     expect(drinks?.keywords).toContain('cherry pepsi');
     expect(drinks?.keywords).toContain('diet coke');
     expect(drinks?.keywords).toContain('mango pepsi zero');
@@ -30,5 +54,22 @@ describe('US config', () => {
     expect(frozenTreats?.keywords).toContain('popsicles');
     expect(frozenFruit?.keywords).toContain('frozen blueberries');
     expect(frozenMeals?.keywords).toContain('frozen dumplings');
+    expect(babyFood?.label).toBe('Baby Food & Formula');
+    expect(babyFood?.keywords).toContain('infant formula');
+    expect(baby?.keywords).toContain('diapers');
+    expect(healthBeauty?.label).toBe('Personal Care / Pharmacy');
+    expect(healthBeauty?.keywords).toContain('first aid');
+    expect(seasonal?.keywords).toContain('school supplies');
+  });
+
+  it('routes common US grocery items to the expected aisles', () => {
+    expect(detectSection('black beans', US_CONFIG)).toBe('tinned_jarred');
+    expect(detectSection('tomatoes', US_CONFIG)).toBe('produce');
+    expect(detectSection('cake mix', US_CONFIG)).toBe('cooking_ingredients');
+    expect(detectSection('coffee pods', US_CONFIG)).toBe('hot_drinks');
+    expect(detectSection('candy bars', US_CONFIG)).toBe('snacks');
+    expect(detectSection('baby formula', US_CONFIG)).toBe('baby_food');
+    expect(detectSection('diapers', US_CONFIG)).toBe('baby');
+    expect(detectSection('school supplies', US_CONFIG)).toBe('seasonal');
   });
 });
