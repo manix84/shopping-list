@@ -8,6 +8,7 @@ describe('UK config', () => {
     const cereal = cupboard?.sections.find((section) => section.key === 'cereal');
     const snacks = cupboard?.sections.find((section) => section.key === 'snacks');
     const tinnedJarred = cupboard?.sections.find((section) => section.key === 'tinned_jarred');
+    const homeBaking = cupboard?.sections.find((section) => section.key === 'home_baking');
     const cookingIngredients = cupboard?.sections.find((section) => section.key === 'cooking_ingredients');
     const hotDrinks = cupboard?.sections.find((section) => section.key === 'hot_drinks');
     const drinks = cupboard?.sections.find((section) => section.key === 'drinks');
@@ -31,6 +32,15 @@ describe('UK config', () => {
     expect(tinnedJarred?.label).toBe('Tinned & Jarred Goods');
     expect(tinnedJarred?.keywords).toContain('baked beans');
     expect(tinnedJarred?.keywords).toContain('tinned tomatoes');
+    expect(homeBaking?.label).toBe('Home Baking');
+    expect(homeBaking?.keywords).toContain('eggs');
+    expect(homeBaking?.keywords).toContain('plain flour');
+    expect(homeBaking?.keywords).toContain('baking powder');
+    expect(homeBaking?.keywords).toContain('cream of tartar');
+    expect(homeBaking?.keywords).toContain('golden syrup');
+    expect(homeBaking?.keywords).toContain('edible glitter');
+    expect(homeBaking?.keywords).toContain('sultanas');
+    expect(homeBaking?.keywords).toContain('custard powder');
     expect(cookingIngredients?.label).toBe('Cooking Ingredients & World Foods');
     expect(cookingIngredients?.keywords).toContain('soy sauce');
     expect(cookingIngredients?.keywords).toContain('fajita kit');

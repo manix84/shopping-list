@@ -25,6 +25,7 @@ export type SectionKey =
   | 'cereal'
   | 'baby_food'
   | 'tinned_jarred'
+  | 'home_baking'
   | 'cooking_ingredients'
   | 'hot_drinks'
   | 'seafood_counter'
@@ -51,6 +52,7 @@ export type Item = {
   sizeValue?: 'S' | 'M' | 'L';
   quantity?: string;
   quantityValue?: number;
+  variant?: string;
   matchedSection: SectionKey;
 };
 
@@ -96,6 +98,13 @@ export type CountryConfig = {
   groups: SectionGroup[];
 };
 
+export type ConfigTestResult = {
+  title: string;
+  expected: string;
+  actual: string;
+  passed: boolean;
+};
+
 export type GroupedSectionView = {
   key: SectionKey;
   label: string;
@@ -124,6 +133,13 @@ export type UnitQuantityTestCase = {
   expectedQuantityValue?: number;
 };
 
+export type VariantTestCase = {
+  input: string;
+  expectedName: string;
+  expectedVariant?: string;
+  expectedSection: SectionKey;
+};
+
 export type MatcherTestResult = MatcherTestCase & {
   actualSection: SectionKey;
   passed: boolean;
@@ -142,7 +158,21 @@ export type UnitQuantityTestResult = UnitQuantityTestCase & {
   passed: boolean;
 };
 
+export type VariantTestResult = VariantTestCase & {
+  actualName: string;
+  actualVariant?: string;
+  actualSection: SectionKey;
+  passed: boolean;
+};
+
 export type StorageTestResult = {
+  title: string;
+  expected: string;
+  actual: string;
+  passed: boolean;
+};
+
+export type StateTestResult = {
   title: string;
   expected: string;
   actual: string;

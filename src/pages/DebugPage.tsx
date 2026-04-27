@@ -1,12 +1,15 @@
 import { useState } from 'react';
 import type {
   BackendStatus,
+  ConfigTestResult,
   CountQuantityTestResult,
   CountryConfig,
   Item,
   MatcherTestResult,
+  StateTestResult,
   StorageTestResult,
   UnitQuantityTestResult,
+  VariantTestResult,
 } from '../types';
 import { Card } from '../components/Card';
 import { ParsedItemCard } from '../components/ParsedItemCard';
@@ -20,13 +23,19 @@ type DebugPageProps = {
   items: Item[];
   config: CountryConfig;
   matcherTests: MatcherTestResult[];
+  configTests: ConfigTestResult[];
   countQuantityTests: CountQuantityTestResult[];
   unitQuantityTests: UnitQuantityTestResult[];
+  variantTests: VariantTestResult[];
   storageTests: StorageTestResult[];
+  stateTests: StateTestResult[];
   matcherHasFailures: boolean;
+  configHasFailures: boolean;
   countQuantityHasFailures: boolean;
   unitQuantityHasFailures: boolean;
+  variantHasFailures: boolean;
   storageHasFailures: boolean;
+  stateHasFailures: boolean;
   onRenameItem: (itemId: string, nextRaw: string) => void;
   onToggleItem: (itemId: string) => void;
   onDeleteItem: (itemId: string) => void;
@@ -52,20 +61,36 @@ const backendStateLabel = (status: BackendStatus, messages: Messages) => {
 
 const checkLabel = (passed: boolean, messages: Messages) => (passed ? messages.pages.debug.pass : messages.pages.debug.fail);
 
-type DebugTabKey = 'parsed' | 'backend' | 'matcher' | 'quantity' | 'weights' | 'sections' | 'storage';
+type DebugTabKey =
+  | 'parsed'
+  | 'state'
+  | 'backend'
+  | 'config'
+  | 'matcher'
+  | 'quantity'
+  | 'weights'
+  | 'variants'
+  | 'sections'
+  | 'storage';
 
 export function DebugPage({
   backendStatus,
   items,
   config,
   matcherTests,
+  configTests,
   countQuantityTests,
   unitQuantityTests,
+  variantTests,
   storageTests,
+  stateTests,
   matcherHasFailures,
+  configHasFailures,
   countQuantityHasFailures,
   unitQuantityHasFailures,
+  variantHasFailures,
   storageHasFailures,
+  stateHasFailures,
   onRenameItem,
   onToggleItem,
   onDeleteItem,
@@ -76,10 +101,13 @@ export function DebugPage({
   const [activeTab, setActiveTab] = useState<DebugTabKey>('parsed');
   const debugTabs: Array<{ key: DebugTabKey; label: string }> = [
     { key: 'parsed', label: messages.pages.debug.tabParsed },
+    { key: 'state', label: messages.pages.debug.tabState },
     { key: 'backend', label: messages.pages.debug.tabBackend },
+    { key: 'config', label: messages.pages.debug.tabConfig },
     { key: 'matcher', label: messages.pages.debug.tabMatcher },
     { key: 'quantity', label: messages.pages.debug.tabQuantity },
     { key: 'weights', label: messages.pages.debug.tabWeights },
+    { key: 'variants', label: messages.pages.debug.tabVariants },
     { key: 'sections', label: messages.pages.debug.tabSections },
     { key: 'storage', label: messages.pages.debug.tabStorage },
   ];
@@ -147,6 +175,29 @@ export function DebugPage({
         </Card>
       ) : null}
 
+      {activeTab === 'state' ? (
+        <Card
+          header={
+            <>
+              <h2 className="title title-sm">{messages.pages.debug.stateTitle}</h2>
+              <p className="subtitle">{messages.pages.debug.stateSubtitle}</p>
+            </>
+          }
+          bodyClassName="stack"
+        >
+          {stateTests.map((test) => (
+            <TestResultCard
+              key={test.title}
+              title={test.title}
+              expected={test.expected}
+              actual={test.actual}
+              passed={test.passed}
+            />
+          ))}
+          {!stateHasFailures ? <div className="empty-state">{messages.pages.debug.allStatePass}</div> : null}
+        </Card>
+      ) : null}
+
       {activeTab === 'backend' ? (
         <Card
           header={
@@ -189,6 +240,29 @@ export function DebugPage({
             tone={checkTone(backendStatus.database.ok)}
             label={checkLabel(backendStatus.database.ok, messages)}
           />
+        </Card>
+      ) : null}
+
+      {activeTab === 'config' ? (
+        <Card
+          header={
+            <>
+              <h2 className="title title-sm">{messages.pages.debug.configTitle}</h2>
+              <p className="subtitle">{messages.pages.debug.configSubtitle}</p>
+            </>
+          }
+          bodyClassName="stack"
+        >
+          {configTests.map((test) => (
+            <TestResultCard
+              key={test.title}
+              title={test.title}
+              expected={test.expected}
+              actual={test.actual}
+              passed={test.passed}
+            />
+          ))}
+          {!configHasFailures ? <div className="empty-state">{messages.pages.debug.allConfigPass}</div> : null}
         </Card>
       ) : null}
 
@@ -286,6 +360,33 @@ export function DebugPage({
             />
           ))}
           {!unitQuantityHasFailures ? <div className="empty-state">{messages.pages.debug.allWeightPass}</div> : null}
+        </Card>
+      ) : null}
+
+      {activeTab === 'variants' ? (
+        <Card
+          header={
+            <>
+              <h2 className="title title-sm">{messages.pages.debug.variantTitle}</h2>
+              <p className="subtitle">{messages.pages.debug.variantSubtitle}</p>
+            </>
+          }
+          bodyClassName="stack"
+        >
+          {variantTests.map((test) => (
+            <TestResultCard
+              key={`${test.input}-${test.expectedName}-${test.expectedVariant ?? 'none'}`}
+              title={test.input}
+              expected={`${test.expectedName}${
+                test.expectedVariant ? ` · ${messages.labels.variant} ${test.expectedVariant}` : ''
+              } · ${test.expectedSection}`}
+              actual={`${test.actualName}${
+                test.actualVariant ? ` · ${messages.labels.variant} ${test.actualVariant}` : ''
+              } · ${test.actualSection}`}
+              passed={test.passed}
+            />
+          ))}
+          {!variantHasFailures ? <div className="empty-state">{messages.pages.debug.allVariantPass}</div> : null}
         </Card>
       ) : null}
 

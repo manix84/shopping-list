@@ -69,6 +69,7 @@ export const es: Messages = {
     unavailable: 'No disponible',
     unknown: 'desconocido',
     updated: 'actualizado',
+    variant: 'Variante',
   },
   pages: {
     edit: {
@@ -129,10 +130,13 @@ export const es: Messages = {
       parsedSubtitle:
         'Inspecciona y ajusta manualmente los elementos estructurados generados desde la lista actual.',
       tabParsed: 'Procesados',
+      tabState: 'Estado',
       tabBackend: 'Backend',
+      tabConfig: 'Config',
       tabMatcher: 'Clasificador',
       tabQuantity: 'Cantidades',
       tabWeights: 'Pesos',
+      tabVariants: 'Variantes',
       tabSections: 'Secciones',
       tabStorage: 'Almacenamiento',
       backendTitle: 'Comprobaciones del backend',
@@ -148,6 +152,9 @@ export const es: Messages = {
       databaseTitle: 'Base de datos',
       databaseExpected:
         'GET /api/database/status puede leer el almacenamiento del backend',
+      configTitle: 'Comprobaciones de configuración de país',
+      configSubtitle:
+        'Valida la estructura del perfil, la cobertura de palabras clave y su sección propietaria.',
       matcherTitle: 'Comprobaciones del clasificador',
       matcherSubtitle:
         'Pruebas ligeras para que las regresiones de agrupación se vean enseguida al construir.',
@@ -157,13 +164,22 @@ export const es: Messages = {
       weightTitle: 'Comprobaciones de pesos y unidades',
       weightSubtitle:
         'Los pesos y unidades como 500g o 1.5kg siguen unidos al artículo, incluso cuando también hay una cantidad.',
+      variantTitle: 'Comprobaciones de variantes',
+      variantSubtitle:
+        'Sabores, estilos de leche y descriptores parecidos se mantienen separados del producto base.',
       storageTitle: 'Comprobaciones de almacenamiento',
       storageSubtitle:
         'Los datos deben redondearse limpiamente a través del almacenamiento local y cualquier futura base de datos.',
+      stateTitle: 'Comprobaciones de estado',
+      stateSubtitle:
+        'Valida la lista actual contra el parser, el clasificador, las variantes, el progreso y la identidad.',
       allMatcherPass: 'Todas las comprobaciones del clasificador pasan.',
       allQuantityPass: 'Todas las comprobaciones de cantidades contadas pasan.',
       allWeightPass: 'Todas las comprobaciones de pesos y unidades pasan.',
+      allVariantPass: 'Todas las comprobaciones de variantes pasan.',
       allStoragePass: 'Todas las comprobaciones de almacenamiento pasan.',
+      allStatePass: 'Todas las comprobaciones de estado pasan.',
+      allConfigPass: 'Todas las comprobaciones de configuración pasan.',
       expected: 'esperado',
       got: 'obtenido',
       pass: 'Pasa',

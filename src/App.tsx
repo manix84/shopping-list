@@ -2,7 +2,15 @@ import { useEffect, useMemo, useState } from 'react';
 import { COUNTRY_CONFIGS } from './config/countries';
 import { AppHeader } from './components/AppHeader';
 import { PwaSplashScreen } from './components/PwaSplashScreen';
-import { runCountQuantityTests, runMatcherTests, runStorageTests, runUnitQuantityTests } from './lib/debugTests';
+import {
+  runCountQuantityTests,
+  runConfigTests,
+  runMatcherTests,
+  runStateTests,
+  runStorageTests,
+  runUnitQuantityTests,
+  runVariantTests,
+} from './lib/debugTests';
 import {
   applyDocumentLocale,
   createMessages,
@@ -32,6 +40,7 @@ import { loadRouteViewMode, saveRouteViewMode } from './lib/routeViewPreference'
 import { getResolvedTheme, loadThemeMode, saveThemeMode } from './lib/themePreference';
 import { createUuidV7 } from './lib/uuid';
 import { formatCountQuantity } from './lib/quantity';
+import { extractVariant } from './lib/variant';
 import { DebugPage } from './pages/DebugPage';
 import { EditPage } from './pages/EditPage';
 import { RoutePage } from './pages/RoutePage';
@@ -553,8 +562,10 @@ export default function App() {
   }, [isLoaded, items.length, page]);
 
   const matcherTests = useMemo(() => runMatcherTests(config), [config]);
+  const configTests = useMemo(() => runConfigTests(config), [config]);
   const countQuantityTests = useMemo(() => runCountQuantityTests(), []);
   const unitQuantityTests = useMemo(() => runUnitQuantityTests(), []);
+  const variantTests = useMemo(() => runVariantTests(config), [config]);
   const storageTests = useMemo(() => runStorageTests(), []);
 
   const grouped = useMemo((): GroupedSectionView[] => {
@@ -588,6 +599,19 @@ export default function App() {
   const total = items.length;
   const checkedTotal = items.filter((item) => item.checked).length;
   const progress = total === 0 ? 0 : Math.round((checkedTotal / total) * 100);
+  const stateTests = useMemo(
+    () =>
+      runStateTests({
+        input,
+        items,
+        config,
+        countryCode,
+        activeListId,
+        isServerBackedList,
+        checkedTotal,
+      }),
+    [activeListId, checkedTotal, config, countryCode, input, isServerBackedList, items],
+  );
 
   const handleParse = () => {
     setItems((current) => parseItems(input, config, current));
@@ -630,10 +654,12 @@ export default function App() {
     setItems((current) => {
       const target = current.find((item) => item.id === itemId);
       if (!target) return current;
+      const nextRawVariant = extractVariant(cleanedRaw, config).variant;
 
       const nextStoredValue = [
         target.size,
         typeof target.quantityValue === 'number' ? formatCountQuantity(target.quantityValue) : undefined,
+        nextRawVariant ? undefined : target.variant,
         cleanedRaw,
         target.quantity,
       ].filter(Boolean).join(' ');
@@ -846,13 +872,19 @@ export default function App() {
                 items={items}
                 config={config}
                 matcherTests={matcherTests}
+                configTests={configTests}
                 countQuantityTests={countQuantityTests}
                 unitQuantityTests={unitQuantityTests}
+                variantTests={variantTests}
                 storageTests={storageTests}
+                stateTests={stateTests}
                 matcherHasFailures={matcherTests.some((test) => !test.passed)}
+                configHasFailures={configTests.some((test) => !test.passed)}
                 countQuantityHasFailures={countQuantityTests.some((test) => !test.passed)}
                 unitQuantityHasFailures={unitQuantityTests.some((test) => !test.passed)}
+                variantHasFailures={variantTests.some((test) => !test.passed)}
                 storageHasFailures={storageTests.some((test) => !test.passed)}
+                stateHasFailures={stateTests.some((test) => !test.passed)}
                 onRenameItem={handleRenameItem}
                 onToggleItem={toggleItem}
                 onDeleteItem={handleDeleteItem}

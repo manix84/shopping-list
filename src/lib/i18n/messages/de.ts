@@ -74,6 +74,7 @@ export const de: Messages = {
     unavailable: 'Nicht verfügbar',
     unknown: 'unbekannt',
     updated: 'aktualisiert',
+    variant: 'Variante',
   },
   pages: {
     ...en.pages,
@@ -135,10 +136,13 @@ export const de: Messages = {
       parsedSubtitle:
         'Prüfe und passe die strukturierten Artikel aus der aktuellen Liste manuell an.',
       tabParsed: 'Analysiert',
+      tabState: 'Status',
       tabBackend: 'Backend',
+      tabConfig: 'Config',
       tabMatcher: 'Matcher',
       tabQuantity: 'Mengen',
       tabWeights: 'Gewichte',
+      tabVariants: 'Varianten',
       tabSections: 'Bereiche',
       tabStorage: 'Speicher',
       backendTitle: 'Backend-Prüfungen',
@@ -153,6 +157,9 @@ export const de: Messages = {
       databaseTitle: 'Datenbank',
       databaseExpected:
         'GET /api/database/status kann den Backend-Speicher lesen',
+      configTitle: 'Länderprofil-Selbsttests',
+      configSubtitle:
+        'Prüft Profilstruktur, Keyword-Abdeckung und die zugehörigen Matcher-Bereiche.',
       matcherTitle: 'Matcher-Selbsttests',
       matcherSubtitle:
         'Leichte Prüfungen, damit Gruppierungsfehler sofort sichtbar werden.',
@@ -162,13 +169,22 @@ export const de: Messages = {
       weightTitle: 'Gewichts- und Einheiten-Selbsttests',
       weightSubtitle:
         'Gewichte und Einheiten wie 500g oder 1.5kg bleiben am Artikel hängen, auch wenn eine Zählmenge vorhanden ist.',
+      variantTitle: 'Varianten-Selbsttests',
+      variantSubtitle:
+        'Geschmacksrichtungen, Milchsorten und ähnliche Beschreibungen bleiben vom Basisprodukt getrennt.',
       storageTitle: 'Speicher-Selbsttests',
       storageSubtitle:
         'Daten sollten sauber durch lokalen Speicher und spätere Datenbanken laufen.',
+      stateTitle: 'Status-Selbsttests',
+      stateSubtitle:
+        'Prüft die aktuelle Liste gegen Parser, Matcher, Varianten, Fortschritt und Listenidentität.',
       allMatcherPass: 'Alle Matcher-Prüfungen bestehen.',
       allQuantityPass: 'Alle Zählmengen-Prüfungen bestehen.',
       allWeightPass: 'Alle Gewichts- und Einheiten-Prüfungen bestehen.',
+      allVariantPass: 'Alle Varianten-Prüfungen bestehen.',
       allStoragePass: 'Alle Speicher-Prüfungen bestehen.',
+      allStatePass: 'Alle Status-Prüfungen bestehen.',
+      allConfigPass: 'Alle Config-Prüfungen bestehen.',
       expected: 'erwartet',
       got: 'erhalten',
       pass: 'Bestanden',

@@ -70,6 +70,7 @@ export const en: Messages = {
     unavailable: 'Unavailable',
     unknown: 'unknown',
     updated: 'updated',
+    variant: 'Variant',
   },
   pages: {
     edit: {
@@ -127,10 +128,13 @@ export const en: Messages = {
       parsedSubtitle:
         'Inspect and manually adjust the structured items generated from the current list.',
       tabParsed: 'Parsed',
+      tabState: 'State',
       tabBackend: 'Backend',
+      tabConfig: 'Config',
       tabMatcher: 'Matcher',
       tabQuantity: 'Quantities',
       tabWeights: 'Weights',
+      tabVariants: 'Variants',
       tabSections: 'Sections',
       tabStorage: 'Storage',
       backendTitle: 'Backend checks',
@@ -143,6 +147,9 @@ export const en: Messages = {
       backendHealthExpected: 'GET /api/health returns OK',
       databaseTitle: 'Database',
       databaseExpected: 'GET /api/database/status can read the backend store',
+      configTitle: 'Country config self-checks',
+      configSubtitle:
+        'Validate the selected country profile shape, keyword coverage, and matcher ownership.',
       matcherTitle: 'Matcher self-checks',
       matcherSubtitle:
         'Lightweight checks so grouping regressions are obvious while building.',
@@ -152,13 +159,22 @@ export const en: Messages = {
       weightTitle: 'Weight and unit self-checks',
       weightSubtitle:
         'Weights and units like 500g or 1.5kg stay attached as item metadata, even when a count is present.',
+      variantTitle: 'Variant self-checks',
+      variantSubtitle:
+        'Flavours, milk styles, and similar descriptors stay separate from the base product.',
       storageTitle: 'Storage self-checks',
       storageSubtitle:
         'Record data should round-trip cleanly through local storage and any future database store.',
+      stateTitle: 'State self-checks',
+      stateSubtitle:
+        'Validate the current list state against the parser, matcher, variants, progress counters, and list identity.',
       allMatcherPass: 'All matcher checks are passing.',
       allQuantityPass: 'All count quantity checks are passing.',
       allWeightPass: 'All weight and unit checks are passing.',
+      allVariantPass: 'All variant checks are passing.',
       allStoragePass: 'All storage checks are passing.',
+      allStatePass: 'All state checks are passing.',
+      allConfigPass: 'All country config checks are passing.',
       expected: 'expected',
       got: 'got',
       pass: 'Pass',
