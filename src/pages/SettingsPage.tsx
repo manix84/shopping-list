@@ -71,6 +71,7 @@ function SettingsSelect<T extends string>({
 }) {
   const [open, setOpen] = useState(false);
   const selectedOption = options.find((option) => option.value === value) ?? options[0];
+  const menuId = `${id}-menu`;
 
   return (
     <div
@@ -87,7 +88,13 @@ function SettingsSelect<T extends string>({
         className="select settings-select-button"
         aria-haspopup="listbox"
         aria-expanded={open}
+        aria-controls={open ? menuId : undefined}
         onClick={() => setOpen((current) => !current)}
+        onKeyDown={(event) => {
+          if (event.key === 'Escape') {
+            setOpen(false);
+          }
+        }}
       >
         <span className="settings-option-content">
           {selectedOption.icon ? <span className="settings-option-icon-slot">{selectedOption.icon}</span> : null}
@@ -99,7 +106,7 @@ function SettingsSelect<T extends string>({
       </button>
 
       {open ? (
-        <div className="settings-select-menu" role="listbox" aria-labelledby={id}>
+        <div id={menuId} className="settings-select-menu" role="listbox" aria-labelledby={id}>
           {options.map((option) => (
             <button
               key={option.value}

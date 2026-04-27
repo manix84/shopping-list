@@ -97,7 +97,7 @@ export function AppHeader({ page, hasItems, backendStatus, onChangePage }: AppHe
 
               <div className="header-actions">
                 {badge && connectionBadgeVisible ? (
-                  <div className="connection-badge-shell">
+                  <div className="connection-badge-shell" aria-live="polite">
                     <button
                       type="button"
                       className="connection-badge-button"
@@ -135,7 +135,7 @@ export function AppHeader({ page, hasItems, backendStatus, onChangePage }: AppHe
                     type="button"
                     className="button mobile-menu-trigger"
                     aria-expanded={mobileMenuOpen}
-                    aria-controls="mobile-menu-panel"
+                    aria-controls={mobileMenuOpen ? 'mobile-menu-panel' : undefined}
                     onClick={() => setMobileMenuOpen((current) => !current)}
                   >
                     <span className="sr-only">{messages.mobileMenu.openNavigation}</span>

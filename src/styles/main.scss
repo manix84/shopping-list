@@ -208,6 +208,35 @@ select {
   border: 0;
 }
 
+.skip-link {
+  background: $panel;
+  border: 2px solid $primary;
+  border-radius: 8px;
+  color: $text;
+  font-weight: 700;
+  left: 24px;
+  padding: 10px 14px;
+  position: fixed;
+  top: 16px;
+  transform: translateY(-160%);
+  transition: transform 0.16s ease;
+  z-index: 1200;
+
+  &:focus {
+    transform: translateY(0);
+  }
+}
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  &:focus {
+    outline: none;
+  }
+}
+
 .shopping-shell {
   max-width: 1240px;
   margin: 0 auto;
@@ -363,6 +392,11 @@ select {
     transform: translateY(-1px);
   }
 
+  &:focus-visible {
+    outline: 2px solid $primary;
+    outline-offset: 2px;
+  }
+
   &-primary {
     background: $primary;
     border-color: $primary;
@@ -446,6 +480,11 @@ select {
   border-radius: 14px;
   padding: 12px 14px;
   color: $text;
+
+  &:focus-visible {
+    outline: 2px solid $primary;
+    outline-offset: 2px;
+  }
 }
 
 .settings-select {
@@ -777,6 +816,8 @@ select {
   border-radius: 22px;
   box-shadow: $shadow;
   display: flex;
+  flex-direction: column;
+  gap: 16px;
   justify-content: center;
   max-width: 560px;
   padding: 20px;
@@ -970,6 +1011,8 @@ select {
     animation: none;
   }
 
+  .button,
+  .skip-link,
   .share-qr-card,
   .share-qr-image,
   .share-qr-overlay,
@@ -979,6 +1022,11 @@ select {
   .share-scanner-frame-missing {
     animation: none;
     transition: none;
+  }
+
+  .button:hover,
+  .section-toggle:hover {
+    transform: none;
   }
 }
 

@@ -28,6 +28,7 @@ export type Messages = {
     add: string;
     backToEdit: string;
     backToSettings: string;
+    close: string;
     copy: string;
     createSharedLink: string;
     creating: string;
@@ -42,6 +43,7 @@ export type Messages = {
     remove: string;
     scanQrCode: string;
     stopScanning: string;
+    skipToMainContent: string;
     resetTicks: string;
     revealQrCode: string;
     resortFromList: string;
