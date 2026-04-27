@@ -66,6 +66,60 @@ body {
     sans-serif;
 }
 
+.pwa-splash {
+  align-items: center;
+  animation: pwa-splash-exit 0.42s ease 1.92s forwards;
+  background:
+    radial-gradient(circle at 50% 38%, color-mix(in srgb, $primary 16%, transparent) 0 28%, transparent 58%),
+    $bg;
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 32px;
+  position: fixed;
+  z-index: 1000;
+}
+
+.pwa-splash-content {
+  align-items: center;
+  animation: pwa-splash-content-in 0.42s ease-out both;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pwa-splash-logo {
+  display: block;
+  height: clamp(132px, 30vw, 192px);
+  width: clamp(132px, 30vw, 192px);
+}
+
+.pwa-splash-title {
+  color: $text;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+@keyframes pwa-splash-content-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes pwa-splash-exit {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
 button,
 input,
 textarea,
@@ -911,6 +965,11 @@ select {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .pwa-splash,
+  .pwa-splash-content {
+    animation: none;
+  }
+
   .share-qr-card,
   .share-qr-image,
   .share-qr-overlay,

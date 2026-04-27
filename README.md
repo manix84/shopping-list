@@ -137,6 +137,8 @@ Shared list API routes:
 
 The app includes a web app manifest, install icons, theme-aware browser favicons, and runtime theme-colour updates. Light, dark, and system theme choices update the browser/PWA chrome where the host OS supports dynamic `theme-color` changes. Some installed app shells cache manifest metadata, so reinstalling the PWA may be needed after manifest colour or icon changes.
 
+Installed PWA launches show an app-level animated splash using `public/logo-animated-once.svg`. Browser/OS native PWA splash screens are generated from the manifest icons and may remain static before the web app shell starts.
+
 ### Install it
 
 On supported browsers you can install the app with the browser's install action:
