@@ -171,8 +171,6 @@ export const US_CONFIG: CountryConfig = {
             'breakfast bars',
             'pancake mix',
             'waffle mix',
-            'maple syrup',
-            'syrup',
           ],
         },
         {
@@ -216,8 +214,8 @@ export const US_CONFIG: CountryConfig = {
           label: 'Pantry Staples',
           keywords: [
             'pantry', 'rice', 'white rice', 'brown rice', 'instant rice', 'rice mix', 'rice mixes', 'quinoa',
-            'couscous', 'broth', 'stock', 'peanut butter', 'jam', 'jelly', 'honey', 'mac and cheese',
-            'mac & cheese', 'boxed mac and cheese', 'boxed meal', 'boxed meal kit',
+            'couscous', 'broth', 'stock', 'peanut butter', 'jam', 'jelly', 'honey', 'maple syrup', 'syrup',
+            'mac and cheese', 'mac & cheese', 'boxed mac and cheese', 'boxed meal', 'boxed meal kit',
           ],
         },
         {

@@ -170,8 +170,6 @@ export const CA_CONFIG: CountryConfig = {
             'breakfast bars',
             'pancake mix',
             'waffle mix',
-            'maple syrup',
-            'syrup',
           ],
         },
         {
@@ -216,7 +214,7 @@ export const CA_CONFIG: CountryConfig = {
           keywords: [
             'pantry', 'rice', 'white rice', 'brown rice', 'instant rice', 'rice mix', 'rice mixes', 'quinoa',
             'couscous', 'grain blend', 'grain blends', 'broth', 'stock', 'peanut butter', 'jam', 'jelly',
-            'honey', 'mac and cheese', 'mac & cheese', 'boxed meal', 'boxed meal kit',
+            'honey', 'maple syrup', 'syrup', 'mac and cheese', 'mac & cheese', 'boxed meal', 'boxed meal kit',
           ],
         },
         {
