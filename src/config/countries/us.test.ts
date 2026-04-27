@@ -5,6 +5,10 @@ describe('US config', () => {
   it('includes the US-specific aisles', () => {
     const fresh = US_CONFIG.groups.find((group) => group.key === 'food_fresh');
     const seafood = fresh?.sections.find((section) => section.key === 'seafood_counter');
+    const freezers = US_CONFIG.groups.find((group) => group.key === 'food_freezers');
+    const frozenTreats = freezers?.sections.find((section) => section.key === 'frozen_ice_cream');
+    const frozenFruit = freezers?.sections.find((section) => section.key === 'frozen_fruit');
+    const frozenMeals = freezers?.sections.find((section) => section.key === 'frozen_meals');
     const pantry = US_CONFIG.groups.find((group) => group.key === 'food_pantry');
     const cereal = pantry?.sections.find((section) => section.key === 'cereal');
     const drinks = pantry?.sections.find((section) => section.key === 'drinks');
@@ -19,5 +23,8 @@ describe('US config', () => {
     expect(drinks?.keywords).toContain('mango pepsi zero');
     expect(drinks?.keywords).not.toContain('mango pepsi max');
     expect(drinks?.keywords).toContain('tropical coke zero');
+    expect(frozenTreats?.keywords).toContain('popsicles');
+    expect(frozenFruit?.keywords).toContain('frozen blueberries');
+    expect(frozenMeals?.keywords).toContain('frozen dumplings');
   });
 });

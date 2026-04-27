@@ -104,24 +104,22 @@ export const UK_CONFIG: CountryConfig = {
         {
           key: 'frozen_veg',
           label: 'Frozen Veg',
-          keywords: ['frozen veg', 'frozen vegetables', 'frozen peas', 'frozen sweetcorn', 'frozen broccoli'],
+          keywords: ['frozen veg', 'frozen vegetables', 'frozen peas', 'frozen sweetcorn', 'frozen broccoli', 'frozen spinach', 'frozen green beans', 'frozen mixed veg', 'frozen mixed vegetables', 'frozen carrots', 'frozen cauliflower', 'frozen edamame', 'frozen mushrooms', 'frozen peppers', 'frozen onions'],
         },
         {
           key: 'frozen_ice_cream',
           label: 'Ice Cream',
-          keywords: ['ice cream', 'icecream', 'ice-cream', 'gelato', 'sorbet', 'ice lolly', 'ice lollies'],
+          keywords: ['ice cream', 'icecream', 'ice-cream', 'gelato', 'sorbet', 'frozen yogurt', 'frozen yoghurt', 'frozen dessert', 'ice lolly', 'ice lollies', 'lolly', 'lollies', 'popsicle', 'ice pop', 'ice pops', 'ice cream cones', 'ice cream sandwich', 'ice cream sandwiches', 'magnum', 'cornetto', 'twister lolly', 'solero', 'fab lolly', 'calippo', 'ben and jerrys', 'ben and jerry\'s', 'haagen dazs', 'häagen-dazs'],
         },
         {
           key: 'frozen_fruit',
           label: 'Frozen Fruit',
-          keywords: ['frozen fruit', 'frozen berries', 'frozen mango', 'frozen strawberries', 'frozen blueberries'],
+          keywords: ['frozen fruit', 'frozen berries', 'frozen mixed berries', 'summer fruits', 'frozen summer fruits', 'frozen mango', 'frozen pineapple', 'frozen strawberries', 'frozen blueberries', 'frozen raspberries', 'frozen blackberries', 'frozen cherries', 'frozen peaches', 'frozen banana', 'smoothie mix', 'smoothie fruit'],
         },
         {
           key: 'frozen_meals',
           label: 'Frozen Meals',
-          keywords: [
-            'frozen pizza', 'frozen meal', 'frozen lasagna', 'frozen lasagne', 'frozen chips', 'chips', 'waffles', 'hash brown', 'hash browns', 'fish fingers',
-          ],
+          keywords: ['frozen pizza', 'frozen meal', 'frozen meals', 'frozen lasagna', 'frozen lasagne', 'frozen chips', 'chips', 'frozen fries', 'waffles', 'potato waffles', 'hash brown', 'hash browns', 'fish fingers', 'chicken nuggets', 'frozen chicken nuggets', 'chicken dippers', 'frozen burgers', 'frozen sausages', 'frozen garlic bread', 'garlic bread', 'frozen Yorkshire puddings', 'yorkshire puddings', 'frozen roast potatoes', 'roast potatoes', 'frozen onion rings', 'onion rings', 'frozen pies', 'frozen pie', 'frozen pastry', 'frozen prawns', 'frozen fish'],
         },
       ],
     },
