@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       LIGHTHOUSE_PRESET: desktop
+      LIGHTHOUSE_PERFORMANCE_MIN: '0.85'
       VITE_SKIP_BACKEND_CHECKS: 'true'
 
     steps:
