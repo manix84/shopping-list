@@ -60,7 +60,7 @@ describe('parser', () => {
 
     expect(items).toHaveLength(1);
     expect(items[0]).toMatchObject({
-      raw: 'Chicken Thighs',
+      raw: 'chicken thighs',
       quantity: '500g',
     });
     expect(getDisplayValue(items[0])).toBe('Chicken Thighs');
@@ -219,6 +219,35 @@ describe('parser', () => {
     expect(getVariantPrefixedDisplayValue(items[0])).toBe('Cherry Pepsi Max');
     expect(getStoredValue(items[2])).toBe('pear kopparberg cider');
     expect(getVariantPrefixedDisplayValue(items[2])).toBe('Pear Kopparberg Cider');
+  });
+
+  it('corrects common misspellings before matching and display', () => {
+    const items = parseItems('spagetti\nbrocoli\nstrawbery yogurt\nkopperberg pear cider\nparacetemol', UK_CONFIG);
+
+    expect(items).toHaveLength(5);
+    expect(items[0]).toMatchObject({
+      raw: 'spaghetti',
+      matchedSection: 'pasta',
+    });
+    expect(getDisplayValue(items[0])).toBe('Spaghetti');
+    expect(items[1]).toMatchObject({
+      raw: 'broccoli',
+      matchedSection: 'produce',
+    });
+    expect(items[2]).toMatchObject({
+      raw: 'yogurt',
+      variant: 'strawberry',
+      matchedSection: 'chilled_milk_juice_cream',
+    });
+    expect(items[3]).toMatchObject({
+      raw: 'kopparberg cider',
+      variant: 'pear',
+      matchedSection: 'alcohol',
+    });
+    expect(items[4]).toMatchObject({
+      raw: 'paracetamol',
+      matchedSection: 'health_beauty',
+    });
   });
 
   it('preserves checked state from previously saved combined variant names', () => {

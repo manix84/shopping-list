@@ -713,7 +713,6 @@ export const UK_CONFIG: CountryConfig = {
             'spaghetti',
             'bucatini',
             'linguine',
-            'linguini',
             'fettuccine',
             'capellini',
             'angel hair',

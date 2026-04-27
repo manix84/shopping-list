@@ -406,7 +406,7 @@ export const US_CONFIG: CountryConfig = {
           key: 'pasta',
           label: 'Pasta',
           keywords: [
-            'pasta', 'spaghetti', 'bucatini', 'linguine', 'linguini', 'fettuccine', 'capellini', 'angel hair', 'penne',
+            'pasta', 'spaghetti', 'bucatini', 'linguine', 'fettuccine', 'capellini', 'angel hair', 'penne',
             'rigatoni', 'fusilli', 'rotini', 'macaroni', 'elbows', 'cavatappi', 'manicotti', 'farfalle', 'bowties',
             'orecchiette', 'little ears', 'radiatore', 'orzo', 'ravioli', 'tortellini', 'gnocchi',
           ],
