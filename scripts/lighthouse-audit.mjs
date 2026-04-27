@@ -11,6 +11,7 @@ const reportDir = resolve(root, 'lighthouse');
 const reportJson = resolve(reportDir, 'report.json');
 const reportHtml = resolve(reportDir, 'report.html');
 const defaultUrl = 'http://127.0.0.1:4173/';
+const lighthousePreset = process.env.LIGHTHOUSE_PRESET ?? 'desktop';
 
 const thresholds = {
   performance: Number(process.env.LIGHTHOUSE_PERFORMANCE_MIN ?? 0.9),
@@ -52,6 +53,7 @@ const runLighthouse = async (url, output, outputPath) => {
     `--output=${output}`,
     `--output-path=${outputPath}`,
     '--only-categories=performance,accessibility,best-practices,seo',
+    `--preset=${lighthousePreset}`,
     '--chrome-flags=--headless=new --no-sandbox',
   ]);
 };

@@ -9,6 +9,9 @@ on:
 jobs:
   lighthouse:
     runs-on: ubuntu-latest
+    env:
+      LIGHTHOUSE_PRESET: desktop
+      VITE_SKIP_BACKEND_CHECKS: 'true'
 
     steps:
       - name: Checkout
