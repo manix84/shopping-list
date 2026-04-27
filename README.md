@@ -162,6 +162,14 @@ npm run build
 npm run preview
 ```
 
+Run a local Lighthouse audit against the production build:
+
+```bash
+npm run lighthouse
+```
+
+The audit writes `lighthouse/report.json` and `lighthouse/report.html`, and fails if the main Lighthouse category scores fall below the configured thresholds. You can audit an already deployed URL with `LIGHTHOUSE_URL=https://example.com npm run lighthouse`. On Apple Silicon, run this with an arm64 Node install; x64 Node under Rosetta is blocked by Lighthouse because it makes Chrome performance results unreliable.
+
 ## 🚢 Deployment
 
 The repo includes a GitHub Actions workflow in `.github/workflows/deploy-gh-pages.yml` that builds on push to `main` and publishes `dist/` to GitHub Pages.

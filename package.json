@@ -12,6 +12,7 @@
     "test:watch": "vitest",
     "typecheck": "tsc -b --pretty false",
     "build": "tsc -b && vite build",
+    "lighthouse": "npm run build && node scripts/lighthouse-audit.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -31,6 +32,7 @@
     "esbuild": "^0.28.0",
     "eslint": "^10.2.1",
     "globals": "^17.5.0",
+    "lighthouse": "^13.1.0",
     "sass": "^1.83.4",
     "typescript": "^5.5.4",
     "typescript-eslint": "^8.59.0",

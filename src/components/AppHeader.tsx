@@ -87,7 +87,7 @@ export function AppHeader({ page, hasItems, backendStatus, onChangePage }: AppHe
             <div className="title-row">
               <div className="title-block">
                 <div className="app-icon">
-                  <img className="app-icon-image" src={logoHref} alt="" />
+                  <img className="app-icon-image" src={logoHref} alt="" width="48" height="48" />
                 </div>
                 <div>
                   <h1 className="title">{messages.app.title}</h1>
