@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react';
 import { useI18n } from '../lib/i18n';
 
 const SPLASH_DURATION_MS = 2_350;
+const PWA_SPLASH_ENABLED = import.meta.env.VITE_ENABLE_PWA_SPLASH === 'true';
 
 const isStandalonePwa = (): boolean => {
-  if (typeof window === 'undefined') return false;
+  if (!PWA_SPLASH_ENABLED || typeof window === 'undefined') return false;
 
   const navigatorWithStandalone = window.navigator as Navigator & { standalone?: boolean };
   return window.matchMedia('(display-mode: standalone)').matches || navigatorWithStandalone.standalone === true;
