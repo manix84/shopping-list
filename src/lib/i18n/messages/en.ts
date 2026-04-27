@@ -130,6 +130,7 @@ export const en: Messages = {
       tabParsed: 'Parsed',
       tabState: 'State',
       tabBackend: 'Backend',
+      tabConfig: 'Config',
       tabMatcher: 'Matcher',
       tabQuantity: 'Quantities',
       tabWeights: 'Weights',
@@ -146,6 +147,9 @@ export const en: Messages = {
       backendHealthExpected: 'GET /api/health returns OK',
       databaseTitle: 'Database',
       databaseExpected: 'GET /api/database/status can read the backend store',
+      configTitle: 'Country config self-checks',
+      configSubtitle:
+        'Validate the selected country profile shape, keyword coverage, and matcher ownership.',
       matcherTitle: 'Matcher self-checks',
       matcherSubtitle:
         'Lightweight checks so grouping regressions are obvious while building.',
@@ -170,6 +174,7 @@ export const en: Messages = {
       allVariantPass: 'All variant checks are passing.',
       allStoragePass: 'All storage checks are passing.',
       allStatePass: 'All state checks are passing.',
+      allConfigPass: 'All country config checks are passing.',
       expected: 'expected',
       got: 'got',
       pass: 'Pass',

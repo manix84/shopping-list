@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type {
   BackendStatus,
+  ConfigTestResult,
   CountQuantityTestResult,
   CountryConfig,
   Item,
@@ -22,12 +23,14 @@ type DebugPageProps = {
   items: Item[];
   config: CountryConfig;
   matcherTests: MatcherTestResult[];
+  configTests: ConfigTestResult[];
   countQuantityTests: CountQuantityTestResult[];
   unitQuantityTests: UnitQuantityTestResult[];
   variantTests: VariantTestResult[];
   storageTests: StorageTestResult[];
   stateTests: StateTestResult[];
   matcherHasFailures: boolean;
+  configHasFailures: boolean;
   countQuantityHasFailures: boolean;
   unitQuantityHasFailures: boolean;
   variantHasFailures: boolean;
@@ -62,6 +65,7 @@ type DebugTabKey =
   | 'parsed'
   | 'state'
   | 'backend'
+  | 'config'
   | 'matcher'
   | 'quantity'
   | 'weights'
@@ -74,12 +78,14 @@ export function DebugPage({
   items,
   config,
   matcherTests,
+  configTests,
   countQuantityTests,
   unitQuantityTests,
   variantTests,
   storageTests,
   stateTests,
   matcherHasFailures,
+  configHasFailures,
   countQuantityHasFailures,
   unitQuantityHasFailures,
   variantHasFailures,
@@ -97,6 +103,7 @@ export function DebugPage({
     { key: 'parsed', label: messages.pages.debug.tabParsed },
     { key: 'state', label: messages.pages.debug.tabState },
     { key: 'backend', label: messages.pages.debug.tabBackend },
+    { key: 'config', label: messages.pages.debug.tabConfig },
     { key: 'matcher', label: messages.pages.debug.tabMatcher },
     { key: 'quantity', label: messages.pages.debug.tabQuantity },
     { key: 'weights', label: messages.pages.debug.tabWeights },
@@ -233,6 +240,29 @@ export function DebugPage({
             tone={checkTone(backendStatus.database.ok)}
             label={checkLabel(backendStatus.database.ok, messages)}
           />
+        </Card>
+      ) : null}
+
+      {activeTab === 'config' ? (
+        <Card
+          header={
+            <>
+              <h2 className="title title-sm">{messages.pages.debug.configTitle}</h2>
+              <p className="subtitle">{messages.pages.debug.configSubtitle}</p>
+            </>
+          }
+          bodyClassName="stack"
+        >
+          {configTests.map((test) => (
+            <TestResultCard
+              key={test.title}
+              title={test.title}
+              expected={test.expected}
+              actual={test.actual}
+              passed={test.passed}
+            />
+          ))}
+          {!configHasFailures ? <div className="empty-state">{messages.pages.debug.allConfigPass}</div> : null}
         </Card>
       ) : null}
 

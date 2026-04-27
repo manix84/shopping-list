@@ -4,6 +4,7 @@ import { AppHeader } from './components/AppHeader';
 import { PwaSplashScreen } from './components/PwaSplashScreen';
 import {
   runCountQuantityTests,
+  runConfigTests,
   runMatcherTests,
   runStateTests,
   runStorageTests,
@@ -561,6 +562,7 @@ export default function App() {
   }, [isLoaded, items.length, page]);
 
   const matcherTests = useMemo(() => runMatcherTests(config), [config]);
+  const configTests = useMemo(() => runConfigTests(config), [config]);
   const countQuantityTests = useMemo(() => runCountQuantityTests(), []);
   const unitQuantityTests = useMemo(() => runUnitQuantityTests(), []);
   const variantTests = useMemo(() => runVariantTests(config), [config]);
@@ -870,12 +872,14 @@ export default function App() {
                 items={items}
                 config={config}
                 matcherTests={matcherTests}
+                configTests={configTests}
                 countQuantityTests={countQuantityTests}
                 unitQuantityTests={unitQuantityTests}
                 variantTests={variantTests}
                 storageTests={storageTests}
                 stateTests={stateTests}
                 matcherHasFailures={matcherTests.some((test) => !test.passed)}
+                configHasFailures={configTests.some((test) => !test.passed)}
                 countQuantityHasFailures={countQuantityTests.some((test) => !test.passed)}
                 unitQuantityHasFailures={unitQuantityTests.some((test) => !test.passed)}
                 variantHasFailures={variantTests.some((test) => !test.passed)}

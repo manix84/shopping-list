@@ -131,6 +131,7 @@ export type Messages = {
       tabParsed: string;
       tabState: string;
       tabBackend: string;
+      tabConfig: string;
       tabMatcher: string;
       tabQuantity: string;
       tabWeights: string;
@@ -146,6 +147,8 @@ export type Messages = {
       backendHealthExpected: string;
       databaseTitle: string;
       databaseExpected: string;
+      configTitle: string;
+      configSubtitle: string;
       matcherTitle: string;
       matcherSubtitle: string;
       quantityTitle: string;
@@ -164,6 +167,7 @@ export type Messages = {
       allVariantPass: string;
       allStoragePass: string;
       allStatePass: string;
+      allConfigPass: string;
       expected: string;
       got: string;
       pass: string;

@@ -132,6 +132,7 @@ export const es: Messages = {
       tabParsed: 'Procesados',
       tabState: 'Estado',
       tabBackend: 'Backend',
+      tabConfig: 'Config',
       tabMatcher: 'Clasificador',
       tabQuantity: 'Cantidades',
       tabWeights: 'Pesos',
@@ -151,6 +152,9 @@ export const es: Messages = {
       databaseTitle: 'Base de datos',
       databaseExpected:
         'GET /api/database/status puede leer el almacenamiento del backend',
+      configTitle: 'Comprobaciones de configuración de país',
+      configSubtitle:
+        'Valida la estructura del perfil, la cobertura de palabras clave y su sección propietaria.',
       matcherTitle: 'Comprobaciones del clasificador',
       matcherSubtitle:
         'Pruebas ligeras para que las regresiones de agrupación se vean enseguida al construir.',
@@ -175,6 +179,7 @@ export const es: Messages = {
       allVariantPass: 'Todas las comprobaciones de variantes pasan.',
       allStoragePass: 'Todas las comprobaciones de almacenamiento pasan.',
       allStatePass: 'Todas las comprobaciones de estado pasan.',
+      allConfigPass: 'Todas las comprobaciones de configuración pasan.',
       expected: 'esperado',
       got: 'obtenido',
       pass: 'Pasa',

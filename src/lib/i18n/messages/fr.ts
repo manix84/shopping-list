@@ -138,6 +138,7 @@ export const fr: Messages = {
       tabParsed: 'Analysés',
       tabState: 'État',
       tabBackend: 'Backend',
+      tabConfig: 'Config',
       tabMatcher: 'Correspondance',
       tabQuantity: 'Quantités',
       tabWeights: 'Poids',
@@ -156,6 +157,9 @@ export const fr: Messages = {
       databaseTitle: 'Base de données',
       databaseExpected:
         'GET /api/database/status peut lire le stockage backend',
+      configTitle: 'Auto-vérifications du profil pays',
+      configSubtitle:
+        'Validez la structure du profil, la couverture des mots-clés et leur section propriétaire.',
       matcherTitle: 'Auto-vérifications du moteur de correspondance',
       matcherSubtitle:
         'Des vérifications légères pour rendre évidentes les régressions de regroupement.',
@@ -183,6 +187,7 @@ export const fr: Messages = {
       allVariantPass: 'Toutes les vérifications de variantes sont valides.',
       allStoragePass: 'Toutes les vérifications de stockage sont valides.',
       allStatePass: 'Toutes les vérifications d’état sont valides.',
+      allConfigPass: 'Toutes les vérifications de configuration sont valides.',
       expected: 'attendu',
       got: 'obtenu',
       pass: 'Réussi',

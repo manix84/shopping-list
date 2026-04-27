@@ -138,6 +138,7 @@ export const de: Messages = {
       tabParsed: 'Analysiert',
       tabState: 'Status',
       tabBackend: 'Backend',
+      tabConfig: 'Config',
       tabMatcher: 'Matcher',
       tabQuantity: 'Mengen',
       tabWeights: 'Gewichte',
@@ -156,6 +157,9 @@ export const de: Messages = {
       databaseTitle: 'Datenbank',
       databaseExpected:
         'GET /api/database/status kann den Backend-Speicher lesen',
+      configTitle: 'Länderprofil-Selbsttests',
+      configSubtitle:
+        'Prüft Profilstruktur, Keyword-Abdeckung und die zugehörigen Matcher-Bereiche.',
       matcherTitle: 'Matcher-Selbsttests',
       matcherSubtitle:
         'Leichte Prüfungen, damit Gruppierungsfehler sofort sichtbar werden.',
@@ -180,6 +184,7 @@ export const de: Messages = {
       allVariantPass: 'Alle Varianten-Prüfungen bestehen.',
       allStoragePass: 'Alle Speicher-Prüfungen bestehen.',
       allStatePass: 'Alle Status-Prüfungen bestehen.',
+      allConfigPass: 'Alle Config-Prüfungen bestehen.',
       expected: 'erwartet',
       got: 'erhalten',
       pass: 'Bestanden',

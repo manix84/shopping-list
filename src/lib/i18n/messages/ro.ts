@@ -136,6 +136,7 @@ export const ro: Messages = {
       tabParsed: 'Analizate',
       tabState: 'Stare',
       tabBackend: 'Backend',
+      tabConfig: 'Config',
       tabMatcher: 'Potrivire',
       tabQuantity: 'Cantități',
       tabWeights: 'Greutăți',
@@ -153,6 +154,9 @@ export const ro: Messages = {
       backendHealthExpected: 'GET /api/health returnează OK',
       databaseTitle: 'Bază de date',
       databaseExpected: 'GET /api/database/status poate citi stocarea backend',
+      configTitle: 'Autoverificări profil de țară',
+      configSubtitle:
+        'Validează structura profilului, acoperirea cuvintelor cheie și secțiunile lor proprietare.',
       matcherTitle: 'Autoverificări de potrivire',
       matcherSubtitle:
         'Verificări ușoare pentru a face regresiile de grupare evidente.',
@@ -177,6 +181,7 @@ export const ro: Messages = {
       allVariantPass: 'Toate verificările de variante trec.',
       allStoragePass: 'Toate verificările de stocare trec.',
       allStatePass: 'Toate verificările de stare trec.',
+      allConfigPass: 'Toate verificările de configurare trec.',
       expected: 'așteptat',
       got: 'obținut',
       pass: 'Trece',

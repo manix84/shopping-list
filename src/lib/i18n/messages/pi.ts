@@ -135,6 +135,7 @@ export const pi: Messages = {
       tabParsed: 'Parsed',
       tabState: 'State',
       tabBackend: 'Backend',
+      tabConfig: 'Config',
       tabMatcher: 'Matcher',
       tabQuantity: 'Quantities',
       tabWeights: 'Weights',
@@ -152,6 +153,9 @@ export const pi: Messages = {
       backendHealthExpected: 'GET /api/health returns OK',
       databaseTitle: 'Hold',
       databaseExpected: 'GET /api/database/status can read the backend hold',
+      configTitle: 'Waters profile self-checks',
+      configSubtitle:
+        'Check profile shape, keyword coverage, and matcher ownership.',
       matcherTitle: 'Matcher self-checks',
       matcherSubtitle:
         'Light checks so grouping mishaps be obvious while buildin’.',
@@ -176,6 +180,7 @@ export const pi: Messages = {
       allVariantPass: 'All variant checks be passin’.',
       allStoragePass: 'All stowage checks be passin’.',
       allStatePass: 'All state checks be passin’.',
+      allConfigPass: 'All config checks be passin’.',
       expected: 'expected',
       got: 'got',
       pass: 'Pass',

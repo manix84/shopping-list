@@ -1,5 +1,6 @@
 import { COUNTRY_CONFIGS } from '../config/countries';
 import type {
+  ConfigTestResult,
   CountQuantityTestCase,
   CountQuantityTestResult,
   CountryCode,
@@ -260,6 +261,85 @@ type RunStateTestsInput = {
 
 const itemStateKey = (item: Item): string =>
   dedupeKey(item.raw, item.quantity, item.size, item.quantityValue, item.variant);
+
+const duplicates = (values: string[]): string[] => {
+  const seen = new Set<string>();
+  const repeated = new Set<string>();
+
+  for (const value of values) {
+    if (seen.has(value)) {
+      repeated.add(value);
+    } else {
+      seen.add(value);
+    }
+  }
+
+  return [...repeated].sort();
+};
+
+export const runConfigTests = (config: CountryConfig): ConfigTestResult[] => {
+  const sections = config.groups.flatMap((group) =>
+    group.sections.map((section) => ({
+      ...section,
+      groupKey: group.key,
+      groupLabel: group.label,
+    })),
+  );
+  const emptyGroups = config.groups.filter((group) => group.sections.length === 0);
+  const emptySections = sections.filter((section) => section.keywords.length === 0);
+  const missingLabels = [
+    ...config.groups.filter((group) => !cleanLine(group.label)).map((group) => group.key),
+    ...sections.filter((section) => !cleanLine(section.label)).map((section) => section.key),
+  ];
+  const invalidKeywords = sections.flatMap((section) =>
+    section.keywords
+      .filter((keyword) => !cleanEntryName(keyword))
+      .map((keyword) => `${section.key}: ${String(keyword)}`),
+  );
+  const sectionKeyDuplicates = duplicates(sections.map((section) => section.key));
+  const groupKeyDuplicates = duplicates(config.groups.map((group) => group.key));
+  const groupOrderDuplicates = duplicates(config.groups.map((group) => String(group.order)));
+  const keywordCount = sections.reduce((total, section) => total + section.keywords.length, 0);
+
+  return [
+    {
+      title: 'Country config shape',
+      expected: 'Country profile has labelled groups and sections',
+      actual: `${config.groups.length} groups, ${sections.length} sections, ${missingLabels.length} missing labels`,
+      passed: config.groups.length > 0 && sections.length > 0 && missingLabels.length === 0,
+    },
+    {
+      title: 'Unique group ordering',
+      expected: 'Group keys and route orders are unique',
+      actual: `${groupKeyDuplicates.length} duplicate group keys, ${groupOrderDuplicates.length} duplicate group orders`,
+      passed: groupKeyDuplicates.length === 0 && groupOrderDuplicates.length === 0,
+    },
+    {
+      title: 'Unique section keys',
+      expected: 'Each section key appears once in this country profile',
+      actual: sectionKeyDuplicates.length === 0 ? `${sections.length} unique sections` : sectionKeyDuplicates.join(', '),
+      passed: sectionKeyDuplicates.length === 0,
+    },
+    {
+      title: 'Keyword coverage',
+      expected: 'Every group has sections and every section has keywords',
+      actual: `${emptyGroups.length} empty groups, ${emptySections.length} empty sections`,
+      passed: emptyGroups.length === 0 && emptySections.length === 0,
+    },
+    {
+      title: 'Keyword text',
+      expected: 'Every keyword normalizes to searchable text',
+      actual: invalidKeywords.length === 0 ? 'All keywords are searchable' : invalidKeywords.slice(0, 5).join(', '),
+      passed: invalidKeywords.length === 0,
+    },
+    {
+      title: 'Keyword volume',
+      expected: 'Country profile has enough keywords to cover every section',
+      actual: `${keywordCount} keywords across ${sections.length} sections`,
+      passed: keywordCount >= sections.length,
+    },
+  ];
+};
 
 export const runStateTests = ({
   input,

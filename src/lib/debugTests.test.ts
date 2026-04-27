@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { COUNTRY_CONFIGS } from '../config/countries';
 import {
   runCountQuantityTests,
+  runConfigTests,
   runMatcherTests,
   runStateTests,
   runStorageTests,
@@ -12,6 +13,16 @@ import { parseItems } from './parser';
 import { createUuidV7 } from './uuid';
 
 describe('debug checks', () => {
+  it('all config checks pass', () => {
+    const failures = Object.entries(COUNTRY_CONFIGS).flatMap(([code, config]) =>
+      runConfigTests(config)
+        .filter((test) => !test.passed)
+        .map((test) => `${code}: ${test.title} (${test.actual})`),
+    );
+
+    expect(failures).toEqual([]);
+  });
+
   it('all matcher checks pass', () => {
     expect(runMatcherTests(COUNTRY_CONFIGS.uk).every((test) => test.passed)).toBe(true);
   });

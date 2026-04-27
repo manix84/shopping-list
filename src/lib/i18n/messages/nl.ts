@@ -137,6 +137,7 @@ export const nl: Messages = {
       tabParsed: 'Geparseerd',
       tabState: 'Status',
       tabBackend: 'Backend',
+      tabConfig: 'Config',
       tabMatcher: 'Matcher',
       tabQuantity: 'Hoeveelheden',
       tabWeights: 'Gewichten',
@@ -154,6 +155,9 @@ export const nl: Messages = {
       backendHealthExpected: 'GET /api/health geeft OK terug',
       databaseTitle: 'Database',
       databaseExpected: 'GET /api/database/status kan de backend-opslag lezen',
+      configTitle: 'Landprofiel-zelftests',
+      configSubtitle:
+        'Controleer profielstructuur, trefwoorddekking en de bijbehorende matcher-secties.',
       matcherTitle: 'Matcher-zelftests',
       matcherSubtitle:
         'Lichte controles zodat regressies in groepering snel zichtbaar zijn.',
@@ -178,6 +182,7 @@ export const nl: Messages = {
       allVariantPass: 'Alle variantcontroles slagen.',
       allStoragePass: 'Alle opslagcontroles slagen.',
       allStatePass: 'Alle statuscontroles slagen.',
+      allConfigPass: 'Alle configcontroles slagen.',
       expected: 'verwacht',
       got: 'gekregen',
       pass: 'Geslaagd',

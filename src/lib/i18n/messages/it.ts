@@ -136,6 +136,7 @@ export const it: Messages = {
       tabParsed: 'Analizzati',
       tabState: 'Stato',
       tabBackend: 'Backend',
+      tabConfig: 'Config',
       tabMatcher: 'Matcher',
       tabQuantity: 'Quantità',
       tabWeights: 'Pesi',
@@ -154,6 +155,9 @@ export const it: Messages = {
       databaseTitle: 'Database',
       databaseExpected:
         'GET /api/database/status può leggere l’archiviazione backend',
+      configTitle: 'Autocontrolli profilo paese',
+      configSubtitle:
+        'Convalida struttura del profilo, copertura delle parole chiave e sezioni proprietarie.',
       matcherTitle: 'Autocontrolli matcher',
       matcherSubtitle:
         'Controlli leggeri per rendere evidenti le regressioni di raggruppamento.',
@@ -178,6 +182,7 @@ export const it: Messages = {
       allVariantPass: 'Tutti i controlli varianti sono superati.',
       allStoragePass: 'Tutti i controlli archiviazione sono superati.',
       allStatePass: 'Tutti i controlli stato sono superati.',
+      allConfigPass: 'Tutti i controlli config sono superati.',
       expected: 'atteso',
       got: 'ottenuto',
       pass: 'OK',

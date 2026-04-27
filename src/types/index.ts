@@ -98,6 +98,13 @@ export type CountryConfig = {
   groups: SectionGroup[];
 };
 
+export type ConfigTestResult = {
+  title: string;
+  expected: string;
+  actual: string;
+  passed: boolean;
+};
+
 export type GroupedSectionView = {
   key: SectionKey;
   label: string;
