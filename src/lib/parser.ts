@@ -24,6 +24,18 @@ export const getDisplayName = (item: Item): string => formatDisplayName(item.raw
 
 export const getDisplayValue = (item: Item): string => getDisplayName(item);
 
+export const getVariantPrefixedDisplayValue = (item: Item): string => {
+  const displayValue = getDisplayValue(item);
+  const variantValue = getVariantValue(item);
+  if (!variantValue) return displayValue;
+
+  const normalizedDisplay = normalize(displayValue);
+  const normalizedVariant = normalize(variantValue);
+  if (normalizedDisplay.startsWith(`${normalizedVariant} `)) return displayValue;
+
+  return `${variantValue} ${displayValue}`;
+};
+
 export const getSizeDisplayValue = (item: Item): string | undefined =>
   typeof item.sizeValue === 'string' ? `Size: ${item.sizeValue}` : undefined;
 

@@ -10,6 +10,7 @@ import {
   getUnitQuantityDisplayValue,
   getUnitQuantityValue,
   getVariantDisplayValue,
+  getVariantPrefixedDisplayValue,
   getVariantValue,
   parseItems,
 } from './parser';
@@ -29,6 +30,7 @@ describe('parser', () => {
     expect(getSizeDisplayValue(items[0])).toBe('Size: S');
     expect(getSizeValue(items[0])).toBe('S');
     expect(getDisplayValue(items[0])).toBe('Semi-Skimmed Milk');
+    expect(getVariantPrefixedDisplayValue(items[0])).toBe('Semi-Skimmed Milk');
     expect(getStoredValue(items[0])).toBe('small semi skimmed milk');
 
     expect(items[1]).toMatchObject({
@@ -210,7 +212,9 @@ describe('parser', () => {
       matchedSection: 'alcohol',
     });
     expect(getStoredValue(items[0])).toBe('cherry pepsi max');
+    expect(getVariantPrefixedDisplayValue(items[0])).toBe('Cherry Pepsi Max');
     expect(getStoredValue(items[2])).toBe('pear kopparberg cider');
+    expect(getVariantPrefixedDisplayValue(items[2])).toBe('Pear Kopparberg Cider');
   });
 
   it('preserves checked state from previously saved combined variant names', () => {
