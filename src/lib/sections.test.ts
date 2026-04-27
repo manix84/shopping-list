@@ -8,6 +8,7 @@ describe('section detection', () => {
   it.each([
     [UK_CONFIG, 'baby food', 'baby_food'],
     [UK_CONFIG, 'pasta', 'pasta'],
+    [UK_CONFIG, 'linguini', 'pasta'],
     [UK_CONFIG, 'eggs', 'home_baking'],
     [UK_CONFIG, 'large free-range eggs', 'home_baking'],
     [UK_CONFIG, 'plain flour', 'home_baking'],

@@ -27,6 +27,7 @@ import { isUuidV7 } from './uuid';
 export const MATCHER_TEST_CASES: MatcherTestCase[] = [
   { input: 'spaghetti', expectedSection: 'pasta' },
   { input: 'fettuccine', expectedSection: 'pasta' },
+  { input: 'linguini', expectedSection: 'pasta' },
   { input: 'macaroni', expectedSection: 'pasta' },
   { input: 'ravioli', expectedSection: 'pasta' },
   { input: 'corn flakes', expectedSection: 'cereal' },
