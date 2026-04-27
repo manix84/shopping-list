@@ -1,0 +1,230 @@
+import type { Messages } from '../types';
+import { en } from './en';
+
+export const ro: Messages = {
+  ...en,
+  app: {
+    title: 'Listă inteligentă de cumpărături',
+    subtitle: 'Transformă o listă rapidă într-un traseu ordonat prin magazin.',
+  },
+  nav: {
+    editList: 'Editează lista',
+    route: 'Traseu',
+    sections: 'Secțiuni',
+    settings: 'Setări',
+    debugTools: 'Unelte de depanare',
+  },
+  actions: {
+    ...en.actions,
+    add: 'Adaugă',
+    backToEdit: 'Înapoi la editare',
+    backToSettings: 'Înapoi la setări',
+    copy: 'Copiază',
+    createSharedLink: 'Creează link partajat',
+    creating: 'Se creează...',
+    editList: 'Editează lista',
+    fullReset: 'Listă nouă',
+    goToEditList: 'Mergi la listă',
+    loadSharedList: 'Deschide lista partajată',
+    openDebugTools: 'Deschide uneltele de depanare',
+    filterItems: 'Filtrează articolele',
+    refresh: 'Reîmprospătează',
+    refreshing: 'Se reîmprospătează...',
+    remove: 'Elimină',
+    scanQrCode: 'Scanează codul QR',
+    stopScanning: 'Oprește scanarea',
+    resetTicks: 'Resetează bifările',
+    revealQrCode: 'Afișează codul QR',
+    resortFromList: 'Reordonează din listă',
+    saveAndSort: 'Salvează lista',
+    tick: 'Bifează',
+    tickAll: 'Bifează tot',
+    untick: 'Debifează',
+    untickAll: 'Debifează tot',
+  },
+  labels: {
+    ...en.labels,
+    available: 'disponibil',
+    cleaned: 'Curățat',
+    count: 'număr',
+    countryProfile: 'Profil de țară',
+    created: 'creat',
+    defaultList: 'listă implicită',
+    done: 'Gata',
+    empty: 'goală',
+    exists: 'există',
+    group: 'Grup',
+    items: 'Articole',
+    locale: 'Limbă',
+    mode: 'mod',
+    order: 'Ordine',
+    progress: 'Progres',
+    qty: 'Cant.',
+    routeOrder: 'Ordinea traseului',
+    section: 'Secțiune',
+    sharedLink: 'Link partajat',
+    sharedLists: 'liste partajate',
+    size: 'Mărime',
+    state: 'stare',
+    storedLocally: 'Stocat doar local pe acest dispozitiv.',
+    theme: 'Temă',
+    unavailable: 'Indisponibil',
+    unknown: 'necunoscut',
+    updated: 'actualizat',
+  },
+  pages: {
+    ...en.pages,
+    edit: {
+      title: 'Editor listă',
+      subtitle:
+        'Lipește de oriunde, ajustează lista și salveaz-o local deocamdată.',
+      pasteLabel: 'Lipește sau scrie lista',
+      pastePlaceholder: 'lapte\npâine\nmere\ncafea',
+      quickAddLabel: 'Adaugă rapid un articol',
+      quickAddPlaceholder: 'ex. banane x20',
+      sharingTitle: 'Partajare',
+      sharingSubtitle: 'Oricine are linkul partajat poate edita această listă.',
+      sharingUnavailable:
+        'Partajarea este disponibilă când backendul este conectat.',
+      parsedTitle: 'Articole analizate',
+      parsedSubtitle:
+        'Articole structurate, pregătite pentru stocare locală azi și o bază de date mai târziu.',
+      parsedEmpty:
+        'Salvează și sortează lista pentru a genera articole structurate.',
+    },
+    route: {
+      title: 'Traseu prin magazin',
+      subtitle:
+        'Secțiunile incomplete rămân sus. Secțiunile complet terminate coboară jos.',
+      filterPlaceholder: 'Filtrează articolele',
+      emptyNoItems:
+        'Adaugă mai întâi articole în pagina de editare înainte de a afișa traseul.',
+      emptyNoResults:
+        'Încă nu este nimic de afișat. Revino la editare și adaugă câteva articole.',
+      viewDefault: 'Vizualizare implicită',
+      viewComfortable: 'Vizualizare confortabilă',
+      viewCompact: 'Vizualizare compactă',
+    },
+    settings: {
+      title: 'Setări',
+      subtitle:
+        'Preferințe care influențează cum acest dispozitiv afișează și grupează listele de cumpărături.',
+      countryLabel: 'Profil de țară',
+      themeLabel: 'Temă',
+      themeSubtitle: 'Alege aspectul cel mai confortabil pentru tine.',
+      localeLabel: 'Limbă',
+      localeSubtitle: 'Alege limba în care preferi să citești aplicația.',
+      routeDensityLabel: 'Densitatea traseului',
+      routeDensitySubtitle:
+        'Controlează spațierea traseului pe acest dispozitiv.',
+    },
+    sections: {
+      title: 'Secțiuni',
+      subtitle:
+        'Referință doar în citire pentru gruparea magazinului în profilul de țară selectat.',
+    },
+    debug: {
+      title: 'Unelte de depanare',
+      subtitle:
+        'Autoverificările și diagnosticele parserului stau aici în loc să aglomereze fluxul principal.',
+      parsedTitle: 'Articole analizate',
+      parsedSubtitle:
+        'Inspectează și ajustează manual articolele structurate generate din lista curentă.',
+      tabParsed: 'Analizate',
+      tabBackend: 'Backend',
+      tabMatcher: 'Potrivire',
+      tabQuantity: 'Cantități',
+      tabWeights: 'Greutăți',
+      tabSections: 'Secțiuni',
+      tabStorage: 'Stocare',
+      backendTitle: 'Verificări backend',
+      backendConnected: 'API-ul backend și baza de date sunt disponibile.',
+      backendChecking: 'Starea backendului este verificată.',
+      backendError:
+        'Backendul a răspuns, dar una sau mai multe verificări au eșuat.',
+      backendOffline:
+        'Backendul este offline; aplicația folosește doar stocare frontend.',
+      backendHealthTitle: 'Sănătate backend',
+      backendHealthExpected: 'GET /api/health returnează OK',
+      databaseTitle: 'Bază de date',
+      databaseExpected: 'GET /api/database/status poate citi stocarea backend',
+      matcherTitle: 'Autoverificări de potrivire',
+      matcherSubtitle:
+        'Verificări ușoare pentru a face regresiile de grupare evidente.',
+      quantityTitle: 'Autoverificări de cantități numărate',
+      quantitySubtitle:
+        'Cantitățile precum x2 și 4 morcovi rămân atașate unui singur articol bifabil.',
+      weightTitle: 'Autoverificări de greutăți și unități',
+      weightSubtitle:
+        'Greutățile și unitățile precum 500g sau 1.5kg rămân atașate articolului, chiar și cu o cantitate.',
+      storageTitle: 'Autoverificări de stocare',
+      storageSubtitle:
+        'Datele trebuie să treacă curat prin stocarea locală și orice bază viitoare.',
+      allMatcherPass: 'Toate verificările de potrivire trec.',
+      allQuantityPass: 'Toate verificările de cantități numărate trec.',
+      allWeightPass: 'Toate verificările de greutăți și unități trec.',
+      allStoragePass: 'Toate verificările de stocare trec.',
+      expected: 'așteptat',
+      got: 'obținut',
+      pass: 'Trece',
+      fail: 'Eșuează',
+      unavailable: 'Indisponibil',
+    },
+  },
+  localeOptions: {
+    en: 'English',
+    es: 'Español',
+    fr: 'Français',
+    de: 'Deutsch',
+    nl: 'Nederlands',
+    it: 'Italiano',
+    ro: 'Română',
+    pi: 'Pirate',
+  },
+  themeOptions: {
+    system: 'Preferința sistemului',
+    light: 'Deschis',
+    dark: 'Închis',
+  },
+  mobileMenu: {
+    openNavigation: 'Deschide meniul de navigare',
+  },
+  backendStatus: {
+    connected: 'Online',
+    checking: 'Se verifică',
+    issue: 'Offline',
+    frontendOnly: 'Offline',
+  },
+  sharing: {
+    cameraUnavailable:
+      'Accesul la cameră nu este disponibil pe acest dispozitiv.',
+    connectBackendFirst:
+      'Conectează backendul înainte de a crea un link partajat.',
+    createFailed: 'Nu s-a putut crea linkul partajat.',
+    emptyList: 'Listă goală',
+    invalidLink: 'Introdu un URL sau UUID valid pentru lista partajată.',
+    loadFailed: 'Nu s-a putut deschide acea listă partajată.',
+    loadMissing: 'Acea listă partajată nu există în backend.',
+    manualLinkLabel: 'Deschide o listă partajată',
+    manualLinkPlaceholder: 'Lipește un URL partajat sau un UUID',
+    refreshMissing:
+      'Această listă partajată nu există încă. Modificările o vor crea.',
+    refreshFailed: 'Nu s-a putut reîmprospăta lista partajată.',
+    offlineBackup:
+      'Backendul este offline. Se afișează copia locală a acestei liste partajate.',
+    recentListsEmpty:
+      'Nicio listă partajată nu a fost deschisă încă pe acest dispozitiv.',
+    recentListsTitle: 'Liste partajate deschise recent',
+    scannerInstructions: 'Îndreaptă camera spre un cod QR Smart Shopping List.',
+    scannerListMissing: 'Acea listă partajată nu există.',
+    scannerOpenFailed:
+      'Nu s-a putut deschide camera pentru scanarea codului QR.',
+    scannerReady: 'Listă partajată găsită. Verifică câmpul și apoi deschide-o.',
+    scannerUnsupported:
+      'Scanarea QR nu este suportată în acest browser. Lipește URL-ul sau UUID-ul.',
+  },
+  sectionToggle: {
+    tickAll: 'Bifează tot',
+    untickAll: 'Debifează tot',
+  },
+};
