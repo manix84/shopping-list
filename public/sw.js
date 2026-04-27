@@ -1,6 +1,6 @@
-const CACHE_NAME = 'smart-shopping-list-pwa-v5';
+const CACHE_NAME = 'smart-shopping-list-pwa-v6';
 
-const assetUrls = () => [
+const staticAssetUrls = () => [
   new URL('index.html', self.registration.scope).href,
   new URL('manifest.webmanifest', self.registration.scope).href,
   new URL('favicon-light.png', self.registration.scope).href,
@@ -22,10 +22,26 @@ const assetUrls = () => [
   new URL('apple-touch-icon.png', self.registration.scope).href,
 ];
 
+const buildAssetUrls = async () => {
+  const indexUrl = new URL('index.html', self.registration.scope).href;
+  const response = await fetch(indexUrl, { cache: 'reload' });
+  if (!response.ok) {
+    return [];
+  }
+
+  const html = await response.text();
+  const assetPaths = [...html.matchAll(/(?:href|src)="([^"]*\.(?:js|css))"/g)].map((match) => match[1]);
+  return [...new Set(assetPaths)].map((path) => new URL(path, self.registration.scope).href);
+};
+
+const cacheAssets = async () => {
+  const cache = await caches.open(CACHE_NAME);
+  const urls = [...staticAssetUrls(), ...(await buildAssetUrls())];
+  await cache.addAll(urls);
+};
+
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(assetUrls())).then(() => self.skipWaiting()),
-  );
+  event.waitUntil(cacheAssets().then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', (event) => {
@@ -37,7 +53,12 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  if (event.request.method !== 'GET' || new URL(event.request.url).origin !== self.location.origin) {
+  const requestUrl = new URL(event.request.url);
+  if (event.request.method !== 'GET' || requestUrl.origin !== self.location.origin) {
+    return;
+  }
+
+  if (requestUrl.pathname.startsWith('/api/')) {
     return;
   }
 
@@ -61,11 +82,18 @@ self.addEventListener('fetch', (event) => {
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) return cachedResponse;
 
-      return fetch(event.request).then((response) => {
-        const responseClone = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
-        return response;
-      });
+      return fetch(event.request)
+        .then((response) => {
+          if (response.ok) {
+            const responseClone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
+          }
+          return response;
+        })
+        .catch(async () => {
+          const cache = await caches.open(CACHE_NAME);
+          return cache.match(event.request) ?? new Response('', { status: 504, statusText: 'Offline' });
+        });
     }),
   );
 });

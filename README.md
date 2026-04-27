@@ -149,6 +149,7 @@ On supported browsers you can install the app with the browser's install action:
 
 ### PWA notes
 
+- the app shell, core icons, and built JS/CSS are cached for offline navigation after the service worker has installed
 - the app works offline with local storage even without the backend
 - backend-backed shared lists still need network access to validate, refresh, or load remote list data
 - QR scanning depends on browser camera support and `BarcodeDetector`; if it is unavailable, the scanner action is hidden and you can paste the shared UUID or URL manually
