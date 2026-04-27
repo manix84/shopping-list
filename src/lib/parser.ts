@@ -29,6 +29,15 @@ export const getVariantPrefixedDisplayValue = (item: Item): string => {
   const variantValue = getVariantValue(item);
   if (!variantValue) return displayValue;
 
+  if (normalize(item.raw) === 'milk') {
+    const milkVariantLabels = new Map([
+      ['semi skimmed', 'Semi-Skimmed Milk'],
+      ['whole', 'Whole Milk'],
+      ['skimmed', 'Skimmed Milk'],
+    ]);
+    return milkVariantLabels.get(normalize(variantValue)) ?? `${variantValue} Milk`;
+  }
+
   const normalizedDisplay = normalize(displayValue);
   const normalizedVariant = normalize(variantValue);
   if (normalizedDisplay.startsWith(`${normalizedVariant} `)) return displayValue;

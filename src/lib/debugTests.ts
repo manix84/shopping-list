@@ -145,7 +145,25 @@ export const VARIANT_TEST_CASES: VariantTestCase[] = [
   {
     input: 'gold milk',
     expectedName: 'milk',
-    expectedVariant: 'gold',
+    expectedVariant: 'semi skimmed',
+    expectedSection: 'chilled_milk_juice_cream',
+  },
+  {
+    input: 'green milk',
+    expectedName: 'milk',
+    expectedVariant: 'semi skimmed',
+    expectedSection: 'chilled_milk_juice_cream',
+  },
+  {
+    input: 'blue milk',
+    expectedName: 'milk',
+    expectedVariant: 'whole',
+    expectedSection: 'chilled_milk_juice_cream',
+  },
+  {
+    input: 'red milk',
+    expectedName: 'milk',
+    expectedVariant: 'skimmed',
     expectedSection: 'chilled_milk_juice_cream',
   },
   {

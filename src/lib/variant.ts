@@ -15,8 +15,12 @@ type VariantRule = {
 
 const VARIANTABLE_BASE_KEYWORDS = new Set(['cream', 'ice cream', 'milk', 'yogurt', 'yoghurt']);
 const VARIANT_EXTRACTION_EXCLUSIONS = new Set(['whipped cream']);
-const DEFAULT_VARIANTS = new Map<string, string>([
-  ['milk', 'semi skimmed'],
+const DEFAULT_VARIANTS = new Map<string, ExtractedVariant>([
+  ['milk', { name: 'milk', variant: 'semi skimmed' }],
+  ['blue milk', { name: 'milk', variant: 'whole' }],
+  ['gold milk', { name: 'milk', variant: 'semi skimmed' }],
+  ['green milk', { name: 'milk', variant: 'semi skimmed' }],
+  ['red milk', { name: 'milk', variant: 'skimmed' }],
 ]);
 const DRINK_VARIANT_RULES: VariantRule[] = [
   {
@@ -162,10 +166,7 @@ export const extractVariant = (value: unknown, config: CountryConfig | undefined
 
   const defaultVariant = DEFAULT_VARIANTS.get(normalizedName);
   if (defaultVariant) {
-    return {
-      name: normalizedName,
-      variant: defaultVariant,
-    };
+    return defaultVariant;
   }
 
   const variantableMatch = findVariantableSuffix(normalizedName, candidates);
