@@ -1,4 +1,4 @@
-const CACHE_NAME = 'smart-shopping-list-pwa-v4';
+const CACHE_NAME = 'smart-shopping-list-pwa-v5';
 
 const assetUrls = () => [
   new URL('index.html', self.registration.scope).href,
@@ -8,6 +8,8 @@ const assetUrls = () => [
   new URL('favicon-16.png', self.registration.scope).href,
   new URL('favicon-32.png', self.registration.scope).href,
   new URL('logo-mark.png', self.registration.scope).href,
+  new URL('logo-animated-loop.svg', self.registration.scope).href,
+  new URL('logo-animated-once.svg', self.registration.scope).href,
   new URL('logo-light.png', self.registration.scope).href,
   new URL('logo-dark.png', self.registration.scope).href,
   new URL('logo-universal.png', self.registration.scope).href,

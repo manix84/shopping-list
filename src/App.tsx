@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { COUNTRY_CONFIGS } from './config/countries';
 import { AppHeader } from './components/AppHeader';
+import { PwaSplashScreen } from './components/PwaSplashScreen';
 import { runMatcherTests, runQuantityTests, runStorageTests } from './lib/debugTests';
 import {
   applyDocumentLocale,
@@ -762,6 +763,7 @@ export default function App() {
 
   return (
     <I18nProvider value={{ locale, messages, setLocale }}>
+      <PwaSplashScreen />
       <div className="shopping-app">
         <div className="shopping-shell">
           <AppHeader
