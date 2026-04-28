@@ -22,6 +22,7 @@ type SettingsPageProps = {
   canPromptInstall: boolean;
   isInstalled: boolean;
   isLikelyMobileForInstall: boolean;
+  isFloatingInstallVisible: boolean;
   onInstall: () => void;
 };
 
@@ -144,6 +145,7 @@ export function SettingsPage({
   canPromptInstall,
   isInstalled,
   isLikelyMobileForInstall,
+  isFloatingInstallVisible,
   onInstall,
 }: SettingsPageProps) {
   const { locale, setLocale, messages } = useI18n();
@@ -165,7 +167,7 @@ export function SettingsPage({
       icon: <LocaleIcon locale={value as LocaleCode} />,
     }),
   );
-  const shouldShowInstallSetting = !isInstalled && (isLikelyMobileForInstall || canPromptInstall);
+  const shouldShowInstallSetting = !isFloatingInstallVisible && !isInstalled && (isLikelyMobileForInstall || canPromptInstall);
   const installTitle = isInstalled
     ? messages.pwaInstall.installedTitle
     : canPromptInstall

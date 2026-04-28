@@ -880,6 +880,7 @@ export default function App() {
 
     dismissPwaInstallNudge();
   };
+  const isFloatingPwaInstallVisible = isLoaded && isPwaInstallNudgeVisible && !isPwaInstalled && isLikelyMobileForInstall;
 
   return (
     <I18nProvider value={{ locale, messages, setLocale }}>
@@ -957,6 +958,7 @@ export default function App() {
                 canPromptInstall={Boolean(beforeInstallPromptEvent)}
                 isInstalled={isPwaInstalled}
                 isLikelyMobileForInstall={isLikelyMobileForInstall}
+                isFloatingInstallVisible={isFloatingPwaInstallVisible}
                 onInstall={promptPwaInstall}
               />
             ) : null}
@@ -993,7 +995,7 @@ export default function App() {
         </div>
         <PwaInstallBadge
           canPromptInstall={Boolean(beforeInstallPromptEvent)}
-          isVisible={isLoaded && isPwaInstallNudgeVisible && !isPwaInstalled && isLikelyMobileForInstall}
+          isVisible={isFloatingPwaInstallVisible}
           onDismiss={dismissPwaInstallNudge}
           onInstall={promptPwaInstall}
         />
