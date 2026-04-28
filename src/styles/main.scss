@@ -436,6 +436,11 @@ select {
     padding: 0;
     text-decoration: underline;
   }
+
+  &-sm {
+    border-radius: 12px;
+    padding: 9px 12px;
+  }
 }
 
 .button-icon {
@@ -1506,6 +1511,235 @@ select {
   text-align: right;
 }
 
+.settings-install-row {
+  align-items: center;
+  background: $panel-alt;
+  border: 1px solid $border;
+  border-radius: 18px;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  padding: 14px;
+}
+
+.settings-install-icon,
+.pwa-install-badge-icon {
+  align-items: center;
+  background: color-mix(in srgb, $primary 12%, $panel);
+  border: 1px solid color-mix(in srgb, $primary 28%, $border);
+  border-radius: 14px;
+  color: $primary;
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: 42px;
+  justify-content: center;
+  width: 42px;
+
+  svg {
+    display: block;
+    height: 22px;
+    width: 22px;
+  }
+}
+
+.settings-install-copy {
+  min-width: 0;
+
+  h3 {
+    font-size: 14px;
+    line-height: 1.25;
+    margin: 0 0 4px;
+  }
+
+  p {
+    color: $muted;
+    font-size: 13px;
+    line-height: 1.4;
+    margin: 0;
+  }
+}
+
+.pwa-install-badge {
+  align-items: center;
+  background: color-mix(in srgb, $panel 94%, transparent);
+  border: 1px solid color-mix(in srgb, $border 86%, transparent);
+  border-radius: 18px;
+  bottom: max(18px, env(safe-area-inset-bottom));
+  box-shadow: 0 18px 42px color-mix(in srgb, var(--shadow-color) 88%, transparent);
+  display: grid;
+  gap: 12px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  left: 50%;
+  max-width: min(520px, calc(100vw - 32px));
+  padding: 12px;
+  position: fixed;
+  transform: translateX(-50%);
+  width: max-content;
+  z-index: 80;
+}
+
+.pwa-install-badge-copy {
+  min-width: 0;
+
+  h2 {
+    font-size: 14px;
+    line-height: 1.25;
+    margin: 0 0 3px;
+  }
+
+  p {
+    color: $muted;
+    font-size: 12px;
+    line-height: 1.35;
+    margin: 0;
+  }
+}
+
+.pwa-install-badge-actions {
+  align-items: center;
+  display: inline-flex;
+  gap: 8px;
+}
+
+.pwa-install-dismiss {
+  height: 38px;
+  width: 38px;
+
+  svg {
+    display: block;
+    height: 18px;
+    width: 18px;
+  }
+}
+
+.about-page {
+  display: block;
+}
+
+.about-card {
+  overflow: visible;
+}
+
+.about-card-body {
+  display: grid;
+  gap: 24px;
+  justify-items: center;
+  padding: 34px;
+}
+
+.about-hero {
+  display: grid;
+  gap: 18px;
+  justify-items: center;
+  max-width: 620px;
+  text-align: center;
+}
+
+.about-logo-lockup {
+  height: 188px;
+  position: relative;
+  width: 188px;
+}
+
+.about-app-logo {
+  display: block;
+  height: 180px;
+  margin: 0 auto;
+  width: 180px;
+}
+
+.about-avatar-link {
+  border-radius: 50%;
+  bottom: 8px;
+  display: block;
+  height: 64px;
+  left: 8px;
+  position: absolute;
+  transform: translate(-25%, 25%);
+  width: 64px;
+
+  &:focus-visible {
+    outline: 2px solid $primary;
+    outline-offset: 4px;
+  }
+}
+
+.about-avatar-badge {
+  background: $panel;
+  border: 4px solid $panel;
+  border-radius: 50%;
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--shadow-color) 80%, transparent);
+  display: block;
+  height: 64px;
+  object-fit: cover;
+  width: 64px;
+}
+
+.about-heading {
+  text-align: center;
+}
+
+.about-spec-list {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  max-width: 420px;
+  width: min(100%, 420px);
+
+  > div {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: minmax(96px, 0.46fr) minmax(0, 1fr);
+  }
+
+  dt {
+    color: $text;
+    font-size: 13px;
+    text-align: right;
+  }
+
+  dd {
+    color: $muted;
+    font-size: 13px;
+    margin: 0;
+    min-width: 0;
+  }
+}
+
+.about-copy {
+  border-top: 1px solid $border;
+  color: $text;
+  font-size: 14px;
+  line-height: 1.55;
+  max-width: 760px;
+  padding-top: 18px;
+
+  p {
+    margin: 0;
+  }
+}
+
+.about-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 2px;
+
+  .button {
+    text-decoration: none;
+  }
+}
+
+.about-footnote {
+  color: $muted;
+  font-size: 12px;
+  line-height: 1.45;
+  margin: -8px auto 0;
+  max-width: 300px;
+  text-align: center;
+}
+
 .warning-actions {
   justify-content: center;
 }
@@ -1711,6 +1945,29 @@ select {
   .textarea,
   .select {
     padding: 11px 12px;
+  }
+
+  .settings-install-row {
+    align-items: stretch;
+    grid-template-columns: auto minmax(0, 1fr);
+
+    .button {
+      grid-column: 1 / -1;
+      justify-self: stretch;
+    }
+  }
+
+  .pwa-install-badge {
+    align-items: flex-start;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    grid-template-columns: auto minmax(0, 1fr);
+    max-width: calc(100vw - 20px);
+    width: calc(100vw - 20px);
+  }
+
+  .pwa-install-badge-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
   }
 
   .empty-state {

@@ -185,6 +185,18 @@ export type Messages = {
   mobileMenu: {
     openNavigation: string;
   };
+  pwaInstall: {
+    title: string;
+    description: string;
+    installAction: string;
+    dismissAction: string;
+    settingsTitle: string;
+    settingsDescription: string;
+    unavailableTitle: string;
+    unavailableDescription: string;
+    installedTitle: string;
+    installedDescription: string;
+  };
   backendStatus: {
     connected: string;
     checking: string;

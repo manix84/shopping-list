@@ -1,4 +1,4 @@
-import { mdiChevronDown } from '@mdi/js';
+import { mdiChevronDown, mdiDownload } from '@mdi/js';
 import { type ReactNode, useState } from 'react';
 import type { RouteViewMode, ThemeMode } from '../types';
 import { Card } from '../components/Card';
@@ -19,6 +19,10 @@ type SettingsPageProps = {
   onRouteViewModeChange: (mode: RouteViewMode) => void;
   onThemeChange: (themeMode: ThemeMode) => void;
   onOpenDebug: () => void;
+  canPromptInstall: boolean;
+  isInstalled: boolean;
+  isLikelyMobileForInstall: boolean;
+  onInstall: () => void;
 };
 
 type ThemeIconProps = {
@@ -137,6 +141,10 @@ export function SettingsPage({
   onRouteViewModeChange,
   onThemeChange,
   onOpenDebug,
+  canPromptInstall,
+  isInstalled,
+  isLikelyMobileForInstall,
+  onInstall,
 }: SettingsPageProps) {
   const { locale, setLocale, messages } = useI18n();
   const routeViewOptions: RouteViewMode[] = ['default', 'comfortable', 'compact'];
@@ -157,53 +165,86 @@ export function SettingsPage({
       icon: <LocaleIcon locale={value as LocaleCode} />,
     }),
   );
+  const shouldShowInstallSetting = !isInstalled && (isLikelyMobileForInstall || canPromptInstall);
+  const installTitle = isInstalled
+    ? messages.pwaInstall.installedTitle
+    : canPromptInstall
+      ? messages.pwaInstall.settingsTitle
+      : messages.pwaInstall.unavailableTitle;
+  const installDescription = isInstalled
+    ? messages.pwaInstall.installedDescription
+    : canPromptInstall
+      ? messages.pwaInstall.settingsDescription
+      : messages.pwaInstall.unavailableDescription;
+
+  const installSetting = shouldShowInstallSetting ? (
+    <div className="settings-install-row">
+      <div className="settings-install-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d={mdiDownload} fill="currentColor" />
+        </svg>
+      </div>
+      <div className="settings-install-copy">
+        <h3>{installTitle}</h3>
+        <p>{installDescription}</p>
+      </div>
+      {canPromptInstall && !isInstalled ? (
+        <button type="button" className="button button-primary" onClick={onInstall}>
+          {messages.pwaInstall.installAction}
+        </button>
+      ) : null}
+    </div>
+  ) : null;
 
   return (
-    <Card
-      header={
-        <>
-          <h2 className="title title-md">{messages.pages.settings.title}</h2>
-          <p className="subtitle">{messages.pages.settings.subtitle}</p>
-        </>
-      }
-      bodyClassName="stack"
-    >
-      <div className="field field-compact">
-        <div>
-          <label htmlFor="locale-select">{messages.pages.settings.localeLabel}</label>
-          <div className="small-text">{messages.pages.settings.localeSubtitle}</div>
+    <>
+      <Card
+        header={
+          <>
+            <h2 className="title title-md">{messages.pages.settings.title}</h2>
+            <p className="subtitle">{messages.pages.settings.subtitle}</p>
+          </>
+        }
+        bodyClassName="stack"
+      >
+        <div className="field field-compact">
+          <div>
+            <label htmlFor="locale-select">{messages.pages.settings.localeLabel}</label>
+            <div className="small-text">{messages.pages.settings.localeSubtitle}</div>
+          </div>
+          <SettingsSelect
+            id="locale-select"
+            value={locale}
+            options={localeOptions}
+            onChange={setLocale}
+          />
         </div>
-        <SettingsSelect
-          id="locale-select"
-          value={locale}
-          options={localeOptions}
-          onChange={setLocale}
-        />
-      </div>
 
-      <div className="field field-compact">
-        <div>
-          <label htmlFor="theme-select">{messages.pages.settings.themeLabel}</label>
-          <div className="small-text">{messages.pages.settings.themeSubtitle}</div>
+        <div className="field field-compact">
+          <div>
+            <label htmlFor="theme-select">{messages.pages.settings.themeLabel}</label>
+            <div className="small-text">{messages.pages.settings.themeSubtitle}</div>
+          </div>
+          <SettingsSelect id="theme-select" value={themeMode} options={themeOptions} onChange={onThemeChange} />
         </div>
-        <SettingsSelect id="theme-select" value={themeMode} options={themeOptions} onChange={onThemeChange} />
-      </div>
 
-      <div className="field field-compact">
-        <div>
-          <label htmlFor="route-density-select">{messages.pages.settings.routeDensityLabel}</label>
-          <div className="small-text">{messages.pages.settings.routeDensitySubtitle}</div>
+        <div className="field field-compact">
+          <div>
+            <label htmlFor="route-density-select">{messages.pages.settings.routeDensityLabel}</label>
+            <div className="small-text">{messages.pages.settings.routeDensitySubtitle}</div>
+          </div>
+          <SettingsSelect
+            id="route-density-select"
+            value={routeViewMode}
+            options={routeDensityOptions}
+            onChange={onRouteViewModeChange}
+          />
         </div>
-        <SettingsSelect
-          id="route-density-select"
-          value={routeViewMode}
-          options={routeDensityOptions}
-          onChange={onRouteViewModeChange}
-        />
-      </div>
 
-      <DebugLink onOpen={onOpenDebug} />
-      <div className="settings-footnote small-text">{messages.labels.storedLocally}</div>
-    </Card>
+        <DebugLink onOpen={onOpenDebug} />
+        <div className="settings-footnote small-text">{messages.labels.storedLocally}</div>
+      </Card>
+      {installSetting}
+    </>
   );
 }
