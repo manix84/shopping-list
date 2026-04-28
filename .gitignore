@@ -5,6 +5,7 @@ node_modules/
 dist/
 data/
 lighthouse/
+storybook-static/
 
 # TypeScript build info
 *.tsbuildinfo

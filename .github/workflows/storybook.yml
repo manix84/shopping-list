@@ -1,5 +1,5 @@
-name: Build
-run-name: Build
+name: Storybook
+run-name: Storybook
 
 on:
   pull_request:
@@ -7,7 +7,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  test:
+    name: Storybook UI tests
     runs-on: ubuntu-latest
 
     steps:
@@ -23,5 +24,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build
-        run: npm run build
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Storybook UI tests
+        run: npm run test:storybook

@@ -15,9 +15,9 @@ export function RouteSectionCard({ section, viewMode, onToggleSection, onToggleI
   const isCompact = viewMode === 'compact';
   const allChecked = section.checkedCount === section.items.length && section.items.length > 0;
   const noneChecked = section.checkedCount === 0;
-  const toggleTarget = allChecked;
+  const toggleTarget = !allChecked;
   const state = allChecked ? 'checked' : noneChecked ? 'unchecked' : 'mixed';
-  const actionLabel = toggleTarget ? messages.sectionToggle.untickAll : messages.sectionToggle.tickAll;
+  const actionLabel = allChecked ? messages.sectionToggle.untickAll : messages.sectionToggle.tickAll;
   const sectionTitleId = `route-section-${section.key}-title`;
 
   return (
