@@ -239,6 +239,9 @@ export const fr: Messages = {
   mobileMenu: {
     openNavigation: 'Ouvrir le menu de navigation',
   },
+  pwaInstall: {
+    ...en.pwaInstall,
+  },
   backendStatus: {
     connected: 'En ligne',
     checking: 'Vérification',

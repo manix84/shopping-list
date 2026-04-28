@@ -232,6 +232,9 @@ export const pi: Messages = {
   mobileMenu: {
     openNavigation: 'Open the nav chart',
   },
+  pwaInstall: {
+    ...en.pwaInstall,
+  },
   backendStatus: {
     connected: 'Ahoy',
     checking: 'Lookout',

@@ -436,6 +436,11 @@ select {
     padding: 0;
     text-decoration: underline;
   }
+
+  &-sm {
+    border-radius: 12px;
+    padding: 9px 12px;
+  }
 }
 
 .button-icon {
@@ -1025,7 +1030,8 @@ select {
   .share-qr-dialog,
   .share-scanner-modal,
   .share-scanner-dialog,
-  .share-scanner-frame-missing {
+  .share-scanner-frame-missing,
+  .settings-install-row {
     animation: none;
     transition: none;
   }
@@ -1506,6 +1512,120 @@ select {
   text-align: right;
 }
 
+.settings-install-row {
+  align-items: center;
+  animation: settings-install-row-in 0.2s ease-out both;
+  background: $panel-alt;
+  border: 1px solid $border;
+  border-radius: 18px;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  padding: 14px;
+}
+
+@keyframes settings-install-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.settings-install-icon,
+.pwa-install-badge-icon {
+  align-items: center;
+  background: color-mix(in srgb, $primary 12%, $panel);
+  border: 1px solid color-mix(in srgb, $primary 28%, $border);
+  border-radius: 14px;
+  color: $primary;
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: 42px;
+  justify-content: center;
+  width: 42px;
+
+  svg {
+    display: block;
+    height: 22px;
+    width: 22px;
+  }
+}
+
+.settings-install-copy {
+  min-width: 0;
+
+  h3 {
+    font-size: 14px;
+    line-height: 1.25;
+    margin: 0 0 4px;
+  }
+
+  p {
+    color: $muted;
+    font-size: 13px;
+    line-height: 1.4;
+    margin: 0;
+  }
+}
+
+.pwa-install-badge {
+  align-items: center;
+  background: color-mix(in srgb, $panel 94%, transparent);
+  border: 1px solid color-mix(in srgb, $border 86%, transparent);
+  border-radius: 18px;
+  bottom: max(18px, env(safe-area-inset-bottom));
+  box-shadow: 0 18px 42px color-mix(in srgb, var(--shadow-color) 88%, transparent);
+  display: grid;
+  gap: 12px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  left: 50%;
+  max-width: min(520px, calc(100vw - 32px));
+  padding: 12px;
+  position: fixed;
+  transform: translateX(-50%);
+  width: max-content;
+  z-index: 80;
+}
+
+.pwa-install-badge-copy {
+  min-width: 0;
+
+  h2 {
+    font-size: 14px;
+    line-height: 1.25;
+    margin: 0 0 3px;
+  }
+
+  p {
+    color: $muted;
+    font-size: 12px;
+    line-height: 1.35;
+    margin: 0;
+  }
+}
+
+.pwa-install-badge-actions {
+  align-items: center;
+  display: inline-flex;
+  gap: 8px;
+}
+
+.pwa-install-dismiss {
+  height: 38px;
+  width: 38px;
+
+  svg {
+    display: block;
+    height: 18px;
+    width: 18px;
+  }
+}
+
 .about-page {
   display: block;
 }
@@ -1839,6 +1959,29 @@ select {
   .textarea,
   .select {
     padding: 11px 12px;
+  }
+
+  .settings-install-row {
+    align-items: stretch;
+    grid-template-columns: auto minmax(0, 1fr);
+
+    .button {
+      grid-column: 1 / -1;
+      justify-self: stretch;
+    }
+  }
+
+  .pwa-install-badge {
+    align-items: flex-start;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    grid-template-columns: auto minmax(0, 1fr);
+    max-width: calc(100vw - 20px);
+    width: calc(100vw - 20px);
+  }
+
+  .pwa-install-badge-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
   }
 
   .empty-state {

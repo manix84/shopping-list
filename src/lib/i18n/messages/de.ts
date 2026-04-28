@@ -236,6 +236,9 @@ export const de: Messages = {
   mobileMenu: {
     openNavigation: 'Navigationsmenü öffnen',
   },
+  pwaInstall: {
+    ...en.pwaInstall,
+  },
   backendStatus: {
     connected: 'Online',
     checking: 'Prüfung',
