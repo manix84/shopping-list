@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { COUNTRY_CONFIGS } from './config/countries';
 import { AppHeader } from './components/AppHeader';
+import { PwaInstallBadge } from './components/PwaInstallBadge';
 import { PwaSplashScreen } from './components/PwaSplashScreen';
 import {
   runCountQuantityTests,
@@ -51,7 +52,16 @@ import type { AppRoute, BackendStatus, CountryCode, GroupedSectionView, Item, Pa
 const DEFAULT_PAGE: PageKey = 'edit';
 const BACKEND_HEARTBEAT_CONNECTED_MS = 5_000;
 const BACKEND_HEARTBEAT_RETRY_MS = 1_500;
+const PWA_INSTALL_NUDGE_DISMISSED_KEY = 'smart-shopping-list-pwa-install-nudge-dismissed-v1';
 type StorageMode = 'local' | 'backend';
+type BeforeInstallPromptChoice = {
+  outcome: 'accepted' | 'dismissed';
+  platform: string;
+};
+type BeforeInstallPromptEvent = Event & {
+  prompt: () => Promise<void>;
+  userChoice: Promise<BeforeInstallPromptChoice>;
+};
 type ShareErrorKey =
   | 'connectBackendFirst'
   | 'createFailed'
@@ -75,6 +85,25 @@ const defaultBackendStatus = (): BackendStatus => ({
 
 const appBasePath = import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_URL.replace(/\/$/, '');
 const currentOrigin = (): string | undefined => (typeof window === 'undefined' ? undefined : window.location.origin);
+
+const isRunningInstalledPwa = (): boolean => {
+  if (typeof window === 'undefined') return false;
+
+  const navigatorWithStandalone = window.navigator as Navigator & { standalone?: boolean };
+  return window.matchMedia('(display-mode: standalone)').matches || navigatorWithStandalone.standalone === true;
+};
+
+const isMobileOrTabletDevice = (): boolean => {
+  if (typeof window === 'undefined') return false;
+
+  return window.matchMedia('(hover: none), (pointer: coarse)').matches && window.matchMedia('(max-width: 1180px)').matches;
+};
+
+const hasDismissedPwaInstallNudge = (): boolean => {
+  if (typeof window === 'undefined') return false;
+
+  return window.localStorage.getItem(PWA_INSTALL_NUDGE_DISMISSED_KEY) === 'true';
+};
 
 const updateBrowserIcon = (theme: 'light' | 'dark'): void => {
   if (typeof document === 'undefined') return;
@@ -154,6 +183,10 @@ export default function App() {
   const [isLoadingSharedList, setIsLoadingSharedList] = useState(false);
   const [shareError, setShareError] = useState<ShareErrorKey>();
   const [sharedListHistory, setSharedListHistory] = useState<SharedListHistoryEntry[]>(() => sharedListHistoryRepository.load());
+  const [beforeInstallPromptEvent, setBeforeInstallPromptEvent] = useState<BeforeInstallPromptEvent>();
+  const [isPwaInstalled, setIsPwaInstalled] = useState(() => isRunningInstalledPwa());
+  const [isPwaInstallNudgeVisible, setIsPwaInstallNudgeVisible] = useState(() => !hasDismissedPwaInstallNudge());
+  const [isLikelyMobileForInstall, setIsLikelyMobileForInstall] = useState(() => isMobileOrTabletDevice());
 
   const config = useMemo(() => COUNTRY_CONFIGS[countryCode], [countryCode]);
   const messages = useMemo(() => createMessages(locale), [locale]);
@@ -561,6 +594,45 @@ export default function App() {
     }
   }, [isLoaded, items.length, page]);
 
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (event: Event) => {
+      event.preventDefault();
+      setBeforeInstallPromptEvent(event as BeforeInstallPromptEvent);
+    };
+
+    const handleAppInstalled = () => {
+      setIsPwaInstalled(true);
+      setBeforeInstallPromptEvent(undefined);
+      setIsPwaInstallNudgeVisible(false);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('appinstalled', handleAppInstalled);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('appinstalled', handleAppInstalled);
+    };
+  }, []);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(hover: none), (pointer: coarse)');
+    const widthQuery = window.matchMedia('(max-width: 1180px)');
+    const syncInstallDevice = () => {
+      setIsLikelyMobileForInstall(mediaQuery.matches && widthQuery.matches);
+      setIsPwaInstalled(isRunningInstalledPwa());
+    };
+
+    syncInstallDevice();
+    mediaQuery.addEventListener('change', syncInstallDevice);
+    widthQuery.addEventListener('change', syncInstallDevice);
+
+    return () => {
+      mediaQuery.removeEventListener('change', syncInstallDevice);
+      widthQuery.removeEventListener('change', syncInstallDevice);
+    };
+  }, []);
+
   const matcherTests = useMemo(() => runMatcherTests(config), [config]);
   const configTests = useMemo(() => runConfigTests(config), [config]);
   const countQuantityTests = useMemo(() => runCountQuantityTests(), []);
@@ -788,6 +860,28 @@ export default function App() {
     setRoute({ page: 'edit' });
   };
 
+  const dismissPwaInstallNudge = () => {
+    window.localStorage.setItem(PWA_INSTALL_NUDGE_DISMISSED_KEY, 'true');
+    setIsPwaInstallNudgeVisible(false);
+  };
+
+  const promptPwaInstall = async () => {
+    if (!beforeInstallPromptEvent) return;
+
+    await beforeInstallPromptEvent.prompt();
+    const choice = await beforeInstallPromptEvent.userChoice;
+    setBeforeInstallPromptEvent(undefined);
+
+    if (choice.outcome === 'accepted') {
+      setIsPwaInstalled(true);
+      setIsPwaInstallNudgeVisible(false);
+      return;
+    }
+
+    dismissPwaInstallNudge();
+  };
+  const isFloatingPwaInstallVisible = isLoaded && isPwaInstallNudgeVisible && !isPwaInstalled && isLikelyMobileForInstall;
+
   return (
     <I18nProvider value={{ locale, messages, setLocale }}>
       <PwaSplashScreen />
@@ -861,6 +955,11 @@ export default function App() {
                 onRouteViewModeChange={setRouteViewMode}
                 onThemeChange={setThemeMode}
                 onOpenDebug={() => changePage('debug')}
+                canPromptInstall={Boolean(beforeInstallPromptEvent)}
+                isInstalled={isPwaInstalled}
+                isLikelyMobileForInstall={isLikelyMobileForInstall}
+                isFloatingInstallVisible={isFloatingPwaInstallVisible}
+                onInstall={promptPwaInstall}
               />
             ) : null}
 
@@ -894,6 +993,12 @@ export default function App() {
             ) : null}
           </main>
         </div>
+        <PwaInstallBadge
+          canPromptInstall={Boolean(beforeInstallPromptEvent)}
+          isVisible={isFloatingPwaInstallVisible}
+          onDismiss={dismissPwaInstallNudge}
+          onInstall={promptPwaInstall}
+        />
       </div>
     </I18nProvider>
   );

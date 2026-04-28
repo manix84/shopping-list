@@ -202,6 +202,19 @@ export const en: Messages = {
   mobileMenu: {
     openNavigation: 'Open navigation menu',
   },
+  pwaInstall: {
+    title: 'Install the app',
+    description: 'Keep your shopping list one tap away on this device.',
+    installAction: 'Install',
+    dismissAction: 'Not now',
+    dismissLabel: 'Dismiss install prompt',
+    settingsTitle: 'Install on this device',
+    settingsDescription:
+      'Add Smart Shopping List to your home screen for faster access.',
+    unavailableTitle: 'Install from your browser menu',
+    unavailableDescription:
+      'Use your browser share or menu button, then choose Add to Home Screen or Install app.',
+  },
   backendStatus: {
     connected: 'Online',
     checking: 'Checking',

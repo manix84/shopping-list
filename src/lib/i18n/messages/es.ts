@@ -207,6 +207,19 @@ export const es: Messages = {
   mobileMenu: {
     openNavigation: 'Abrir menú de navegación',
   },
+  pwaInstall: {
+    title: 'Instalar la app',
+    description: 'Ten tu lista de la compra a un toque en este dispositivo.',
+    installAction: 'Instalar',
+    dismissAction: 'Ahora no',
+    dismissLabel: 'Descartar aviso de instalación',
+    settingsTitle: 'Instalar en este dispositivo',
+    settingsDescription:
+      'Añade Lista de la compra inteligente a la pantalla de inicio para acceder más rápido.',
+    unavailableTitle: 'Instalar desde el menú del navegador',
+    unavailableDescription:
+      'Usa el botón de compartir o el menú del navegador y elige Añadir a pantalla de inicio o Instalar app.',
+  },
   backendStatus: {
     connected: 'En línea',
     checking: 'Comprobando',
