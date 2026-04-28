@@ -45,7 +45,7 @@ export const es: Messages = {
     available: 'disponible',
     cleaned: 'Limpio',
     count: 'cantidad',
-    countryProfile: 'Perfil de país',
+    countryProfile: 'Perfil de distribución de tienda',
     created: 'creada',
     defaultList: 'lista predeterminada',
     done: 'Hecho',
@@ -78,6 +78,8 @@ export const es: Messages = {
         'Pega desde cualquier sitio, ajusta la lista y guárdala localmente por ahora.',
       pasteLabel: 'Pega o escribe tu lista',
       pastePlaceholder: 'leche\npan\nmanzanas\ncafé',
+      countryProfileHint:
+        'Elige las reglas de distribución de tienda usadas para ordenar pasillos y secciones en este país.',
       quickAddLabel: 'Añadir un artículo rápido',
       quickAddPlaceholder: 'p. ej. plátanos x20',
       sharingTitle: 'Compartir',
@@ -108,7 +110,7 @@ export const es: Messages = {
       title: 'Ajustes',
       subtitle:
         'Preferencias que afectan a cómo este dispositivo muestra y agrupa las listas de la compra.',
-      countryLabel: 'Perfil de país',
+      countryLabel: 'Perfil de distribución de tienda',
       themeLabel: 'Tema',
       themeSubtitle: 'Elige el aspecto que te resulte más cómodo de usar.',
       localeLabel: 'Idioma',

@@ -50,7 +50,7 @@ export const fr: Messages = {
     available: 'disponible',
     cleaned: 'Nettoyé',
     count: 'nombre',
-    countryProfile: 'Profil pays',
+    countryProfile: 'Profil d’agencement magasin',
     created: 'créé',
     defaultList: 'liste par défaut',
     done: 'Terminé',
@@ -84,6 +84,8 @@ export const fr: Messages = {
         'Collez depuis n’importe où, ajustez la liste et enregistrez-la localement pour le moment.',
       pasteLabel: 'Collez ou saisissez votre liste',
       pastePlaceholder: 'lait\npain\npommes\ncafé',
+      countryProfileHint:
+        'Choisissez les règles d’agencement utilisées pour trier les rayons et sections de ce pays.',
       quickAddLabel: 'Ajout rapide d’un article',
       quickAddPlaceholder: 'ex. bananes x20',
       sharingTitle: 'Partage',
@@ -114,7 +116,7 @@ export const fr: Messages = {
       title: 'Paramètres',
       subtitle:
         'Préférences qui influencent la façon dont cet appareil affiche et groupe les listes de courses.',
-      countryLabel: 'Profil pays',
+      countryLabel: 'Profil d’agencement magasin',
       themeLabel: 'Thème',
       themeSubtitle: 'Choisissez l’apparence la plus agréable à utiliser.',
       localeLabel: 'Langue',

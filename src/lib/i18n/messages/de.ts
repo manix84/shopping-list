@@ -50,7 +50,7 @@ export const de: Messages = {
     available: 'verfügbar',
     cleaned: 'Bereinigt',
     count: 'Anzahl',
-    countryProfile: 'Länderprofil',
+    countryProfile: 'Ladenlayout-Profil',
     created: 'erstellt',
     defaultList: 'Standardliste',
     done: 'Erledigt',
@@ -84,6 +84,8 @@ export const de: Messages = {
         'Füge Inhalte aus beliebigen Quellen ein, passe die Liste an und speichere sie vorerst lokal.',
       pasteLabel: 'Liste einfügen oder eingeben',
       pastePlaceholder: 'milch\nbrot\näpfel\nkaffee',
+      countryProfileHint:
+        'Wähle die Ladenlayout-Regeln, nach denen Gänge und Bereiche für dieses Land sortiert werden.',
       quickAddLabel: 'Schnell einen Artikel hinzufügen',
       quickAddPlaceholder: 'z. B. bananen x20',
       sharingTitle: 'Teilen',
@@ -114,7 +116,7 @@ export const de: Messages = {
       title: 'Einstellungen',
       subtitle:
         'Voreinstellungen dafür, wie dieses Gerät Einkaufslisten darstellt und gruppiert.',
-      countryLabel: 'Länderprofil',
+      countryLabel: 'Ladenlayout-Profil',
       themeLabel: 'Design',
       themeSubtitle: 'Wähle die Darstellung, die für dich am angenehmsten ist.',
       localeLabel: 'Sprache',

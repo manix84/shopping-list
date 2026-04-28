@@ -46,7 +46,7 @@ export const en: Messages = {
     available: 'available',
     cleaned: 'Cleaned',
     count: 'count',
-    countryProfile: 'Country profile',
+    countryProfile: 'Store layout profile',
     created: 'created',
     defaultList: 'default list',
     done: 'Done',
@@ -79,6 +79,8 @@ export const en: Messages = {
         'Paste from anywhere, tweak the list, and save it locally for now.',
       pasteLabel: 'Paste or type your list',
       pastePlaceholder: 'milk\nbread\napples\ncoffee',
+      countryProfileHint:
+        'Choose the store layout rules used to sort aisles and sections for this country.',
       quickAddLabel: 'Quick add single item',
       quickAddPlaceholder: 'e.g. bananas x20',
       sharingTitle: 'Sharing',
@@ -107,7 +109,7 @@ export const en: Messages = {
       title: 'Settings',
       subtitle:
         'Preferences that affect how this device displays and groups shopping lists.',
-      countryLabel: 'Country profile',
+      countryLabel: 'Store layout profile',
       themeLabel: 'Theme',
       themeSubtitle: 'Choose the look that feels easiest to use.',
       localeLabel: 'Language',

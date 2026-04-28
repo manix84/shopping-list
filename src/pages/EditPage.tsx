@@ -88,6 +88,7 @@ export function EditPage({
         <div className="field field-compact">
           <label htmlFor="list-country-select">{messages.pages.settings.countryLabel}</label>
           <CountrySelect id="list-country-select" value={countryCode} onChange={onCountryChange} />
+          <div className="small-text">{messages.pages.edit.countryProfileHint}</div>
         </div>
 
         <div className="field">
