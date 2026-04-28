@@ -50,7 +50,7 @@ export const pi: Messages = {
     available: 'available',
     cleaned: 'Swabbed',
     count: 'count',
-    countryProfile: 'Waters profile',
+    countryProfile: 'Market layout profile',
     created: 'forged',
     defaultList: 'default ledger',
     done: 'Done fer',
@@ -84,6 +84,8 @@ export const pi: Messages = {
         'Paste from anywhere, tweak the cargo list, and stash it local fer now.',
       pasteLabel: 'Paste or write yer ledger',
       pastePlaceholder: 'milk\nbread\napples\ncoffee',
+      countryProfileHint:
+        'Choose the market layout rules used to sort aisles and decks fer these waters.',
       quickAddLabel: 'Quick-add one bit o’ cargo',
       quickAddPlaceholder: 'e.g. bananas x20',
       sharingTitle: 'Chart sharing',
@@ -112,7 +114,7 @@ export const pi: Messages = {
       title: 'Rigging',
       subtitle:
         'Preferences fer how this device shows and groups yer shopping ledgers.',
-      countryLabel: 'Waters profile',
+      countryLabel: 'Market layout profile',
       themeLabel: 'Look',
       themeSubtitle: 'Choose the look that sits easiest on yer eyes.',
       localeLabel: 'Tongue',

@@ -49,7 +49,7 @@ export const ro: Messages = {
     available: 'disponibil',
     cleaned: 'Curățat',
     count: 'număr',
-    countryProfile: 'Profil de țară',
+    countryProfile: 'Profil de aranjare a magazinului',
     created: 'creat',
     defaultList: 'listă implicită',
     done: 'Gata',
@@ -83,6 +83,8 @@ export const ro: Messages = {
         'Lipește de oriunde, ajustează lista și salveaz-o local deocamdată.',
       pasteLabel: 'Lipește sau scrie lista',
       pastePlaceholder: 'lapte\npâine\nmere\ncafea',
+      countryProfileHint:
+        'Alege regulile de aranjare a magazinului folosite pentru sortarea raioanelor și secțiunilor din această țară.',
       quickAddLabel: 'Adaugă rapid un articol',
       quickAddPlaceholder: 'ex. banane x20',
       sharingTitle: 'Partajare',
@@ -112,7 +114,7 @@ export const ro: Messages = {
       title: 'Setări',
       subtitle:
         'Preferințe care influențează cum acest dispozitiv afișează și grupează listele de cumpărături.',
-      countryLabel: 'Profil de țară',
+      countryLabel: 'Profil de aranjare a magazinului',
       themeLabel: 'Temă',
       themeSubtitle: 'Alege aspectul cel mai confortabil pentru tine.',
       localeLabel: 'Limbă',

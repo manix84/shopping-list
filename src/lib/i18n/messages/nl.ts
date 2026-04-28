@@ -50,7 +50,7 @@ export const nl: Messages = {
     available: 'beschikbaar',
     cleaned: 'Opgeschoond',
     count: 'aantal',
-    countryProfile: 'Landprofiel',
+    countryProfile: 'Winkelindelingsprofiel',
     created: 'aangemaakt',
     defaultList: 'standaardlijst',
     done: 'Klaar',
@@ -84,6 +84,8 @@ export const nl: Messages = {
         'Plak van overal, pas de lijst aan en sla hem voorlopig lokaal op.',
       pasteLabel: 'Plak of typ je lijst',
       pastePlaceholder: 'melk\nbrood\nappels\nkoffie',
+      countryProfileHint:
+        'Kies de winkelindelingsregels waarmee gangen en secties voor dit land worden gesorteerd.',
       quickAddLabel: 'Snel één artikel toevoegen',
       quickAddPlaceholder: 'bijv. bananen x20',
       sharingTitle: 'Delen',
@@ -113,7 +115,7 @@ export const nl: Messages = {
       title: 'Instellingen',
       subtitle:
         'Voorkeuren die bepalen hoe dit apparaat boodschappenlijsten toont en groepeert.',
-      countryLabel: 'Landprofiel',
+      countryLabel: 'Winkelindelingsprofiel',
       themeLabel: 'Thema',
       themeSubtitle: 'Kies de weergave die voor jou het prettigst werkt.',
       localeLabel: 'Taal',

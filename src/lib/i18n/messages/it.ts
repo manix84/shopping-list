@@ -49,7 +49,7 @@ export const it: Messages = {
     available: 'disponibile',
     cleaned: 'Pulito',
     count: 'conteggio',
-    countryProfile: 'Profilo paese',
+    countryProfile: 'Profilo disposizione negozio',
     created: 'creato',
     defaultList: 'lista predefinita',
     done: 'Fatto',
@@ -83,6 +83,8 @@ export const it: Messages = {
         'Incolla da ovunque, modifica la lista e salvala localmente per ora.',
       pasteLabel: 'Incolla o scrivi la tua lista',
       pastePlaceholder: 'latte\npane\nmele\ncaffè',
+      countryProfileHint:
+        'Scegli le regole di disposizione del negozio usate per ordinare corsie e sezioni in questo paese.',
       quickAddLabel: 'Aggiungi rapidamente un articolo',
       quickAddPlaceholder: 'es. banane x20',
       sharingTitle: 'Condivisione',
@@ -112,7 +114,7 @@ export const it: Messages = {
       title: 'Impostazioni',
       subtitle:
         'Preferenze che influenzano il modo in cui questo dispositivo mostra e raggruppa le liste della spesa.',
-      countryLabel: 'Profilo paese',
+      countryLabel: 'Profilo disposizione negozio',
       themeLabel: 'Tema',
       themeSubtitle: 'Scegli l’aspetto più comodo da usare.',
       localeLabel: 'Lingua',

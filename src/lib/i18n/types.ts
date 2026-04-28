@@ -89,6 +89,7 @@ export type Messages = {
       subtitle: string;
       pasteLabel: string;
       pastePlaceholder: string;
+      countryProfileHint: string;
       quickAddLabel: string;
       quickAddPlaceholder: string;
       sharingTitle: string;
