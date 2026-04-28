@@ -1,14 +1,14 @@
 var _a;
-import { defineConfig } from 'vitest/config';
+import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
 import react from '@vitejs/plugin-react';
+import { playwright } from '@vitest/browser-playwright';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
-import { playwright } from '@vitest/browser-playwright';
+import { defineConfig } from 'vitest/config';
 var dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 var repoName = (_a = process.env.GITHUB_REPOSITORY) === null || _a === void 0 ? void 0 : _a.split('/')[1];
-var base = process.env.GITHUB_ACTIONS && repoName ? "/".concat(repoName, "/") : '/';
+var base = process.env.GITHUB_ACTIONS && repoName ? '/'.concat(repoName, '/') : '/';
 export default defineConfig({
     plugins: [react()],
     base: base,
