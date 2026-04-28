@@ -210,6 +210,9 @@ export const nl: Messages = {
   mobileMenu: {
     openNavigation: 'Navigatiemenu openen',
   },
+  pwaInstall: {
+    ...en.pwaInstall,
+  },
   backendStatus: {
     connected: 'Online',
     checking: 'Controleren',

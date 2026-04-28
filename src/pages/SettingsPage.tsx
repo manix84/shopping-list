@@ -168,16 +168,10 @@ export function SettingsPage({
     }),
   );
   const shouldShowInstallSetting = !isFloatingInstallVisible && !isInstalled && (isLikelyMobileForInstall || canPromptInstall);
-  const installTitle = isInstalled
-    ? messages.pwaInstall.installedTitle
-    : canPromptInstall
-      ? messages.pwaInstall.settingsTitle
-      : messages.pwaInstall.unavailableTitle;
-  const installDescription = isInstalled
-    ? messages.pwaInstall.installedDescription
-    : canPromptInstall
-      ? messages.pwaInstall.settingsDescription
-      : messages.pwaInstall.unavailableDescription;
+  const installTitle = canPromptInstall ? messages.pwaInstall.settingsTitle : messages.pwaInstall.unavailableTitle;
+  const installDescription = canPromptInstall
+    ? messages.pwaInstall.settingsDescription
+    : messages.pwaInstall.unavailableDescription;
 
   const installSetting = shouldShowInstallSetting ? (
     <div className="settings-install-row">

@@ -190,12 +190,11 @@ export type Messages = {
     description: string;
     installAction: string;
     dismissAction: string;
+    dismissLabel: string;
     settingsTitle: string;
     settingsDescription: string;
     unavailableTitle: string;
     unavailableDescription: string;
-    installedTitle: string;
-    installedDescription: string;
   };
   backendStatus: {
     connected: string;

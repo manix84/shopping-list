@@ -209,6 +209,9 @@ export const ro: Messages = {
   mobileMenu: {
     openNavigation: 'Deschide meniul de navigare',
   },
+  pwaInstall: {
+    ...en.pwaInstall,
+  },
   backendStatus: {
     connected: 'Online',
     checking: 'Se verifică',
