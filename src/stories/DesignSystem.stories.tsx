@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, userEvent, within } from 'storybook/test';
 
 const palette = [
   ['Background', 'var(--bg)'],
@@ -41,7 +42,7 @@ function StorySection({ title, children }: { title: string; children: React.Reac
 
 export const Foundations: Story = {
   render: () => (
-    <main className="shopping-app">
+    <main>
       <div className="shopping-shell" style={{ paddingBlock: 24 }}>
         <StorySection title="Typography">
           <div className="stack">
@@ -120,4 +121,19 @@ export const Foundations: Story = {
       </div>
     </main>
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await expect(canvas.getByRole('heading', { name: /page title/i })).toBeVisible();
+    await expect(canvas.getByText('Primary')).toBeVisible();
+    await expect(canvas.getByRole('button', { name: /primary action/i })).toBeVisible();
+
+    const input = canvas.getByLabelText('Field label');
+    await userEvent.type(input, 'Shopping note');
+    await expect(input).toHaveValue('Shopping note');
+
+    const select = canvas.getByLabelText('Select label');
+    await userEvent.selectOptions(select, 'two');
+    await expect(select).toHaveValue('two');
+  },
 };

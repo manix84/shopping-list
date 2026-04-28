@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, within } from 'storybook/test';
 import { TestResultCard } from './TestResultCard';
 import { StoryCanvas } from './storyFixtures';
 
@@ -26,6 +27,15 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
+const playTestResultCard: Story['play'] = async ({ args, canvasElement }) => {
+  const canvas = within(canvasElement);
+
+  await expect(canvas.getByText(args.title)).toBeVisible();
+  await expect(canvas.getByText(new RegExp(`expected ${args.expected}`, 'i'))).toBeVisible();
+  await expect(canvas.getByText(new RegExp(`got ${args.actual}`, 'i'))).toBeVisible();
+  await expect(canvas.getByText(args.label ?? (args.passed ? 'Pass' : 'Fail'))).toBeVisible();
+};
+
 export const Passing: Story = {
   args: {
     title: 'Parser keeps quantity',
@@ -38,6 +48,7 @@ export const Passing: Story = {
       <TestResultCard {...args} />
     </StoryCanvas>
   ),
+  play: playTestResultCard,
 };
 
 export const Failing: Story = {
@@ -48,6 +59,7 @@ export const Failing: Story = {
     passed: false,
   },
   render: Passing.render,
+  play: playTestResultCard,
 };
 
 export const CustomLabel: Story = {
@@ -60,4 +72,5 @@ export const CustomLabel: Story = {
     label: 'Skipped',
   },
   render: Passing.render,
+  play: playTestResultCard,
 };

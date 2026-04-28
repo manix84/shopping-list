@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import type { CountryCode } from '../types';
 import { Card } from './Card';
 import { CountrySelect } from './CountrySelect';
@@ -24,6 +25,15 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
+const playCountrySelect: Story['play'] = async ({ args, canvasElement }) => {
+  const canvas = within(canvasElement);
+  const select = canvas.getByLabelText('Store layout profile');
+
+  await expect(select).toHaveValue(args.value);
+  await userEvent.selectOptions(select, 'us');
+  await expect(select).toHaveValue('us');
+};
+
 function CountrySelectExample({ value }: { value: CountryCode }) {
   const [countryCode, setCountryCode] = useState<CountryCode>(value);
 
@@ -46,6 +56,7 @@ export const UnitedKingdom: Story = {
     onChange: () => undefined,
   },
   render: (args) => <CountrySelectExample value={args.value} />,
+  play: playCountrySelect,
 };
 
 export const UnitedStates: Story = {
@@ -54,6 +65,7 @@ export const UnitedStates: Story = {
     value: 'us',
   },
   render: UnitedKingdom.render,
+  play: playCountrySelect,
 };
 
 export const Canada: Story = {
@@ -62,4 +74,5 @@ export const Canada: Story = {
     value: 'ca',
   },
   render: UnitedKingdom.render,
+  play: playCountrySelect,
 };

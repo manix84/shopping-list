@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, within } from 'storybook/test';
 import { Badge } from './Badge';
 import { Card } from './Card';
 import { StoryCanvas } from './storyFixtures';
@@ -29,6 +30,19 @@ const meta = {
 export default meta;
 
 type Story = StoryObj<CardStoryArgs>;
+
+const playCard: Story['play'] = async ({ args, canvasElement }) => {
+  const canvas = within(canvasElement);
+
+  await expect(canvas.getByText(args.body)).toBeVisible();
+  await expect(canvas.getByText('Default badge')).toBeVisible();
+  await expect(canvas.getByText('Ready')).toBeVisible();
+
+  if (args.showHeader) {
+    await expect(canvas.getByRole('heading', { name: args.heading })).toBeVisible();
+    await expect(canvas.getByText(args.subtitle)).toBeVisible();
+  }
+};
 
 function CardExample({ heading, subtitle, body, showHeader, bodyClassName }: CardStoryArgs) {
   return (
@@ -63,6 +77,7 @@ export const WithHeader: Story = {
     bodyClassName: 'stack',
   },
   render: (args) => <CardExample {...args} />,
+  play: playCard,
 };
 
 export const BodyOnly: Story = {
@@ -71,4 +86,5 @@ export const BodyOnly: Story = {
     showHeader: false,
   },
   render: WithHeader.render,
+  play: playCard,
 };

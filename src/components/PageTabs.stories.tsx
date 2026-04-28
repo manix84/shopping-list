@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import type { PageKey } from '../types';
 import { Card } from './Card';
 import { PageTabs } from './PageTabs';
@@ -25,6 +26,22 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
+const playPageTabs: Story['play'] = async ({ args, canvasElement }) => {
+  const canvas = within(canvasElement);
+
+  await expect(canvas.getByText(`Current page: ${args.page}`)).toBeVisible();
+
+  if (args.hasItems) {
+    await userEvent.click(canvas.getByRole('button', { name: /route/i }));
+    await expect(canvas.getByText('Current page: route')).toBeVisible();
+  } else {
+    await expect(canvas.getByRole('button', { name: /route/i })).toHaveAttribute('aria-disabled', 'true');
+  }
+
+  await userEvent.click(canvas.getByRole('button', { name: /settings/i }));
+  await expect(canvas.getByText('Current page: settings')).toBeVisible();
+};
+
 function PageTabsExample({ page: initialPage, hasItems }: { page: PageKey; hasItems: boolean }) {
   const [page, setPage] = useState<PageKey>(initialPage);
 
@@ -45,6 +62,7 @@ export const EditActive: Story = {
     onChange: () => undefined,
   },
   render: (args) => <PageTabsExample page={args.page} hasItems={args.hasItems} />,
+  play: playPageTabs,
 };
 
 export const RouteActive: Story = {
@@ -54,6 +72,7 @@ export const RouteActive: Story = {
     onChange: () => undefined,
   },
   render: EditActive.render,
+  play: playPageTabs,
 };
 
 export const RouteDisabled: Story = {
@@ -63,4 +82,5 @@ export const RouteDisabled: Story = {
     onChange: () => undefined,
   },
   render: EditActive.render,
+  play: playPageTabs,
 };

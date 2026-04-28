@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import type { BackendStatus, PageKey } from '../types';
 import { AppHeader } from './AppHeader';
 import { connectedBackend, offlineBackend, StoryCanvas } from './storyFixtures';
@@ -27,6 +28,26 @@ const meta = {
 export default meta;
 
 type Story = StoryObj<typeof meta>;
+
+const playAppHeader: Story['play'] = async ({ args, canvasElement }) => {
+  const canvas = within(canvasElement);
+
+  await expect(canvas.getByRole('heading', { name: /smart shopping list/i })).toBeVisible();
+  await expect(canvas.getByText(/ordered route through the store/i)).toBeVisible();
+
+  if (args.backendStatus.state === 'offline') {
+    const statusButton = canvas.getByRole('button', { name: /offline/i });
+
+    await userEvent.click(statusButton);
+    await expect(canvas.getByRole('tooltip')).toBeVisible();
+  } else {
+    await expect(canvas.getByText(/online/i)).toBeInTheDocument();
+  }
+
+  const settingsButton = canvas.getByRole('button', { name: /settings/i });
+  await userEvent.click(settingsButton);
+  await expect(settingsButton).toHaveAttribute('aria-current', 'page');
+};
 
 function AppHeaderExample({
   page: initialPage,
@@ -70,6 +91,7 @@ export const Connected: Story = {
       resolvedTheme={args.resolvedTheme}
     />
   ),
+  play: playAppHeader,
 };
 
 export const Offline: Story = {
@@ -81,4 +103,5 @@ export const Offline: Story = {
     onChangePage: () => undefined,
   },
   render: Connected.render,
+  play: playAppHeader,
 };

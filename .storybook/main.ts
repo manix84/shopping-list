@@ -7,6 +7,7 @@ const packageRoot = join(rootDir, '..');
 
 const config: StorybookConfig = {
   stories: ['../src/**/*.stories.@(ts|tsx|mdx)'],
+  staticDirs: ['../public'],
   addons: [
     '@storybook/addon-docs',
     '@storybook/addon-a11y',

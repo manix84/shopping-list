@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, within } from 'storybook/test';
 import { StatsGrid } from './StatsGrid';
 import { StoryCanvas } from './storyFixtures';
 
@@ -20,6 +21,14 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
+const playStatsGrid: Story['play'] = async ({ args, canvasElement }) => {
+  const canvas = within(canvasElement);
+
+  await expect(canvas.getAllByText(String(args.total))[0]).toBeVisible();
+  await expect(canvas.getAllByText(String(args.checkedTotal))[0]).toBeVisible();
+  await expect(canvas.getByText(`${args.progress}%`)).toBeVisible();
+};
+
 export const InProgress: Story = {
   args: {
     total: 18,
@@ -31,6 +40,7 @@ export const InProgress: Story = {
       <StatsGrid {...args} />
     </StoryCanvas>
   ),
+  play: playStatsGrid,
 };
 
 export const Empty: Story = {
@@ -40,6 +50,7 @@ export const Empty: Story = {
     progress: 0,
   },
   render: InProgress.render,
+  play: playStatsGrid,
 };
 
 export const Complete: Story = {
@@ -49,4 +60,5 @@ export const Complete: Story = {
     progress: 100,
   },
   render: InProgress.render,
+  play: playStatsGrid,
 };

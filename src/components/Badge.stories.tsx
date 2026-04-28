@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, within } from 'storybook/test';
 import { Badge } from './Badge';
 import { StoryCanvas } from './storyFixtures';
 
@@ -24,6 +25,12 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
+const playBadge: Story['play'] = async ({ args, canvasElement }) => {
+  const canvas = within(canvasElement);
+
+  await expect(canvas.getByText(String(args.children))).toBeVisible();
+};
+
 export const Default: Story = {
   args: {
     children: 'Default',
@@ -34,6 +41,7 @@ export const Default: Story = {
       <Badge {...args} />
     </StoryCanvas>
   ),
+  play: playBadge,
 };
 
 export const Success: Story = {
@@ -42,6 +50,7 @@ export const Success: Story = {
     tone: 'success',
   },
   render: Default.render,
+  play: playBadge,
 };
 
 export const Danger: Story = {
@@ -50,6 +59,7 @@ export const Danger: Story = {
     tone: 'danger',
   },
   render: Default.render,
+  play: playBadge,
 };
 
 export const Muted: Story = {
@@ -58,4 +68,5 @@ export const Muted: Story = {
     tone: 'muted',
   },
   render: Default.render,
+  play: playBadge,
 };
