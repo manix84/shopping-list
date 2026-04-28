@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { ReactNode } from 'react';
 import { expect, userEvent, within } from 'storybook/test';
 
 const palette = [
@@ -29,7 +30,7 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-function StorySection({ title, children }: { title: string; children: React.ReactNode }) {
+function StorySection({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="card">
       <div className="card-header">

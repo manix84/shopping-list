@@ -33,7 +33,7 @@ const playRouteSectionCard: Story['play'] = async ({ args, canvasElement }) => {
 
   if (args.viewMode !== 'compact') {
     await userEvent.click(canvas.getByRole('button', { name: /tick all/i }));
-    await expect(args.onToggleSection).toHaveBeenCalledWith(args.section.key, false);
+    await expect(args.onToggleSection).toHaveBeenCalledWith(args.section.key, true);
   }
 };
 

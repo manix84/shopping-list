@@ -1,4 +1,6 @@
 import type { Preview } from '@storybook/react-vite';
+import type { ReactNode } from 'react';
+import type {} from './storybook-env';
 import { useEffect } from 'react';
 import { createMessages, I18nProvider } from '../src/lib/i18n';
 import '../src/styles/main.scss';
@@ -7,7 +9,7 @@ const locale = 'en';
 const messages = createMessages(locale);
 type StorybookTheme = 'light' | 'dark';
 
-function ThemeDecorator({ theme, children }: { theme: StorybookTheme; children: React.ReactNode }) {
+function ThemeDecorator({ theme, children }: { theme: StorybookTheme; children: ReactNode }) {
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
 

@@ -34,6 +34,7 @@ export default defineConfig({
       })],
       test: {
         name: 'storybook',
+        exclude: ['src/**/*.test.ts'],
         browser: {
           enabled: true,
           headless: true,
