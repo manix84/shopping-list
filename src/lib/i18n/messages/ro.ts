@@ -12,6 +12,7 @@ export const ro: Messages = {
     route: 'Traseu',
     sections: 'Secțiuni',
     settings: 'Setări',
+    about: 'Despre',
     debugTools: 'Unelte de depanare',
   },
   actions: {

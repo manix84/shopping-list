@@ -22,6 +22,7 @@ export type Messages = {
     route: string;
     sections: string;
     settings: string;
+    about: string;
     debugTools: string;
   };
   actions: {

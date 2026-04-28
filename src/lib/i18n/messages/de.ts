@@ -13,6 +13,7 @@ export const de: Messages = {
     route: 'Route',
     sections: 'Bereiche',
     settings: 'Einstellungen',
+    about: 'Info',
     debugTools: 'Debug-Werkzeuge',
   },
   actions: {

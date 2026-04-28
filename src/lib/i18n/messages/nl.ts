@@ -13,6 +13,7 @@ export const nl: Messages = {
     route: 'Route',
     sections: 'Secties',
     settings: 'Instellingen',
+    about: 'Over',
     debugTools: 'Debughulpmiddelen',
   },
   actions: {

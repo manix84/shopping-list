@@ -12,6 +12,7 @@ export const it: Messages = {
     route: 'Percorso',
     sections: 'Sezioni',
     settings: 'Impostazioni',
+    about: 'Info',
     debugTools: 'Strumenti di debug',
   },
   actions: {

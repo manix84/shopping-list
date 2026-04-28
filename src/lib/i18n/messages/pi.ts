@@ -13,6 +13,7 @@ export const pi: Messages = {
     route: 'Route',
     sections: 'Decks',
     settings: 'Rigging',
+    about: 'About',
     debugTools: 'Bilge tools',
   },
   actions: {

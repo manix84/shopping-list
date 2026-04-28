@@ -13,6 +13,7 @@ export const fr: Messages = {
     route: 'Parcours',
     sections: 'Sections',
     settings: 'Paramètres',
+    about: 'À propos',
     debugTools: 'Outils de débogage',
   },
   actions: {

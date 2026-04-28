@@ -18,9 +18,10 @@ describe('routing', () => {
     });
   });
 
-  it('keeps settings and sections app-level when rendering URLs', () => {
+  it('keeps settings, sections, and about app-level when rendering URLs', () => {
     expect(routeToUrl({ page: 'settings', listId: LIST_ID })).toBe('/#/settings');
     expect(routeToUrl({ page: 'sections', listId: LIST_ID })).toBe('/#/sections');
+    expect(routeToUrl({ page: 'about', listId: LIST_ID })).toBe('/#/about');
   });
 
   it('renders list-specific edit and route URLs', () => {

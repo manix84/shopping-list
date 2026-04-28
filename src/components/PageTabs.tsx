@@ -37,6 +37,14 @@ export function PageTabs({ page, hasItems, onChange }: PageTabsProps) {
       >
         {messages.nav.settings}
       </button>
+      <button
+        type="button"
+        className={`button ${page === 'about' ? 'button-active' : ''}`}
+        aria-current={page === 'about' ? 'page' : undefined}
+        onClick={() => onChange('about')}
+      >
+        {messages.nav.about}
+      </button>
     </nav>
   );
 }

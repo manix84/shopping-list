@@ -11,6 +11,7 @@ export const en: Messages = {
     route: 'Route',
     sections: 'Sections',
     settings: 'Settings',
+    about: 'About',
     debugTools: 'Debug tools',
   },
   actions: {

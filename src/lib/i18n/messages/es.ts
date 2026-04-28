@@ -10,6 +10,7 @@ export const es: Messages = {
     route: 'Ruta',
     sections: 'Secciones',
     settings: 'Ajustes',
+    about: 'Acerca de',
     debugTools: 'Herramientas de depuración',
   },
   actions: {
