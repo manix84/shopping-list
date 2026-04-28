@@ -2018,4 +2018,29 @@ select {
   .shared-history-title-wrap::after {
     width: 48px;
   }
+
+  .about-card-body {
+    padding: 24px 18px;
+  }
+
+  .about-logo-lockup {
+    height: 168px;
+    width: 168px;
+  }
+
+  .about-app-logo {
+    height: 160px;
+    width: 160px;
+  }
+
+  .about-avatar-link,
+  .about-avatar-badge {
+    height: 58px;
+    width: 58px;
+  }
+
+  .about-spec-list > div {
+    gap: 10px;
+    grid-template-columns: minmax(84px, 0.44fr) minmax(0, 1fr);
+  }
 }

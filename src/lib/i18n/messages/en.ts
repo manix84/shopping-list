@@ -11,6 +11,7 @@ export const en: Messages = {
     route: 'Route',
     sections: 'Sections',
     settings: 'Settings',
+    about: 'About',
     debugTools: 'Debug tools',
   },
   actions: {
@@ -121,6 +122,29 @@ export const en: Messages = {
       title: 'Sections',
       subtitle:
         'Read-only store grouping reference for the selected country profile.',
+    },
+    about: {
+      tagline: 'A free, privacy-minded grocery route planner.',
+      authorLabel: 'Built by',
+      authorValue: 'Rob',
+      costLabel: 'Cost',
+      costValue: 'Free',
+      privacyLabel: 'Privacy',
+      privacyValue: 'No adverts, no tracking, local-first storage',
+      purposeLabel: 'Purpose',
+      purposeValue:
+        'Turn a rough shopping list into an ordered route through the store',
+      bodyIntro:
+        'Smart Shopping List exists to make a normal supermarket trip less fiddly. Paste or type what you need, choose the store layout profile that matches where you shop, and the app groups your list into a route you can tick off as you go.',
+      bodyPrivacy:
+        "This is a free product. There are no adverts and no analytics trackers. The app is designed to be useful without turning your shopping habits into somebody else's dataset.",
+      bodyAuthor:
+        "I'm Rob, an experienced software engineer who likes building practical tools that respect the people using them. This project is deliberately small, direct, and focused on doing one everyday job well.",
+      sourceAction: 'View source',
+      sponsorAction: 'Sponsor Rob',
+      sponsorFootnote:
+        'Sponsorship helps keep this app independent, maintained, and free to use.',
+      authorProfileLabel: "Open Rob's GitHub profile",
     },
     debug: {
       title: 'Debug tools',

@@ -1,7 +1,7 @@
 import type { AppRoute, PageKey } from '../types';
 import { isUuidV7 } from './uuid';
 
-const APP_PAGES: PageKey[] = ['edit', 'route', 'sections', 'settings', 'debug'];
+const APP_PAGES: PageKey[] = ['edit', 'route', 'sections', 'settings', 'about', 'debug'];
 const DEFAULT_PAGE: PageKey = 'edit';
 
 const normalizeBasePath = (basePath: string): string => (basePath === '/' ? '' : basePath.replace(/\/$/, ''));
@@ -44,6 +44,6 @@ export const readRouteFromLocationParts = ({
 
 export const routeToUrl = ({ page, listId }: AppRoute, basePath = ''): string => {
   const normalizedBasePath = normalizeBasePath(basePath);
-  const shouldShowListId = !['sections', 'settings'].includes(page) && Boolean(listId);
+  const shouldShowListId = !['sections', 'settings', 'about'].includes(page) && Boolean(listId);
   return shouldShowListId ? `${normalizedBasePath}/list/${listId}/${page}` : `${normalizedBasePath}/#/${page}`;
 };

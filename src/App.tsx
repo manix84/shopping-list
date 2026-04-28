@@ -42,6 +42,7 @@ import { getResolvedTheme, loadThemeMode, saveThemeMode } from './lib/themePrefe
 import { createUuidV7 } from './lib/uuid';
 import { formatCountQuantity } from './lib/quantity';
 import { extractVariant } from './lib/variant';
+import { AboutPage } from './pages/AboutPage';
 import { DebugPage } from './pages/DebugPage';
 import { EditPage } from './pages/EditPage';
 import { RoutePage } from './pages/RoutePage';
@@ -964,6 +965,8 @@ export default function App() {
             ) : null}
 
             {page === 'sections' ? <SectionsPage config={config} /> : null}
+
+            {page === 'about' ? <AboutPage /> : null}
 
             {page === 'debug' ? (
               <DebugPage

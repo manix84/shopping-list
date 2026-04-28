@@ -13,6 +13,7 @@ export const fr: Messages = {
     route: 'Parcours',
     sections: 'Sections',
     settings: 'Paramètres',
+    about: 'À propos',
     debugTools: 'Outils de débogage',
   },
   actions: {
@@ -129,6 +130,29 @@ export const fr: Messages = {
       title: 'Sections',
       subtitle:
         'Référence en lecture seule du regroupement du magasin pour le profil pays sélectionné.',
+    },
+    about: {
+      tagline: 'Un planificateur de parcours de courses gratuit et respectueux de la vie privée.',
+      authorLabel: 'Créé par',
+      authorValue: 'Rob',
+      costLabel: 'Coût',
+      costValue: 'Gratuit',
+      privacyLabel: 'Confidentialité',
+      privacyValue: 'Aucune publicité, aucun suivi, stockage local d’abord',
+      purposeLabel: 'But',
+      purposeValue:
+        'Transformer une liste de courses rapide en parcours ordonné dans le magasin',
+      bodyIntro:
+        'Smart Shopping List existe pour rendre une course normale au supermarché moins pénible. Collez ou saisissez ce dont vous avez besoin, choisissez le profil d’agencement qui correspond à votre magasin, et l’application regroupe votre liste en un parcours que vous pouvez cocher au fur et à mesure.',
+      bodyPrivacy:
+        'C’est un produit gratuit. Il n’y a ni publicité ni traceur d’analyse. L’application est conçue pour être utile sans transformer vos habitudes d’achat en données pour quelqu’un d’autre.',
+      bodyAuthor:
+        'Je suis Rob, un ingénieur logiciel expérimenté qui aime créer des outils pratiques respectueux des personnes qui les utilisent. Ce projet est volontairement petit, direct et centré sur une tâche quotidienne bien faite.',
+      sourceAction: 'Voir le code source',
+      sponsorAction: 'Soutenir Rob',
+      sponsorFootnote:
+        'Le sponsoring aide à garder cette application indépendante, maintenue et gratuite.',
+      authorProfileLabel: 'Ouvrir le profil GitHub de Rob',
     },
     debug: {
       title: 'Outils de débogage',
