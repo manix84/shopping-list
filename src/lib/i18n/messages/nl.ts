@@ -130,6 +130,29 @@ export const nl: Messages = {
       subtitle:
         'Alleen-lezen referentie van winkelgroepering voor het geselecteerde landprofiel.',
     },
+    about: {
+      tagline: 'Een gratis, privacybewuste planner voor je boodschappenroute.',
+      authorLabel: 'Gebouwd door',
+      authorValue: 'Rob',
+      costLabel: 'Kosten',
+      costValue: 'Gratis',
+      privacyLabel: 'Privacy',
+      privacyValue: 'Geen advertenties, geen tracking, lokale opslag eerst',
+      purposeLabel: 'Doel',
+      purposeValue:
+        'Maak van een ruwe boodschappenlijst een geordende route door de winkel',
+      bodyIntro:
+        'Smart Shopping List bestaat om een gewone supermarkttrip minder omslachtig te maken. Plak of typ wat je nodig hebt, kies het winkelindelingsprofiel dat past bij waar je winkelt, en de app groepeert je lijst in een route die je onderweg kunt afvinken.',
+      bodyPrivacy:
+        'Dit is een gratis product. Er zijn geen advertenties en geen analytics-trackers. De app is ontworpen om nuttig te zijn zonder je winkelgewoonten in iemands dataset te veranderen.',
+      bodyAuthor:
+        'Ik ben Rob, een ervaren software-engineer die graag praktische hulpmiddelen bouwt die de mensen die ze gebruiken respecteren. Dit project is bewust klein, direct en gericht op één alledaagse taak goed doen.',
+      sourceAction: 'Broncode bekijken',
+      sponsorAction: 'Sponsor Rob',
+      sponsorFootnote:
+        'Sponsoring helpt deze app onafhankelijk, onderhouden en gratis te houden.',
+      authorProfileLabel: 'Robs GitHub-profiel openen',
+    },
     debug: {
       title: 'Debughulpmiddelen',
       subtitle:

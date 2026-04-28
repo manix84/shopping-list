@@ -129,6 +129,29 @@ export const it: Messages = {
       subtitle:
         'Riferimento in sola lettura dei gruppi del negozio per il profilo paese selezionato.',
     },
+    about: {
+      tagline: 'Un pianificatore gratuito del percorso spesa attento alla privacy.',
+      authorLabel: 'Creato da',
+      authorValue: 'Rob',
+      costLabel: 'Costo',
+      costValue: 'Gratis',
+      privacyLabel: 'Privacy',
+      privacyValue: 'Niente pubblicità, niente tracciamento, archiviazione locale prima di tutto',
+      purposeLabel: 'Scopo',
+      purposeValue:
+        'Trasformare una lista della spesa grezza in un percorso ordinato nel negozio',
+      bodyIntro:
+        'Smart Shopping List esiste per rendere meno macchinosa una normale spesa al supermercato. Incolla o scrivi ciò che ti serve, scegli il profilo di disposizione del negozio che corrisponde a dove fai la spesa, e l’app raggruppa la lista in un percorso da spuntare man mano.',
+      bodyPrivacy:
+        'È un prodotto gratuito. Non ci sono pubblicità né tracker analitici. L’app è progettata per essere utile senza trasformare le tue abitudini di spesa nel dataset di qualcun altro.',
+      bodyAuthor:
+        'Sono Rob, un ingegnere software esperto a cui piace creare strumenti pratici che rispettano le persone che li usano. Questo progetto è volutamente piccolo, diretto e concentrato sul fare bene un compito quotidiano.',
+      sourceAction: 'Vedi sorgente',
+      sponsorAction: 'Sponsorizza Rob',
+      sponsorFootnote:
+        'La sponsorizzazione aiuta a mantenere questa app indipendente, curata e gratuita.',
+      authorProfileLabel: 'Apri il profilo GitHub di Rob',
+    },
     debug: {
       title: 'Strumenti di debug',
       subtitle:

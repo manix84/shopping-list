@@ -125,6 +125,24 @@ export type Messages = {
       title: string;
       subtitle: string;
     };
+    about: {
+      tagline: string;
+      authorLabel: string;
+      authorValue: string;
+      costLabel: string;
+      costValue: string;
+      privacyLabel: string;
+      privacyValue: string;
+      purposeLabel: string;
+      purposeValue: string;
+      bodyIntro: string;
+      bodyPrivacy: string;
+      bodyAuthor: string;
+      sourceAction: string;
+      sponsorAction: string;
+      sponsorFootnote: string;
+      authorProfileLabel: string;
+    };
     debug: {
       title: string;
       subtitle: string;

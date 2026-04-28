@@ -128,6 +128,29 @@ export const pi: Messages = {
       title: 'Decks',
       subtitle: 'Read-only market grouping fer the chosen waters profile.',
     },
+    about: {
+      tagline: 'A free, privacy-minded grocery route planner fer yer market run.',
+      authorLabel: 'Built by',
+      authorValue: 'Rob',
+      costLabel: 'Cost',
+      costValue: 'Free',
+      privacyLabel: 'Privacy',
+      privacyValue: 'No adverts, no tracking, local-first stowage',
+      purposeLabel: 'Purpose',
+      purposeValue:
+        'Turn a rough shopping ledger into a tidy route through the market',
+      bodyIntro:
+        'Smart Shopping List exists to make a normal market voyage less fiddly. Paste or write what ye need, choose the market layout profile that matches where ye shop, and the app groups yer ledger into a route ye can mark off as ye go.',
+      bodyPrivacy:
+        'This be a free product. There be no adverts and no analytics trackers. The app be made useful without turnin’ yer shopping habits into somebody else’s dataset.',
+      bodyAuthor:
+        'I be Rob, an experienced software engineer who likes buildin’ practical tools that respect the crew using them. This project be deliberately small, direct, and focused on doing one everyday job well.',
+      sourceAction: 'View source',
+      sponsorAction: 'Sponsor Rob',
+      sponsorFootnote:
+        'Sponsorship helps keep this app independent, maintained, and free to use.',
+      authorProfileLabel: 'Open Rob’s GitHub profile',
+    },
     debug: {
       title: 'Bilge tools',
       subtitle:

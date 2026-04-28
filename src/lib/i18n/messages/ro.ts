@@ -129,6 +129,29 @@ export const ro: Messages = {
       subtitle:
         'Referință doar în citire pentru gruparea magazinului în profilul de țară selectat.',
     },
+    about: {
+      tagline: 'Un planificator gratuit al traseului de cumpărături, atent la confidențialitate.',
+      authorLabel: 'Creat de',
+      authorValue: 'Rob',
+      costLabel: 'Cost',
+      costValue: 'Gratuit',
+      privacyLabel: 'Confidențialitate',
+      privacyValue: 'Fără reclame, fără urmărire, stocare locală mai întâi',
+      purposeLabel: 'Scop',
+      purposeValue:
+        'Transformă o listă rapidă de cumpărături într-un traseu ordonat prin magazin',
+      bodyIntro:
+        'Smart Shopping List există pentru a face o vizită obișnuită la supermarket mai puțin complicată. Lipește sau scrie ce ai nevoie, alege profilul de aranjare a magazinului care se potrivește locului unde cumperi, iar aplicația îți grupează lista într-un traseu pe care îl poți bifa pe parcurs.',
+      bodyPrivacy:
+        'Acesta este un produs gratuit. Nu există reclame și nici trackere de analiză. Aplicația este concepută să fie utilă fără să transforme obiceiurile tale de cumpărături în setul de date al altcuiva.',
+      bodyAuthor:
+        'Sunt Rob, un inginer software cu experiență căruia îi place să construiască instrumente practice care respectă oamenii care le folosesc. Acest proiect este intenționat mic, direct și concentrat pe a face bine o sarcină de zi cu zi.',
+      sourceAction: 'Vezi sursa',
+      sponsorAction: 'Sponsorizează-l pe Rob',
+      sponsorFootnote:
+        'Sponsorizarea ajută această aplicație să rămână independentă, întreținută și gratuită.',
+      authorProfileLabel: 'Deschide profilul GitHub al lui Rob',
+    },
     debug: {
       title: 'Unelte de depanare',
       subtitle:

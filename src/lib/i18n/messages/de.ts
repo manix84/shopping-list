@@ -131,6 +131,29 @@ export const de: Messages = {
       subtitle:
         'Schreibgeschützte Referenz der Ladenbereiche für das gewählte Länderprofil.',
     },
+    about: {
+      tagline: 'Ein kostenloser, datenschutzbewusster Einkaufsroutenplaner.',
+      authorLabel: 'Erstellt von',
+      authorValue: 'Rob',
+      costLabel: 'Kosten',
+      costValue: 'Kostenlos',
+      privacyLabel: 'Datenschutz',
+      privacyValue: 'Keine Werbung, kein Tracking, lokaler Speicher zuerst',
+      purposeLabel: 'Zweck',
+      purposeValue:
+        'Verwandelt eine grobe Einkaufsliste in eine geordnete Route durch den Laden',
+      bodyIntro:
+        'Smart Shopping List soll einen normalen Supermarkteinkauf weniger umständlich machen. Füge ein, was du brauchst, wähle das Ladenlayout-Profil, das zu deinem Geschäft passt, und die App gruppiert deine Liste zu einer Route, die du unterwegs abhaken kannst.',
+      bodyPrivacy:
+        'Dies ist ein kostenloses Produkt. Es gibt keine Werbung und keine Analytics-Tracker. Die App soll nützlich sein, ohne deine Einkaufsgewohnheiten in den Datensatz anderer Leute zu verwandeln.',
+      bodyAuthor:
+        'Ich bin Rob, ein erfahrener Softwareentwickler, der gerne praktische Werkzeuge baut, die die Menschen respektieren, die sie nutzen. Dieses Projekt ist bewusst klein, direkt und darauf fokussiert, eine alltägliche Aufgabe gut zu erledigen.',
+      sourceAction: 'Quellcode ansehen',
+      sponsorAction: 'Rob unterstützen',
+      sponsorFootnote:
+        'Sponsoring hilft, diese App unabhängig, gepflegt und kostenlos nutzbar zu halten.',
+      authorProfileLabel: 'Robs GitHub-Profil öffnen',
+    },
     debug: {
       title: 'Debug-Werkzeuge',
       subtitle:

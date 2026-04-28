@@ -125,6 +125,29 @@ export const es: Messages = {
       subtitle:
         'Referencia de agrupación de tienda de solo lectura para el perfil de país seleccionado.',
     },
+    about: {
+      tagline: 'Un planificador gratuito de rutas de compra que respeta tu privacidad.',
+      authorLabel: 'Creado por',
+      authorValue: 'Rob',
+      costLabel: 'Coste',
+      costValue: 'Gratis',
+      privacyLabel: 'Privacidad',
+      privacyValue: 'Sin anuncios, sin rastreo, almacenamiento local primero',
+      purposeLabel: 'Propósito',
+      purposeValue:
+        'Convertir una lista de la compra rápida en una ruta ordenada por la tienda',
+      bodyIntro:
+        'Lista de la compra inteligente existe para hacer menos incómoda una compra normal en el supermercado. Pega o escribe lo que necesitas, elige el perfil de distribución de tienda que coincide con donde compras y la app agrupa tu lista en una ruta que puedes ir marcando.',
+      bodyPrivacy:
+        'Es un producto gratuito. No hay anuncios ni rastreadores analíticos. La app está diseñada para ser útil sin convertir tus hábitos de compra en el conjunto de datos de otra persona.',
+      bodyAuthor:
+        'Soy Rob, un ingeniero de software con experiencia al que le gusta crear herramientas prácticas que respetan a quienes las usan. Este proyecto es deliberadamente pequeño, directo y centrado en hacer bien una tarea cotidiana.',
+      sourceAction: 'Ver código fuente',
+      sponsorAction: 'Patrocinar a Rob',
+      sponsorFootnote:
+        'El patrocinio ayuda a mantener esta app independiente, mantenida y gratuita.',
+      authorProfileLabel: 'Abrir el perfil de GitHub de Rob',
+    },
     debug: {
       title: 'Herramientas de depuración',
       subtitle:
