@@ -132,6 +132,10 @@ select {
   padding: 0 24px 24px;
 }
 
+.story-canvas {
+  padding: 0 24px 24px;
+}
+
 .app-header {
   position: sticky;
   top: 0;
@@ -1771,7 +1775,8 @@ select {
 }
 
 @media (max-width: 640px) {
-  .shopping-app {
+  .shopping-app,
+  .story-canvas {
     padding: 0 10px 10px;
   }
 

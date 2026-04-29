@@ -60,7 +60,7 @@ export const offlineBackend: BackendStatus = {
 
 export function StoryCanvas({ children }: { children: ReactNode }) {
   return (
-    <main className="shopping-app">
+    <main className="story-canvas">
       <div className="shopping-shell" style={{ paddingBlock: 24 }}>
         {children}
       </div>
