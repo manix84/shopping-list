@@ -3,6 +3,9 @@ import { GLOBALS_UPDATED } from 'storybook/internal/core-events';
 import { create } from 'storybook/theming';
 
 type StorybookTheme = 'light' | 'dark';
+interface GlobalsUpdatedPayload {
+  globals?: Record<string, unknown>;
+}
 
 const brand = {
   brandTitle: 'Smart Shopping List',
@@ -29,13 +32,15 @@ function setManagerTheme(theme: StorybookTheme) {
   });
 }
 
+function resolveTheme(value: unknown): StorybookTheme {
+  return value === 'dark' ? 'dark' : 'light';
+}
+
 setManagerTheme('light');
 
 addons.register('shopping-list/theme-sync', (api) => {
-  const syncManagerTheme = () => {
-    const theme = api.getGlobals().theme === 'dark' ? 'dark' : 'light';
-
-    setManagerTheme(theme);
+  const syncManagerTheme = (payload?: GlobalsUpdatedPayload) => {
+    setManagerTheme(resolveTheme(payload?.globals?.theme ?? api.getGlobals().theme));
   };
 
   syncManagerTheme();
