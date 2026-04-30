@@ -41,14 +41,6 @@ const preview: Preview = {
       name: 'Theme',
       description: 'App color theme',
       defaultValue: 'light',
-      toolbar: {
-        icon: 'circlehollow',
-        items: [
-          { value: 'light', title: 'Light' },
-          { value: 'dark', title: 'Dark' },
-        ],
-        dynamicTitle: true,
-      },
     },
   },
   initialGlobals: {

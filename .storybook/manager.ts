@@ -1,4 +1,7 @@
-import { addons } from 'storybook/manager-api';
+import React from 'react';
+import { MoonIcon, SunIcon } from '@storybook/icons';
+import { IconButton } from 'storybook/internal/components';
+import { addons, types, useGlobals } from 'storybook/manager-api';
 import { GLOBALS_UPDATED } from 'storybook/internal/core-events';
 import { create } from 'storybook/theming';
 
@@ -36,6 +39,25 @@ function resolveTheme(value: unknown): StorybookTheme {
   return value === 'dark' ? 'dark' : 'light';
 }
 
+function ThemeToggleTool() {
+  const [globals, updateGlobals] = useGlobals();
+  const theme = resolveTheme(globals.theme);
+  const nextTheme = theme === 'dark' ? 'light' : 'dark';
+  const label = `Switch to ${nextTheme} mode`;
+  const Icon = theme === 'dark' ? SunIcon : MoonIcon;
+
+  return React.createElement(
+    IconButton,
+    {
+      active: theme === 'dark',
+      'aria-label': label,
+      title: label,
+      onClick: () => updateGlobals({ theme: nextTheme }),
+    },
+    React.createElement(Icon)
+  );
+}
+
 setManagerTheme('light');
 
 addons.register('shopping-list/theme-sync', (api) => {
@@ -45,4 +67,10 @@ addons.register('shopping-list/theme-sync', (api) => {
 
   syncManagerTheme();
   api.on(GLOBALS_UPDATED, syncManagerTheme);
+
+  addons.add('shopping-list/theme-toggle', {
+    title: 'Theme',
+    type: types.TOOL,
+    render: () => React.createElement(ThemeToggleTool),
+  });
 });
