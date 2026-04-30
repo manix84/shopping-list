@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import type { BackendStatus, PageKey } from '../types';
 import { AppHeader } from './AppHeader';
 import { connectedBackend, offlineBackend, StoryCanvas } from './storyFixtures';
@@ -31,9 +31,29 @@ type Story = StoryObj<typeof meta>;
 
 const playAppHeader: Story['play'] = async ({ args, canvasElement }) => {
   const canvas = within(canvasElement);
+  const usesMobileMenu = window.matchMedia('(max-width: 640px)').matches;
+  const getVisibleSettingsButton = () => {
+    const settingsButtons = canvas.getAllByRole('button', { name: /settings/i });
+    const visibleSettingsButton = settingsButtons.find((button) => {
+      const rect = button.getBoundingClientRect();
+
+      return rect.width > 0 && rect.height > 0;
+    });
+
+    if (!visibleSettingsButton) {
+      throw new Error('Expected a visible Settings button');
+    }
+
+    return visibleSettingsButton;
+  };
 
   await expect(canvas.getByRole('heading', { name: /smart shopping list/i })).toBeVisible();
-  await expect(canvas.getByText(/ordered route through the store/i)).toBeVisible();
+  const subtitle = canvas.getByText(/ordered route through the store/i);
+  if (window.matchMedia('(max-width: 1080px)').matches) {
+    await expect(subtitle).toBeInTheDocument();
+  } else {
+    await expect(subtitle).toBeVisible();
+  }
 
   if (args.backendStatus.state === 'offline') {
     const statusButton = canvas.getByRole('button', { name: /offline/i });
@@ -44,9 +64,22 @@ const playAppHeader: Story['play'] = async ({ args, canvasElement }) => {
     await expect(canvas.getByText(/online/i)).toBeInTheDocument();
   }
 
-  const settingsButton = canvas.getByRole('button', { name: /settings/i });
+  if (usesMobileMenu) {
+    await userEvent.click(canvas.getByRole('button', { name: /open navigation menu/i }));
+  }
+
+  let settingsButton = getVisibleSettingsButton();
   await userEvent.click(settingsButton);
-  await expect(settingsButton).toHaveAttribute('aria-current', 'page');
+
+  if (usesMobileMenu) {
+    const menuButton = canvas.getByRole('button', { name: /open navigation menu/i });
+
+    await waitFor(() => expect(menuButton).toHaveAttribute('aria-expanded', 'false'));
+    await userEvent.click(menuButton);
+    settingsButton = getVisibleSettingsButton();
+  }
+
+  await waitFor(() => expect(settingsButton).toHaveAttribute('aria-current', 'page'));
 };
 
 function AppHeaderExample({
