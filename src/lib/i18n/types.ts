@@ -127,6 +127,7 @@ export type Messages = {
     };
     about: {
       tagline: string;
+      versionLabel: string;
       authorLabel: string;
       authorValue: string;
       costLabel: string;

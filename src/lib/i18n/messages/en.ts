@@ -125,6 +125,7 @@ export const en: Messages = {
     },
     about: {
       tagline: 'A free, privacy-minded grocery route planner.',
+      versionLabel: 'Version',
       authorLabel: 'Built by',
       authorValue: 'Rob',
       costLabel: 'Cost',

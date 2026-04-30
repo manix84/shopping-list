@@ -131,6 +131,7 @@ export const ro: Messages = {
     },
     about: {
       tagline: 'Un planificator gratuit al traseului de cumpărături, atent la confidențialitate.',
+      versionLabel: 'Versiune',
       authorLabel: 'Creat de',
       authorValue: 'Rob',
       costLabel: 'Cost',

@@ -1,5 +1,6 @@
 import { Card } from '../components/Card';
 import { useI18n } from '../lib/i18n';
+import { appVersion } from '../version';
 
 const logoHref = `${import.meta.env.BASE_URL}logo-animated-loop.svg`;
 const avatarHref = `${import.meta.env.BASE_URL}rob-avatar.png`;
@@ -32,6 +33,10 @@ export function AboutPage() {
         </div>
 
         <dl className="about-spec-list">
+          <div>
+            <dt>{about.versionLabel}</dt>
+            <dd>{appVersion}</dd>
+          </div>
           <div>
             <dt>{about.authorLabel}</dt>
             <dd>{about.authorValue}</dd>
