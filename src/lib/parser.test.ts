@@ -16,6 +16,23 @@ import {
 } from './parser';
 
 describe('parser', () => {
+  it('ignores empty split entries and dedupes equivalent items', () => {
+    const items = parseItems('bananas, bananas; - bananas\n\n', UK_CONFIG);
+
+    expect(items).toHaveLength(1);
+    expect(items[0]).toMatchObject({
+      raw: 'bananas',
+      cleaned: 'banana',
+      matchedSection: 'produce',
+      checked: false,
+    });
+  });
+
+  it('falls back cleanly for non-string input', () => {
+    expect(parseItems(undefined, UK_CONFIG)).toEqual([]);
+    expect(parseItems(42, UK_CONFIG)).toEqual([]);
+  });
+
   it('parses quantity, size, and display metadata together', () => {
     const items = parseItems('small milk\nbananas x2\n500g mince', UK_CONFIG);
 
@@ -267,6 +284,44 @@ describe('parser', () => {
       raw: 'ice cream',
       variant: 'strawberry',
       checked: true,
+    });
+  });
+
+  it('preserves previous checked state when the same parsed item is entered again', () => {
+    const items = parseItems('large bananas x2', UK_CONFIG, [
+      {
+        id: 'previous-bananas',
+        raw: 'bananas',
+        normalized: 'bananas',
+        cleaned: 'banana',
+        size: 'large',
+        sizeValue: 'L',
+        quantityValue: 2,
+        checked: true,
+        matchedSection: 'produce',
+      },
+    ]);
+
+    expect(items).toHaveLength(1);
+    expect(items[0]).toMatchObject({
+      id: 'previous-bananas',
+      raw: 'bananas',
+      size: 'large',
+      sizeValue: 'L',
+      quantityValue: 2,
+      checked: true,
+    });
+  });
+
+  it('strips pasted display size labels before reparsing saved text', () => {
+    const items = parseItems('Milk (Size: S)', UK_CONFIG);
+
+    expect(items).toHaveLength(1);
+    expect(items[0]).toMatchObject({
+      raw: 'milk',
+      variant: 'semi skimmed',
+      size: undefined,
+      sizeValue: undefined,
     });
   });
 });

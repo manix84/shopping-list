@@ -6,9 +6,12 @@ import {
   applyDocumentLocale,
   createMessages,
   defaultLocale,
+  getDocumentLocale,
   getBrowserLocale,
+  getRouteViewLabel,
   isLocaleCode,
   loadLocale,
+  resolveLocale,
   saveLocale,
 } from './i18n';
 
@@ -39,6 +42,11 @@ describe('i18n', () => {
     expect(getBrowserLocale('it-IT')).toBe('it');
     expect(getBrowserLocale('ro-RO')).toBe('ro');
     expect(getBrowserLocale('en-GB')).toBe('en');
+  });
+
+  it('falls back to English for unsupported browser languages', () => {
+    expect(getBrowserLocale('pt-BR')).toBe('en');
+    expect(getBrowserLocale('')).toBe('en');
   });
 
   it('creates translated message bundles', () => {
@@ -80,6 +88,19 @@ describe('i18n', () => {
 
     expect(isLocaleCode('xx')).toBe(false);
     expect(isLocaleCode(undefined)).toBe(false);
+    expect(resolveLocale('nl')).toBe('nl');
+    expect(resolveLocale('pirate')).toBe('en');
+  });
+
+  it('uses the saved locale before browser defaults and ignores invalid saved values', () => {
+    const windowMock = createWindowMock({ language: 'fr-FR' });
+    vi.stubGlobal('window', windowMock);
+
+    windowMock.localStorage.setItem(LOCALE_STORAGE_KEY, 'de');
+    expect(loadLocale()).toBe('de');
+
+    windowMock.localStorage.setItem(LOCALE_STORAGE_KEY, 'xx');
+    expect(loadLocale()).toBe('fr');
   });
 
   it('loads and saves locale locally', () => {
@@ -100,5 +121,15 @@ describe('i18n', () => {
     applyDocumentLocale('pi');
 
     expect(documentMock.documentElement.lang).toBe('en-x-pirate');
+    expect(getDocumentLocale('en')).toBe('en-GB');
+    expect(getDocumentLocale('es')).toBe('es');
+  });
+
+  it('returns localized route view labels', () => {
+    const messages = createMessages('en');
+
+    expect(getRouteViewLabel('default', messages)).toBe(messages.pages.route.viewDefault);
+    expect(getRouteViewLabel('comfortable', messages)).toBe(messages.pages.route.viewComfortable);
+    expect(getRouteViewLabel('compact', messages)).toBe(messages.pages.route.viewCompact);
   });
 });

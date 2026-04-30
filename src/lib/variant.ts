@@ -159,6 +159,7 @@ export const extractVariant = (value: unknown, config: CountryConfig | undefined
   const trimmed = cleanLine(value);
   const normalizedName = normalize(trimmed);
   if (!normalizedName) return { name: trimmed };
+  if (VARIANT_EXTRACTION_EXCLUSIONS.has(normalizedName)) return { name: trimmed };
 
   const candidates = keywordCandidates(config);
   const ruleMatch = extractByRule(normalizedName);
@@ -170,6 +171,13 @@ export const extractVariant = (value: unknown, config: CountryConfig | undefined
   }
 
   const variantableMatch = findVariantableSuffix(normalizedName, candidates);
+  if (
+    candidates.includes(normalizedName) &&
+    (VARIANTABLE_BASE_KEYWORDS.has(normalizedName) || !variantableMatch)
+  ) {
+    return { name: trimmed };
+  }
+
   if (variantableMatch) {
     const variant = normalizedName.slice(0, -variantableMatch.length).trim();
     if (variant && cleanEntryName(variant) !== cleanEntryName(variantableMatch)) {
@@ -178,10 +186,6 @@ export const extractVariant = (value: unknown, config: CountryConfig | undefined
         variant,
       };
     }
-  }
-
-  if (candidates.includes(normalizedName)) {
-    return { name: trimmed };
   }
 
   const match = candidates.find((keyword) => normalizedName.endsWith(` ${keyword}`));
