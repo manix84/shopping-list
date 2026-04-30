@@ -48,4 +48,11 @@ describe('variant extraction', () => {
   it('leaves unmatched products unchanged', () => {
     expect(extractVariant('artisan sourdough loaf', UK_CONFIG)).toEqual({ name: 'artisan sourdough loaf' });
   });
+
+  it('extracts a generic suffix variant when only the base keyword is known', () => {
+    expect(extractVariant('seeded bread', UK_CONFIG)).toEqual({
+      name: 'bread',
+      variant: 'seeded',
+    });
+  });
 });

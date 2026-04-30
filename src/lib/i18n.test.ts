@@ -1,6 +1,9 @@
+import { createElement } from 'react';
+import { renderToString } from 'react-dom/server';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createWindowMock } from '../test/testUtils';
 import {
+  I18nProvider,
   LOCALE_STORAGE_KEY,
   SUPPORTED_LOCALES,
   applyDocumentLocale,
@@ -13,6 +16,7 @@ import {
   loadLocale,
   resolveLocale,
   saveLocale,
+  useI18n,
 } from './i18n';
 
 const flattenMessageKeys = (value: unknown, prefix = ''): string[] => {
@@ -131,5 +135,32 @@ describe('i18n', () => {
     expect(getRouteViewLabel('default', messages)).toBe(messages.pages.route.viewDefault);
     expect(getRouteViewLabel('comfortable', messages)).toBe(messages.pages.route.viewComfortable);
     expect(getRouteViewLabel('compact', messages)).toBe(messages.pages.route.viewCompact);
+  });
+
+  it('provides i18n context through the hook', () => {
+    const messages = createMessages('en');
+    const Component = () => {
+      const i18n = useI18n();
+      return createElement('span', null, i18n.messages.app.title);
+    };
+
+    expect(
+      renderToString(
+        createElement(
+          I18nProvider,
+          { value: { locale: 'en', messages, setLocale: () => undefined } },
+          createElement(Component),
+        ),
+      ),
+    ).toContain('Smart Shopping List');
+  });
+
+  it('throws when the i18n hook is used outside its provider', () => {
+    const Component = () => {
+      useI18n();
+      return null;
+    };
+
+    expect(() => renderToString(createElement(Component))).toThrow('useI18n must be used within an I18nProvider');
   });
 });
