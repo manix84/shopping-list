@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { CA_CONFIG } from '../config/countries/ca';
 import { UK_CONFIG } from '../config/countries/uk';
 import { US_CONFIG } from '../config/countries/us';
-import { detectSection, getSectionMeta } from './sections';
+import { buildKeywordPattern, detectSection, flattenSections, getSectionMeta } from './sections';
 
 describe('section detection', () => {
   it.each([
@@ -34,5 +34,27 @@ describe('section detection', () => {
       groupLabel: 'Cupboard Staples',
       order: 5,
     });
+  });
+
+  it('falls back to other for missing config, empty names, and unknown metadata', () => {
+    expect(flattenSections(undefined)).toEqual([]);
+    expect(detectSection('', UK_CONFIG)).toBe('other');
+    expect(detectSection('mystery imported snack', undefined)).toBe('other');
+    expect(getSectionMeta(UK_CONFIG, 'not_a_section' as never)).toEqual({
+      label: 'Other',
+      groupLabel: 'Other',
+      order: 999,
+    });
+  });
+
+  it('builds keyword patterns using cleaned whole-word matches', () => {
+    const pattern = buildKeywordPattern('free-range eggs');
+
+    expect(pattern.test('free range egg')).toBe(true);
+    expect(pattern.test('eggplant')).toBe(false);
+  });
+
+  it('prefers the longest matching keyword over an earlier broader match', () => {
+    expect(detectSection('ice cream cones', UK_CONFIG)).toBe('frozen_ice_cream');
   });
 });

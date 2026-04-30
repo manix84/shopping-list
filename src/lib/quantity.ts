@@ -1,9 +1,9 @@
-import { cleanLine, normalize } from './stringUtils';
+import { cleanLine } from './stringUtils';
 
 export const formatCountQuantity = (value: number): string => `x${value}`;
 
 export const parseQuantityValue = (quantity: unknown): number | undefined => {
-  const cleanedQuantity = normalize(quantity);
+  const cleanedQuantity = cleanLine(quantity).toLowerCase().replace(/\s+/g, ' ');
 
   let match = cleanedQuantity.match(/^x\s*(\d+(?:\.\d+)?)$/i);
   if (match) return Number(match[1]);

@@ -1,15 +1,22 @@
+import { createElement } from 'react';
+import { renderToString } from 'react-dom/server';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createWindowMock } from '../test/testUtils';
 import {
+  I18nProvider,
   LOCALE_STORAGE_KEY,
   SUPPORTED_LOCALES,
   applyDocumentLocale,
   createMessages,
   defaultLocale,
+  getDocumentLocale,
   getBrowserLocale,
+  getRouteViewLabel,
   isLocaleCode,
   loadLocale,
+  resolveLocale,
   saveLocale,
+  useI18n,
 } from './i18n';
 
 const flattenMessageKeys = (value: unknown, prefix = ''): string[] => {
@@ -39,6 +46,11 @@ describe('i18n', () => {
     expect(getBrowserLocale('it-IT')).toBe('it');
     expect(getBrowserLocale('ro-RO')).toBe('ro');
     expect(getBrowserLocale('en-GB')).toBe('en');
+  });
+
+  it('falls back to English for unsupported browser languages', () => {
+    expect(getBrowserLocale('pt-BR')).toBe('en');
+    expect(getBrowserLocale('')).toBe('en');
   });
 
   it('creates translated message bundles', () => {
@@ -80,6 +92,19 @@ describe('i18n', () => {
 
     expect(isLocaleCode('xx')).toBe(false);
     expect(isLocaleCode(undefined)).toBe(false);
+    expect(resolveLocale('nl')).toBe('nl');
+    expect(resolveLocale('pirate')).toBe('en');
+  });
+
+  it('uses the saved locale before browser defaults and ignores invalid saved values', () => {
+    const windowMock = createWindowMock({ language: 'fr-FR' });
+    vi.stubGlobal('window', windowMock);
+
+    windowMock.localStorage.setItem(LOCALE_STORAGE_KEY, 'de');
+    expect(loadLocale()).toBe('de');
+
+    windowMock.localStorage.setItem(LOCALE_STORAGE_KEY, 'xx');
+    expect(loadLocale()).toBe('fr');
   });
 
   it('loads and saves locale locally', () => {
@@ -100,5 +125,42 @@ describe('i18n', () => {
     applyDocumentLocale('pi');
 
     expect(documentMock.documentElement.lang).toBe('en-x-pirate');
+    expect(getDocumentLocale('en')).toBe('en-GB');
+    expect(getDocumentLocale('es')).toBe('es');
+  });
+
+  it('returns localized route view labels', () => {
+    const messages = createMessages('en');
+
+    expect(getRouteViewLabel('default', messages)).toBe(messages.pages.route.viewDefault);
+    expect(getRouteViewLabel('comfortable', messages)).toBe(messages.pages.route.viewComfortable);
+    expect(getRouteViewLabel('compact', messages)).toBe(messages.pages.route.viewCompact);
+  });
+
+  it('provides i18n context through the hook', () => {
+    const messages = createMessages('en');
+    const Component = () => {
+      const i18n = useI18n();
+      return createElement('span', null, i18n.messages.app.title);
+    };
+
+    expect(
+      renderToString(
+        createElement(
+          I18nProvider,
+          { value: { locale: 'en', messages, setLocale: () => undefined } },
+          createElement(Component),
+        ),
+      ),
+    ).toContain('Smart Shopping List');
+  });
+
+  it('throws when the i18n hook is used outside its provider', () => {
+    const Component = () => {
+      useI18n();
+      return null;
+    };
+
+    expect(() => renderToString(createElement(Component))).toThrow('useI18n must be used within an I18nProvider');
   });
 });

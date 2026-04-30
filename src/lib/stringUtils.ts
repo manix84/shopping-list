@@ -68,6 +68,8 @@ export const correctSpelling = (value: unknown): string => {
 const singularizeWord = (word: string): string => {
   if (word.length <= 3) return word;
   if (word === 'cheeses') return 'cheese';
+  if (word === 'potatoes') return 'potato';
+  if (word === 'tomatoes') return 'tomato';
   if (word.endsWith('ies')) return `${word.slice(0, -3)}y`;
   if (word.endsWith('ves')) return `${word.slice(0, -3)}f`;
   if (/(?:ches|shes|xes|zes|ses)$/.test(word)) return word.slice(0, -2);

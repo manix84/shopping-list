@@ -1,5 +1,5 @@
 import type { CountryConfig, SectionDef, SectionKey } from '../types';
-import { cleanEntryName, escapeRegExp } from './stringUtils';
+import { cleanEntryName, escapeRegExp, normalize } from './stringUtils';
 
 export const flattenSections = (config: CountryConfig | undefined): Array<SectionDef & { groupLabel: string; order: number }> => {
   if (!config) return [];
@@ -17,7 +17,7 @@ export const flattenSections = (config: CountryConfig | undefined): Array<Sectio
 };
 
 export const buildKeywordPattern = (keyword: unknown): RegExp => {
-  const safeKeyword = escapeRegExp(cleanEntryName(keyword));
+  const safeKeyword = escapeRegExp(normalize(cleanEntryName(keyword)));
   if (!safeKeyword) {
     return /^$/i;
   }
@@ -25,7 +25,7 @@ export const buildKeywordPattern = (keyword: unknown): RegExp => {
 };
 
 export const detectSection = (name: unknown, config: CountryConfig | undefined): SectionKey => {
-  const cleaned = cleanEntryName(name);
+  const cleaned = normalize(cleanEntryName(name));
   if (!cleaned) return 'other';
 
   const sections = flattenSections(config);
@@ -33,7 +33,7 @@ export const detectSection = (name: unknown, config: CountryConfig | undefined):
 
   for (const section of sections) {
     for (const keyword of section.keywords) {
-      const cleanedKeyword = cleanEntryName(keyword);
+      const cleanedKeyword = normalize(cleanEntryName(keyword));
       if (!cleanedKeyword) continue;
 
       const pattern = buildKeywordPattern(cleanedKeyword);
