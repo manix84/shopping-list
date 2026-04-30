@@ -132,6 +132,7 @@ export const nl: Messages = {
     },
     about: {
       tagline: 'Een gratis, privacybewuste planner voor je boodschappenroute.',
+      versionLabel: 'Versie',
       authorLabel: 'Gebouwd door',
       authorValue: 'Rob',
       costLabel: 'Kosten',

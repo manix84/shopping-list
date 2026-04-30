@@ -131,6 +131,7 @@ export const it: Messages = {
     },
     about: {
       tagline: 'Un pianificatore gratuito del percorso spesa attento alla privacy.',
+      versionLabel: 'Versione',
       authorLabel: 'Creato da',
       authorValue: 'Rob',
       costLabel: 'Costo',
