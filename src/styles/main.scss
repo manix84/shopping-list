@@ -352,6 +352,35 @@ select {
   text-align: left !important;
 }
 
+.table-wrap {
+  overflow-x: auto;
+}
+
+.debug-table {
+  border-collapse: collapse;
+  min-width: 720px;
+  width: 100%;
+
+  th,
+  td {
+    border-bottom: 1px solid $border;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    color: $muted;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  td {
+    font-size: 0.88rem;
+  }
+}
+
 .title-row,
 .item-row,
 .section-header {

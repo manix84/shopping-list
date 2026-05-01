@@ -21,6 +21,7 @@ describe('UK config', () => {
     const frozenMeals = freezers?.sections.find((section) => section.key === 'frozen_meals');
 
     expect(UK_CONFIG.code).toBe('uk');
+    expect(UK_CONFIG.measurement).toEqual({ unitSystem: 'metric', displayMode: 'metric' });
     expect(babyFood?.label).toBe('Baby Food');
     expect(babyFood?.keywords).toContain('baby rice');
     expect(cereal?.label).toBe('Cereal Aisle');
@@ -32,6 +33,10 @@ describe('UK config', () => {
     expect(tinnedJarred?.label).toBe('Tinned & Jarred Goods');
     expect(tinnedJarred?.keywords).toContain('baked beans');
     expect(tinnedJarred?.keywords).toContain('tinned tomatoes');
+    expect(tinnedJarred?.keywords).toContain('ketchup');
+    expect(tinnedJarred?.keywords).toContain('dijon mustard');
+    expect(tinnedJarred?.keywords).toContain('mayonnaise');
+    expect(tinnedJarred?.keywords).toContain('marmite');
     expect(homeBaking?.label).toBe('Home Baking');
     expect(homeBaking?.keywords).toContain('eggs');
     expect(homeBaking?.keywords).toContain('plain flour');
@@ -42,6 +47,7 @@ describe('UK config', () => {
     expect(homeBaking?.keywords).toContain('sultanas');
     expect(homeBaking?.keywords).toContain('custard powder');
     expect(cookingIngredients?.label).toBe('Cooking Ingredients & World Foods');
+    expect(cookingIngredients?.keywords).toContain('liquid smoke');
     expect(cookingIngredients?.keywords).toContain('soy sauce');
     expect(cookingIngredients?.keywords).toContain('fajita kit');
     expect(hotDrinks?.label).toBe('Tea, Coffee & Hot Drinks');

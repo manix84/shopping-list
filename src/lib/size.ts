@@ -15,11 +15,17 @@ export const formatSizeLabel = (sizeValue: SizeValue): string => `Size: ${sizeVa
 export const extractSize = (value: unknown): { size?: string; sizeValue?: SizeValue; name: string } => {
   const trimmed = cleanLine(value);
 
-  const match = trimmed.match(/^(small|medium|large)\s+(.+)$/i);
-  if (!match) {
-    return { name: trimmed };
+  let match = trimmed.match(/^(small|medium|large)\s+(.+)$/i);
+  if (match) {
+    const sizeValue = parseSizeValue(match[1]);
+    return { size: match[1].toLowerCase(), sizeValue, name: match[2] };
   }
 
-  const sizeValue = parseSizeValue(match[1]);
-  return { size: match[1].toLowerCase(), sizeValue, name: match[2] };
+  match = trimmed.match(/^(.+?)\s*\((small|medium|large|s|m|l)\)\s*$/i);
+  if (match) {
+    const sizeValue = parseSizeValue(match[2]);
+    return { size: match[2].toLowerCase(), sizeValue, name: match[1] };
+  }
+
+  return { name: trimmed };
 };

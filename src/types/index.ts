@@ -6,6 +6,8 @@ export type AppRoute = {
 export type CountryCode = 'uk' | 'us' | 'ca';
 export type ThemeMode = 'system' | 'light' | 'dark';
 export type RouteViewMode = 'default' | 'comfortable' | 'compact';
+export type MeasurementUnitSystem = 'metric' | 'us-customary' | 'canadian-customary';
+export type MeasurementDisplayMode = 'metric' | 'source';
 
 export type SectionKey =
   | 'produce'
@@ -51,6 +53,9 @@ export type Item = {
   size?: string;
   sizeValue?: 'S' | 'M' | 'L';
   quantity?: string;
+  quantityDisplay?: string;
+  quantityMetricValue?: number;
+  quantityMetricUnit?: 'g' | 'ml';
   quantityValue?: number;
   variant?: string;
   matchedSection: SectionKey;
@@ -95,6 +100,10 @@ export type CountryConfig = {
   code: CountryCode;
   flag: string;
   label: string;
+  measurement: {
+    unitSystem: MeasurementUnitSystem;
+    displayMode: MeasurementDisplayMode;
+  };
   groups: SectionGroup[];
 };
 
@@ -128,8 +137,10 @@ export type CountQuantityTestCase = {
 
 export type UnitQuantityTestCase = {
   input: string;
+  countryCode?: CountryCode;
   expectedName: string;
   expectedQuantity: string;
+  expectedQuantityDisplay?: string;
   expectedQuantityValue?: number;
 };
 
@@ -154,6 +165,7 @@ export type CountQuantityTestResult = CountQuantityTestCase & {
 export type UnitQuantityTestResult = UnitQuantityTestCase & {
   actualName: string;
   actualQuantity?: string;
+  actualQuantityDisplay?: string;
   actualQuantityValue?: number;
   passed: boolean;
 };

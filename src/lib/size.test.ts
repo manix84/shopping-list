@@ -21,6 +21,8 @@ describe('size helpers', () => {
     ['small milk', { size: 'small', sizeValue: 'S', name: 'milk' }],
     ['Medium pasta', { size: 'medium', sizeValue: 'M', name: 'pasta' }],
     ['large free-range eggs', { size: 'large', sizeValue: 'L', name: 'free-range eggs' }],
+    ['milk (large)', { size: 'large', sizeValue: 'L', name: 'milk' }],
+    ['milk (M)', { size: 'm', sizeValue: 'M', name: 'milk' }],
     ['large', { name: 'large' }],
     ['small  ', { name: 'small' }],
     [undefined, { name: '' }],

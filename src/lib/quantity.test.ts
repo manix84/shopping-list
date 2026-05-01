@@ -1,4 +1,8 @@
 import { describe, expect, it } from 'vitest';
+import { CA_CONFIG } from '../config/countries/ca';
+import { UK_CONFIG } from '../config/countries/uk';
+import { US_CONFIG } from '../config/countries/us';
+import { parseMeasurementNumber } from './measurements';
 import { extractQuantifiedItem, extractQuantity, formatCountQuantity, parseQuantityValue } from './quantity';
 
 describe('quantity helpers', () => {
@@ -29,7 +33,7 @@ describe('quantity helpers', () => {
     ['4 carrots', { name: 'carrots', quantity: 'x4', quantityValue: 4 }],
     ['500g mince', { name: 'mince', quantity: '500g' }],
     ['mince 500g', { name: 'mince', quantity: '500g' }],
-    ['1.5kg potatoes', { name: 'potatoes', quantity: '1.5kg' }],
+    ['1.5kg potatoes', { name: 'potatoes', quantity: '1500g' }],
   ])('extracts %s', (input, expected) => {
     expect(extractQuantity(input)).toMatchObject(expected);
   });
@@ -43,6 +47,63 @@ describe('quantity helpers', () => {
       name: 'bags of rice',
       quantity: '500g',
       quantityValue: 2,
+    });
+  });
+
+  it.each([
+    ['1⁄2', 0.5],
+    ['½', 0.5],
+    ['2½', 2.5],
+    ['1¼', 1.25],
+  ])('parses measurement number %s', (input, expected) => {
+    expect(parseMeasurementNumber(input)).toBe(expected);
+  });
+
+  it('stores metric quantities for UK measurements', () => {
+    expect(extractQuantifiedItem('Liquid smoke – ½ tsp', UK_CONFIG)).toMatchObject({
+      name: 'Liquid smoke',
+      quantity: '2.5ml',
+      quantityDisplay: '2.5ml',
+      quantityMetricValue: 2.5,
+      quantityMetricUnit: 'ml',
+    });
+    expect(extractQuantifiedItem('Sugar – 20 ml (~4 tsp)', UK_CONFIG)).toMatchObject({
+      name: 'Sugar',
+      quantity: '20ml',
+      quantityDisplay: '20ml',
+      quantityMetricValue: 20,
+      quantityMetricUnit: 'ml',
+    });
+    expect(extractQuantifiedItem('Mayonnaise (25ml)', UK_CONFIG)).toMatchObject({
+      name: 'Mayonnaise',
+      quantity: '25ml',
+      quantityDisplay: '25ml',
+      quantityMetricValue: 25,
+      quantityMetricUnit: 'ml',
+    });
+  });
+
+  it('stores metric values while preserving US and Canada source display', () => {
+    expect(extractQuantifiedItem('Liquid smoke – ½ tsp', US_CONFIG)).toMatchObject({
+      name: 'Liquid smoke',
+      quantity: '2.46ml',
+      quantityDisplay: '0.5tsp',
+      quantityMetricValue: 2.46,
+      quantityMetricUnit: 'ml',
+    });
+    expect(extractQuantifiedItem('Oil – 1 cup', CA_CONFIG)).toMatchObject({
+      name: 'Oil',
+      quantity: '250ml',
+      quantityDisplay: '1cup',
+      quantityMetricValue: 250,
+      quantityMetricUnit: 'ml',
+    });
+    expect(extractQuantifiedItem('Sugar – 20 ml (~4 tsp)', CA_CONFIG)).toMatchObject({
+      name: 'Sugar',
+      quantity: '20ml',
+      quantityDisplay: '4tsp',
+      quantityMetricValue: 20,
+      quantityMetricUnit: 'ml',
     });
   });
 });

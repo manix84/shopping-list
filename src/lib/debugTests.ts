@@ -101,9 +101,11 @@ export const COUNT_QUANTITY_TEST_CASES: CountQuantityTestCase[] = [
 
 export const UNIT_QUANTITY_TEST_CASES: UnitQuantityTestCase[] = [
   { input: '500g mince', expectedName: 'mince', expectedQuantity: '500g' },
-  { input: '1.5kg potatoes', expectedName: 'potatoes', expectedQuantity: '1.5kg' },
+  { input: '1.5kg potatoes', expectedName: 'potatoes', expectedQuantity: '1500g' },
   { input: 'olive oil 750ml', expectedName: 'olive oil', expectedQuantity: '750ml' },
   { input: '2x 500g bags of rice', expectedName: 'bags of rice', expectedQuantity: '500g', expectedQuantityValue: 2 },
+  { input: 'liquid smoke – ½ tsp', countryCode: 'uk', expectedName: 'liquid smoke', expectedQuantity: '2.5ml', expectedQuantityDisplay: '2.5ml' },
+  { input: 'liquid smoke – ½ tsp', countryCode: 'us', expectedName: 'liquid smoke', expectedQuantity: '2.46ml', expectedQuantityDisplay: '0.5tsp' },
 ];
 
 export const VARIANT_TEST_CASES: VariantTestCase[] = [
@@ -319,6 +321,11 @@ export const runConfigTests = (config: CountryConfig): ConfigTestResult[] => {
   const groupKeyDuplicates = duplicates(config.groups.map((group) => group.key));
   const groupOrderDuplicates = duplicates(config.groups.map((group) => String(group.order)));
   const keywordCount = sections.reduce((total, section) => total + section.keywords.length, 0);
+  const validUnitSystems = ['metric', 'us-customary', 'canadian-customary'];
+  const validDisplayModes = ['metric', 'source'];
+  const measurementPassed =
+    validUnitSystems.includes(config.measurement.unitSystem) &&
+    validDisplayModes.includes(config.measurement.displayMode);
 
   return [
     {
@@ -356,6 +363,12 @@ export const runConfigTests = (config: CountryConfig): ConfigTestResult[] => {
       expected: 'Country profile has enough keywords to cover every section',
       actual: `${keywordCount} keywords across ${sections.length} sections`,
       passed: keywordCount >= sections.length,
+    },
+    {
+      title: 'Measurement profile',
+      expected: 'Country profile declares unit conversion and display behaviour',
+      actual: `${config.measurement.unitSystem}, ${config.measurement.displayMode}`,
+      passed: measurementPassed,
     },
   ];
 };
@@ -551,15 +564,18 @@ export const runCountQuantityTests = (): CountQuantityTestResult[] =>
 
 export const runUnitQuantityTests = (): UnitQuantityTestResult[] =>
   UNIT_QUANTITY_TEST_CASES.map((test) => {
-    const actual = extractQuantifiedItem(test.input);
+    const config = test.countryCode ? COUNTRY_CONFIGS[test.countryCode] : undefined;
+    const actual = extractQuantifiedItem(test.input, config);
     return {
       ...test,
       actualName: cleanLine(actual.name),
       actualQuantity: actual.quantity,
+      actualQuantityDisplay: actual.quantityDisplay,
       actualQuantityValue: actual.quantityValue,
       passed:
         cleanLine(actual.name) === test.expectedName &&
         actual.quantity === test.expectedQuantity &&
+        (test.expectedQuantityDisplay === undefined || actual.quantityDisplay === test.expectedQuantityDisplay) &&
         actual.quantityValue === test.expectedQuantityValue,
     };
   });
