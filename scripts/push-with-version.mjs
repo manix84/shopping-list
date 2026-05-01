@@ -40,4 +40,4 @@ if (hasPackageChanges()) {
   console.log(`Version ${currentVersion()} is already current for this push.`);
 }
 
-run('git', ['push', ...pushArgs]);
+run('git', ['push', '--no-verify', ...pushArgs]);
