@@ -2,8 +2,7 @@ import type { CountryConfig } from '../types';
 
 export const INGREDIENT_MODE_STORAGE_KEY = 'smart-shopping-list-ingredient-mode-v1';
 
-export const supportsIngredientMode = (config: CountryConfig): boolean =>
-  config.measurement.unitSystem !== 'metric';
+export const supportsIngredientMode = (_config: CountryConfig): boolean => true;
 
 export const withIngredientModeDisplay = (
   config: CountryConfig,
@@ -15,7 +14,7 @@ export const withIngredientModeDisplay = (
     ...config,
     measurement: {
       ...config.measurement,
-      displayMode: enabled ? 'source' : config.measurement.displayMode,
+      displayMode: enabled ? 'cooking' : config.measurement.displayMode,
     },
   };
 };

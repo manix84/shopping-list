@@ -101,7 +101,7 @@ describe('quantity helpers', () => {
     });
   });
 
-  it('stores metric values while preserving US and Canada source display in ingredient mode', () => {
+  it('stores metric values while preserving US and Canada cup and spoon display in ingredient mode', () => {
     expect(extractQuantifiedItem('Liquid smoke – ½ tsp', withIngredientModeDisplay(US_CONFIG, true))).toMatchObject({
       name: 'Liquid smoke',
       quantity: '2.46ml',

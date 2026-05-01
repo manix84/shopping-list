@@ -43,8 +43,8 @@ export const Default: Story = {
     <DesignSystemStory>
       <StorySection title="Measurements">
         <p className="subtitle" style={{ marginTop: 0 }}>
-          Parsed measurements are normalized to metric storage. Ingredient mode switches cup and spoon country profiles
-          from metric display to source-style display.
+          Parsed measurements are normalized to metric storage. Ingredient mode switches display from metric to cups
+          and spoons, while imperial display support is available for a future control.
         </p>
         <div className="table-wrap">
           <table className="debug-table">
