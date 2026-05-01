@@ -8,6 +8,7 @@ export type ThemeMode = 'system' | 'light' | 'dark';
 export type RouteViewMode = 'default' | 'comfortable' | 'compact';
 export type MeasurementUnitSystem = 'metric' | 'us-customary' | 'canadian-customary';
 export type MeasurementDisplayMode = 'metric' | 'source';
+export type IngredientMode = boolean;
 
 export type SectionKey =
   | 'produce'

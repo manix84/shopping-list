@@ -3,6 +3,7 @@ import { expect, within } from 'storybook/test';
 import { CA_CONFIG } from '../config/countries/ca';
 import { UK_CONFIG } from '../config/countries/uk';
 import { US_CONFIG } from '../config/countries/us';
+import { withIngredientModeDisplay } from '../lib/ingredientMode';
 import { extractQuantifiedItem } from '../lib/quantity';
 import { DesignSystemStory, StorySection } from './DesignSystemStory';
 
@@ -13,7 +14,13 @@ const examples = [
   'Potatoes – 1.5kg',
 ];
 
-const configs = [UK_CONFIG, US_CONFIG, CA_CONFIG];
+const configs = [
+  { label: 'United Kingdom', config: UK_CONFIG },
+  { label: 'United States - metric display', config: withIngredientModeDisplay(US_CONFIG, false) },
+  { label: 'United States - ingredient mode', config: withIngredientModeDisplay(US_CONFIG, true) },
+  { label: 'Canada - metric display', config: withIngredientModeDisplay(CA_CONFIG, false) },
+  { label: 'Canada - ingredient mode', config: withIngredientModeDisplay(CA_CONFIG, true) },
+];
 
 const meta = {
   title: 'Design System/Measurements',
@@ -36,8 +43,8 @@ export const Default: Story = {
     <DesignSystemStory>
       <StorySection title="Measurements">
         <p className="subtitle" style={{ marginTop: 0 }}>
-          Parsed measurements are normalized to metric storage. US and Canada keep source-style display for cups,
-          teaspoons, tablespoons, and fluid ounces.
+          Parsed measurements are normalized to metric storage. Ingredient mode switches cup and spoon country profiles
+          from metric display to source-style display.
         </p>
         <div className="table-wrap">
           <table className="debug-table">
@@ -51,13 +58,13 @@ export const Default: Story = {
               </tr>
             </thead>
             <tbody>
-              {configs.flatMap((config) =>
+              {configs.flatMap(({ label, config }) =>
                 examples.map((example) => {
                   const parsed = extractQuantifiedItem(example, config);
 
                   return (
-                    <tr key={`${config.code}-${example}`}>
-                      <td>{config.label}</td>
+                    <tr key={`${label}-${example}`}>
+                      <td>{label}</td>
                       <td>{example}</td>
                       <td>{parsed.name}</td>
                       <td>{parsed.quantity}</td>
@@ -78,5 +85,6 @@ export const Default: Story = {
     await expect(canvas.getByText('Measurements')).toBeVisible();
     await expect(canvas.getAllByText('2.5ml')[0]).toBeVisible();
     await expect(canvas.getAllByText('0.5tsp')[0]).toBeVisible();
+    await expect(canvas.getAllByText(/United States - metric display/i)[0]).toBeVisible();
   },
 };
