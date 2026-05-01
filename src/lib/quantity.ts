@@ -1,3 +1,5 @@
+import type { CountryConfig } from '../types';
+import { extractMeasurementQuantity } from './measurements';
 import { cleanLine } from './stringUtils';
 
 export const formatCountQuantity = (value: number): string => `x${value}`;
@@ -20,6 +22,9 @@ export const parseQuantityValue = (quantity: unknown): number | undefined => {
 type ExtractedQuantifiedItem = {
   name: string;
   quantity?: string;
+  quantityDisplay?: string;
+  quantityMetricValue?: number;
+  quantityMetricUnit?: 'g' | 'ml';
   quantityValue?: number;
 };
 
@@ -64,8 +69,11 @@ const extractUnitQuantity = (value: string): { quantity?: string; name: string }
   return { name: value };
 };
 
-export const extractQuantifiedItem = (value: unknown): ExtractedQuantifiedItem => {
+export const extractQuantifiedItem = (value: unknown, config?: CountryConfig): ExtractedQuantifiedItem => {
   const trimmed = cleanLine(value);
+  const measured = extractMeasurementQuantity(trimmed, config);
+  if (measured) return measured;
+
   const counted = extractCountQuantity(trimmed);
   const unitized = extractUnitQuantity(counted.name);
 

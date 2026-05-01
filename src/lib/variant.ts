@@ -1,6 +1,8 @@
 import type { CountryConfig } from '../types';
 import { cleanEntryName, cleanLine, normalize } from './stringUtils';
 import { flattenSections } from './sections';
+import { parseMeasurement } from './measurements';
+import { parseSizeValue } from './size';
 
 type ExtractedVariant = {
   name: string;
@@ -157,6 +159,17 @@ const extractByRule = (normalizedName: string): ExtractedVariant | undefined => 
 
 export const extractVariant = (value: unknown, config: CountryConfig | undefined): ExtractedVariant => {
   const trimmed = cleanLine(value);
+  const parentheticalMatch = trimmed.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
+  if (parentheticalMatch) {
+    const [, baseName, bracketValue] = parentheticalMatch;
+    if (!parseMeasurement(bracketValue, config) && !parseSizeValue(bracketValue)) {
+      return {
+        name: cleanLine(baseName),
+        variant: normalize(bracketValue),
+      };
+    }
+  }
+
   const normalizedName = normalize(trimmed);
   if (!normalizedName) return { name: trimmed };
   if (VARIANT_EXTRACTION_EXCLUSIONS.has(normalizedName)) return { name: trimmed };

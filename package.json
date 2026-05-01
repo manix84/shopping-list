@@ -1,7 +1,7 @@
 {
   "name": "shopping-list",
   "private": true,
-  "version": "0.8.0",
+  "version": "0.9.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -15,9 +15,11 @@
     "test:storybook": "vitest run --project storybook",
     "test:all": "npm run test",
     "version:auto": "node scripts/bump-version.mjs auto",
+    "version:prepush": "node scripts/bump-version.mjs prepush",
     "version:major": "node scripts/bump-version.mjs major",
     "version:minor": "node scripts/bump-version.mjs minor",
     "version:patch": "node scripts/bump-version.mjs patch",
+    "push": "node scripts/push-with-version.mjs",
     "storybook": "storybook dev -p 7007",
     "build-storybook": "storybook build",
     "typecheck": "tsc -b --pretty false",

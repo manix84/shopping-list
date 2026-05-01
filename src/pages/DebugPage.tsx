@@ -342,6 +342,7 @@ export function DebugPage({
                 <>
                   {test.expectedName}
                   {` · ${test.expectedQuantity}`}
+                  {test.expectedQuantityDisplay ? ` · display ${test.expectedQuantityDisplay}` : ''}
                   {typeof test.expectedQuantityValue === 'number'
                     ? ` · ${messages.labels.count} ${test.expectedQuantityValue}`
                     : ''}
@@ -351,6 +352,9 @@ export function DebugPage({
                 <>
                   {test.actualName}
                   {test.actualQuantity ? ` · ${test.actualQuantity}` : ''}
+                  {test.actualQuantityDisplay && test.actualQuantityDisplay !== test.actualQuantity
+                    ? ` · display ${test.actualQuantityDisplay}`
+                    : ''}
                   {typeof test.actualQuantityValue === 'number'
                     ? ` · ${messages.labels.count} ${test.actualQuantityValue}`
                     : ''}

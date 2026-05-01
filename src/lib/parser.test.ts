@@ -86,6 +86,105 @@ describe('parser', () => {
     expect(getUnitQuantityDisplayValue(items[0])).toBe('500g');
   });
 
+  it('matches recipe-style condiment lines with dash-separated quantities', () => {
+    const items = parseItems(
+      [
+        'Dijon Mustard – 25 Ml',
+        'Ketchup – 120 Ml',
+        'Liquid Smoke – 1⁄2 Tsp',
+        'Marmite Optional – 1⁄2 Tsp',
+        'Mayonnaise Full Fat – 650 Ml',
+      ].join('\n'),
+      UK_CONFIG,
+    );
+
+    expect(items.map((item) => item.matchedSection)).toEqual([
+      'tinned_jarred',
+      'tinned_jarred',
+      'cooking_ingredients',
+      'tinned_jarred',
+      'tinned_jarred',
+    ]);
+  });
+
+  it('normalizes metric sauce recipe measurements while preserving sortable names', () => {
+    const items = parseItems(
+      [
+        '- Mayonnaise (full-fat) – 650 ml',
+        '- Greek yogurt (full-fat) – 150 ml',
+        '- Ketchup – 120 ml',
+        '- Dijon mustard – 25 ml',
+        '- White vinegar – 25 ml',
+        '- Sugar – 20 ml (~4 tsp)',
+        '- Onion powder – 12 ml (~2½ tsp)',
+        '- Garlic powder – 6 ml (~1¼ tsp)',
+        '- Smoked paprika – 12 ml (~2½ tsp)',
+        '- Salt – 6 ml (~1 tsp)',
+        '- Black pepper – 3 ml (~½ tsp)',
+        '- Liquid smoke – ½ tsp',
+        '- Marmite (optional) – ½ tsp',
+      ].join('\n'),
+      UK_CONFIG,
+    );
+
+    expect(items.map((item) => [item.raw, item.variant, item.quantity, item.matchedSection])).toEqual([
+      ['mayonnaise', 'full fat', '650ml', 'tinned_jarred'],
+      ['greek yogurt', 'full fat', '150ml', 'chilled_milk_juice_cream'],
+      ['ketchup', undefined, '120ml', 'tinned_jarred'],
+      ['dijon mustard', undefined, '25ml', 'tinned_jarred'],
+      ['vinegar', 'white', '25ml', 'cooking_ingredients'],
+      ['sugar', undefined, '20ml', 'home_baking'],
+      ['onion powder', undefined, '12ml', 'cooking_ingredients'],
+      ['garlic powder', undefined, '6ml', 'cooking_ingredients'],
+      ['smoked paprika', undefined, '12ml', 'cooking_ingredients'],
+      ['salt', undefined, '6ml', 'pantry'],
+      ['black pepper', undefined, '3ml', 'cooking_ingredients'],
+      ['liquid smoke', undefined, '2.5ml', 'cooking_ingredients'],
+      ['marmite', 'optional', '2.5ml', 'tinned_jarred'],
+    ]);
+    expect(items.every((item) => item.quantityMetricUnit === 'ml')).toBe(true);
+  });
+
+  it('uses bracketed text as variants unless it is a size or measurement', () => {
+    const items = parseItems(
+      [
+        'Mayonnaise (full-fat)',
+        'Mayonnaise (25ml)',
+        'Mayonnaise (large)',
+      ].join('\n'),
+      UK_CONFIG,
+    );
+
+    expect(items).toHaveLength(3);
+    expect(items[0]).toMatchObject({
+      raw: 'mayonnaise',
+      variant: 'full fat',
+      quantity: undefined,
+      sizeValue: undefined,
+      matchedSection: 'tinned_jarred',
+    });
+    expect(getVariantValue(items[0])).toBe('Full Fat');
+    expect(getVariantPrefixedDisplayValue(items[0])).toBe('Full Fat Mayonnaise');
+
+    expect(items[1]).toMatchObject({
+      raw: 'mayonnaise',
+      variant: undefined,
+      quantity: '25ml',
+      sizeValue: undefined,
+      matchedSection: 'tinned_jarred',
+    });
+    expect(getUnitQuantityDisplayValue(items[1])).toBe('25ml');
+
+    expect(items[2]).toMatchObject({
+      raw: 'mayonnaise',
+      variant: undefined,
+      quantity: undefined,
+      sizeValue: 'L',
+      matchedSection: 'tinned_jarred',
+    });
+    expect(getSizeDisplayValue(items[2])).toBe('Size: L');
+  });
+
   it('parses count and weight together and unwraps container names', () => {
     const items = parseItems('2x 500g bags of basmati rice', UK_CONFIG);
 

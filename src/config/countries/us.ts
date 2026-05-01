@@ -4,6 +4,10 @@ export const US_CONFIG: CountryConfig = {
   code: 'us',
   flag: '🇺🇸',
   label: 'United States',
+  measurement: {
+    unitSystem: 'us-customary',
+    displayMode: 'source',
+  },
   groups: [
     {
       key: 'food_produce',

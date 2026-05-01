@@ -24,6 +24,15 @@ describe('variant extraction', () => {
     });
   });
 
+  it('extracts bracketed variants without treating bracketed sizes or measurements as variants', () => {
+    expect(extractVariant('Mayonnaise (full-fat)', UK_CONFIG)).toEqual({
+      name: 'Mayonnaise',
+      variant: 'full fat',
+    });
+    expect(extractVariant('Mayonnaise (large)', UK_CONFIG)).toEqual({ name: 'Mayonnaise (large)' });
+    expect(extractVariant('Mayonnaise (25ml)', UK_CONFIG)).toEqual({ name: 'Mayonnaise (25ml)' });
+  });
+
   it('does not extract variants for explicit exclusions or exact keyword matches', () => {
     expect(extractVariant('whipped cream', UK_CONFIG)).toEqual({ name: 'whipped cream' });
     expect(extractVariant('ice cream', UK_CONFIG)).toEqual({ name: 'ice cream' });

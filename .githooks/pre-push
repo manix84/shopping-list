@@ -1,0 +1,23 @@
+#!/bin/sh
+set -e
+
+echo "Running pre-push version check..."
+
+before_package="$(git diff -- package.json package-lock.json)"
+before_cached_package="$(git diff --cached -- package.json package-lock.json)"
+npm run version:prepush
+after_package="$(git diff -- package.json package-lock.json)"
+
+if [ "$before_package" != "$after_package" ]; then
+  if [ -n "$before_package" ] || [ -n "$before_cached_package" ]; then
+    echo "Version files were updated by the pre-push hook, but package.json or package-lock.json already had uncommitted changes."
+    echo "Commit or stash the existing package-file changes, then push again."
+    exit 1
+  fi
+
+  echo "Version files were updated by the pre-push hook."
+  git add package.json package-lock.json
+  git commit -m "chore: bump app version"
+  echo "Created a version bump commit. Push again to include it."
+  exit 1
+fi

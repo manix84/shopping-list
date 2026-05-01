@@ -4,6 +4,10 @@ export const CA_CONFIG: CountryConfig = {
   code: 'ca',
   flag: '🇨🇦',
   label: 'Canada',
+  measurement: {
+    unitSystem: 'canadian-customary',
+    displayMode: 'source',
+  },
   groups: [
     {
       key: 'food_produce',

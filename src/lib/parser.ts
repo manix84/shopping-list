@@ -60,7 +60,7 @@ export const getQuantityValue = (item: Item): string | undefined => {
   return undefined;
 };
 
-export const getUnitQuantityDisplayValue = (item: Item): string | undefined => item.quantity;
+export const getUnitQuantityDisplayValue = (item: Item): string | undefined => item.quantityDisplay ?? item.quantity;
 
 export const getUnitQuantityValue = (item: Item): string | undefined => item.quantity;
 
@@ -92,29 +92,35 @@ export const parseItems = (input: unknown, config: CountryConfig | undefined, pr
     .filter(Boolean)
     .map((line, index) => {
       const normalizedLine = stripDisplaySizeLabel(line);
-      const { quantity, quantityValue, name } = extractQuantifiedItem(normalizedLine);
-      const correctedName = correctSpelling(unwrapContainerName(name));
-      const sizeResult = extractSize(correctedName);
+      const { quantity, quantityDisplay, quantityMetricValue, quantityMetricUnit, quantityValue, name } = extractQuantifiedItem(normalizedLine, config);
+      const unwrappedName = unwrapContainerName(name);
+      const sizeInput = /\([^)]+\)\s*$/.test(unwrappedName) ? unwrappedName : correctSpelling(unwrappedName);
+      const sizeResult = extractSize(sizeInput);
       const variantResult = extractVariant(sizeResult.name, config);
-      const key = dedupeKey(variantResult.name, quantity, sizeResult.size, quantityValue, variantResult.variant);
+      const correctedName = correctSpelling(variantResult.name);
+      const correctedVariant = variantResult.variant ? correctSpelling(variantResult.variant) : undefined;
+      const key = dedupeKey(correctedName, quantity, sizeResult.size, quantityValue, correctedVariant);
       if (seen.has(key)) return null;
       seen.add(key);
 
       const previous = previousMap.get(key);
-      const cleaned = cleanEntryName(variantResult.name);
+      const cleaned = cleanEntryName(correctedName);
 
       return {
         id: previous?.id ?? `${Date.now()}-${index}-${cleaned || 'item'}`,
-        raw: variantResult.name,
-        normalized: normalize(variantResult.name),
+        raw: correctedName,
+        normalized: normalize(correctedName),
         cleaned,
         size: sizeResult.size,
         sizeValue: sizeResult.sizeValue,
         quantity,
+        quantityDisplay,
+        quantityMetricValue,
+        quantityMetricUnit,
         quantityValue,
-        variant: variantResult.variant,
+        variant: correctedVariant,
         checked: previous?.checked ?? false,
-        matchedSection: detectSection(variantResult.name, config),
+        matchedSection: detectSection(correctedName, config),
       } satisfies Item;
     })
     .filter(Boolean) as Item[];
