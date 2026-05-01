@@ -95,7 +95,7 @@ const FRACTION_VALUES = new Map([
 
 const unitPattern = UNIT_DEFINITIONS.flatMap((definition) => definition.aliases)
   .sort((a, b) => b.length - a.length)
-  .map((unit) => unit.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\\ /g, '\\s+'))
+  .map((unit) => unit.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+'))
   .join('|');
 
 const numberPattern = String.raw`(?:\d+(?:\.\d+)?|\d+\s*[\/⁄]\s*\d+|[¼½¾⅓⅔⅛⅜⅝⅞]|\d+\s*[¼½¾⅓⅔⅛⅜⅝⅞])`;
