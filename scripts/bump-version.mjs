@@ -86,7 +86,7 @@ const prepushBaseRef = releaseType === 'prepush' ? upstreamRef() || defaultBaseR
 const nextReleaseType = automaticReleaseTypes.has(releaseType) ? inferReleaseType(prepushBaseRef) : releaseType;
 
 if (!explicitReleaseTypes.has(nextReleaseType)) {
-  console.error('Usage: node scripts/bump-version.mjs [auto|major|minor|patch]');
+  console.error('Usage: node scripts/bump-version.mjs [auto|prepush|major|minor|patch]');
   process.exit(1);
 }
 
