@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { CA_CONFIG } from '../config/countries/ca';
 import { UK_CONFIG } from '../config/countries/uk';
 import { US_CONFIG } from '../config/countries/us';
+import { withIngredientModeDisplay } from './ingredientMode';
 import { parseMeasurementNumber } from './measurements';
 import { extractQuantifiedItem, extractQuantity, formatCountQuantity, parseQuantityValue } from './quantity';
 
@@ -83,22 +84,39 @@ describe('quantity helpers', () => {
     });
   });
 
-  it('stores metric values while preserving US and Canada source display', () => {
+  it('stores metric values while using metric display for US and Canada by default', () => {
     expect(extractQuantifiedItem('Liquid smoke – ½ tsp', US_CONFIG)).toMatchObject({
       name: 'Liquid smoke',
       quantity: '2.46ml',
-      quantityDisplay: '0.5tsp',
+      quantityDisplay: '2.46ml',
       quantityMetricValue: 2.46,
       quantityMetricUnit: 'ml',
     });
     expect(extractQuantifiedItem('Oil – 1 cup', CA_CONFIG)).toMatchObject({
       name: 'Oil',
       quantity: '250ml',
-      quantityDisplay: '1cup',
+      quantityDisplay: '250ml',
       quantityMetricValue: 250,
       quantityMetricUnit: 'ml',
     });
+  });
+
+  it('stores metric values while preserving US and Canada source display in ingredient mode', () => {
+    expect(extractQuantifiedItem('Liquid smoke – ½ tsp', withIngredientModeDisplay(US_CONFIG, true))).toMatchObject({
+      name: 'Liquid smoke',
+      quantity: '2.46ml',
+      quantityDisplay: '0.5tsp',
+      quantityMetricValue: 2.46,
+      quantityMetricUnit: 'ml',
+    });
     expect(extractQuantifiedItem('Sugar – 20 ml (~4 tsp)', CA_CONFIG)).toMatchObject({
+      name: 'Sugar',
+      quantity: '20ml',
+      quantityDisplay: '20ml',
+      quantityMetricValue: 20,
+      quantityMetricUnit: 'ml',
+    });
+    expect(extractQuantifiedItem('Sugar – 20 ml (~4 tsp)', withIngredientModeDisplay(CA_CONFIG, true))).toMatchObject({
       name: 'Sugar',
       quantity: '20ml',
       quantityDisplay: '4tsp',

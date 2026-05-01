@@ -6,7 +6,7 @@ export const CA_CONFIG: CountryConfig = {
   label: 'Canada',
   measurement: {
     unitSystem: 'canadian-customary',
-    displayMode: 'source',
+    displayMode: 'metric',
   },
   groups: [
     {

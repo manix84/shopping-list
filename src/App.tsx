@@ -54,7 +54,7 @@ import { EditPage } from './pages/EditPage';
 import { RoutePage } from './pages/RoutePage';
 import { SectionsPage } from './pages/SectionsPage';
 import { SettingsPage } from './pages/SettingsPage';
-import type { AppRoute, BackendStatus, CountryCode, GroupedSectionView, IngredientMode, Item, PageKey, RouteViewMode, SectionKey, SharedListHistoryEntry, ThemeMode } from './types';
+import type { AppRoute, BackendStatus, CountryCode, GroupedSectionView, Item, PageKey, RouteViewMode, SectionKey, SharedListHistoryEntry, ThemeMode } from './types';
 
 const DEFAULT_PAGE: PageKey = 'edit';
 const BACKEND_HEARTBEAT_CONNECTED_MS = 5_000;
@@ -157,8 +157,8 @@ const buildRecord = (
   countryCode,
 });
 
-const countryConfigForIngredientMode = (countryCode: CountryCode, ingredientMode: IngredientMode) =>
-  withIngredientModeDisplay(COUNTRY_CONFIGS[countryCode], ingredientMode);
+const countryConfigForIngredientMode = (countryCode: CountryCode, ingredientModeEnabled: boolean) =>
+  withIngredientModeDisplay(COUNTRY_CONFIGS[countryCode], ingredientModeEnabled);
 
 const getSharedListPreview = (items: Item[]): string[] => items.slice(0, 6).map((item) => item.raw);
 
@@ -184,7 +184,7 @@ export default function App() {
   const [activeListId, setActiveListId] = useState<string>(() => readRouteFromLocation().listId ?? createUuidV7());
   const [isServerBackedList, setIsServerBackedList] = useState(false);
   const [countryCode, setCountryCode] = useState<CountryCode>('uk');
-  const [ingredientMode, setIngredientMode] = useState<IngredientMode>(() => loadIngredientMode());
+  const [ingredientMode, setIngredientMode] = useState(() => loadIngredientMode());
   const [themeMode, setThemeMode] = useState<ThemeMode>(() => loadThemeMode());
   const [routeViewMode, setRouteViewMode] = useState<RouteViewMode>(() => loadRouteViewMode());
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>(() => getResolvedTheme(loadThemeMode()));
@@ -777,7 +777,7 @@ export default function App() {
     ));
   };
 
-  const handleIngredientModeChange = (enabled: IngredientMode) => {
+  const handleIngredientModeChange = (enabled: boolean) => {
     setIngredientMode(enabled);
     setItems((current) => parseItems(input, countryConfigForIngredientMode(countryCode, enabled), current));
   };

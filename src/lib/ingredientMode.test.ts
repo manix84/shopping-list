@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { CA_CONFIG } from '../config/countries/ca';
 import { UK_CONFIG } from '../config/countries/uk';
 import {
@@ -10,6 +10,10 @@ import {
 } from './ingredientMode';
 
 describe('ingredient mode preference', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   it('is available for cup and spoon country profiles only', () => {
     expect(supportsIngredientMode(UK_CONFIG)).toBe(false);
     expect(supportsIngredientMode(CA_CONFIG)).toBe(true);
@@ -40,7 +44,5 @@ describe('ingredient mode preference', () => {
     saveIngredientMode(true);
     expect(storage.get(INGREDIENT_MODE_STORAGE_KEY)).toBe('true');
     expect(loadIngredientMode()).toBe(true);
-
-    vi.unstubAllGlobals();
   });
 });

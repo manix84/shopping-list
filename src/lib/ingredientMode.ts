@@ -15,7 +15,7 @@ export const withIngredientModeDisplay = (
     ...config,
     measurement: {
       ...config.measurement,
-      displayMode: enabled ? 'source' : 'metric',
+      displayMode: enabled ? 'source' : config.measurement.displayMode,
     },
   };
 };
