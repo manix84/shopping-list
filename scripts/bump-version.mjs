@@ -5,6 +5,7 @@ import { readFileSync } from 'node:fs';
 const releaseType = process.argv[2] ?? 'auto';
 const explicitReleaseTypes = new Set(['major', 'minor', 'patch']);
 const automaticReleaseTypes = new Set(['auto', 'prepush']);
+const hookReleaseTypes = new Set(['precommit']);
 const versionTagPattern = /^v(\d+\.\d+\.\d+)$/;
 
 const runGit = (args) => {
@@ -83,10 +84,12 @@ const inferReleaseType = (baseRef) => {
 };
 
 const prepushBaseRef = releaseType === 'prepush' ? upstreamRef() || defaultBaseRef() : undefined;
-const nextReleaseType = automaticReleaseTypes.has(releaseType) ? inferReleaseType(prepushBaseRef) : releaseType;
+const hookReleaseType = hookReleaseTypes.has(releaseType) ? process.env.VERSION_BUMP ?? 'patch' : undefined;
+const nextReleaseType = hookReleaseType ?? (automaticReleaseTypes.has(releaseType) ? inferReleaseType(prepushBaseRef) : releaseType);
 
 if (!explicitReleaseTypes.has(nextReleaseType)) {
-  console.error('Usage: node scripts/bump-version.mjs [auto|prepush|major|minor|patch]');
+  console.error('Usage: node scripts/bump-version.mjs [auto|precommit|prepush|major|minor|patch]');
+  console.error('Set VERSION_BUMP=major|minor|patch when using precommit mode.');
   process.exit(1);
 }
 
