@@ -19,6 +19,12 @@ import {
   loadLocale,
   saveLocale,
 } from './lib/i18n';
+import {
+  loadIngredientMode,
+  saveIngredientMode,
+  supportsIngredientMode,
+  withIngredientModeDisplay,
+} from './lib/ingredientMode';
 import { getDisplayValue, getStoredValue, parseItems } from './lib/parser';
 import {
   checkBackendStatus,
@@ -151,6 +157,9 @@ const buildRecord = (
   countryCode,
 });
 
+const countryConfigForIngredientMode = (countryCode: CountryCode, ingredientModeEnabled: boolean) =>
+  withIngredientModeDisplay(COUNTRY_CONFIGS[countryCode], ingredientModeEnabled);
+
 const getSharedListPreview = (items: Item[]): string[] => items.slice(0, 6).map((item) => item.raw);
 
 function updateItemTextInInput(input: string, previousDisplay: string, nextDisplay: string): string {
@@ -175,6 +184,7 @@ export default function App() {
   const [activeListId, setActiveListId] = useState<string>(() => readRouteFromLocation().listId ?? createUuidV7());
   const [isServerBackedList, setIsServerBackedList] = useState(false);
   const [countryCode, setCountryCode] = useState<CountryCode>('uk');
+  const [ingredientMode, setIngredientMode] = useState(() => loadIngredientMode());
   const [themeMode, setThemeMode] = useState<ThemeMode>(() => loadThemeMode());
   const [routeViewMode, setRouteViewMode] = useState<RouteViewMode>(() => loadRouteViewMode());
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>(() => getResolvedTheme(loadThemeMode()));
@@ -189,7 +199,11 @@ export default function App() {
   const [isPwaInstallNudgeVisible, setIsPwaInstallNudgeVisible] = useState(() => !hasDismissedPwaInstallNudge());
   const [isLikelyMobileForInstall, setIsLikelyMobileForInstall] = useState(() => isMobileOrTabletDevice());
 
-  const config = useMemo(() => COUNTRY_CONFIGS[countryCode], [countryCode]);
+  const config = useMemo(
+    () => withIngredientModeDisplay(COUNTRY_CONFIGS[countryCode], ingredientMode),
+    [countryCode, ingredientMode],
+  );
+  const isIngredientModeAvailable = supportsIngredientMode(COUNTRY_CONFIGS[countryCode]);
   const messages = useMemo(() => createMessages(locale), [locale]);
   const { page, listId } = route;
   const canUseBackend = backendStatus.state === 'connected';
@@ -392,7 +406,11 @@ export default function App() {
       }));
       setCountryCode(selectedRecord.countryCode);
       setInput(selectedRecord.input);
-      setItems(parseItems(selectedRecord.input, COUNTRY_CONFIGS[selectedRecord.countryCode], selectedRecord.items));
+      setItems(parseItems(
+        selectedRecord.input,
+        countryConfigForIngredientMode(selectedRecord.countryCode, ingredientMode),
+        selectedRecord.items,
+      ));
       setIsLoaded(true);
     };
 
@@ -513,7 +531,11 @@ export default function App() {
         }));
         setCountryCode(selectedRecord.countryCode);
         setInput(selectedRecord.input);
-        setItems(parseItems(selectedRecord.input, COUNTRY_CONFIGS[selectedRecord.countryCode], selectedRecord.items));
+        setItems(parseItems(
+          selectedRecord.input,
+          countryConfigForIngredientMode(selectedRecord.countryCode, ingredientMode),
+          selectedRecord.items,
+        ));
       } catch (error) {
         console.warn('Backend reconnected but could not be merged. Staying in local storage mode.', error);
         setBackendStatus((current) => ({
@@ -570,6 +592,10 @@ export default function App() {
   useEffect(() => {
     saveRouteViewMode(routeViewMode);
   }, [routeViewMode]);
+
+  useEffect(() => {
+    saveIngredientMode(ingredientMode);
+  }, [ingredientMode]);
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -744,7 +770,16 @@ export default function App() {
 
   const handleCountryChange = (nextCountryCode: CountryCode) => {
     setCountryCode(nextCountryCode);
-    setItems((current) => parseItems(input, COUNTRY_CONFIGS[nextCountryCode], current));
+    setItems((current) => parseItems(
+      input,
+      countryConfigForIngredientMode(nextCountryCode, ingredientMode),
+      current,
+    ));
+  };
+
+  const handleIngredientModeChange = (enabled: boolean) => {
+    setIngredientMode(enabled);
+    setItems((current) => parseItems(input, countryConfigForIngredientMode(countryCode, enabled), current));
   };
 
   const toggleItem = (id: string) => {
@@ -775,7 +810,11 @@ export default function App() {
     setIsServerBackedList(record.serverBacked === true);
     setCountryCode(record.countryCode);
     setInput(record.input);
-    setItems(parseItems(record.input, COUNTRY_CONFIGS[record.countryCode], record.items));
+    setItems(parseItems(
+      record.input,
+      countryConfigForIngredientMode(record.countryCode, ingredientMode),
+      record.items,
+    ));
   };
 
   const handleCreateSharedLink = async () => {
@@ -855,7 +894,7 @@ export default function App() {
     setStorageMode('local');
     setCountryCode(initial.countryCode);
     setInput(initial.input);
-    setItems(parseItems(initial.input, COUNTRY_CONFIGS[initial.countryCode]));
+    setItems(parseItems(initial.input, countryConfigForIngredientMode(initial.countryCode, ingredientMode)));
     setDraftItem('');
     setQuery('');
     setRoute({ page: 'edit' });
@@ -940,9 +979,12 @@ export default function App() {
                 grouped={grouped}
                 hasItems={items.length > 0}
                 viewMode={routeViewMode}
+                ingredientMode={ingredientMode}
+                canUseIngredientMode={isIngredientModeAvailable}
                 onQueryChange={setQuery}
                 onToggleFilter={toggleRouteFilter}
                 onViewModeChange={setRouteViewMode}
+                onIngredientModeChange={handleIngredientModeChange}
                 onToggleSection={toggleSection}
                 onToggleItem={toggleItem}
                 onOpenEdit={() => changePage('edit')}

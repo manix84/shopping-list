@@ -105,7 +105,7 @@ export const UNIT_QUANTITY_TEST_CASES: UnitQuantityTestCase[] = [
   { input: 'olive oil 750ml', expectedName: 'olive oil', expectedQuantity: '750ml' },
   { input: '2x 500g bags of rice', expectedName: 'bags of rice', expectedQuantity: '500g', expectedQuantityValue: 2 },
   { input: 'liquid smoke – ½ tsp', countryCode: 'uk', expectedName: 'liquid smoke', expectedQuantity: '2.5ml', expectedQuantityDisplay: '2.5ml' },
-  { input: 'liquid smoke – ½ tsp', countryCode: 'us', expectedName: 'liquid smoke', expectedQuantity: '2.46ml', expectedQuantityDisplay: '0.5tsp' },
+  { input: 'liquid smoke – ½ tsp', countryCode: 'us', expectedName: 'liquid smoke', expectedQuantity: '2.46ml', expectedQuantityDisplay: '2.46ml' },
 ];
 
 export const VARIANT_TEST_CASES: VariantTestCase[] = [

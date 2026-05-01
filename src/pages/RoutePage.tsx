@@ -1,4 +1,4 @@
-import { mdiMagnify, mdiViewAgendaOutline, mdiViewDayOutline, mdiViewListOutline } from '@mdi/js';
+import { mdiBeakerOutline, mdiCupOutline, mdiMagnify, mdiViewAgendaOutline, mdiViewDayOutline, mdiViewListOutline } from '@mdi/js';
 import type { GroupedSectionView } from '../types';
 import { Card } from '../components/Card';
 import { RouteSectionCard } from '../components/RouteSectionCard';
@@ -11,9 +11,12 @@ type RoutePageProps = {
   grouped: GroupedSectionView[];
   hasItems: boolean;
   viewMode: RouteViewMode;
+  ingredientMode: boolean;
+  canUseIngredientMode: boolean;
   onQueryChange: (value: string) => void;
   onToggleFilter: () => void;
   onViewModeChange: (mode: RouteViewMode) => void;
+  onIngredientModeChange: (enabled: boolean) => void;
   onToggleSection: (sectionKey: GroupedSectionView['key'], checked: boolean) => void;
   onToggleItem: (itemId: string) => void;
   onOpenEdit: () => void;
@@ -25,9 +28,12 @@ export function RoutePage({
   isFilterVisible,
   hasItems,
   viewMode,
+  ingredientMode,
+  canUseIngredientMode,
   onQueryChange,
   onToggleFilter,
   onViewModeChange,
+  onIngredientModeChange,
   onToggleSection,
   onToggleItem,
   onOpenEdit,
@@ -38,6 +44,9 @@ export function RoutePage({
     { mode: 'comfortable', icon: mdiViewDayOutline },
     { mode: 'compact', icon: mdiViewListOutline },
   ];
+  const ingredientModeLabel = ingredientMode
+    ? messages.labels.ingredientModeSwitchToMetric
+    : messages.labels.ingredientModeSwitchToCups;
 
   return (
     <Card
@@ -67,6 +76,23 @@ export function RoutePage({
                   </button>
                 ))}
               </div>
+              {canUseIngredientMode ? (
+                <>
+                  <div className="route-tools-divider" aria-hidden="true" />
+                  <button
+                    type="button"
+                    className={`button button-icon ingredient-mode-toggle ${ingredientMode ? 'button-active' : ''}`}
+                    onClick={() => onIngredientModeChange(!ingredientMode)}
+                    aria-label={ingredientModeLabel}
+                    aria-pressed={ingredientMode}
+                    title={ingredientModeLabel}
+                  >
+                    <svg aria-hidden="true" className="button-icon-svg" viewBox="0 0 24 24">
+                      <path d={ingredientMode ? mdiBeakerOutline : mdiCupOutline} fill="currentColor" />
+                    </svg>
+                  </button>
+                </>
+              ) : null}
               <div className="route-tools-divider" aria-hidden="true" />
               <button
                 type="button"

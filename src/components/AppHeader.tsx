@@ -25,7 +25,12 @@ const backendBadge = (status: BackendStatus, messages: Messages) => {
   return { tone: 'danger' as const, label: messages.backendStatus.frontendOnly };
 };
 
-export function AppHeader({ page, hasItems, backendStatus, onChangePage }: AppHeaderProps) {
+export function AppHeader({
+  page,
+  hasItems,
+  backendStatus,
+  onChangePage,
+}: AppHeaderProps) {
   const { messages } = useI18n();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [connectionBadgeVisible, setConnectionBadgeVisible] = useState(false);

@@ -6,7 +6,7 @@ export const US_CONFIG: CountryConfig = {
   label: 'United States',
   measurement: {
     unitSystem: 'us-customary',
-    displayMode: 'source',
+    displayMode: 'metric',
   },
   groups: [
     {

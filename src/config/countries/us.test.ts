@@ -26,7 +26,7 @@ describe('US config', () => {
 
     expect(US_CONFIG.code).toBe('us');
     expect(US_CONFIG.label).toBe('United States');
-    expect(US_CONFIG.measurement).toEqual({ unitSystem: 'us-customary', displayMode: 'source' });
+    expect(US_CONFIG.measurement).toEqual({ unitSystem: 'us-customary', displayMode: 'metric' });
     expect(seafood?.keywords).toContain('shrimp');
     expect(seafood?.keywords).toContain('smoked salmon');
     expect(cereal?.keywords).toContain('frosted flakes');

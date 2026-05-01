@@ -26,7 +26,7 @@ describe('Canada config', () => {
 
     expect(CA_CONFIG.code).toBe('ca');
     expect(CA_CONFIG.label).toBe('Canada');
-    expect(CA_CONFIG.measurement).toEqual({ unitSystem: 'canadian-customary', displayMode: 'source' });
+    expect(CA_CONFIG.measurement).toEqual({ unitSystem: 'canadian-customary', displayMode: 'metric' });
     expect(dairy?.keywords).toContain('bagged milk');
     expect(cereal?.keywords).toContain('shreddies');
     expect(cereal?.keywords).toContain('vector cereal');
