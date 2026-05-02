@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { CA_CONFIG } from '../config/countries/ca';
 import { UK_CONFIG } from '../config/countries/uk';
 import { US_CONFIG } from '../config/countries/us';
-import { withIngredientModeDisplay } from './ingredientMode';
+import { withMeasurementDisplayMode } from './ingredientMode';
 import { parseMeasurementNumber } from './measurements';
 import { extractQuantifiedItem, extractQuantity, formatCountQuantity, parseQuantityValue } from './quantity';
 
@@ -101,8 +101,8 @@ describe('quantity helpers', () => {
     });
   });
 
-  it('stores metric values while preserving US and Canada cup and spoon display in ingredient mode', () => {
-    expect(extractQuantifiedItem('Liquid smoke – ½ tsp', withIngredientModeDisplay(US_CONFIG, true))).toMatchObject({
+  it('stores metric values while preserving US and Canada cup and spoon display in cooking mode', () => {
+    expect(extractQuantifiedItem('Liquid smoke – ½ tsp', withMeasurementDisplayMode(US_CONFIG, 'cooking'))).toMatchObject({
       name: 'Liquid smoke',
       quantity: '2.46ml',
       quantityDisplay: '0.5tsp',
@@ -116,7 +116,7 @@ describe('quantity helpers', () => {
       quantityMetricValue: 20,
       quantityMetricUnit: 'ml',
     });
-    expect(extractQuantifiedItem('Sugar – 20 ml (~4 tsp)', withIngredientModeDisplay(CA_CONFIG, true))).toMatchObject({
+    expect(extractQuantifiedItem('Sugar – 20 ml (~4 tsp)', withMeasurementDisplayMode(CA_CONFIG, 'cooking'))).toMatchObject({
       name: 'Sugar',
       quantity: '20ml',
       quantityDisplay: '4tsp',

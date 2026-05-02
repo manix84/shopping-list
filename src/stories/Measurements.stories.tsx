@@ -3,7 +3,7 @@ import { expect, within } from 'storybook/test';
 import { CA_CONFIG } from '../config/countries/ca';
 import { UK_CONFIG } from '../config/countries/uk';
 import { US_CONFIG } from '../config/countries/us';
-import { withIngredientModeDisplay } from '../lib/ingredientMode';
+import { withMeasurementDisplayMode } from '../lib/ingredientMode';
 import { extractQuantifiedItem } from '../lib/quantity';
 import { DesignSystemStory, StorySection } from './DesignSystemStory';
 
@@ -16,10 +16,11 @@ const examples = [
 
 const configs = [
   { label: 'United Kingdom', config: UK_CONFIG },
-  { label: 'United States - metric display', config: withIngredientModeDisplay(US_CONFIG, false) },
-  { label: 'United States - ingredient mode', config: withIngredientModeDisplay(US_CONFIG, true) },
-  { label: 'Canada - metric display', config: withIngredientModeDisplay(CA_CONFIG, false) },
-  { label: 'Canada - ingredient mode', config: withIngredientModeDisplay(CA_CONFIG, true) },
+  { label: 'United Kingdom - imperial display', config: withMeasurementDisplayMode(UK_CONFIG, 'imperial') },
+  { label: 'United States - metric display', config: withMeasurementDisplayMode(US_CONFIG, 'metric') },
+  { label: 'United States - cooking display', config: withMeasurementDisplayMode(US_CONFIG, 'cooking') },
+  { label: 'Canada - metric display', config: withMeasurementDisplayMode(CA_CONFIG, 'metric') },
+  { label: 'Canada - cooking display', config: withMeasurementDisplayMode(CA_CONFIG, 'cooking') },
 ];
 
 const meta = {
@@ -43,8 +44,8 @@ export const Default: Story = {
     <DesignSystemStory>
       <StorySection title="Measurements">
         <p className="subtitle" style={{ marginTop: 0 }}>
-          Parsed measurements are normalized to metric storage. Ingredient mode switches display from metric to cups
-          and spoons, while imperial display support is available for a future control.
+          Parsed measurements are normalized to metric storage. Measurement display mode can show metric, imperial,
+          or cooking units without changing the stored value.
         </p>
         <div className="table-wrap">
           <table className="debug-table">
@@ -86,5 +87,6 @@ export const Default: Story = {
     await expect(canvas.getAllByText('2.5ml')[0]).toBeVisible();
     await expect(canvas.getAllByText('0.5tsp')[0]).toBeVisible();
     await expect(canvas.getAllByText(/United States - metric display/i)[0]).toBeVisible();
+    await expect(canvas.getAllByText(/United Kingdom - imperial display/i)[0]).toBeVisible();
   },
 };

@@ -65,13 +65,12 @@ export type Messages = {
     empty: string;
     exists: string;
     group: string;
-    ingredientMode: string;
-    ingredientModeCups: string;
-    ingredientModeMetric: string;
-    ingredientModeSwitchToCups: string;
-    ingredientModeSwitchToMetric: string;
     items: string;
     locale: string;
+    measurementMode: string;
+    measurementModeCooking: string;
+    measurementModeImperial: string;
+    measurementModeMetric: string;
     mode: string;
     order: string;
     progress: string;

@@ -7,7 +7,7 @@ export type CountryCode = 'uk' | 'us' | 'ca';
 export type ThemeMode = 'system' | 'light' | 'dark';
 export type RouteViewMode = 'default' | 'comfortable' | 'compact';
 export type MeasurementUnitSystem = 'metric' | 'us-customary' | 'canadian-customary';
-export type MeasurementDisplayMode = 'metric' | 'cooking' | 'imperial';
+export type MeasurementDisplayMode = 'metric' | 'imperial' | 'cooking';
 
 export type SectionKey =
   | 'produce'
