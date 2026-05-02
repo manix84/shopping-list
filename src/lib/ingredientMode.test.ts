@@ -14,21 +14,24 @@ describe('ingredient mode preference', () => {
     vi.unstubAllGlobals();
   });
 
-  it('is available for cup and spoon country profiles only', () => {
-    expect(supportsIngredientMode(UK_CONFIG)).toBe(false);
+  it('is available for every country profile', () => {
+    expect(supportsIngredientMode(UK_CONFIG)).toBe(true);
     expect(supportsIngredientMode(CA_CONFIG)).toBe(true);
   });
 
-  it('switches cup and spoon countries between metric and source display', () => {
+  it('switches country profiles between baseline and cooking display', () => {
     expect(withIngredientModeDisplay(CA_CONFIG, false).measurement).toEqual({
       unitSystem: 'canadian-customary',
       displayMode: 'metric',
     });
     expect(withIngredientModeDisplay(CA_CONFIG, true).measurement).toEqual({
       unitSystem: 'canadian-customary',
-      displayMode: 'source',
+      displayMode: 'cooking',
     });
-    expect(withIngredientModeDisplay(UK_CONFIG, true)).toBe(UK_CONFIG);
+    expect(withIngredientModeDisplay(UK_CONFIG, true).measurement).toEqual({
+      unitSystem: 'metric',
+      displayMode: 'cooking',
+    });
   });
 
   it('persists the ingredient mode toggle', () => {

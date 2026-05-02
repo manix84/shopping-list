@@ -3,3 +3,6 @@ set -e
 
 echo "Running pre-commit checks..."
 npm run lint
+echo "Bumping app version..."
+npm run version:precommit
+git add package.json package-lock.json

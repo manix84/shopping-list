@@ -1,4 +1,4 @@
-import type { CountryConfig, MeasurementUnitSystem } from '../types';
+import type { CountryConfig, MeasurementDisplayMode, MeasurementUnitSystem } from '../types';
 import { cleanLine } from './stringUtils';
 
 export type MetricMeasurementUnit = 'g' | 'ml';
@@ -149,17 +149,28 @@ const roundDisplayValue = (value: number): number => {
   return Math.round(value * 100) / 100;
 };
 
-const formatCountryDisplayMeasurement = (
+const UNIT_DEFINITIONS_BY_DISPLAY = new Map(
+  UNIT_DEFINITIONS.map((definition) => [definition.displayUnit, definition] as const),
+);
+
+const unitByDisplay = (displayUnit: string): UnitDefinition => {
+  const unitDefinition = UNIT_DEFINITIONS_BY_DISPLAY.get(displayUnit);
+  if (!unitDefinition) {
+    throw new Error(`Unknown display unit: ${displayUnit}`);
+  }
+
+  return unitDefinition;
+};
+
+const formatCookingDisplayMeasurement = (
   metricValue: number,
   metricUnit: MetricMeasurementUnit,
   unitSystem: MeasurementUnitSystem,
 ): string => {
-  if (unitSystem === 'metric') return formatMetricMeasurement(metricValue, metricUnit);
-
   if (metricUnit === 'ml') {
-    const tsp = UNIT_DEFINITIONS.find((definition) => definition.displayUnit === 'tsp')!;
-    const tbsp = UNIT_DEFINITIONS.find((definition) => definition.displayUnit === 'tbsp')!;
-    const cup = UNIT_DEFINITIONS.find((definition) => definition.displayUnit === 'cup')!;
+    const tsp = unitByDisplay('tsp');
+    const tbsp = unitByDisplay('tbsp');
+    const cup = unitByDisplay('cup');
     const unit = metricValue >= cup.metricFactor[unitSystem]
       ? cup
       : metricValue >= tbsp.metricFactor[unitSystem]
@@ -169,10 +180,39 @@ const formatCountryDisplayMeasurement = (
     return `${formatNumber(roundDisplayValue(metricValue / unit.metricFactor[unitSystem]))}${unit.displayUnit}`;
   }
 
-  const pound = UNIT_DEFINITIONS.find((definition) => definition.displayUnit === 'lb')!;
-  const ounce = UNIT_DEFINITIONS.find((definition) => definition.displayUnit === 'oz')!;
-  const unit = metricValue >= pound.metricFactor[unitSystem] ? pound : ounce;
-  return `${formatNumber(roundDisplayValue(metricValue / unit.metricFactor[unitSystem]))}${unit.displayUnit}`;
+  return formatMetricMeasurement(metricValue, metricUnit);
+};
+
+const formatImperialDisplayMeasurement = (
+  metricValue: number,
+  metricUnit: MetricMeasurementUnit,
+): string => {
+  if (metricUnit === 'ml') {
+    const fluidOunce = unitByDisplay('fl oz');
+    return `${formatNumber(roundDisplayValue(metricValue / fluidOunce.metricFactor.metric))}${fluidOunce.displayUnit}`;
+  }
+
+  const pound = unitByDisplay('lb');
+  const ounce = unitByDisplay('oz');
+  const unit = metricValue >= pound.metricFactor.metric ? pound : ounce;
+  return `${formatNumber(roundDisplayValue(metricValue / unit.metricFactor.metric))}${unit.displayUnit}`;
+};
+
+const formatDisplayMeasurement = (
+  metricValue: number,
+  metricUnit: MetricMeasurementUnit,
+  displayMode: MeasurementDisplayMode,
+  unitSystem: MeasurementUnitSystem,
+): string => {
+  if (displayMode === 'cooking') {
+    return formatCookingDisplayMeasurement(metricValue, metricUnit, unitSystem);
+  }
+
+  if (displayMode === 'imperial') {
+    return formatImperialDisplayMeasurement(metricValue, metricUnit);
+  }
+
+  return formatMetricMeasurement(metricValue, metricUnit);
 };
 
 const parseMeasurementParts = (
@@ -212,13 +252,17 @@ export const parseMeasurement = (
   const sourceDisplay = sourceDisplayMatch
     ? parseMeasurementParts(sourceDisplayMatch[1], unitSystem)
     : undefined;
-  const quantityDisplay = sourceDisplay
+  const displayMode = config?.measurement.displayMode ?? 'metric';
+  const hintedQuantityDisplay = sourceDisplay
     ? `${formatNumber(sourceDisplay.amount)}${sourceDisplay.unitDefinition.displayUnit}`
-    : formatCountryDisplayMeasurement(parsed.metricValue, parsed.unitDefinition.metricUnit, unitSystem);
+    : undefined;
+  const quantityDisplay = displayMode === 'cooking' && hintedQuantityDisplay
+    ? hintedQuantityDisplay
+    : formatDisplayMeasurement(parsed.metricValue, parsed.unitDefinition.metricUnit, displayMode, unitSystem);
 
   return {
     quantity: parsed.quantity,
-    quantityDisplay: config?.measurement.displayMode === 'source' ? quantityDisplay : parsed.quantity,
+    quantityDisplay,
     quantityMetricValue: parsed.metricValue,
     quantityMetricUnit: parsed.unitDefinition.metricUnit,
   };

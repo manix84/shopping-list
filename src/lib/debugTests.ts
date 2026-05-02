@@ -322,7 +322,7 @@ export const runConfigTests = (config: CountryConfig): ConfigTestResult[] => {
   const groupOrderDuplicates = duplicates(config.groups.map((group) => String(group.order)));
   const keywordCount = sections.reduce((total, section) => total + section.keywords.length, 0);
   const validUnitSystems = ['metric', 'us-customary', 'canadian-customary'];
-  const validDisplayModes = ['metric', 'source'];
+  const validDisplayModes = ['metric', 'cooking', 'imperial'];
   const measurementPassed =
     validUnitSystems.includes(config.measurement.unitSystem) &&
     validDisplayModes.includes(config.measurement.displayMode);

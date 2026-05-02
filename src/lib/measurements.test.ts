@@ -46,7 +46,7 @@ describe('measurement helpers', () => {
     });
   });
 
-  it('keeps storage metric while switching display mode for cup and spoon countries', () => {
+  it('keeps storage metric while switching display mode to cups and spoons', () => {
     expect(parseMeasurement('½ tsp', withIngredientModeDisplay(US_CONFIG, false))).toMatchObject({
       quantity: '2.46ml',
       quantityDisplay: '2.46ml',
@@ -59,9 +59,36 @@ describe('measurement helpers', () => {
       quantity: '250ml',
       quantityDisplay: '1cup',
     });
+    expect(parseMeasurement('20 ml', withIngredientModeDisplay(UK_CONFIG, true))).toMatchObject({
+      quantity: '20ml',
+      quantityDisplay: '1.33tbsp',
+    });
+    expect(parseMeasurement('500g', withIngredientModeDisplay(UK_CONFIG, true))).toMatchObject({
+      quantity: '500g',
+      quantityDisplay: '500g',
+    });
   });
 
-  it('prefers parenthetical source display hints when ingredient mode is enabled', () => {
+  it('supports imperial display without exposing it in the ingredient mode toggle', () => {
+    const imperialConfig = {
+      ...UK_CONFIG,
+      measurement: {
+        ...UK_CONFIG.measurement,
+        displayMode: 'imperial' as const,
+      },
+    };
+
+    expect(parseMeasurement('500g', imperialConfig)).toMatchObject({
+      quantity: '500g',
+      quantityDisplay: '1.1lb',
+    });
+    expect(parseMeasurement('250ml', imperialConfig)).toMatchObject({
+      quantity: '250ml',
+      quantityDisplay: '8.8fl oz',
+    });
+  });
+
+  it('prefers parenthetical cup and spoon display hints when ingredient mode is enabled', () => {
     expect(parseMeasurement('20 ml (~4 tsp)', withIngredientModeDisplay(CA_CONFIG, true))).toEqual({
       quantity: '20ml',
       quantityDisplay: '4tsp',
