@@ -169,6 +169,7 @@ export const it: Messages = {
       tabBackend: 'Backend',
       tabConfig: 'Config',
       tabMatcher: 'Matcher',
+      tabMeasurements: 'Misure',
       tabQuantity: 'Quantità',
       tabWeights: 'Pesi',
       tabVariants: 'Varianti',
@@ -195,6 +196,9 @@ export const it: Messages = {
       quantityTitle: 'Autocontrolli quantità numeriche',
       quantitySubtitle:
         'Le quantità come x2 e 4 carote restano collegate a un solo articolo selezionabile.',
+      measurementTitle: 'Autocontrolli misure',
+      measurementSubtitle:
+        'Archiviazione metrica, visualizzazione da cucina, visualizzazione imperiale e suggerimenti tra parentesi devono restare coerenti.',
       weightTitle: 'Autocontrolli pesi e unità',
       weightSubtitle:
         'Pesi e unità come 500g o 1.5kg restano collegati all’articolo, anche quando c’è una quantità.',
@@ -208,6 +212,7 @@ export const it: Messages = {
       stateSubtitle:
         'Convalida la lista corrente contro parser, matcher, varianti, avanzamento e identità lista.',
       allMatcherPass: 'Tutti i controlli matcher sono superati.',
+      allMeasurementPass: 'Tutti i controlli misure sono superati.',
       allQuantityPass: 'Tutti i controlli quantità numeriche sono superati.',
       allWeightPass: 'Tutti i controlli pesi e unità sono superati.',
       allVariantPass: 'Tutti i controlli varianti sono superati.',

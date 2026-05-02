@@ -163,6 +163,7 @@ export const en: Messages = {
       tabBackend: 'Backend',
       tabConfig: 'Config',
       tabMatcher: 'Matcher',
+      tabMeasurements: 'Measurements',
       tabQuantity: 'Quantities',
       tabWeights: 'Weights',
       tabVariants: 'Variants',
@@ -187,6 +188,9 @@ export const en: Messages = {
       quantityTitle: 'Count quantity self-checks',
       quantitySubtitle:
         'Count-style quantities like x2 and 4 carrots stay attached to one checkable item.',
+      measurementTitle: 'Measurement self-checks',
+      measurementSubtitle:
+        'Metric storage, cooking display, imperial display, and parenthetical hints should stay consistent.',
       weightTitle: 'Weight and unit self-checks',
       weightSubtitle:
         'Weights and units like 500g or 1.5kg stay attached as item metadata, even when a count is present.',
@@ -200,6 +204,7 @@ export const en: Messages = {
       stateSubtitle:
         'Validate the current list state against the parser, matcher, variants, progress counters, and list identity.',
       allMatcherPass: 'All matcher checks are passing.',
+      allMeasurementPass: 'All measurement checks are passing.',
       allQuantityPass: 'All count quantity checks are passing.',
       allWeightPass: 'All weight and unit checks are passing.',
       allVariantPass: 'All variant checks are passing.',

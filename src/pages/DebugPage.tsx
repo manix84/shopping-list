@@ -6,6 +6,7 @@ import type {
   CountryConfig,
   Item,
   MatcherTestResult,
+  MeasurementTestResult,
   StateTestResult,
   StorageTestResult,
   UnitQuantityTestResult,
@@ -25,6 +26,7 @@ type DebugPageProps = {
   matcherTests: MatcherTestResult[];
   configTests: ConfigTestResult[];
   countQuantityTests: CountQuantityTestResult[];
+  measurementTests: MeasurementTestResult[];
   unitQuantityTests: UnitQuantityTestResult[];
   variantTests: VariantTestResult[];
   storageTests: StorageTestResult[];
@@ -32,6 +34,7 @@ type DebugPageProps = {
   matcherHasFailures: boolean;
   configHasFailures: boolean;
   countQuantityHasFailures: boolean;
+  measurementHasFailures: boolean;
   unitQuantityHasFailures: boolean;
   variantHasFailures: boolean;
   storageHasFailures: boolean;
@@ -68,6 +71,7 @@ type DebugTabKey =
   | 'config'
   | 'matcher'
   | 'quantity'
+  | 'measurements'
   | 'weights'
   | 'variants'
   | 'sections'
@@ -80,6 +84,7 @@ export function DebugPage({
   matcherTests,
   configTests,
   countQuantityTests,
+  measurementTests,
   unitQuantityTests,
   variantTests,
   storageTests,
@@ -87,6 +92,7 @@ export function DebugPage({
   matcherHasFailures,
   configHasFailures,
   countQuantityHasFailures,
+  measurementHasFailures,
   unitQuantityHasFailures,
   variantHasFailures,
   storageHasFailures,
@@ -106,6 +112,7 @@ export function DebugPage({
     { key: 'config', label: messages.pages.debug.tabConfig },
     { key: 'matcher', label: messages.pages.debug.tabMatcher },
     { key: 'quantity', label: messages.pages.debug.tabQuantity },
+    { key: 'measurements', label: messages.pages.debug.tabMeasurements },
     { key: 'weights', label: messages.pages.debug.tabWeights },
     { key: 'variants', label: messages.pages.debug.tabVariants },
     { key: 'sections', label: messages.pages.debug.tabSections },
@@ -321,6 +328,33 @@ export function DebugPage({
             />
           ))}
           {!countQuantityHasFailures ? <div className="empty-state">{messages.pages.debug.allQuantityPass}</div> : null}
+        </Card>
+      ) : null}
+
+      {activeTab === 'measurements' ? (
+        <Card
+          header={
+            <>
+              <h2 className="title title-sm">{messages.pages.debug.measurementTitle}</h2>
+              <p className="subtitle">{messages.pages.debug.measurementSubtitle}</p>
+            </>
+          }
+          bodyClassName="stack"
+        >
+          {measurementTests.map((test) => (
+            <TestResultCard
+              key={`${test.countryCode}-${test.displayMode}-${test.input}`}
+              title={`${test.input} · ${test.countryCode.toUpperCase()} · ${test.displayMode}`}
+              expected={`${test.expectedQuantity} · display ${test.expectedQuantityDisplay}`}
+              actual={`${test.actualQuantity ?? messages.pages.debug.unavailable} · display ${
+                test.actualQuantityDisplay ?? messages.pages.debug.unavailable
+              }`}
+              passed={test.passed}
+            />
+          ))}
+          {!measurementHasFailures ? (
+            <div className="empty-state">{messages.pages.debug.allMeasurementPass}</div>
+          ) : null}
         </Card>
       ) : null}
 

@@ -144,6 +144,14 @@ export type UnitQuantityTestCase = {
   expectedQuantityValue?: number;
 };
 
+export type MeasurementTestCase = {
+  input: string;
+  countryCode: CountryCode;
+  displayMode: MeasurementDisplayMode;
+  expectedQuantity: string;
+  expectedQuantityDisplay: string;
+};
+
 export type VariantTestCase = {
   input: string;
   expectedName: string;
@@ -167,6 +175,14 @@ export type UnitQuantityTestResult = UnitQuantityTestCase & {
   actualQuantity?: string;
   actualQuantityDisplay?: string;
   actualQuantityValue?: number;
+  passed: boolean;
+};
+
+export type MeasurementTestResult = MeasurementTestCase & {
+  actualQuantity?: string;
+  actualQuantityDisplay?: string;
+  actualMetricValue?: number;
+  actualMetricUnit?: 'g' | 'ml';
   passed: boolean;
 };
 

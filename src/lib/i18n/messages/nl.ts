@@ -170,6 +170,7 @@ export const nl: Messages = {
       tabBackend: 'Backend',
       tabConfig: 'Config',
       tabMatcher: 'Matcher',
+      tabMeasurements: 'Maten',
       tabQuantity: 'Hoeveelheden',
       tabWeights: 'Gewichten',
       tabVariants: 'Varianten',
@@ -195,6 +196,9 @@ export const nl: Messages = {
       quantityTitle: 'Telhoeveelheids-zelftests',
       quantitySubtitle:
         'Telhoeveelheden zoals x2 en 4 wortels blijven gekoppeld aan één afvinkbaar artikel.',
+      measurementTitle: 'Maten-zelftests',
+      measurementSubtitle:
+        'Metrische opslag, kookweergave, imperiale weergave en hints tussen haakjes moeten consistent blijven.',
       weightTitle: 'Gewicht- en eenheid-zelftests',
       weightSubtitle:
         'Gewichten en eenheden zoals 500g of 1.5kg blijven aan het artikel gekoppeld, ook met een telhoeveelheid.',
@@ -208,6 +212,7 @@ export const nl: Messages = {
       stateSubtitle:
         'Controleer de huidige lijst tegen parser, matcher, varianten, voortgang en lijstidentiteit.',
       allMatcherPass: 'Alle matcher-controles slagen.',
+      allMeasurementPass: 'Alle matencontroles slagen.',
       allQuantityPass: 'Alle telhoeveelheidscontroles slagen.',
       allWeightPass: 'Alle gewicht- en eenheidcontroles slagen.',
       allVariantPass: 'Alle variantcontroles slagen.',

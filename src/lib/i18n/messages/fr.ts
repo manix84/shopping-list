@@ -171,6 +171,7 @@ export const fr: Messages = {
       tabBackend: 'Backend',
       tabConfig: 'Config',
       tabMatcher: 'Correspondance',
+      tabMeasurements: 'Mesures',
       tabQuantity: 'Quantités',
       tabWeights: 'Poids',
       tabVariants: 'Variantes',
@@ -197,6 +198,9 @@ export const fr: Messages = {
       quantityTitle: 'Auto-vérifications des quantités comptées',
       quantitySubtitle:
         'Les quantités comme x2 et 4 carottes restent attachées à un seul article cochable.',
+      measurementTitle: 'Auto-vérifications des mesures',
+      measurementSubtitle:
+        'Le stockage métrique, l’affichage cuisine, l’affichage impérial et les indications entre parenthèses doivent rester cohérents.',
       weightTitle: 'Auto-vérifications des poids et unités',
       weightSubtitle:
         'Les poids et unités comme 500g ou 1.5kg restent attachés à l’article, même avec une quantité.',
@@ -211,6 +215,7 @@ export const fr: Messages = {
         'Validez la liste actuelle avec le parseur, la correspondance, les variantes, la progression et l’identité.',
       allMatcherPass:
         'Toutes les vérifications du moteur de correspondance sont valides.',
+      allMeasurementPass: 'Toutes les vérifications de mesures sont valides.',
       allQuantityPass:
         'Toutes les vérifications de quantités comptées sont valides.',
       allWeightPass:

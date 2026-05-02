@@ -158,6 +158,7 @@ export type Messages = {
       tabBackend: string;
       tabConfig: string;
       tabMatcher: string;
+      tabMeasurements: string;
       tabQuantity: string;
       tabWeights: string;
       tabVariants: string;
@@ -178,6 +179,8 @@ export type Messages = {
       matcherSubtitle: string;
       quantityTitle: string;
       quantitySubtitle: string;
+      measurementTitle: string;
+      measurementSubtitle: string;
       weightTitle: string;
       weightSubtitle: string;
       variantTitle: string;
@@ -187,6 +190,7 @@ export type Messages = {
       stateTitle: string;
       stateSubtitle: string;
       allMatcherPass: string;
+      allMeasurementPass: string;
       allQuantityPass: string;
       allWeightPass: string;
       allVariantPass: string;
