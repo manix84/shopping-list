@@ -787,7 +787,8 @@ select {
   gap: 8px;
 }
 
-.route-view-controls {
+.route-view-controls,
+.measurement-mode-controls {
   display: inline-flex;
   gap: 8px;
 }
@@ -2014,11 +2015,13 @@ select {
   }
 
   .route-toolbar-row {
+    flex-wrap: wrap;
     justify-content: flex-start;
     width: 100%;
   }
 
-  .route-view-controls {
+  .route-view-controls,
+  .measurement-mode-controls {
     flex: 0 0 auto;
   }
 

@@ -1,5 +1,13 @@
-import { mdiBeakerOutline, mdiCupOutline, mdiMagnify, mdiViewAgendaOutline, mdiViewDayOutline, mdiViewListOutline } from '@mdi/js';
-import type { GroupedSectionView } from '../types';
+import {
+  mdiCupOutline,
+  mdiMagnify,
+  mdiRuler,
+  mdiViewAgendaOutline,
+  mdiViewDayOutline,
+  mdiViewListOutline,
+  mdiWeightPound,
+} from '@mdi/js';
+import type { GroupedSectionView, MeasurementDisplayMode } from '../types';
 import { Card } from '../components/Card';
 import { RouteSectionCard } from '../components/RouteSectionCard';
 import { getRouteViewLabel, useI18n } from '../lib/i18n';
@@ -11,12 +19,11 @@ type RoutePageProps = {
   grouped: GroupedSectionView[];
   hasItems: boolean;
   viewMode: RouteViewMode;
-  ingredientMode: boolean;
-  canUseIngredientMode: boolean;
+  measurementDisplayMode: MeasurementDisplayMode;
   onQueryChange: (value: string) => void;
   onToggleFilter: () => void;
   onViewModeChange: (mode: RouteViewMode) => void;
-  onIngredientModeChange: (enabled: boolean) => void;
+  onMeasurementDisplayModeChange: (mode: MeasurementDisplayMode) => void;
   onToggleSection: (sectionKey: GroupedSectionView['key'], checked: boolean) => void;
   onToggleItem: (itemId: string) => void;
   onOpenEdit: () => void;
@@ -28,12 +35,11 @@ export function RoutePage({
   isFilterVisible,
   hasItems,
   viewMode,
-  ingredientMode,
-  canUseIngredientMode,
+  measurementDisplayMode,
   onQueryChange,
   onToggleFilter,
   onViewModeChange,
-  onIngredientModeChange,
+  onMeasurementDisplayModeChange,
   onToggleSection,
   onToggleItem,
   onOpenEdit,
@@ -44,9 +50,11 @@ export function RoutePage({
     { mode: 'comfortable', icon: mdiViewDayOutline },
     { mode: 'compact', icon: mdiViewListOutline },
   ];
-  const ingredientModeLabel = ingredientMode
-    ? messages.labels.ingredientModeSwitchToMetric
-    : messages.labels.ingredientModeSwitchToCups;
+  const measurementOptions: Array<{ mode: MeasurementDisplayMode; icon: string; label: string }> = [
+    { mode: 'metric', icon: mdiRuler, label: messages.labels.measurementModeMetric },
+    { mode: 'imperial', icon: mdiWeightPound, label: messages.labels.measurementModeImperial },
+    { mode: 'cooking', icon: mdiCupOutline, label: messages.labels.measurementModeCooking },
+  ];
 
   return (
     <Card
@@ -76,23 +84,24 @@ export function RoutePage({
                   </button>
                 ))}
               </div>
-              {canUseIngredientMode ? (
-                <>
-                  <div className="route-tools-divider" aria-hidden="true" />
+              <div className="route-tools-divider" aria-hidden="true" />
+              <div className="measurement-mode-controls" role="group" aria-label={messages.labels.measurementMode}>
+                {measurementOptions.map((option) => (
                   <button
+                    key={option.mode}
                     type="button"
-                    className={`button button-icon ingredient-mode-toggle ${ingredientMode ? 'button-active' : ''}`}
-                    onClick={() => onIngredientModeChange(!ingredientMode)}
-                    aria-label={ingredientModeLabel}
-                    aria-pressed={ingredientMode}
-                    title={ingredientModeLabel}
+                    className={`button button-icon ${measurementDisplayMode === option.mode ? 'button-active' : ''}`}
+                    onClick={() => onMeasurementDisplayModeChange(option.mode)}
+                    aria-label={option.label}
+                    aria-pressed={measurementDisplayMode === option.mode}
+                    title={option.label}
                   >
                     <svg aria-hidden="true" className="button-icon-svg" viewBox="0 0 24 24">
-                      <path d={ingredientMode ? mdiBeakerOutline : mdiCupOutline} fill="currentColor" />
+                      <path d={option.icon} fill="currentColor" />
                     </svg>
                   </button>
-                </>
-              ) : null}
+                ))}
+              </div>
               <div className="route-tools-divider" aria-hidden="true" />
               <button
                 type="button"

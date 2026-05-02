@@ -20,10 +20,9 @@ import {
   saveLocale,
 } from './lib/i18n';
 import {
-  loadIngredientMode,
-  saveIngredientMode,
-  supportsIngredientMode,
-  withIngredientModeDisplay,
+  loadMeasurementDisplayMode,
+  saveMeasurementDisplayMode,
+  withMeasurementDisplayMode,
 } from './lib/ingredientMode';
 import { getDisplayValue, getStoredValue, parseItems } from './lib/parser';
 import {
@@ -54,7 +53,7 @@ import { EditPage } from './pages/EditPage';
 import { RoutePage } from './pages/RoutePage';
 import { SectionsPage } from './pages/SectionsPage';
 import { SettingsPage } from './pages/SettingsPage';
-import type { AppRoute, BackendStatus, CountryCode, GroupedSectionView, Item, PageKey, RouteViewMode, SectionKey, SharedListHistoryEntry, ThemeMode } from './types';
+import type { AppRoute, BackendStatus, CountryCode, GroupedSectionView, Item, MeasurementDisplayMode, PageKey, RouteViewMode, SectionKey, SharedListHistoryEntry, ThemeMode } from './types';
 
 const DEFAULT_PAGE: PageKey = 'edit';
 const BACKEND_HEARTBEAT_CONNECTED_MS = 5_000;
@@ -157,8 +156,10 @@ const buildRecord = (
   countryCode,
 });
 
-const countryConfigForIngredientMode = (countryCode: CountryCode, ingredientModeEnabled: boolean) =>
-  withIngredientModeDisplay(COUNTRY_CONFIGS[countryCode], ingredientModeEnabled);
+const countryConfigForMeasurementDisplayMode = (
+  countryCode: CountryCode,
+  displayMode: MeasurementDisplayMode,
+) => withMeasurementDisplayMode(COUNTRY_CONFIGS[countryCode], displayMode);
 
 const getSharedListPreview = (items: Item[]): string[] => items.slice(0, 6).map((item) => item.raw);
 
@@ -184,7 +185,9 @@ export default function App() {
   const [activeListId, setActiveListId] = useState<string>(() => readRouteFromLocation().listId ?? createUuidV7());
   const [isServerBackedList, setIsServerBackedList] = useState(false);
   const [countryCode, setCountryCode] = useState<CountryCode>('uk');
-  const [ingredientMode, setIngredientMode] = useState(() => loadIngredientMode());
+  const [measurementDisplayMode, setMeasurementDisplayMode] = useState<MeasurementDisplayMode>(
+    () => loadMeasurementDisplayMode(),
+  );
   const [themeMode, setThemeMode] = useState<ThemeMode>(() => loadThemeMode());
   const [routeViewMode, setRouteViewMode] = useState<RouteViewMode>(() => loadRouteViewMode());
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>(() => getResolvedTheme(loadThemeMode()));
@@ -200,10 +203,9 @@ export default function App() {
   const [isLikelyMobileForInstall, setIsLikelyMobileForInstall] = useState(() => isMobileOrTabletDevice());
 
   const config = useMemo(
-    () => withIngredientModeDisplay(COUNTRY_CONFIGS[countryCode], ingredientMode),
-    [countryCode, ingredientMode],
+    () => withMeasurementDisplayMode(COUNTRY_CONFIGS[countryCode], measurementDisplayMode),
+    [countryCode, measurementDisplayMode],
   );
-  const isIngredientModeAvailable = supportsIngredientMode(COUNTRY_CONFIGS[countryCode]);
   const messages = useMemo(() => createMessages(locale), [locale]);
   const { page, listId } = route;
   const canUseBackend = backendStatus.state === 'connected';
@@ -408,7 +410,7 @@ export default function App() {
       setInput(selectedRecord.input);
       setItems(parseItems(
         selectedRecord.input,
-        countryConfigForIngredientMode(selectedRecord.countryCode, ingredientMode),
+        countryConfigForMeasurementDisplayMode(selectedRecord.countryCode, measurementDisplayMode),
         selectedRecord.items,
       ));
       setIsLoaded(true);
@@ -533,7 +535,7 @@ export default function App() {
         setInput(selectedRecord.input);
         setItems(parseItems(
           selectedRecord.input,
-          countryConfigForIngredientMode(selectedRecord.countryCode, ingredientMode),
+          countryConfigForMeasurementDisplayMode(selectedRecord.countryCode, measurementDisplayMode),
           selectedRecord.items,
         ));
       } catch (error) {
@@ -594,8 +596,8 @@ export default function App() {
   }, [routeViewMode]);
 
   useEffect(() => {
-    saveIngredientMode(ingredientMode);
-  }, [ingredientMode]);
+    saveMeasurementDisplayMode(measurementDisplayMode);
+  }, [measurementDisplayMode]);
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -772,14 +774,14 @@ export default function App() {
     setCountryCode(nextCountryCode);
     setItems((current) => parseItems(
       input,
-      countryConfigForIngredientMode(nextCountryCode, ingredientMode),
+      countryConfigForMeasurementDisplayMode(nextCountryCode, measurementDisplayMode),
       current,
     ));
   };
 
-  const handleIngredientModeChange = (enabled: boolean) => {
-    setIngredientMode(enabled);
-    setItems((current) => parseItems(input, countryConfigForIngredientMode(countryCode, enabled), current));
+  const handleMeasurementDisplayModeChange = (displayMode: MeasurementDisplayMode) => {
+    setMeasurementDisplayMode(displayMode);
+    setItems((current) => parseItems(input, countryConfigForMeasurementDisplayMode(countryCode, displayMode), current));
   };
 
   const toggleItem = (id: string) => {
@@ -812,7 +814,7 @@ export default function App() {
     setInput(record.input);
     setItems(parseItems(
       record.input,
-      countryConfigForIngredientMode(record.countryCode, ingredientMode),
+      countryConfigForMeasurementDisplayMode(record.countryCode, measurementDisplayMode),
       record.items,
     ));
   };
@@ -894,7 +896,10 @@ export default function App() {
     setStorageMode('local');
     setCountryCode(initial.countryCode);
     setInput(initial.input);
-    setItems(parseItems(initial.input, countryConfigForIngredientMode(initial.countryCode, ingredientMode)));
+    setItems(parseItems(
+      initial.input,
+      countryConfigForMeasurementDisplayMode(initial.countryCode, measurementDisplayMode),
+    ));
     setDraftItem('');
     setQuery('');
     setRoute({ page: 'edit' });
@@ -979,12 +984,11 @@ export default function App() {
                 grouped={grouped}
                 hasItems={items.length > 0}
                 viewMode={routeViewMode}
-                ingredientMode={ingredientMode}
-                canUseIngredientMode={isIngredientModeAvailable}
+                measurementDisplayMode={measurementDisplayMode}
                 onQueryChange={setQuery}
                 onToggleFilter={toggleRouteFilter}
                 onViewModeChange={setRouteViewMode}
-                onIngredientModeChange={handleIngredientModeChange}
+                onMeasurementDisplayModeChange={handleMeasurementDisplayModeChange}
                 onToggleSection={toggleSection}
                 onToggleItem={toggleItem}
                 onOpenEdit={() => changePage('edit')}

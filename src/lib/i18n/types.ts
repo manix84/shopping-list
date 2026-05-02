@@ -72,6 +72,10 @@ export type Messages = {
     ingredientModeSwitchToMetric: string;
     items: string;
     locale: string;
+    measurementMode: string;
+    measurementModeCooking: string;
+    measurementModeImperial: string;
+    measurementModeMetric: string;
     mode: string;
     order: string;
     progress: string;
