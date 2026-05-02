@@ -169,6 +169,7 @@ export const ro: Messages = {
       tabBackend: 'Backend',
       tabConfig: 'Config',
       tabMatcher: 'Potrivire',
+      tabMeasurements: 'Măsuri',
       tabQuantity: 'Cantități',
       tabWeights: 'Greutăți',
       tabVariants: 'Variante',
@@ -194,6 +195,9 @@ export const ro: Messages = {
       quantityTitle: 'Autoverificări de cantități numărate',
       quantitySubtitle:
         'Cantitățile precum x2 și 4 morcovi rămân atașate unui singur articol bifabil.',
+      measurementTitle: 'Autoverificări de măsuri',
+      measurementSubtitle:
+        'Stocarea metrică, afișarea pentru gătit, afișarea imperială și indiciile din paranteze trebuie să rămână consecvente.',
       weightTitle: 'Autoverificări de greutăți și unități',
       weightSubtitle:
         'Greutățile și unitățile precum 500g sau 1.5kg rămân atașate articolului, chiar și cu o cantitate.',
@@ -207,6 +211,7 @@ export const ro: Messages = {
       stateSubtitle:
         'Validează lista curentă cu parserul, potrivirea, variantele, progresul și identitatea listei.',
       allMatcherPass: 'Toate verificările de potrivire trec.',
+      allMeasurementPass: 'Toate verificările de măsuri trec.',
       allQuantityPass: 'Toate verificările de cantități numărate trec.',
       allWeightPass: 'Toate verificările de greutăți și unități trec.',
       allVariantPass: 'Toate verificările de variante trec.',

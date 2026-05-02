@@ -4,6 +4,7 @@ import {
   runCountQuantityTests,
   runConfigTests,
   runMatcherTests,
+  runMeasurementTests,
   runStateTests,
   runStorageTests,
   runUnitQuantityTests,
@@ -33,6 +34,10 @@ describe('debug checks', () => {
 
   it('all unit quantity checks pass', () => {
     expect(runUnitQuantityTests().every((test) => test.passed)).toBe(true);
+  });
+
+  it('all measurement checks pass', () => {
+    expect(runMeasurementTests().every((test) => test.passed)).toBe(true);
   });
 
   it('all variant checks pass', () => {

@@ -165,6 +165,7 @@ export const es: Messages = {
       tabBackend: 'Backend',
       tabConfig: 'Config',
       tabMatcher: 'Clasificador',
+      tabMeasurements: 'Medidas',
       tabQuantity: 'Cantidades',
       tabWeights: 'Pesos',
       tabVariants: 'Variantes',
@@ -192,6 +193,9 @@ export const es: Messages = {
       quantityTitle: 'Comprobaciones de cantidades contadas',
       quantitySubtitle:
         'Las cantidades como x2 y 4 zanahorias siguen unidas a un solo artículo comprobable.',
+      measurementTitle: 'Comprobaciones de medidas',
+      measurementSubtitle:
+        'El almacenamiento métrico, la visualización de cocina, la imperial y las pistas entre paréntesis deben mantenerse consistentes.',
       weightTitle: 'Comprobaciones de pesos y unidades',
       weightSubtitle:
         'Los pesos y unidades como 500g o 1.5kg siguen unidos al artículo, incluso cuando también hay una cantidad.',
@@ -205,6 +209,7 @@ export const es: Messages = {
       stateSubtitle:
         'Valida la lista actual contra el parser, el clasificador, las variantes, el progreso y la identidad.',
       allMatcherPass: 'Todas las comprobaciones del clasificador pasan.',
+      allMeasurementPass: 'Todas las comprobaciones de medidas pasan.',
       allQuantityPass: 'Todas las comprobaciones de cantidades contadas pasan.',
       allWeightPass: 'Todas las comprobaciones de pesos y unidades pasan.',
       allVariantPass: 'Todas las comprobaciones de variantes pasan.',

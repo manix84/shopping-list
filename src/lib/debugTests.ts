@@ -8,6 +8,8 @@ import type {
   Item,
   MatcherTestCase,
   MatcherTestResult,
+  MeasurementTestCase,
+  MeasurementTestResult,
   StateTestResult,
   StorageTestResult,
   UnitQuantityTestCase,
@@ -16,6 +18,7 @@ import type {
   VariantTestResult,
 } from '../types';
 import { extractQuantifiedItem } from './quantity';
+import { parseMeasurement } from './measurements';
 import { detectSection } from './sections';
 import { cleanEntryName, cleanLine, normalize } from './stringUtils';
 import { dedupeKey, getStoredValue, parseItems } from './parser';
@@ -23,6 +26,7 @@ import { STORAGE_KEY, localStorageRepository } from './repository/localStorageRe
 import { decodeShoppingListRecord, encodeShoppingListRecord } from './repository/recordCodec';
 import { THEME_STORAGE_KEY, loadThemeMode, saveThemeMode } from './themePreference';
 import { isUuidV7 } from './uuid';
+import { withMeasurementDisplayMode } from './ingredientMode';
 
 export const MATCHER_TEST_CASES: MatcherTestCase[] = [
   { input: 'spaghetti', expectedSection: 'pasta' },
@@ -106,6 +110,58 @@ export const UNIT_QUANTITY_TEST_CASES: UnitQuantityTestCase[] = [
   { input: '2x 500g bags of rice', expectedName: 'bags of rice', expectedQuantity: '500g', expectedQuantityValue: 2 },
   { input: 'liquid smoke – ½ tsp', countryCode: 'uk', expectedName: 'liquid smoke', expectedQuantity: '2.5ml', expectedQuantityDisplay: '2.5ml' },
   { input: 'liquid smoke – ½ tsp', countryCode: 'us', expectedName: 'liquid smoke', expectedQuantity: '2.46ml', expectedQuantityDisplay: '2.46ml' },
+];
+
+export const MEASUREMENT_TEST_CASES: MeasurementTestCase[] = [
+  {
+    input: '½ tsp',
+    countryCode: 'uk',
+    displayMode: 'metric',
+    expectedQuantity: '2.5ml',
+    expectedQuantityDisplay: '2.5ml',
+  },
+  {
+    input: '½ tsp',
+    countryCode: 'us',
+    displayMode: 'metric',
+    expectedQuantity: '2.46ml',
+    expectedQuantityDisplay: '2.46ml',
+  },
+  {
+    input: '½ tsp',
+    countryCode: 'us',
+    displayMode: 'cooking',
+    expectedQuantity: '2.46ml',
+    expectedQuantityDisplay: '0.5tsp',
+  },
+  {
+    input: '1 cup',
+    countryCode: 'ca',
+    displayMode: 'cooking',
+    expectedQuantity: '250ml',
+    expectedQuantityDisplay: '1cup',
+  },
+  {
+    input: '500g',
+    countryCode: 'uk',
+    displayMode: 'imperial',
+    expectedQuantity: '500g',
+    expectedQuantityDisplay: '1.1lb',
+  },
+  {
+    input: '250ml',
+    countryCode: 'uk',
+    displayMode: 'imperial',
+    expectedQuantity: '250ml',
+    expectedQuantityDisplay: '8.8fl oz',
+  },
+  {
+    input: '20 ml (~4 tsp)',
+    countryCode: 'ca',
+    displayMode: 'cooking',
+    expectedQuantity: '20ml',
+    expectedQuantityDisplay: '4tsp',
+  },
 ];
 
 export const VARIANT_TEST_CASES: VariantTestCase[] = [
@@ -577,6 +633,22 @@ export const runUnitQuantityTests = (): UnitQuantityTestResult[] =>
         actual.quantity === test.expectedQuantity &&
         (test.expectedQuantityDisplay === undefined || actual.quantityDisplay === test.expectedQuantityDisplay) &&
         actual.quantityValue === test.expectedQuantityValue,
+    };
+  });
+
+export const runMeasurementTests = (): MeasurementTestResult[] =>
+  MEASUREMENT_TEST_CASES.map((test) => {
+    const config = withMeasurementDisplayMode(COUNTRY_CONFIGS[test.countryCode], test.displayMode);
+    const actual = parseMeasurement(test.input, config);
+    return {
+      ...test,
+      actualQuantity: actual?.quantity,
+      actualQuantityDisplay: actual?.quantityDisplay,
+      actualMetricValue: actual?.quantityMetricValue,
+      actualMetricUnit: actual?.quantityMetricUnit,
+      passed:
+        actual?.quantity === test.expectedQuantity &&
+        actual?.quantityDisplay === test.expectedQuantityDisplay,
     };
   });
 

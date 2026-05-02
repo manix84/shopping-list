@@ -7,6 +7,7 @@ import {
   runCountQuantityTests,
   runConfigTests,
   runMatcherTests,
+  runMeasurementTests,
   runStateTests,
   runStorageTests,
   runUnitQuantityTests,
@@ -665,6 +666,7 @@ export default function App() {
   const matcherTests = useMemo(() => runMatcherTests(config), [config]);
   const configTests = useMemo(() => runConfigTests(config), [config]);
   const countQuantityTests = useMemo(() => runCountQuantityTests(), []);
+  const measurementTests = useMemo(() => runMeasurementTests(), []);
   const unitQuantityTests = useMemo(() => runUnitQuantityTests(), []);
   const variantTests = useMemo(() => runVariantTests(config), [config]);
   const storageTests = useMemo(() => runStorageTests(), []);
@@ -1022,6 +1024,7 @@ export default function App() {
                 matcherTests={matcherTests}
                 configTests={configTests}
                 countQuantityTests={countQuantityTests}
+                measurementTests={measurementTests}
                 unitQuantityTests={unitQuantityTests}
                 variantTests={variantTests}
                 storageTests={storageTests}
@@ -1029,6 +1032,7 @@ export default function App() {
                 matcherHasFailures={matcherTests.some((test) => !test.passed)}
                 configHasFailures={configTests.some((test) => !test.passed)}
                 countQuantityHasFailures={countQuantityTests.some((test) => !test.passed)}
+                measurementHasFailures={measurementTests.some((test) => !test.passed)}
                 unitQuantityHasFailures={unitQuantityTests.some((test) => !test.passed)}
                 variantHasFailures={variantTests.some((test) => !test.passed)}
                 storageHasFailures={storageTests.some((test) => !test.passed)}

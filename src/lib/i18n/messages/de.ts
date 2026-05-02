@@ -171,6 +171,7 @@ export const de: Messages = {
       tabBackend: 'Backend',
       tabConfig: 'Config',
       tabMatcher: 'Matcher',
+      tabMeasurements: 'Maße',
       tabQuantity: 'Mengen',
       tabWeights: 'Gewichte',
       tabVariants: 'Varianten',
@@ -197,6 +198,9 @@ export const de: Messages = {
       quantityTitle: 'Zählmengen-Selbsttests',
       quantitySubtitle:
         'Zählmengen wie x2 und 4 Karotten bleiben an einem abhackbaren Artikel hängen.',
+      measurementTitle: 'Maße-Selbsttests',
+      measurementSubtitle:
+        'Metrische Speicherung, Kochanzeige, imperiale Anzeige und Hinweise in Klammern müssen konsistent bleiben.',
       weightTitle: 'Gewichts- und Einheiten-Selbsttests',
       weightSubtitle:
         'Gewichte und Einheiten wie 500g oder 1.5kg bleiben am Artikel hängen, auch wenn eine Zählmenge vorhanden ist.',
@@ -210,6 +214,7 @@ export const de: Messages = {
       stateSubtitle:
         'Prüft die aktuelle Liste gegen Parser, Matcher, Varianten, Fortschritt und Listenidentität.',
       allMatcherPass: 'Alle Matcher-Prüfungen bestehen.',
+      allMeasurementPass: 'Alle Maße-Prüfungen bestehen.',
       allQuantityPass: 'Alle Zählmengen-Prüfungen bestehen.',
       allWeightPass: 'Alle Gewichts- und Einheiten-Prüfungen bestehen.',
       allVariantPass: 'Alle Varianten-Prüfungen bestehen.',

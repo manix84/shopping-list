@@ -168,6 +168,7 @@ export const pi: Messages = {
       tabBackend: 'Backend',
       tabConfig: 'Config',
       tabMatcher: 'Matcher',
+      tabMeasurements: 'Measurements',
       tabQuantity: 'Quantities',
       tabWeights: 'Weights',
       tabVariants: 'Variants',
@@ -193,6 +194,9 @@ export const pi: Messages = {
       quantityTitle: 'Count quantity self-checks',
       quantitySubtitle:
         'Count-style quantities like x2 and 4 carrots stay tied to one checkable bit o’ cargo.',
+      measurementTitle: 'Measurement self-checks',
+      measurementSubtitle:
+        'Metric stowage, cooking display, imperial display, and parenthetical hints should stay shipshape.',
       weightTitle: 'Weight and unit self-checks',
       weightSubtitle:
         'Weights and units like 500g or 1.5kg stay tied to the cargo, even with a count.',
@@ -206,6 +210,7 @@ export const pi: Messages = {
       stateSubtitle:
         'Check the current ledger against parser, matcher, variants, progress, and list mark.',
       allMatcherPass: 'All matcher checks be passin’.',
+      allMeasurementPass: 'All measurement checks be passin’.',
       allQuantityPass: 'All count quantity checks be passin’.',
       allWeightPass: 'All weight and unit checks be passin’.',
       allVariantPass: 'All variant checks be passin’.',
