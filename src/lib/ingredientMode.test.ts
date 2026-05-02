@@ -5,8 +5,11 @@ import {
   INGREDIENT_MODE_STORAGE_KEY,
   MEASUREMENT_DISPLAY_MODE_STORAGE_KEY,
   isMeasurementDisplayMode,
+  loadIngredientMode,
   loadMeasurementDisplayMode,
+  saveIngredientMode,
   saveMeasurementDisplayMode,
+  withIngredientModeDisplay,
   withMeasurementDisplayMode,
 } from './ingredientMode';
 
@@ -38,6 +41,19 @@ describe('measurement display mode preference', () => {
     });
   });
 
+  it('keeps the old boolean ingredient display semantics', () => {
+    const imperialConfig = withMeasurementDisplayMode(UK_CONFIG, 'imperial');
+
+    expect(withIngredientModeDisplay(imperialConfig, true).measurement).toEqual({
+      unitSystem: 'metric',
+      displayMode: 'cooking',
+    });
+    expect(withIngredientModeDisplay(imperialConfig, false).measurement).toEqual({
+      unitSystem: 'metric',
+      displayMode: 'metric',
+    });
+  });
+
   it('persists the measurement display mode', () => {
     const storage = new Map<string, string>();
     vi.stubGlobal('window', {
@@ -63,5 +79,25 @@ describe('measurement display mode preference', () => {
     });
 
     expect(loadMeasurementDisplayMode()).toBe('cooking');
+  });
+
+  it('keeps the old boolean ingredient mode storage wrappers working', () => {
+    const storage = new Map<string, string>();
+    vi.stubGlobal('window', {
+      localStorage: {
+        getItem: (key: string) => storage.get(key) ?? null,
+        setItem: (key: string, value: string) => storage.set(key, value),
+      },
+    });
+
+    saveIngredientMode(true);
+    expect(storage.get(INGREDIENT_MODE_STORAGE_KEY)).toBe('true');
+    expect(storage.get(MEASUREMENT_DISPLAY_MODE_STORAGE_KEY)).toBe('cooking');
+    expect(loadIngredientMode()).toBe(true);
+
+    saveIngredientMode(false);
+    expect(storage.get(INGREDIENT_MODE_STORAGE_KEY)).toBe('false');
+    expect(storage.get(MEASUREMENT_DISPLAY_MODE_STORAGE_KEY)).toBe('metric');
+    expect(loadIngredientMode()).toBe(false);
   });
 });

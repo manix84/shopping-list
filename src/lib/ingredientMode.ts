@@ -22,7 +22,7 @@ export const withMeasurementDisplayMode = (
 export const withIngredientModeDisplay = (
   config: CountryConfig,
   enabled: boolean,
-): CountryConfig => withMeasurementDisplayMode(config, enabled ? 'cooking' : config.measurement.displayMode);
+): CountryConfig => withMeasurementDisplayMode(config, enabled ? 'cooking' : 'metric');
 
 export const isMeasurementDisplayMode = (value: unknown): value is MeasurementDisplayMode =>
   typeof value === 'string' && MEASUREMENT_DISPLAY_MODES.includes(value as MeasurementDisplayMode);
@@ -43,5 +43,9 @@ export const saveMeasurementDisplayMode = (mode: MeasurementDisplayMode): void =
 
 export const loadIngredientMode = (): boolean => loadMeasurementDisplayMode() === 'cooking';
 
-export const saveIngredientMode = (enabled: boolean): void =>
+export const saveIngredientMode = (enabled: boolean): void => {
+  if (typeof window === 'undefined') return;
+
+  window.localStorage.setItem(INGREDIENT_MODE_STORAGE_KEY, String(enabled));
   saveMeasurementDisplayMode(enabled ? 'cooking' : 'metric');
+};
