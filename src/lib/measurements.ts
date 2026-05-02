@@ -149,8 +149,18 @@ const roundDisplayValue = (value: number): number => {
   return Math.round(value * 100) / 100;
 };
 
-const unitByDisplay = (displayUnit: string): UnitDefinition =>
-  UNIT_DEFINITIONS.find((definition) => definition.displayUnit === displayUnit)!;
+const UNIT_DEFINITIONS_BY_DISPLAY = new Map(
+  UNIT_DEFINITIONS.map((definition) => [definition.displayUnit, definition] as const),
+);
+
+const unitByDisplay = (displayUnit: string): UnitDefinition => {
+  const unitDefinition = UNIT_DEFINITIONS_BY_DISPLAY.get(displayUnit);
+  if (!unitDefinition) {
+    throw new Error(`Unknown display unit: ${displayUnit}`);
+  }
+
+  return unitDefinition;
+};
 
 const formatCookingDisplayMeasurement = (
   metricValue: number,
