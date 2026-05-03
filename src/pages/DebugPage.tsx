@@ -74,6 +74,7 @@ type DebugTabKey =
   | 'measurements'
   | 'weights'
   | 'variants'
+  | 'layout'
   | 'sections'
   | 'storage';
 
@@ -115,9 +116,23 @@ export function DebugPage({
     { key: 'measurements', label: messages.pages.debug.tabMeasurements },
     { key: 'weights', label: messages.pages.debug.tabWeights },
     { key: 'variants', label: messages.pages.debug.tabVariants },
+    { key: 'layout', label: messages.pages.debug.tabLayout },
     { key: 'sections', label: messages.pages.debug.tabSections },
     { key: 'storage', label: messages.pages.debug.tabStorage },
   ];
+  const layoutRows = config.groups.flatMap((group) =>
+    group.sections.map((section) => ({
+      group,
+      section,
+    })),
+  );
+  const layoutSectionCount = layoutRows.length;
+  const layoutKeywordCount = layoutRows.reduce((total, row) => total + row.section.keywords.length, 0);
+  const measurementModeLabels = {
+    metric: messages.labels.measurementModeMetric,
+    imperial: messages.labels.measurementModeImperial,
+    cooking: messages.labels.measurementModeCooking,
+  };
 
   return (
     <Card
@@ -448,6 +463,82 @@ export function DebugPage({
             />
           ))}
           {!storageHasFailures ? <div className="empty-state">{messages.pages.debug.allStoragePass}</div> : null}
+        </Card>
+      ) : null}
+
+      {activeTab === 'layout' ? (
+        <Card
+          header={
+            <>
+              <h2 className="title title-sm">{messages.pages.debug.layoutTitle}</h2>
+              <p className="subtitle">{messages.pages.debug.layoutSubtitle}</p>
+            </>
+          }
+          bodyClassName="stack"
+        >
+          <div className="table-wrap">
+            <table className="debug-table">
+              <tbody>
+                <tr>
+                  <th scope="row">{messages.labels.countryProfile}</th>
+                  <td>
+                    {config.flag} {config.label} ({config.code.toUpperCase()})
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">{messages.labels.measurementMode}</th>
+                  <td>
+                    {measurementModeLabels[config.measurement.displayMode]} · {config.measurement.unitSystem}
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">{messages.labels.group}</th>
+                  <td>{config.groups.length}</td>
+                </tr>
+                <tr>
+                  <th scope="row">{messages.labels.section}</th>
+                  <td>{layoutSectionCount}</td>
+                </tr>
+                <tr>
+                  <th scope="row">{messages.labels.keywords}</th>
+                  <td>{layoutKeywordCount}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div className="table-wrap">
+            <table className="debug-table">
+              <thead>
+                <tr>
+                  <th scope="col">{messages.labels.order}</th>
+                  <th scope="col">{messages.labels.group}</th>
+                  <th scope="col">{messages.labels.section}</th>
+                  <th scope="col">{messages.labels.keywords}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {layoutRows.map(({ group, section }, index) => (
+                  <tr key={`${group.key}-${section.key}`}>
+                    <td>{index + 1}</td>
+                    <td>
+                      {group.label}
+                      <br />
+                      <span className="muted">{group.key}</span>
+                    </td>
+                    <td>
+                      {section.label}
+                      <br />
+                      <span className="muted">{section.key}</span>
+                    </td>
+                    <td>
+                      {section.keywords.length}
+                      {section.keywords.length > 0 ? ` · ${section.keywords.slice(0, 8).join(', ')}` : ''}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </Card>
       ) : null}
 
