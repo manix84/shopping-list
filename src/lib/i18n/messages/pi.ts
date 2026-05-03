@@ -245,6 +245,7 @@ export const pi: Messages = {
     dark: 'Moonlight',
   },
   mobileMenu: {
+    closeNavigation: 'Close the nav chart',
     openNavigation: 'Open the nav chart',
   },
   pwaInstall: {

@@ -38,6 +38,7 @@ export function AppHeader({
   const [offlineInfoOpen, setOfflineInfoOpen] = useState(false);
   const badge = backendBadge(backendStatus, messages);
   const canShowOfflineInfo = backendStatus.state === 'offline' || backendStatus.state === 'error';
+  const mobileMenuLabel = mobileMenuOpen ? messages.mobileMenu.closeNavigation : messages.mobileMenu.openNavigation;
 
   useEffect(() => {
     setMobileMenuOpen(false);
@@ -139,13 +140,13 @@ export function AppHeader({
                   <button
                     type="button"
                     className="button mobile-menu-trigger"
-                    aria-label={messages.mobileMenu.openNavigation}
+                    aria-label={mobileMenuLabel}
                     aria-expanded={mobileMenuOpen}
                     aria-controls={mobileMenuOpen ? 'mobile-menu-panel' : undefined}
-                    title={messages.mobileMenu.openNavigation}
+                    title={mobileMenuLabel}
                     onClick={() => setMobileMenuOpen((current) => !current)}
                   >
-                    <span className="sr-only">{messages.mobileMenu.openNavigation}</span>
+                    <span className="sr-only">{mobileMenuLabel}</span>
                     <svg aria-hidden="true" className="button-icon-svg" viewBox="0 0 24 24">
                       <path d={mdiMenu} fill="currentColor" />
                     </svg>

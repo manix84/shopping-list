@@ -85,7 +85,7 @@ export const Default: Story = {
         <a className="skip-link" href="#storybook-accessibility-demo">
           Skip to demo content
         </a>
-        <div className="button-row" aria-label="Example controls">
+        <div className="button-row" role="group" aria-label="Example controls">
           <button type="button" className="button button-primary">
             Primary action
           </button>

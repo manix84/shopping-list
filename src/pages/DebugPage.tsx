@@ -186,7 +186,7 @@ export function DebugPage({
             type="button"
             role="tab"
             aria-selected={activeTab === tab.key}
-            aria-controls={`debug-panel-${tab.key}`}
+            aria-controls={activeTab === tab.key ? `debug-panel-${tab.key}` : undefined}
             tabIndex={activeTab === tab.key ? 0 : -1}
             className={`button ${activeTab === tab.key ? 'button-active' : ''}`}
             onClick={() => setActiveTab(tab.key)}
