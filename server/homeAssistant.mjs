@@ -41,7 +41,7 @@ export const pushRecordToHomeAssistant = async (record) => {
 
   for (const item of record.items) {
     const name = item.raw?.trim();
-    if (!name) continue;
+    if (!name) { continue; }
 
     await callShoppingListService('add_item', { name });
     actions.push({ service: 'add_item', name });

@@ -49,26 +49,26 @@ export const getBrowserLocale = (language?: string): LocaleCode => {
 
   const normalizedLanguage = String(effectiveLanguage).toLowerCase();
 
-  if (normalizedLanguage.startsWith('es')) return 'es';
-  if (normalizedLanguage.startsWith('fr')) return 'fr';
-  if (normalizedLanguage.startsWith('de')) return 'de';
-  if (normalizedLanguage.startsWith('nl')) return 'nl';
-  if (normalizedLanguage.startsWith('it')) return 'it';
-  if (normalizedLanguage.startsWith('ro')) return 'ro';
+  if (normalizedLanguage.startsWith('es')) { return 'es'; }
+  if (normalizedLanguage.startsWith('fr')) { return 'fr'; }
+  if (normalizedLanguage.startsWith('de')) { return 'de'; }
+  if (normalizedLanguage.startsWith('nl')) { return 'nl'; }
+  if (normalizedLanguage.startsWith('it')) { return 'it'; }
+  if (normalizedLanguage.startsWith('ro')) { return 'ro'; }
   return 'en';
 };
 
 export const defaultLocale = (): LocaleCode => getBrowserLocale();
 
 export const loadLocale = (): LocaleCode => {
-  if (typeof window === 'undefined') return defaultLocale();
+  if (typeof window === 'undefined') { return defaultLocale(); }
 
   const raw = window.localStorage.getItem(LOCALE_STORAGE_KEY);
   return isLocaleCode(raw) ? raw : defaultLocale();
 };
 
 export const saveLocale = (locale: LocaleCode): void => {
-  if (typeof window === 'undefined') return;
+  if (typeof window === 'undefined') { return; }
   window.localStorage.setItem(LOCALE_STORAGE_KEY, locale);
 };
 
@@ -76,7 +76,7 @@ export const getDocumentLocale = (locale: LocaleCode): string =>
   locale === 'en' ? 'en-GB' : locale === 'pi' ? 'en-x-pirate' : locale;
 
 export const applyDocumentLocale = (locale: LocaleCode): void => {
-  if (typeof document === 'undefined') return;
+  if (typeof document === 'undefined') { return; }
   document.documentElement.lang = getDocumentLocale(locale);
 };
 

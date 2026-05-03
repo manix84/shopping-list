@@ -19,9 +19,9 @@ type AppHeaderProps = {
 };
 
 const backendBadge = (status: BackendStatus, messages: Messages) => {
-  if (status.state === 'connected') return { tone: 'success' as const, label: messages.backendStatus.connected };
-  if (status.state === 'checking') return undefined;
-  if (status.state === 'error') return { tone: 'danger' as const, label: messages.backendStatus.issue };
+  if (status.state === 'connected') { return { tone: 'success' as const, label: messages.backendStatus.connected }; }
+  if (status.state === 'checking') { return undefined; }
+  if (status.state === 'error') { return { tone: 'danger' as const, label: messages.backendStatus.issue }; }
   return { tone: 'danger' as const, label: messages.backendStatus.frontendOnly };
 };
 
@@ -60,7 +60,7 @@ export function AppHeader({
     setConnectionBadgeVisible(true);
     setConnectionBadgeLeaving(false);
 
-    if (backendStatus.state !== 'connected') return;
+    if (backendStatus.state !== 'connected') { return; }
 
     const fadeTimer = window.setTimeout(() => {
       setConnectionBadgeLeaving(true);

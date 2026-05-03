@@ -17,8 +17,8 @@ const extractListIdFromParts = (parts: string[]): string | undefined => {
 
 export const extractSharedListId = (value: string, basePath = '', origin?: string): string | undefined => {
   const trimmed = value.trim();
-  if (!trimmed) return undefined;
-  if (isUuidV7(trimmed)) return trimmed.toLowerCase();
+  if (!trimmed) { return undefined; }
+  if (isUuidV7(trimmed)) { return trimmed.toLowerCase(); }
 
   try {
     const url = new URL(trimmed);
@@ -39,7 +39,7 @@ export const extractSharedListId = (value: string, basePath = '', origin?: strin
       .split('/')
       .filter(Boolean);
     const pathListId = extractListIdFromParts(pathParts);
-    if (pathListId) return pathListId;
+    if (pathListId) { return pathListId; }
 
     const hashParts = url.hash.replace(/^#\/?/, '').toLowerCase().split('/').filter(Boolean);
     return extractListIdFromParts(hashParts);

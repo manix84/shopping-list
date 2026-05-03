@@ -27,7 +27,7 @@ export const getDisplayValue = (item: Item): string => getDisplayName(item);
 export const getVariantPrefixedDisplayValue = (item: Item): string => {
   const displayValue = getDisplayValue(item);
   const variantValue = getVariantValue(item);
-  if (!variantValue) return displayValue;
+  if (!variantValue) { return displayValue; }
 
   if (normalize(item.raw) === 'milk') {
     const milkVariantLabels = new Map([
@@ -40,7 +40,7 @@ export const getVariantPrefixedDisplayValue = (item: Item): string => {
 
   const normalizedDisplay = normalize(displayValue);
   const normalizedVariant = normalize(variantValue);
-  if (normalizedDisplay.startsWith(`${normalizedVariant} `)) return displayValue;
+  if (normalizedDisplay.startsWith(`${normalizedVariant} `)) { return displayValue; }
 
   return `${variantValue} ${displayValue}`;
 };
@@ -51,12 +51,12 @@ export const getSizeDisplayValue = (item: Item): string | undefined =>
 export const getSizeValue = (item: Item): string | undefined => item.sizeValue;
 
 export const getQuantityDisplayValue = (item: Item): string | undefined => {
-  if (typeof item.quantityValue === 'number') return `Qty: ${item.quantityValue}`;
+  if (typeof item.quantityValue === 'number') { return `Qty: ${item.quantityValue}`; }
   return undefined;
 };
 
 export const getQuantityValue = (item: Item): string | undefined => {
-  if (typeof item.quantityValue === 'number') return String(item.quantityValue);
+  if (typeof item.quantityValue === 'number') { return String(item.quantityValue); }
   return undefined;
 };
 
@@ -100,7 +100,7 @@ export const parseItems = (input: unknown, config: CountryConfig | undefined, pr
       const correctedName = correctSpelling(variantResult.name);
       const correctedVariant = variantResult.variant ? correctSpelling(variantResult.variant) : undefined;
       const key = dedupeKey(correctedName, quantity, sizeResult.size, quantityValue, correctedVariant);
-      if (seen.has(key)) return null;
+      if (seen.has(key)) { return null; }
       seen.add(key);
 
       const previous = previousMap.get(key);

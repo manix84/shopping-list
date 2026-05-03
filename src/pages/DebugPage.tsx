@@ -47,18 +47,18 @@ type DebugPageProps = {
 };
 
 const backendSummary = (status: BackendStatus, messages: Messages): string => {
-  if (status.state === 'connected') return messages.pages.debug.backendConnected;
-  if (status.state === 'checking') return messages.pages.debug.backendChecking;
-  if (status.state === 'error') return messages.pages.debug.backendError;
+  if (status.state === 'connected') { return messages.pages.debug.backendConnected; }
+  if (status.state === 'checking') { return messages.pages.debug.backendChecking; }
+  if (status.state === 'error') { return messages.pages.debug.backendError; }
   return messages.pages.debug.backendOffline;
 };
 
 const checkTone = (passed: boolean) => (passed ? ('success' as const) : ('danger' as const));
 
 const backendStateLabel = (status: BackendStatus, messages: Messages) => {
-  if (status.state === 'connected') return messages.backendStatus.connected;
-  if (status.state === 'checking') return messages.backendStatus.checking;
-  if (status.state === 'error') return messages.backendStatus.issue;
+  if (status.state === 'connected') { return messages.backendStatus.connected; }
+  if (status.state === 'checking') { return messages.backendStatus.checking; }
+  if (status.state === 'error') { return messages.backendStatus.issue; }
   return messages.backendStatus.frontendOnly;
 };
 
@@ -150,7 +150,7 @@ export function DebugPage({
               ? lastIndex
               : undefined;
 
-    if (nextIndex === undefined) return;
+    if (nextIndex === undefined) { return; }
 
     event.preventDefault();
     const nextTab = debugTabs[nextIndex];

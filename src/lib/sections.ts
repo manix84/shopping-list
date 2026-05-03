@@ -2,7 +2,7 @@ import type { CountryConfig, SectionDef, SectionKey } from '../types';
 import { cleanEntryName, escapeRegExp, normalize } from './stringUtils';
 
 export const flattenSections = (config: CountryConfig | undefined): Array<SectionDef & { groupLabel: string; order: number }> => {
-  if (!config) return [];
+  if (!config) { return []; }
 
   return config.groups.flatMap((group) =>
     group.sections.map((section) => ({
@@ -26,7 +26,7 @@ export const buildKeywordPattern = (keyword: unknown): RegExp => {
 
 export const detectSection = (name: unknown, config: CountryConfig | undefined): SectionKey => {
   const cleaned = normalize(cleanEntryName(name));
-  if (!cleaned) return 'other';
+  if (!cleaned) { return 'other'; }
 
   const sections = flattenSections(config);
   let bestMatch: { section: SectionKey; keywordLength: number; groupOrder: number } | null = null;
@@ -34,10 +34,10 @@ export const detectSection = (name: unknown, config: CountryConfig | undefined):
   for (const section of sections) {
     for (const keyword of section.keywords) {
       const cleanedKeyword = normalize(cleanEntryName(keyword));
-      if (!cleanedKeyword) continue;
+      if (!cleanedKeyword) { continue; }
 
       const pattern = buildKeywordPattern(cleanedKeyword);
-      if (!pattern.test(cleaned)) continue;
+      if (!pattern.test(cleaned)) { continue; }
 
       const candidate = {
         section: section.key,

@@ -205,7 +205,7 @@ export function SharedListPanel({
 
     const timeoutId = window.setTimeout(() => {
       void onValidateSharedInput(sharedInput).then((validation) => {
-        if (cancelled) return;
+        if (cancelled) { return; }
 
         if (validation.state === 'valid') {
           setSharedInputStatus('valid');
@@ -233,7 +233,7 @@ export function SharedListPanel({
   }, [canUseBackend, onValidateSharedInput, sharedInput]);
 
   useEffect(() => {
-    if (!scannerOpen) return;
+    if (!scannerOpen) { return; }
 
     const BarcodeDetectorApi = (window as Window & { BarcodeDetector?: BarcodeDetectorConstructor }).BarcodeDetector;
     if (!BarcodeDetectorApi) {
@@ -272,7 +272,7 @@ export function SharedListPanel({
     };
 
     const scan = async () => {
-      if (cancelled || !videoRef.current) return;
+      if (cancelled || !videoRef.current) { return; }
 
       try {
         const results = await detector.detect(videoRef.current);
@@ -288,7 +288,7 @@ export function SharedListPanel({
         }
 
         const validation = await onValidateSharedInput(value);
-        if (cancelled) return;
+        if (cancelled) { return; }
 
         if (validation.state === 'invalid') {
           scheduleScan();
@@ -310,7 +310,7 @@ export function SharedListPanel({
           setScannerState('missing');
           setScannerMessage(messages.sharing.scannerListMissing);
           timeoutId = window.setTimeout(() => {
-            if (cancelled) return;
+            if (cancelled) { return; }
             setScannerState('scanning');
             setScannerMessage(undefined);
             void scan();
@@ -322,7 +322,7 @@ export function SharedListPanel({
         setScannerState('ready');
         setScannerMessage(messages.sharing.scannerReady);
         timeoutId = window.setTimeout(() => {
-          if (cancelled) return;
+          if (cancelled) { return; }
           setScannerOpen(false);
           setScannerState('scanning');
           setScannerMessage(undefined);
@@ -408,10 +408,10 @@ export function SharedListPanel({
     setScannerMessage(undefined);
   };
   useEffect(() => {
-    if (!scannerOpen && !qrModalOpen) return;
+    if (!scannerOpen && !qrModalOpen) { return; }
 
     const handleEscape = (event: globalThis.KeyboardEvent) => {
-      if (event.key !== 'Escape') return;
+      if (event.key !== 'Escape') { return; }
       if (scannerOpen) {
         closeScanner();
         return;
@@ -444,12 +444,12 @@ export function SharedListPanel({
   const isActionTarget = (target: EventTarget | null): boolean =>
     target instanceof Element && target.closest('button') !== null;
   const handleHistoryPointerDown = (listId: string, event: PointerEvent<HTMLDivElement>) => {
-    if (isActionTarget(event.target)) return;
+    if (isActionTarget(event.target)) { return; }
     historyPointerRef.current = { listId, x: event.clientX, y: event.clientY, moved: false };
   };
   const handleHistoryPointerMove = (listId: string, event: PointerEvent<HTMLDivElement>) => {
     const activePointer = historyPointerRef.current;
-    if (!activePointer || activePointer.listId !== listId) return;
+    if (!activePointer || activePointer.listId !== listId) { return; }
 
     const deltaX = Math.abs(event.clientX - activePointer.x);
     const deltaY = Math.abs(event.clientY - activePointer.y);
@@ -458,10 +458,10 @@ export function SharedListPanel({
     }
   };
   const handleHistoryClick = (listId: string, event: MouseEvent<HTMLDivElement>) => {
-    if (isActionTarget(event.target)) return;
+    if (isActionTarget(event.target)) { return; }
     const activePointer = historyPointerRef.current;
     historyPointerRef.current = null;
-    if (activePointer?.listId === listId && activePointer.moved) return;
+    if (activePointer?.listId === listId && activePointer.moved) { return; }
     void onLoadHistoryEntry(listId);
   };
   const handleHistoryPointerCancel = () => {
@@ -537,7 +537,7 @@ export function SharedListPanel({
                   onPaste={(event) => {
                     const pastedText = event.clipboardData.getData('text');
                     const normalized = normalizeSharedInput(pastedText);
-                    if (normalized === pastedText) return;
+                    if (normalized === pastedText) { return; }
                     event.preventDefault();
                     setSharedInput(normalized);
                   }}

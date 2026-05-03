@@ -47,7 +47,7 @@ const readJsonBody = async (request) => {
   }
 
   const raw = Buffer.concat(chunks).toString('utf8');
-  if (!raw) return {};
+  if (!raw) { return {}; }
 
   try {
     return JSON.parse(raw);

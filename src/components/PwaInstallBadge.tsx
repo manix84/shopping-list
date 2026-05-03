@@ -16,7 +16,7 @@ export function PwaInstallBadge({
 }: PwaInstallBadgeProps) {
   const { messages } = useI18n();
 
-  if (!isVisible) return null;
+  if (!isVisible) { return null; }
 
   return (
     <aside className={'pwa-install-badge'} aria-labelledby={'pwa-install-badge-title'}>

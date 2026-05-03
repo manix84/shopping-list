@@ -85,7 +85,7 @@ function colorValueToCssVariable(value: string) {
 function formatResolvedColor(color: string) {
   const match = color.match(/^rgba?\(([^)]+)\)$/);
 
-  if (!match) return color;
+  if (!match) { return color; }
 
   const [red, green, blue, alpha = '1'] = match[1].split(',').map((part) => part.trim());
   const alphaValue = Number(alpha);
@@ -106,7 +106,7 @@ function ColorSwatch({ groupTitle, name, value }: { groupTitle: string; name: st
   const cssVariable = colorValueToCssVariable(value);
 
   useEffect(() => {
-    if (!swatchRef.current) return;
+    if (!swatchRef.current) { return; }
 
     setResolvedValue(formatResolvedColor(window.getComputedStyle(swatchRef.current).backgroundColor));
   }, [value]);

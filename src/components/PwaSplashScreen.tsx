@@ -5,7 +5,7 @@ const SPLASH_DURATION_MS = 2_350;
 const PWA_SPLASH_ENABLED = import.meta.env.VITE_ENABLE_PWA_SPLASH === 'true';
 
 const isStandalonePwa = (): boolean => {
-  if (!PWA_SPLASH_ENABLED || typeof window === 'undefined') return false;
+  if (!PWA_SPLASH_ENABLED || typeof window === 'undefined') { return false; }
 
   const navigatorWithStandalone = window.navigator as Navigator & { standalone?: boolean };
   return window.matchMedia('(display-mode: standalone)').matches || navigatorWithStandalone.standalone === true;
@@ -16,7 +16,7 @@ export function PwaSplashScreen() {
   const [visible, setVisible] = useState(() => isStandalonePwa());
 
   useEffect(() => {
-    if (!visible) return;
+    if (!visible) { return; }
 
     const timeoutId = window.setTimeout(() => {
       setVisible(false);
@@ -25,7 +25,7 @@ export function PwaSplashScreen() {
     return () => window.clearTimeout(timeoutId);
   }, [visible]);
 
-  if (!visible) return null;
+  if (!visible) { return null; }
 
   const logoHref = `${import.meta.env.BASE_URL}logo-animated-once.svg`;
 

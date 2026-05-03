@@ -4,9 +4,9 @@ export type SizeValue = 'S' | 'M' | 'L';
 
 export const parseSizeValue = (size: unknown): SizeValue | undefined => {
   const cleanedSize = normalize(size);
-  if (cleanedSize === 'small' || cleanedSize === 's') return 'S';
-  if (cleanedSize === 'medium' || cleanedSize === 'm') return 'M';
-  if (cleanedSize === 'large' || cleanedSize === 'l') return 'L';
+  if (cleanedSize === 'small' || cleanedSize === 's') { return 'S'; }
+  if (cleanedSize === 'medium' || cleanedSize === 'm') { return 'M'; }
+  if (cleanedSize === 'large' || cleanedSize === 'l') { return 'L'; }
   return undefined;
 };
 

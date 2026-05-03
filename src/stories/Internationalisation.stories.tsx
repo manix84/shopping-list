@@ -30,13 +30,13 @@ const samplePaths = [
 
 const valueAtPath = (messages: Messages, path: string): string =>
   path.split('.').reduce<unknown>((current, segment) => {
-    if (!current || typeof current !== 'object') return undefined;
+    if (!current || typeof current !== 'object') { return undefined; }
     return (current as Record<string, unknown>)[segment];
   }, messages) as string;
 
 const flattenMessageKeys = (value: unknown, prefix = ''): string[] => {
-  if (typeof value === 'string') return [prefix];
-  if (!value || typeof value !== 'object') return [];
+  if (typeof value === 'string') { return [prefix]; }
+  if (!value || typeof value !== 'object') { return []; }
 
   return Object.entries(value).flatMap(([key, child]) =>
     flattenMessageKeys(child, prefix ? `${prefix}.${key}` : key),

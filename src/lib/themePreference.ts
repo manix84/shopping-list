@@ -5,14 +5,14 @@ export const THEME_STORAGE_KEY = 'smart-shopping-list-theme-v1';
 export const defaultThemeMode = (): ThemeMode => 'system';
 
 export const loadThemeMode = (): ThemeMode => {
-  if (typeof window === 'undefined') return defaultThemeMode();
+  if (typeof window === 'undefined') { return defaultThemeMode(); }
 
   const raw = window.localStorage.getItem(THEME_STORAGE_KEY);
   return raw === 'light' || raw === 'dark' || raw === 'system' ? raw : defaultThemeMode();
 };
 
 export const saveThemeMode = (mode: ThemeMode): void => {
-  if (typeof window === 'undefined') return;
+  if (typeof window === 'undefined') { return; }
   window.localStorage.setItem(THEME_STORAGE_KEY, mode);
 };
 

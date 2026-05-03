@@ -54,7 +54,7 @@ const readDatabase = async () => {
     try {
       return normalizeDatabase(JSON.parse(raw));
     } catch (error) {
-      if (!(error instanceof SyntaxError)) throw error;
+      if (!(error instanceof SyntaxError)) { throw error; }
 
       const corruptPath = `${databasePath}.corrupt-${new Date().toISOString().replace(/[:.]/g, '-')}`;
       await rename(databasePath, corruptPath);
@@ -62,7 +62,7 @@ const readDatabase = async () => {
       return emptyDatabase();
     }
   } catch (error) {
-    if (error?.code === 'ENOENT') return emptyDatabase();
+    if (error?.code === 'ENOENT') { return emptyDatabase(); }
     throw error;
   }
 };

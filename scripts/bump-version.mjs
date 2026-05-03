@@ -25,8 +25,8 @@ const compareVersions = (left, right) => {
   const rightParts = right.split('.').map(Number);
 
   for (let index = 0; index < 3; index += 1) {
-    if (leftParts[index] > rightParts[index]) return 1;
-    if (leftParts[index] < rightParts[index]) return -1;
+    if (leftParts[index] > rightParts[index]) { return 1; }
+    if (leftParts[index] < rightParts[index]) { return -1; }
   }
 
   return 0;
@@ -42,14 +42,14 @@ const upstreamRef = () => runGit(['rev-parse', '--abbrev-ref', '--symbolic-full-
 
 const defaultBaseRef = () => {
   const originHead = runGit(['symbolic-ref', '--quiet', '--short', 'refs/remotes/origin/HEAD']);
-  if (originHead) return originHead;
-  if (runGit(['rev-parse', '--verify', 'origin/main'])) return 'origin/main';
-  if (runGit(['rev-parse', '--verify', 'origin/master'])) return 'origin/master';
+  if (originHead) { return originHead; }
+  if (runGit(['rev-parse', '--verify', 'origin/main'])) { return 'origin/main'; }
+  if (runGit(['rev-parse', '--verify', 'origin/master'])) { return 'origin/master'; }
   return undefined;
 };
 
 const packageVersionAtRef = (ref) => {
-  if (!ref) return undefined;
+  if (!ref) { return undefined; }
 
   try {
     return JSON.parse(execFileSync('git', ['show', `${ref}:package.json`], { encoding: 'utf8' })).version;

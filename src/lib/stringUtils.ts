@@ -57,7 +57,7 @@ const spellingAliases = new Map<string, string>([
 
 export const correctSpelling = (value: unknown): string => {
   const normalizedValue = normalize(value);
-  if (!normalizedValue) return '';
+  if (!normalizedValue) { return ''; }
 
   return normalizedValue
     .split(' ')
@@ -66,14 +66,14 @@ export const correctSpelling = (value: unknown): string => {
 };
 
 const singularizeWord = (word: string): string => {
-  if (word.length <= 3) return word;
-  if (word === 'cheeses') return 'cheese';
-  if (word === 'potatoes') return 'potato';
-  if (word === 'tomatoes') return 'tomato';
-  if (word.endsWith('ies')) return `${word.slice(0, -3)}y`;
-  if (word.endsWith('ves')) return `${word.slice(0, -3)}f`;
-  if (/(?:ches|shes|xes|zes|ses)$/.test(word)) return word.slice(0, -2);
-  if (word.endsWith('s') && !/(?:ss|us|is)$/.test(word)) return word.slice(0, -1);
+  if (word.length <= 3) { return word; }
+  if (word === 'cheeses') { return 'cheese'; }
+  if (word === 'potatoes') { return 'potato'; }
+  if (word === 'tomatoes') { return 'tomato'; }
+  if (word.endsWith('ies')) { return `${word.slice(0, -3)}y`; }
+  if (word.endsWith('ves')) { return `${word.slice(0, -3)}f`; }
+  if (/(?:ches|shes|xes|zes|ses)$/.test(word)) { return word.slice(0, -2); }
+  if (word.endsWith('s') && !/(?:ss|us|is)$/.test(word)) { return word.slice(0, -1); }
   return word;
 };
 
@@ -96,12 +96,12 @@ const neverPluralize = new Set([
 ]);
 
 const pluralizeWord = (word: string): string => {
-  if (word.length <= 2 || neverPluralize.has(word)) return word;
-  if (word.endsWith('y') && !/[aeiou]y$/.test(word)) return `${word.slice(0, -1)}ies`;
-  if (word.endsWith('fe')) return `${word.slice(0, -2)}ves`;
-  if (word.endsWith('f')) return `${word.slice(0, -1)}ves`;
-  if (/(?:s|sh|ch|x|z)$/.test(word)) return `${word}es`;
-  if (word.endsWith('o') && !/[aeiou]o$/.test(word)) return `${word}es`;
+  if (word.length <= 2 || neverPluralize.has(word)) { return word; }
+  if (word.endsWith('y') && !/[aeiou]y$/.test(word)) { return `${word.slice(0, -1)}ies`; }
+  if (word.endsWith('fe')) { return `${word.slice(0, -2)}ves`; }
+  if (word.endsWith('f')) { return `${word.slice(0, -1)}ves`; }
+  if (/(?:s|sh|ch|x|z)$/.test(word)) { return `${word}es`; }
+  if (word.endsWith('o') && !/[aeiou]o$/.test(word)) { return `${word}es`; }
   return `${word}s`;
 };
 
@@ -116,12 +116,12 @@ const displayNameAliases = new Map<string, string>([
 const lowercaseTrailingToken = (value: string): string => {
   const tokens = value.split(' ');
   const lastIndex = tokens.length - 1;
-  if (lastIndex < 0) return value;
+  if (lastIndex < 0) { return value; }
 
   tokens[lastIndex] = tokens[lastIndex]
     .split('-')
     .map((segment, segmentIndex, segments) => {
-      if (segmentIndex !== segments.length - 1) return segment;
+      if (segmentIndex !== segments.length - 1) { return segment; }
       const singular = singularizeWord(segment.toLowerCase());
       return pluralizeWord(singular);
     })
@@ -131,7 +131,7 @@ const lowercaseTrailingToken = (value: string): string => {
 };
 
 const titleCaseWord = (word: string, index: number, words: string[]): string => {
-  if (!word) return word;
+  if (!word) { return word; }
 
   const lower = word.toLowerCase();
   if (word.includes('-')) {
@@ -151,7 +151,7 @@ const titleCaseWord = (word: string, index: number, words: string[]): string => 
 
 export const formatDisplayName = (value: unknown, quantityValue?: number): string => {
   const normalized = ensureString(value).trim().replace(/\s+/g, ' ').toLowerCase();
-  if (!normalized) return '';
+  if (!normalized) { return ''; }
 
   const aliased = displayNameAliases.get(normalized) ?? normalized;
   const pluralized = typeof quantityValue === 'number' && quantityValue !== 1 ? lowercaseTrailingToken(aliased) : aliased;
