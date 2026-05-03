@@ -128,7 +128,6 @@ const readRouteFromLocation = (): AppRoute => {
 
   return readRouteFromLocationParts({
     pathname: window.location.pathname,
-    hash: window.location.hash,
     basePath: appBasePath,
   });
 };
@@ -137,7 +136,7 @@ const syncRouteToUrl = ({ page, listId }: AppRoute): void => {
   if (typeof window === 'undefined') { return; }
 
   const nextUrl = routeToUrl({ page, listId }, appBasePath);
-  const currentUrl = `${window.location.pathname}${window.location.hash}`;
+  const currentUrl = window.location.pathname;
   if (currentUrl !== nextUrl) {
     window.history.replaceState(null, '', nextUrl);
   }
@@ -562,11 +561,9 @@ export default function App() {
     };
 
     handleLocationChange();
-    window.addEventListener('hashchange', handleLocationChange);
     window.addEventListener('popstate', handleLocationChange);
 
     return () => {
-      window.removeEventListener('hashchange', handleLocationChange);
       window.removeEventListener('popstate', handleLocationChange);
     };
   }, []);
