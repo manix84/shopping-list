@@ -41,8 +41,7 @@ export const extractSharedListId = (value: string, basePath = '', origin?: strin
     const pathListId = extractListIdFromParts(pathParts);
     if (pathListId) { return pathListId; }
 
-    const hashParts = url.hash.replace(/^#\/?/, '').toLowerCase().split('/').filter(Boolean);
-    return extractListIdFromParts(hashParts);
+    return undefined;
   } catch {
     return undefined;
   }

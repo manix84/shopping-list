@@ -24,8 +24,8 @@ describe('shared link parsing', () => {
     expect(extractSharedListId(`http://localhost:5173/${LIST_ID}`)).toBe(LIST_ID);
   });
 
-  it('accepts hash-based shared list paths', () => {
-    expect(extractSharedListId(`https://example.com/#/list/${LIST_ID}/route`)).toBe(LIST_ID);
+  it('rejects hash-based shared list paths', () => {
+    expect(extractSharedListId(`https://example.com/#/list/${LIST_ID}/route`)).toBeUndefined();
   });
 
   it('rejects unrelated values', () => {

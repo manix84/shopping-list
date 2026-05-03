@@ -26,13 +26,14 @@ A React + TypeScript shopping list app that turns a rough grocery list into an o
 
 ## 🧭 Routes
 
-The app uses hash-based routing so direct links work on GitHub Pages:
+The app uses normal path-based routing:
 
-- `#/edit` - list editor, used when there is no saved list yet or when editing an existing list
-- `#/route` - shopping list route view
-- `#/sections` - read-only section and route-order reference
-- `#/settings` - language, country profile, and theme preferences
-- `#/debug` - parser, storage, backend, measurement, and layout self-checks
+- `/edit` - list editor, used when there is no saved list yet or when editing an existing list
+- `/route` - shopping list route view
+- `/sections` - read-only section and route-order reference
+- `/settings` - language, country profile, and theme preferences
+- `/about` - app version, install status, and release information
+- `/debug` - parser, storage, backend, measurement, and layout self-checks
 
 Backend-backed shared lists use path routes:
 
@@ -218,7 +219,7 @@ The repo installs `.githooks/pre-commit` through `npm run prepare`. The pre-comm
 
 ## 🚢 Deployment
 
-The repo includes a GitHub Actions workflow in `.github/workflows/deploy-gh-pages.yml` that builds on push to `main` and publishes `dist/` to GitHub Pages.
+The repo includes a GitHub Actions workflow in `.github/workflows/deploy-gh-pages.yml` that builds on push to `main` and publishes `dist/` to GitHub Pages. The production build copies `dist/index.html` to `dist/404.html` so direct path-based SPA links work when opened or refreshed on GitHub Pages.
 
 ## 🧱 Project structure
 

@@ -8,11 +8,9 @@ const normalizeBasePath = (basePath: string): string => (basePath === '/' ? '' :
 
 export const readRouteFromLocationParts = ({
   pathname,
-  hash,
   basePath = '',
 }: {
   pathname: string;
-  hash: string;
   basePath?: string;
 }): AppRoute => {
   const normalizedBasePath = normalizeBasePath(basePath);
@@ -32,18 +30,12 @@ export const readRouteFromLocationParts = ({
     return { page, listId: pathParts[0] };
   }
 
-  const hashParts = hash.replace(/^#\/?/, '').toLowerCase().split('/').filter(Boolean);
-  if (hashParts[0] === 'list' && isUuidV7(hashParts[1])) {
-    const page = APP_PAGES.includes(hashParts[2] as PageKey) ? (hashParts[2] as PageKey) : DEFAULT_PAGE;
-    return { page, listId: hashParts[1] };
-  }
-
-  const page = APP_PAGES.includes(hashParts[0] as PageKey) ? (hashParts[0] as PageKey) : DEFAULT_PAGE;
+  const page = APP_PAGES.includes(pathParts[0] as PageKey) ? (pathParts[0] as PageKey) : DEFAULT_PAGE;
   return { page };
 };
 
 export const routeToUrl = ({ page, listId }: AppRoute, basePath = ''): string => {
   const normalizedBasePath = normalizeBasePath(basePath);
   const shouldShowListId = !['sections', 'settings', 'about'].includes(page) && Boolean(listId);
-  return shouldShowListId ? `${normalizedBasePath}/list/${listId}/${page}` : `${normalizedBasePath}/#/${page}`;
+  return shouldShowListId ? `${normalizedBasePath}/list/${listId}/${page}` : `${normalizedBasePath}/${page}`;
 };

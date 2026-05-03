@@ -1,7 +1,7 @@
 {
   "name": "shopping-list",
   "private": true,
-  "version": "0.15.7",
+  "version": "0.15.8",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -23,7 +23,7 @@
     "storybook": "storybook dev -p 7007",
     "build-storybook": "storybook build",
     "typecheck": "tsc -b --pretty false",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && node scripts/create-spa-fallback.mjs",
     "lighthouse": "npm run build && node scripts/lighthouse-audit.mjs",
     "preview": "vite preview"
   },
