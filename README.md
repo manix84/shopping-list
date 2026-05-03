@@ -9,8 +9,9 @@ A React + TypeScript shopping list app that turns a rough grocery list into an o
 ## ✨ What it does
 
 - accepts pasted or typed shopping lists
-- groups items into supermarket sections using country configs
-- understands quantities like `bananas x2`, `2x apples`, `500g mince`
+- groups items into supermarket sections using country configs for Belgium, Canada, France, Germany, Italy, Mexico, the Netherlands, Romania, Spain, the UK, and the US
+- understands quantities and measurements like `bananas x2`, `2x apples`, `500g mince`, `½ tsp`, and `8 fl. oz`
+- stores liquid and weight quantities in metric form, then displays metric, imperial, or cooking measurements from the route toolbar
 - supports size qualifiers like `small milk` and renders them as a badge
 - applies display aliases for common milk shorthand like `blue milk`, `gold milk`, `green milk`, and `red milk`
 - persists data locally so the app can be reopened without losing state
@@ -18,9 +19,9 @@ A React + TypeScript shopping list app that turns a rough grocery list into an o
 - generates themed QR codes for shared lists and can scan shared-list QR codes when the browser supports camera scanning
 - remembers recently opened shared lists locally on the device for quick reopening
 - stores the country profile in the backend when available, with local fallback
-- supports English and Spanish UI text, defaulting from the browser language
+- supports English, Spanish, French, German, Dutch, Italian, Romanian, and Pirate UI text, defaulting from the browser language
 - supports light, dark, and system themes, including PWA chrome theme colours
-- includes debug self-checks for backend health, database state, quantity parsing, and section matching
+- includes debug self-checks for backend health, database state, state consistency, quantity parsing, measurement conversion, variants, storage, section matching, and active shop layout
 - deploys to GitHub Pages via GitHub Actions
 
 ## 🧭 Routes
@@ -31,7 +32,7 @@ The app uses hash-based routing so direct links work on GitHub Pages:
 - `#/route` - shopping list route view
 - `#/sections` - read-only section and route-order reference
 - `#/settings` - language, country profile, and theme preferences
-- `#/debug` - parser self-checks
+- `#/debug` - parser, storage, backend, measurement, and layout self-checks
 
 Backend-backed shared lists use path routes:
 
@@ -46,6 +47,14 @@ If a page needs data that is not available yet, it shows a warning and points yo
 npm install
 npm run dev
 ```
+
+Run Storybook for component and design-system documentation:
+
+```bash
+npm run storybook
+```
+
+Storybook includes component stories with autodocs plus design-system reference pages for actions, accessibility, colour tokens, empty states, forms, internationalisation, measurements, and typography. The theme button in the Storybook toolbar switches the preview and Storybook chrome between light and dark mode.
 
 ## 🗄️ Optional backend mode
 
@@ -83,6 +92,8 @@ Backend utility routes:
 - `GET /api/database/status`
 - `GET /api/settings`
 - `PUT /api/settings`
+
+Backend records are validated before they are stored. Shopping-list timestamps must use canonical ISO format, country codes must match the supported country profiles, and persisted section keys must be known route sections.
 
 ### 🏠 Home Assistant
 
@@ -164,6 +175,17 @@ npm run build
 npm run preview
 ```
 
+Run the automated checks:
+
+```bash
+npm run lint
+npm run typecheck
+npm run test:unit
+npm run test:storybook
+```
+
+`npm run test:storybook` runs the Storybook interaction tests, including role/name checks for component stories and design-system documentation examples.
+
 Run a local Lighthouse audit against the production build:
 
 ```bash
@@ -171,6 +193,28 @@ npm run lighthouse
 ```
 
 The audit writes `lighthouse/report.json` and `lighthouse/report.html`, and fails if the main Lighthouse category scores fall below the configured thresholds. You can audit an already deployed URL with `LIGHTHOUSE_URL=https://example.com npm run lighthouse`. On Apple Silicon, run this with an arm64 Node install; x64 Node under Rosetta is blocked by Lighthouse because it makes Chrome performance results unreliable.
+
+## ✅ Release checks
+
+Before tagging a release, run the same local checks used by CI:
+
+```bash
+npm run lint
+npm run typecheck
+npm run test:unit
+npm run test:storybook
+npm run build
+```
+
+For accessibility and PWA confidence, also run:
+
+```bash
+npm run lighthouse
+```
+
+The app version shown on the About page comes from `package.json`. Use `npm run version:major`, `npm run version:minor`, or `npm run version:patch` when preparing an intentional release bump.
+
+The repo installs `.githooks/pre-commit` through `npm run prepare`. The pre-commit hook runs lint, applies the configured automatic version bump, and stages `package.json` plus `package-lock.json`. Set `VERSION_BUMP=major`, `VERSION_BUMP=minor`, or `VERSION_BUMP=patch` when you need to control the bump for a specific commit.
 
 ## 🚢 Deployment
 
@@ -184,7 +228,9 @@ The repo includes a GitHub Actions workflow in `.github/workflows/deploy-gh-page
 - `src/lib/repository` persistence layer
 - `src/components` reusable UI pieces
 - `src/pages` top-level views
+- `src/stories` design-system Storybook reference pages
 - `src/styles` SCSS styling
+- `.storybook` Storybook configuration, global theme toggle, i18n provider, and accessibility addon setup
 - `.github/workflows` GitHub Pages deployment
 
 ## 📄 License

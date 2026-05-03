@@ -215,6 +215,7 @@ export type Messages = {
     dark: string;
   };
   mobileMenu: {
+    closeNavigation: string;
     openNavigation: string;
   };
   pwaInstall: {

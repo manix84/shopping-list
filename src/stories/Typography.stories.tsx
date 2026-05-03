@@ -4,7 +4,6 @@ import { DesignSystemStory, StorySection } from './DesignSystemStory';
 
 const meta = {
   title: 'Design System/Typography',
-  tags: ['autodocs'],
   parameters: {
     docs: {
       description: {

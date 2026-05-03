@@ -247,6 +247,7 @@ export const it: Messages = {
     dark: 'Scuro',
   },
   mobileMenu: {
+    closeNavigation: 'Chiudi menu di navigazione',
     openNavigation: 'Apri menu di navigazione',
   },
   pwaInstall: {

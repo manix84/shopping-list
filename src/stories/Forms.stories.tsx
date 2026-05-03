@@ -4,7 +4,6 @@ import { DesignSystemStory, StorySection } from './DesignSystemStory';
 
 const meta = {
   title: 'Design System/Forms',
-  tags: ['autodocs'],
   parameters: {
     docs: {
       description: {

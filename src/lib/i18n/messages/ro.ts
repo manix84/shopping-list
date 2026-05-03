@@ -246,6 +246,7 @@ export const ro: Messages = {
     dark: 'Închis',
   },
   mobileMenu: {
+    closeNavigation: 'Închide meniul de navigare',
     openNavigation: 'Deschide meniul de navigare',
   },
   pwaInstall: {

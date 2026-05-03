@@ -13,11 +13,11 @@ The app may store:
 - the country profile used for store routing
 - a shared-list identifier when sharing is enabled
 - a local history of recently opened shared lists so they can be reopened quickly
-- local display preferences such as language and theme
+- local display preferences such as language, theme, route density, and measurement display mode
 
 In frontend-only mode, this is stored in your browser's local storage on your device.
 
-When the optional backend is running, shopping lists, shared lists, and the country profile can be stored in the backend database file so they can survive restarts and support shared links. Language and theme remain device/browser preferences.
+When the optional backend is running, shopping lists, shared lists, and the country profile can be stored in the backend database file so they can survive restarts and support shared links. Language, theme, route density, and measurement display mode remain device/browser preferences.
 
 ## Shared links
 

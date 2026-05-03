@@ -43,6 +43,7 @@ export function PwaInstallBadge({
           type="button"
           className="button button-icon pwa-install-dismiss"
           aria-label={messages.pwaInstall.dismissLabel}
+          title={messages.pwaInstall.dismissLabel}
           onClick={onDismiss}
         >
           <svg viewBox="0 0 24 24" aria-hidden="true">
