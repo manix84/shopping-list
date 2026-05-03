@@ -59,6 +59,7 @@ export const nl: Messages = {
     exists: 'bestaat',
     group: 'Groep',
     items: 'Artikelen',
+    keywords: 'Trefwoorden',
     locale: 'Taal',
     measurementMode: 'Meetmodus',
     measurementModeCooking: 'Kookmaten',
@@ -174,6 +175,7 @@ export const nl: Messages = {
       tabQuantity: 'Hoeveelheden',
       tabWeights: 'Gewichten',
       tabVariants: 'Varianten',
+      tabLayout: 'Indeling',
       tabSections: 'Secties',
       tabStorage: 'Opslag',
       backendTitle: 'Backendcontroles',
@@ -205,6 +207,9 @@ export const nl: Messages = {
       variantTitle: 'Variant-zelftests',
       variantSubtitle:
         'Smaken, melksoorten en vergelijkbare omschrijvingen blijven apart van het basisproduct.',
+      layoutTitle: 'Huidige winkelindeling',
+      layoutSubtitle:
+        'Controleer het actieve landprofiel, routevolgorde, secties en trefwoorddekking.',
       storageTitle: 'Opslag-zelftests',
       storageSubtitle:
         'Gegevens moeten netjes heen en weer gaan door lokale opslag en latere databases.',

@@ -59,6 +59,7 @@ export const de: Messages = {
     exists: 'vorhanden',
     group: 'Gruppe',
     items: 'Artikel',
+    keywords: 'Keywords',
     locale: 'Sprache',
     measurementMode: 'Messmodus',
     measurementModeCooking: 'Kochmaße',
@@ -175,6 +176,7 @@ export const de: Messages = {
       tabQuantity: 'Mengen',
       tabWeights: 'Gewichte',
       tabVariants: 'Varianten',
+      tabLayout: 'Layout',
       tabSections: 'Bereiche',
       tabStorage: 'Speicher',
       backendTitle: 'Backend-Prüfungen',
@@ -207,6 +209,9 @@ export const de: Messages = {
       variantTitle: 'Varianten-Selbsttests',
       variantSubtitle:
         'Geschmacksrichtungen, Milchsorten und ähnliche Beschreibungen bleiben vom Basisprodukt getrennt.',
+      layoutTitle: 'Aktuelles Ladenlayout',
+      layoutSubtitle:
+        'Prüft aktives Länderprofil, Routenreihenfolge, Bereichszuordnung und Keyword-Abdeckung.',
       storageTitle: 'Speicher-Selbsttests',
       storageSubtitle:
         'Daten sollten sauber durch lokalen Speicher und spätere Datenbanken laufen.',

@@ -104,7 +104,7 @@ export const loadSharedShoppingList = async (listId: string): Promise<ApiShoppin
 
   const payload = (await response.json()) as { record?: unknown; exists?: unknown; createdAt?: unknown; updatedAt?: unknown };
   const rawRecord = JSON.stringify(payload.record);
-  const decoded = rawRecord ? decodeShoppingListRecord(rawRecord) : undefined;
+  const decoded = rawRecord ? decodeShoppingListRecord(rawRecord, 'uk', { strict: true }) : undefined;
   if (!decoded) {
     throw new Error('Backend returned an invalid shared shopping list record');
   }
@@ -153,11 +153,16 @@ export const saveAppSettings = async (record: AppSettingsRecord): Promise<void> 
 };
 
 export const saveSharedShoppingList = async (listId: string, record: ShoppingListRecord): Promise<void> => {
+  const sharedRecord: ShoppingListRecord = {
+    ...record,
+    listId,
+    serverBacked: true,
+  };
   const response = await fetchWithTimeout(
     `/api/shared-lists/${listId}`,
     {
       method: 'PUT',
-      body: encodeShoppingListRecord(record),
+      body: encodeShoppingListRecord(sharedRecord),
     },
     2_000,
   );

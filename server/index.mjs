@@ -16,6 +16,7 @@ import {
   saveShoppingList,
 } from './database.mjs';
 import { callShoppingListService, getHomeAssistantStatus, pushRecordToHomeAssistant } from './homeAssistant.mjs';
+import { isSettingsRecord, isShoppingListRecord } from './validation.mjs';
 
 const port = Number(process.env.PORT ?? 8787);
 const distDir = resolve('dist');
@@ -67,20 +68,6 @@ const sendError = (response, error) => {
     error: error instanceof Error ? error.message : 'Unexpected server error',
   });
 };
-
-const isShoppingListRecord = (value) =>
-  value &&
-  typeof value === 'object' &&
-  typeof value.input === 'string' &&
-  Array.isArray(value.items) &&
-  typeof value.updatedAt === 'string' &&
-  typeof value.countryCode === 'string';
-
-const isSettingsRecord = (value) =>
-  value &&
-  typeof value === 'object' &&
-  ['ca', 'uk', 'us'].includes(value.countryCode) &&
-  typeof value.updatedAt === 'string';
 
 const handleApi = async (request, response, path) => {
   if (request.method === 'OPTIONS') {
@@ -161,7 +148,7 @@ const handleApi = async (request, response, path) => {
 
     if (request.method === 'PUT') {
       const record = await readJsonBody(request);
-      if (!isShoppingListRecord(record)) {
+      if (!isShoppingListRecord(record, id)) {
         sendJson(response, 400, { error: 'Invalid shopping list record' });
         return;
       }

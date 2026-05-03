@@ -59,6 +59,7 @@ export const fr: Messages = {
     exists: 'existe',
     group: 'Groupe',
     items: 'Articles',
+    keywords: 'Mots-clés',
     locale: 'Langue',
     measurementMode: 'Mode de mesure',
     measurementModeCooking: 'Mesures de cuisine',
@@ -175,6 +176,7 @@ export const fr: Messages = {
       tabQuantity: 'Quantités',
       tabWeights: 'Poids',
       tabVariants: 'Variantes',
+      tabLayout: 'Agencement',
       tabSections: 'Sections',
       tabStorage: 'Stockage',
       backendTitle: 'Vérifications backend',
@@ -207,6 +209,9 @@ export const fr: Messages = {
       variantTitle: 'Auto-vérifications des variantes',
       variantSubtitle:
         'Les parfums, styles de lait et descripteurs similaires restent séparés du produit de base.',
+      layoutTitle: 'Agencement magasin actuel',
+      layoutSubtitle:
+        'Inspectez le profil pays actif, l’ordre du parcours, les sections et la couverture des mots-clés.',
       storageTitle: 'Auto-vérifications du stockage',
       storageSubtitle:
         'Les données doivent se relire proprement depuis le stockage local et toute future base.',

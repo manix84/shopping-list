@@ -66,6 +66,7 @@ export type Messages = {
     exists: string;
     group: string;
     items: string;
+    keywords: string;
     locale: string;
     measurementMode: string;
     measurementModeCooking: string;
@@ -162,6 +163,7 @@ export type Messages = {
       tabQuantity: string;
       tabWeights: string;
       tabVariants: string;
+      tabLayout: string;
       tabSections: string;
       tabStorage: string;
       backendTitle: string;
@@ -185,6 +187,8 @@ export type Messages = {
       weightSubtitle: string;
       variantTitle: string;
       variantSubtitle: string;
+      layoutTitle: string;
+      layoutSubtitle: string;
       storageTitle: string;
       storageSubtitle: string;
       stateTitle: string;

@@ -58,6 +58,7 @@ export const ro: Messages = {
     exists: 'există',
     group: 'Grup',
     items: 'Articole',
+    keywords: 'Cuvinte cheie',
     locale: 'Limbă',
     measurementMode: 'Mod măsurare',
     measurementModeCooking: 'Măsuri de gătit',
@@ -173,6 +174,7 @@ export const ro: Messages = {
       tabQuantity: 'Cantități',
       tabWeights: 'Greutăți',
       tabVariants: 'Variante',
+      tabLayout: 'Layout',
       tabSections: 'Secțiuni',
       tabStorage: 'Stocare',
       backendTitle: 'Verificări backend',
@@ -204,6 +206,9 @@ export const ro: Messages = {
       variantTitle: 'Autoverificări de variante',
       variantSubtitle:
         'Aromele, stilurile de lapte și descriptorii similari rămân separate de produsul de bază.',
+      layoutTitle: 'Aranjarea magazinului curent',
+      layoutSubtitle:
+        'Inspectează profilul de țară activ, ordinea traseului, secțiunile și acoperirea cuvintelor cheie.',
       storageTitle: 'Autoverificări de stocare',
       storageSubtitle:
         'Datele trebuie să treacă curat prin stocarea locală și orice bază viitoare.',

@@ -59,6 +59,7 @@ export const pi: Messages = {
     exists: 'exists',
     group: 'Crew',
     items: 'Cargo',
+    keywords: 'Keywords',
     locale: 'Tongue',
     measurementMode: 'Measurement mode',
     measurementModeCooking: 'Cooking measurements',
@@ -172,6 +173,7 @@ export const pi: Messages = {
       tabQuantity: 'Quantities',
       tabWeights: 'Weights',
       tabVariants: 'Variants',
+      tabLayout: 'Deck plan',
       tabSections: 'Decks',
       tabStorage: 'Stowage',
       backendTitle: 'Backend checks',
@@ -203,6 +205,9 @@ export const pi: Messages = {
       variantTitle: 'Variant self-checks',
       variantSubtitle:
         'Flavours, milk styles, and such marks stay apart from the base cargo.',
+      layoutTitle: 'Current market deck plan',
+      layoutSubtitle:
+        'Inspect the active waters profile, route order, deck ownership, and keyword coverage.',
       storageTitle: 'Stowage self-checks',
       storageSubtitle:
         'Record data should round-trip clean through local stowage and any future hold.',

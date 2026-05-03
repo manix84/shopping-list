@@ -55,6 +55,7 @@ export const en: Messages = {
     exists: 'exists',
     group: 'Group',
     items: 'Items',
+    keywords: 'Keywords',
     locale: 'Language',
     measurementMode: 'Measurement mode',
     measurementModeCooking: 'Cooking measurements',
@@ -167,6 +168,7 @@ export const en: Messages = {
       tabQuantity: 'Quantities',
       tabWeights: 'Weights',
       tabVariants: 'Variants',
+      tabLayout: 'Layout',
       tabSections: 'Sections',
       tabStorage: 'Storage',
       backendTitle: 'Backend checks',
@@ -197,6 +199,9 @@ export const en: Messages = {
       variantTitle: 'Variant self-checks',
       variantSubtitle:
         'Flavours, milk styles, and similar descriptors stay separate from the base product.',
+      layoutTitle: 'Current shop layout',
+      layoutSubtitle:
+        'Inspect the active country profile, route order, section ownership, and keyword coverage.',
       storageTitle: 'Storage self-checks',
       storageSubtitle:
         'Record data should round-trip cleanly through local storage and any future database store.',

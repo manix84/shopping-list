@@ -58,6 +58,7 @@ export const it: Messages = {
     exists: 'esiste',
     group: 'Gruppo',
     items: 'Articoli',
+    keywords: 'Parole chiave',
     locale: 'Lingua',
     measurementMode: 'Modalità misure',
     measurementModeCooking: 'Misure da cucina',
@@ -173,6 +174,7 @@ export const it: Messages = {
       tabQuantity: 'Quantità',
       tabWeights: 'Pesi',
       tabVariants: 'Varianti',
+      tabLayout: 'Layout',
       tabSections: 'Sezioni',
       tabStorage: 'Archiviazione',
       backendTitle: 'Controlli backend',
@@ -205,6 +207,9 @@ export const it: Messages = {
       variantTitle: 'Autocontrolli varianti',
       variantSubtitle:
         'Gusti, tipi di latte e descrittori simili restano separati dal prodotto base.',
+      layoutTitle: 'Layout negozio corrente',
+      layoutSubtitle:
+        'Ispeziona profilo paese attivo, ordine percorso, sezioni e copertura parole chiave.',
       storageTitle: 'Autocontrolli archiviazione',
       storageSubtitle:
         'I dati devono attraversare correttamente lo storage locale e qualsiasi database futuro.',

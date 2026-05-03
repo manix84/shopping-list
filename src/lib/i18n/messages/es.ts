@@ -54,6 +54,7 @@ export const es: Messages = {
     exists: 'existe',
     group: 'Grupo',
     items: 'Artículos',
+    keywords: 'Palabras clave',
     locale: 'Idioma',
     measurementMode: 'Modo de medidas',
     measurementModeCooking: 'Medidas de cocina',
@@ -169,6 +170,7 @@ export const es: Messages = {
       tabQuantity: 'Cantidades',
       tabWeights: 'Pesos',
       tabVariants: 'Variantes',
+      tabLayout: 'Diseño',
       tabSections: 'Secciones',
       tabStorage: 'Almacenamiento',
       backendTitle: 'Comprobaciones del backend',
@@ -202,6 +204,9 @@ export const es: Messages = {
       variantTitle: 'Comprobaciones de variantes',
       variantSubtitle:
         'Sabores, estilos de leche y descriptores parecidos se mantienen separados del producto base.',
+      layoutTitle: 'Diseño de tienda actual',
+      layoutSubtitle:
+        'Inspecciona el perfil de país activo, el orden de ruta, las secciones y la cobertura de palabras clave.',
       storageTitle: 'Comprobaciones de almacenamiento',
       storageSubtitle:
         'Los datos deben redondearse limpiamente a través del almacenamiento local y cualquier futura base de datos.',
