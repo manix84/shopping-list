@@ -3,7 +3,7 @@ export type AppRoute = {
   page: PageKey;
   listId?: string;
 };
-export type CountryCode = 'uk' | 'us' | 'ca';
+export type CountryCode = 'uk' | 'us' | 'ca' | 'fr' | 'de' | 'it' | 'be' | 'es' | 'ro' | 'mx' | 'nl';
 export type ThemeMode = 'system' | 'light' | 'dark';
 export type RouteViewMode = 'default' | 'comfortable' | 'compact';
 export type MeasurementUnitSystem = 'metric' | 'us-customary' | 'canadian-customary';

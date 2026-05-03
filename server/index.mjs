@@ -20,6 +20,8 @@ import { callShoppingListService, getHomeAssistantStatus, pushRecordToHomeAssist
 const port = Number(process.env.PORT ?? 8787);
 const distDir = resolve('dist');
 const homeAssistantIntegrationEnabled = process.env.ENABLE_HOME_ASSISTANT_INTEGRATION === 'true';
+const COUNTRY_CODES = new Set(['be', 'ca', 'de', 'es', 'fr', 'it', 'mx', 'nl', 'ro', 'uk', 'us']);
+const UUID_V7_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 const contentTypes = {
   '.css': 'text/css; charset=utf-8',
@@ -68,13 +70,28 @@ const sendError = (response, error) => {
   });
 };
 
-const isShoppingListRecord = (value) =>
+const isIsoTimestamp = (value) => typeof value === 'string' && Number.isFinite(Date.parse(value));
+
+const isShoppingListItem = (value) =>
   value &&
   typeof value === 'object' &&
+  typeof value.id === 'string' &&
+  typeof value.raw === 'string' &&
+  typeof value.normalized === 'string' &&
+  typeof value.cleaned === 'string' &&
+  typeof value.checked === 'boolean' &&
+  typeof value.matchedSection === 'string';
+
+const isShoppingListRecord = (value, sharedListId) =>
+  value &&
+  typeof value === 'object' &&
+  (value.listId === undefined || UUID_V7_PATTERN.test(value.listId)) &&
+  (sharedListId === undefined || value.listId === undefined || value.listId === sharedListId) &&
   typeof value.input === 'string' &&
   Array.isArray(value.items) &&
-  typeof value.updatedAt === 'string' &&
-  typeof value.countryCode === 'string';
+  value.items.every(isShoppingListItem) &&
+  isIsoTimestamp(value.updatedAt) &&
+  COUNTRY_CODES.has(value.countryCode);
 
 const isSettingsRecord = (value) =>
   value &&
@@ -161,7 +178,7 @@ const handleApi = async (request, response, path) => {
 
     if (request.method === 'PUT') {
       const record = await readJsonBody(request);
-      if (!isShoppingListRecord(record)) {
+      if (!isShoppingListRecord(record, id)) {
         sendJson(response, 400, { error: 'Invalid shopping list record' });
         return;
       }
