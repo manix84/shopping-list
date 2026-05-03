@@ -205,7 +205,7 @@ export function SharedListPanel({
 
     const timeoutId = window.setTimeout(() => {
       void onValidateSharedInput(sharedInput).then((validation) => {
-        if (cancelled) return;
+        if (cancelled) { return; }
 
         if (validation.state === 'valid') {
           setSharedInputStatus('valid');
@@ -233,7 +233,7 @@ export function SharedListPanel({
   }, [canUseBackend, onValidateSharedInput, sharedInput]);
 
   useEffect(() => {
-    if (!scannerOpen) return;
+    if (!scannerOpen) { return; }
 
     const BarcodeDetectorApi = (window as Window & { BarcodeDetector?: BarcodeDetectorConstructor }).BarcodeDetector;
     if (!BarcodeDetectorApi) {
@@ -272,7 +272,7 @@ export function SharedListPanel({
     };
 
     const scan = async () => {
-      if (cancelled || !videoRef.current) return;
+      if (cancelled || !videoRef.current) { return; }
 
       try {
         const results = await detector.detect(videoRef.current);
@@ -288,7 +288,7 @@ export function SharedListPanel({
         }
 
         const validation = await onValidateSharedInput(value);
-        if (cancelled) return;
+        if (cancelled) { return; }
 
         if (validation.state === 'invalid') {
           scheduleScan();
@@ -310,7 +310,7 @@ export function SharedListPanel({
           setScannerState('missing');
           setScannerMessage(messages.sharing.scannerListMissing);
           timeoutId = window.setTimeout(() => {
-            if (cancelled) return;
+            if (cancelled) { return; }
             setScannerState('scanning');
             setScannerMessage(undefined);
             void scan();
@@ -322,7 +322,7 @@ export function SharedListPanel({
         setScannerState('ready');
         setScannerMessage(messages.sharing.scannerReady);
         timeoutId = window.setTimeout(() => {
-          if (cancelled) return;
+          if (cancelled) { return; }
           setScannerOpen(false);
           setScannerState('scanning');
           setScannerMessage(undefined);
@@ -408,10 +408,10 @@ export function SharedListPanel({
     setScannerMessage(undefined);
   };
   useEffect(() => {
-    if (!scannerOpen && !qrModalOpen) return;
+    if (!scannerOpen && !qrModalOpen) { return; }
 
     const handleEscape = (event: globalThis.KeyboardEvent) => {
-      if (event.key !== 'Escape') return;
+      if (event.key !== 'Escape') { return; }
       if (scannerOpen) {
         closeScanner();
         return;
@@ -444,12 +444,12 @@ export function SharedListPanel({
   const isActionTarget = (target: EventTarget | null): boolean =>
     target instanceof Element && target.closest('button') !== null;
   const handleHistoryPointerDown = (listId: string, event: PointerEvent<HTMLDivElement>) => {
-    if (isActionTarget(event.target)) return;
+    if (isActionTarget(event.target)) { return; }
     historyPointerRef.current = { listId, x: event.clientX, y: event.clientY, moved: false };
   };
   const handleHistoryPointerMove = (listId: string, event: PointerEvent<HTMLDivElement>) => {
     const activePointer = historyPointerRef.current;
-    if (!activePointer || activePointer.listId !== listId) return;
+    if (!activePointer || activePointer.listId !== listId) { return; }
 
     const deltaX = Math.abs(event.clientX - activePointer.x);
     const deltaY = Math.abs(event.clientY - activePointer.y);
@@ -458,10 +458,10 @@ export function SharedListPanel({
     }
   };
   const handleHistoryClick = (listId: string, event: MouseEvent<HTMLDivElement>) => {
-    if (isActionTarget(event.target)) return;
+    if (isActionTarget(event.target)) { return; }
     const activePointer = historyPointerRef.current;
     historyPointerRef.current = null;
-    if (activePointer?.listId === listId && activePointer.moved) return;
+    if (activePointer?.listId === listId && activePointer.moved) { return; }
     void onLoadHistoryEntry(listId);
   };
   const handleHistoryPointerCancel = () => {
@@ -473,19 +473,19 @@ export function SharedListPanel({
   };
 
   return (
-    <div className="stack">
+    <div className={'stack'}>
       {shareLink ? (
         <>
-          <div className="field">
-            <label htmlFor="shopping-share-link">{messages.labels.sharedLink}</label>
-            <div className="inline-row share-link-row">
-              <input id="shopping-share-link" className="input" readOnly value={shareLink} />
-              <button type="button" className="button" onClick={() => void navigator.clipboard?.writeText(shareLink)}>
+          <div className={'field'}>
+            <label htmlFor={'shopping-share-link'}>{messages.labels.sharedLink}</label>
+            <div className={'inline-row share-link-row'}>
+              <input id={'shopping-share-link'} className={'input'} readOnly value={shareLink} />
+              <button type={'button'} className={'button'} onClick={() => void navigator.clipboard?.writeText(shareLink)}>
                 {messages.actions.copy}
               </button>
               <button
-                type="button"
-                className="button"
+                type={'button'}
+                className={'button'}
                 onClick={onRefreshSharedList}
                 disabled={isRefreshingSharedList || !canUseBackend}
               >
@@ -496,20 +496,20 @@ export function SharedListPanel({
 
           {qrDataUrl ? (
             <button
-              type="button"
+              type={'button'}
               className={`share-qr-card ${qrRevealed ? '' : 'share-qr-card-blurred'}`.trim()}
               onClick={handleQrCardClick}
               aria-label={qrRevealed ? messages.labels.sharedLink : messages.actions.revealQrCode}
             >
-              <img className="share-qr-image" src={qrDataUrl} alt={messages.labels.sharedLink} />
-              {!qrRevealed ? <span className="share-qr-overlay">{messages.actions.revealQrCode}</span> : null}
+              <img className={'share-qr-image'} src={qrDataUrl} alt={messages.labels.sharedLink} />
+              {!qrRevealed ? <span className={'share-qr-overlay'}>{messages.actions.revealQrCode}</span> : null}
             </button>
           ) : null}
         </>
       ) : canUseBackend ? (
         <button
-          type="button"
-          className="button button-primary"
+          type={'button'}
+          className={'button button-primary'}
           onClick={onCreateSharedLink}
           disabled={isCreatingShareLink || !canCreateSharedLink}
           aria-label={messages.actions.createSharedLink}
@@ -518,18 +518,18 @@ export function SharedListPanel({
           {isCreatingShareLink ? messages.actions.creating : messages.actions.createSharedLink}
         </button>
       ) : (
-        <div className="empty-state">{messages.pages.edit.sharingUnavailable}</div>
+        <div className={'empty-state'}>{messages.pages.edit.sharingUnavailable}</div>
       )}
 
       {canUseBackend ? (
         <>
-          <div className="field">
-            <label htmlFor="shared-list-load-input">{messages.sharing.manualLinkLabel}</label>
-            <div className="inline-row share-load-row">
+          <div className={'field'}>
+            <label htmlFor={'shared-list-load-input'}>{messages.sharing.manualLinkLabel}</label>
+            <div className={'inline-row share-load-row'}>
               <div className={`shared-input-shell ${showSharedInputTick ? 'shared-input-shell-valid' : ''}`.trim()}>
                 <input
-                  id="shared-list-load-input"
-                  className="input shared-input"
+                  id={'shared-list-load-input'}
+                  className={'input shared-input'}
                   value={sharedInput}
                   aria-describedby={sharedInputStatus !== 'idle' ? sharedInputStatusId : undefined}
                   aria-invalid={sharedInputStatus === 'missing' || sharedInputStatus === 'invalid'}
@@ -537,28 +537,28 @@ export function SharedListPanel({
                   onPaste={(event) => {
                     const pastedText = event.clipboardData.getData('text');
                     const normalized = normalizeSharedInput(pastedText);
-                    if (normalized === pastedText) return;
+                    if (normalized === pastedText) { return; }
                     event.preventDefault();
                     setSharedInput(normalized);
                   }}
                   placeholder={messages.sharing.manualLinkPlaceholder}
                 />
                 {showSharedInputTick ? (
-                  <span className="shared-input-tick" aria-hidden="true">
+                  <span className={'shared-input-tick'} aria-hidden={'true'}>
                     ✓
                   </span>
                 ) : null}
               </div>
               <button
-                type="button"
-                className="button button-primary"
+                type={'button'}
+                className={'button button-primary'}
                 onClick={() => void handleLoadSharedList()}
                 disabled={isLoadingSharedList || !sharedInput.trim()}
               >
                 {messages.actions.loadSharedList}
               </button>
               {scannerSupported ? (
-                <button type="button" className="button" onClick={() => setScannerOpen(true)}>
+                <button type={'button'} className={'button'} onClick={() => setScannerOpen(true)}>
                   {messages.actions.scanQrCode}
                 </button>
               ) : null}
@@ -568,46 +568,46 @@ export function SharedListPanel({
       ) : null}
 
       {sharedInputStatus !== 'idle' ? (
-        <div id={sharedInputStatusId} className="sr-only" role="status" aria-live="polite">
+        <div id={sharedInputStatusId} className={'sr-only'} role={'status'} aria-live={'polite'}>
           {sharedInputStatusText}
         </div>
       ) : null}
-      {shareError ? <div className="small-text" role="alert">{shareError}</div> : null}
+      {shareError ? <div className={'small-text'} role={'alert'}>{shareError}</div> : null}
       {scannerMessage && !scannerOpen ? (
-        <div className="small-text" role="status" aria-live="polite">
+        <div className={'small-text'} role={'status'} aria-live={'polite'}>
           {scannerMessage}
         </div>
       ) : null}
 
-      <div className="stack">
-        <h3 className="title title-xs">{messages.sharing.recentListsTitle}</h3>
+      <div className={'stack'}>
+        <h3 className={'title title-xs'}>{messages.sharing.recentListsTitle}</h3>
         {historyEntries.length === 0 ? (
-          <div className="empty-state">{messages.sharing.recentListsEmpty}</div>
+          <div className={'empty-state'}>{messages.sharing.recentListsEmpty}</div>
         ) : (
-          <div className="stack">
+          <div className={'stack'}>
             {historyEntries.map((entry) => (
               <div
                 key={entry.listId}
-                className="shared-history-item"
+                className={'shared-history-item'}
                 title={messages.actions.loadSharedList}
                 onPointerDown={(event) => handleHistoryPointerDown(entry.listId, event)}
                 onPointerMove={(event) => handleHistoryPointerMove(entry.listId, event)}
                 onPointerCancel={handleHistoryPointerCancel}
                 onClick={(event) => handleHistoryClick(entry.listId, event)}
               >
-                <div className="stack shared-history-content">
-                  <div className="shared-history-title-wrap">
-                    <div className="shared-history-title">{entry.itemPreview.join(' · ') || messages.sharing.emptyList}</div>
+                <div className={'stack shared-history-content'}>
+                  <div className={'shared-history-title-wrap'}>
+                    <div className={'shared-history-title'}>{entry.itemPreview.join(' · ') || messages.sharing.emptyList}</div>
                   </div>
-                  <div className="small-text">
+                  <div className={'small-text'}>
                     {messages.labels.created} {formatTimestamp(entry.createdAt, localeCode)} · {messages.labels.updated}{' '}
                     {formatTimestamp(entry.updatedAt, localeCode)}
                   </div>
                 </div>
-                <div className="shared-history-actions">
+                <div className={'shared-history-actions'}>
                   <button
-                    type="button"
-                    className="button button-icon"
+                    type={'button'}
+                    className={'button button-icon'}
                     onClick={(event) => {
                       event.stopPropagation();
                       void onLoadHistoryEntry(entry.listId);
@@ -618,13 +618,13 @@ export function SharedListPanel({
                     }`}
                     title={messages.actions.loadSharedList}
                   >
-                    <svg aria-hidden="true" className="button-icon-svg" viewBox="0 0 24 24">
-                      <path d={mdiDownloadOutline} fill="currentColor" />
+                    <svg aria-hidden={'true'} className={'button-icon-svg'} viewBox={'0 0 24 24'}>
+                      <path d={mdiDownloadOutline} fill={'currentColor'} />
                     </svg>
                   </button>
                   <button
-                    type="button"
-                    className="button button-icon"
+                    type={'button'}
+                    className={'button button-icon'}
                     onClick={(event) => {
                       event.stopPropagation();
                       onDeleteHistoryEntry(entry.listId);
@@ -632,8 +632,8 @@ export function SharedListPanel({
                     aria-label={messages.actions.remove}
                     title={messages.actions.remove}
                   >
-                    <svg aria-hidden="true" className="button-icon-svg" viewBox="0 0 24 24">
-                      <path d={mdiDeleteOutline} fill="currentColor" />
+                    <svg aria-hidden={'true'} className={'button-icon-svg'} viewBox={'0 0 24 24'}>
+                      <path d={mdiDeleteOutline} fill={'currentColor'} />
                     </svg>
                   </button>
                 </div>
@@ -644,44 +644,44 @@ export function SharedListPanel({
       </div>
 
       {scannerOpen ? (
-        <div className="share-scanner-modal" onClick={closeScanner} role="presentation">
+        <div className={'share-scanner-modal'} onClick={closeScanner} role={'presentation'}>
           <div
-            className="share-scanner-dialog stack"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="share-scanner-title"
+            className={'share-scanner-dialog stack'}
+            role={'dialog'}
+            aria-modal={'true'}
+            aria-labelledby={'share-scanner-title'}
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="share-scanner-toolbar">
-              <h3 id="share-scanner-title" className="title title-xs">{messages.actions.scanQrCode}</h3>
-              <button type="button" className="button" onClick={closeScanner} autoFocus>
+            <div className={'share-scanner-toolbar'}>
+              <h3 id={'share-scanner-title'} className={'title title-xs'}>{messages.actions.scanQrCode}</h3>
+              <button type={'button'} className={'button'} onClick={closeScanner} autoFocus>
                 {messages.actions.stopScanning}
               </button>
             </div>
             <div className={`share-scanner-frame share-scanner-frame-${scannerState}`}>
-              <video ref={videoRef} className="share-scanner-video" muted playsInline aria-label={messages.actions.scanQrCode} />
-              <div className="share-scanner-overlay">
-                <div className="share-scanner-target" />
+              <video ref={videoRef} className={'share-scanner-video'} muted playsInline aria-label={messages.actions.scanQrCode} />
+              <div className={'share-scanner-overlay'}>
+                <div className={'share-scanner-target'} />
               </div>
             </div>
-            <div className="share-scanner-status" role="status" aria-live="polite">{scannerStatusText}</div>
+            <div className={'share-scanner-status'} role={'status'} aria-live={'polite'}>{scannerStatusText}</div>
           </div>
         </div>
       ) : null}
 
       {qrModalOpen && qrDataUrl ? (
-        <div className="share-scanner-modal" onClick={closeQrModal} role="presentation">
+        <div className={'share-scanner-modal'} onClick={closeQrModal} role={'presentation'}>
           <div
-            className="share-qr-dialog"
-            role="dialog"
-            aria-modal="true"
+            className={'share-qr-dialog'}
+            role={'dialog'}
+            aria-modal={'true'}
             aria-label={messages.labels.sharedLink}
             onClick={(event) => event.stopPropagation()}
           >
-            <button type="button" className="button" onClick={closeQrModal} autoFocus>
+            <button type={'button'} className={'button'} onClick={closeQrModal} autoFocus>
               {messages.actions.close}
             </button>
-            <img className="share-qr-image share-qr-image-large" src={qrDataUrl} alt={messages.labels.sharedLink} />
+            <img className={'share-qr-image share-qr-image-large'} src={qrDataUrl} alt={messages.labels.sharedLink} />
           </div>
         </div>
       ) : null}

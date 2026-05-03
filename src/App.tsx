@@ -95,26 +95,26 @@ const appBasePath = import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE
 const currentOrigin = (): string | undefined => (typeof window === 'undefined' ? undefined : window.location.origin);
 
 const isRunningInstalledPwa = (): boolean => {
-  if (typeof window === 'undefined') return false;
+  if (typeof window === 'undefined') { return false; }
 
   const navigatorWithStandalone = window.navigator as Navigator & { standalone?: boolean };
   return window.matchMedia('(display-mode: standalone)').matches || navigatorWithStandalone.standalone === true;
 };
 
 const isMobileOrTabletDevice = (): boolean => {
-  if (typeof window === 'undefined') return false;
+  if (typeof window === 'undefined') { return false; }
 
   return window.matchMedia('(hover: none), (pointer: coarse)').matches && window.matchMedia('(max-width: 1180px)').matches;
 };
 
 const hasDismissedPwaInstallNudge = (): boolean => {
-  if (typeof window === 'undefined') return false;
+  if (typeof window === 'undefined') { return false; }
 
   return window.localStorage.getItem(PWA_INSTALL_NUDGE_DISMISSED_KEY) === 'true';
 };
 
 const updateBrowserIcon = (theme: 'light' | 'dark'): void => {
-  if (typeof document === 'undefined') return;
+  if (typeof document === 'undefined') { return; }
 
   const iconLink = document.querySelector<HTMLLinkElement>('#browser-theme-icon');
   const nextIcon = theme === 'dark' ? iconLink?.dataset.darkHref : iconLink?.dataset.lightHref;
@@ -124,7 +124,7 @@ const updateBrowserIcon = (theme: 'light' | 'dark'): void => {
 };
 
 const readRouteFromLocation = (): AppRoute => {
-  if (typeof window === 'undefined') return { page: DEFAULT_PAGE };
+  if (typeof window === 'undefined') { return { page: DEFAULT_PAGE }; }
 
   return readRouteFromLocationParts({
     pathname: window.location.pathname,
@@ -134,7 +134,7 @@ const readRouteFromLocation = (): AppRoute => {
 };
 
 const syncRouteToUrl = ({ page, listId }: AppRoute): void => {
-  if (typeof window === 'undefined') return;
+  if (typeof window === 'undefined') { return; }
 
   const nextUrl = routeToUrl({ page, listId }, appBasePath);
   const currentUrl = `${window.location.pathname}${window.location.hash}`;
@@ -168,7 +168,7 @@ const getSharedListPreview = (items: Item[]): string[] => items.slice(0, 6).map(
 function updateItemTextInInput(input: string, previousDisplay: string, nextDisplay: string): string {
   const lines = input.split('\n');
   const index = lines.findIndex((line) => cleanLine(line) === cleanLine(previousDisplay));
-  if (index === -1) return input;
+  if (index === -1) { return input; }
   const next = [...lines];
   next[index] = nextDisplay;
   return next.join('\n');
@@ -224,7 +224,7 @@ export default function App() {
   };
 
   const applyTheme = (mode: ThemeMode) => {
-    if (typeof document === 'undefined') return;
+    if (typeof document === 'undefined') { return; }
 
     const resolved = getResolvedTheme(mode);
     setResolvedTheme(resolved);
@@ -400,7 +400,7 @@ export default function App() {
         }
       }
 
-      if (cancelled) return;
+      if (cancelled) { return; }
 
       setStorageMode(nextStorageMode);
       setActiveListId(nextListId);
@@ -427,7 +427,7 @@ export default function App() {
   }, [listId]);
 
   useEffect(() => {
-    if (!isLoaded) return;
+    if (!isLoaded) { return; }
 
     let cancelled = false;
     let inFlight = false;
@@ -445,7 +445,7 @@ export default function App() {
     };
 
     const runHeartbeat = async () => {
-      if (cancelled) return;
+      if (cancelled) { return; }
 
       if (inFlight) {
         pendingCheck = true;
@@ -456,7 +456,7 @@ export default function App() {
 
       try {
         const nextBackendStatus = await checkBackendStatus();
-        if (cancelled) return;
+        if (cancelled) { return; }
 
         setBackendStatus(nextBackendStatus);
         scheduleHeartbeat(
@@ -501,7 +501,7 @@ export default function App() {
   }, [isLoaded]);
 
   useEffect(() => {
-    if (!isLoaded || storageMode === 'backend' || backendStatus.state !== 'connected') return;
+    if (!isLoaded || storageMode === 'backend' || backendStatus.state !== 'connected') { return; }
 
     const connectBackend = async () => {
       try {
@@ -603,7 +603,7 @@ export default function App() {
   }, [measurementDisplayMode]);
 
   useEffect(() => {
-    if (!isLoaded) return;
+    if (!isLoaded) { return; }
     const record = buildRecord(input, items, countryCode, activeListId, isServerBackedList);
 
     localStorageRepository.save(record);
@@ -730,7 +730,7 @@ export default function App() {
 
   const handleAddSingleItem = () => {
     const cleaned = cleanLine(draftItem);
-    if (!cleaned) return;
+    if (!cleaned) { return; }
 
     const nextInput = input.trim() ? `${input.trim()}\n${cleaned}` : cleaned;
     setInput(nextInput);
@@ -741,7 +741,7 @@ export default function App() {
   const handleDeleteItem = (itemId: string) => {
     setItems((current) => {
       const target = current.find((item) => item.id === itemId);
-      if (!target) return current;
+      if (!target) { return current; }
 
       const nextItems = current.filter((item) => item.id !== itemId);
       const targetDisplay = getStoredValue(target);
@@ -757,11 +757,11 @@ export default function App() {
 
   const handleRenameItem = (itemId: string, nextRaw: string) => {
     const cleanedRaw = stripDisplaySizeLabel(cleanLine(nextRaw));
-    if (!cleanedRaw) return;
+    if (!cleanedRaw) { return; }
 
     setItems((current) => {
       const target = current.find((item) => item.id === itemId);
-      if (!target) return current;
+      if (!target) { return current; }
       const nextRawVariant = extractVariant(cleanedRaw, config).variant;
 
       const nextStoredValue = [
@@ -857,7 +857,7 @@ export default function App() {
   };
 
   const handleRefreshSharedList = async () => {
-    if (!isServerBackedList) return;
+    if (!isServerBackedList) { return; }
     if (backendStatus.state !== 'connected') {
       setShareError('connectBackendFirst');
       return;
@@ -918,7 +918,7 @@ export default function App() {
   };
 
   const promptPwaInstall = async () => {
-    if (!beforeInstallPromptEvent) return;
+    if (!beforeInstallPromptEvent) { return; }
 
     await beforeInstallPromptEvent.prompt();
     const choice = await beforeInstallPromptEvent.userChoice;
@@ -943,9 +943,9 @@ export default function App() {
   return (
     <I18nProvider value={{ locale, messages, setLocale }}>
       <PwaSplashScreen />
-      <div className="shopping-app">
-        <div className="shopping-shell">
-          <a className="skip-link" href="#main-content">
+      <div className={'shopping-app'}>
+        <div className={'shopping-shell'}>
+          <a className={'skip-link'} href={'#main-content'}>
             {messages.actions.skipToMainContent}
           </a>
           <AppHeader
@@ -956,7 +956,7 @@ export default function App() {
             onChangePage={changePage}
           />
 
-          <main id="main-content" className="main-content" tabIndex={-1}>
+          <main id={'main-content'} className={'main-content'} tabIndex={-1}>
             {page === 'edit' ? (
               <EditPage
                 input={input}

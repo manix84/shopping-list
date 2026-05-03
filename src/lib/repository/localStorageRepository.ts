@@ -18,7 +18,7 @@ export const defaultRecord = (): ShoppingListRecord => ({
 
 export const localStorageRepository = {
   load: () => {
-    if (typeof window === 'undefined') return defaultRecord();
+    if (typeof window === 'undefined') { return defaultRecord(); }
 
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) {
@@ -37,16 +37,16 @@ export const localStorageRepository = {
     return decoded;
   },
   save: (record) => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined') { return; }
     window.localStorage.setItem(STORAGE_KEY, encodeShoppingListRecord(record));
   },
   clear: () => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined') { return; }
     window.localStorage.removeItem(STORAGE_KEY);
   },
 } satisfies ShoppingListRepository;
 
 export const hasStoredShoppingListRecord = (): boolean => {
-  if (typeof window === 'undefined') return false;
+  if (typeof window === 'undefined') { return false; }
   return window.localStorage.getItem(STORAGE_KEY) !== null;
 };

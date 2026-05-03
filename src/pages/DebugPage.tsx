@@ -47,18 +47,18 @@ type DebugPageProps = {
 };
 
 const backendSummary = (status: BackendStatus, messages: Messages): string => {
-  if (status.state === 'connected') return messages.pages.debug.backendConnected;
-  if (status.state === 'checking') return messages.pages.debug.backendChecking;
-  if (status.state === 'error') return messages.pages.debug.backendError;
+  if (status.state === 'connected') { return messages.pages.debug.backendConnected; }
+  if (status.state === 'checking') { return messages.pages.debug.backendChecking; }
+  if (status.state === 'error') { return messages.pages.debug.backendError; }
   return messages.pages.debug.backendOffline;
 };
 
 const checkTone = (passed: boolean) => (passed ? ('success' as const) : ('danger' as const));
 
 const backendStateLabel = (status: BackendStatus, messages: Messages) => {
-  if (status.state === 'connected') return messages.backendStatus.connected;
-  if (status.state === 'checking') return messages.backendStatus.checking;
-  if (status.state === 'error') return messages.backendStatus.issue;
+  if (status.state === 'connected') { return messages.backendStatus.connected; }
+  if (status.state === 'checking') { return messages.backendStatus.checking; }
+  if (status.state === 'error') { return messages.backendStatus.issue; }
   return messages.backendStatus.frontendOnly;
 };
 
@@ -150,7 +150,7 @@ export function DebugPage({
               ? lastIndex
               : undefined;
 
-    if (nextIndex === undefined) return;
+    if (nextIndex === undefined) { return; }
 
     event.preventDefault();
     const nextTab = debugTabs[nextIndex];
@@ -161,30 +161,30 @@ export function DebugPage({
   return (
     <Card
       header={
-        <div className="title-row">
+        <div className={'title-row'}>
           <div>
-            <h2 className="title title-md">{messages.pages.debug.title}</h2>
-            <p className="subtitle">{messages.pages.debug.subtitle}</p>
+            <h2 className={'title title-md'}>{messages.pages.debug.title}</h2>
+            <p className={'subtitle'}>{messages.pages.debug.subtitle}</p>
           </div>
-          <div className="button-row">
-            <button type="button" className="button" onClick={onBackToEdit}>
+          <div className={'button-row'}>
+            <button type={'button'} className={'button'} onClick={onBackToEdit}>
               {messages.actions.backToEdit}
             </button>
-            <button type="button" className="button" onClick={onBackToSettings}>
+            <button type={'button'} className={'button'} onClick={onBackToSettings}>
               {messages.actions.backToSettings}
             </button>
           </div>
         </div>
       }
-      bodyClassName="stack"
+      bodyClassName={'stack'}
     >
-      <div className="debug-tablist" role="tablist" aria-label={messages.pages.debug.title}>
+      <div className={'debug-tablist'} role={'tablist'} aria-label={messages.pages.debug.title}>
         {debugTabs.map((tab, index) => (
           <button
             key={tab.key}
             id={`debug-tab-${tab.key}`}
-            type="button"
-            role="tab"
+            type={'button'}
+            role={'tab'}
             aria-selected={activeTab === tab.key}
             aria-controls={activeTab === tab.key ? `debug-panel-${tab.key}` : undefined}
             tabIndex={activeTab === tab.key ? 0 : -1}
@@ -199,19 +199,19 @@ export function DebugPage({
 
       {activeTab === 'parsed' ? (
         <Card
-          id="debug-panel-parsed"
-          role="tabpanel"
-          aria-labelledby="debug-tab-parsed"
+          id={'debug-panel-parsed'}
+          role={'tabpanel'}
+          aria-labelledby={'debug-tab-parsed'}
           header={
             <>
-              <h2 className="title title-sm">{messages.pages.debug.parsedTitle}</h2>
-              <p className="subtitle">{messages.pages.debug.parsedSubtitle}</p>
+              <h2 className={'title title-sm'}>{messages.pages.debug.parsedTitle}</h2>
+              <p className={'subtitle'}>{messages.pages.debug.parsedSubtitle}</p>
             </>
           }
         >
-          <div className="scroll-region stack">
+          <div className={'scroll-region stack'}>
             {items.length === 0 ? (
-              <div className="empty-state">{messages.pages.edit.parsedEmpty}</div>
+              <div className={'empty-state'}>{messages.pages.edit.parsedEmpty}</div>
             ) : (
               items.map((item) => (
                 <ParsedItemCard
@@ -230,16 +230,16 @@ export function DebugPage({
 
       {activeTab === 'state' ? (
         <Card
-          id="debug-panel-state"
-          role="tabpanel"
-          aria-labelledby="debug-tab-state"
+          id={'debug-panel-state'}
+          role={'tabpanel'}
+          aria-labelledby={'debug-tab-state'}
           header={
             <>
-              <h2 className="title title-sm">{messages.pages.debug.stateTitle}</h2>
-              <p className="subtitle">{messages.pages.debug.stateSubtitle}</p>
+              <h2 className={'title title-sm'}>{messages.pages.debug.stateTitle}</h2>
+              <p className={'subtitle'}>{messages.pages.debug.stateSubtitle}</p>
             </>
           }
-          bodyClassName="stack"
+          bodyClassName={'stack'}
         >
           {stateTests.map((test) => (
             <TestResultCard
@@ -250,22 +250,22 @@ export function DebugPage({
               passed={test.passed}
             />
           ))}
-          {!stateHasFailures ? <div className="empty-state">{messages.pages.debug.allStatePass}</div> : null}
+          {!stateHasFailures ? <div className={'empty-state'}>{messages.pages.debug.allStatePass}</div> : null}
         </Card>
       ) : null}
 
       {activeTab === 'backend' ? (
         <Card
-          id="debug-panel-backend"
-          role="tabpanel"
-          aria-labelledby="debug-tab-backend"
+          id={'debug-panel-backend'}
+          role={'tabpanel'}
+          aria-labelledby={'debug-tab-backend'}
           header={
             <>
-              <h2 className="title title-sm">{messages.pages.debug.backendTitle}</h2>
-              <p className="subtitle">{backendSummary(backendStatus, messages)}</p>
+              <h2 className={'title title-sm'}>{messages.pages.debug.backendTitle}</h2>
+              <p className={'subtitle'}>{backendSummary(backendStatus, messages)}</p>
             </>
           }
-          bodyClassName="stack"
+          bodyClassName={'stack'}
         >
           <TestResultCard
             title={messages.pages.debug.backendHealthTitle}
@@ -304,16 +304,16 @@ export function DebugPage({
 
       {activeTab === 'config' ? (
         <Card
-          id="debug-panel-config"
-          role="tabpanel"
-          aria-labelledby="debug-tab-config"
+          id={'debug-panel-config'}
+          role={'tabpanel'}
+          aria-labelledby={'debug-tab-config'}
           header={
             <>
-              <h2 className="title title-sm">{messages.pages.debug.configTitle}</h2>
-              <p className="subtitle">{messages.pages.debug.configSubtitle}</p>
+              <h2 className={'title title-sm'}>{messages.pages.debug.configTitle}</h2>
+              <p className={'subtitle'}>{messages.pages.debug.configSubtitle}</p>
             </>
           }
-          bodyClassName="stack"
+          bodyClassName={'stack'}
         >
           {configTests.map((test) => (
             <TestResultCard
@@ -324,22 +324,22 @@ export function DebugPage({
               passed={test.passed}
             />
           ))}
-          {!configHasFailures ? <div className="empty-state">{messages.pages.debug.allConfigPass}</div> : null}
+          {!configHasFailures ? <div className={'empty-state'}>{messages.pages.debug.allConfigPass}</div> : null}
         </Card>
       ) : null}
 
       {activeTab === 'matcher' ? (
         <Card
-          id="debug-panel-matcher"
-          role="tabpanel"
-          aria-labelledby="debug-tab-matcher"
+          id={'debug-panel-matcher'}
+          role={'tabpanel'}
+          aria-labelledby={'debug-tab-matcher'}
           header={
             <>
-              <h2 className="title title-sm">{messages.pages.debug.matcherTitle}</h2>
-              <p className="subtitle">{messages.pages.debug.matcherSubtitle}</p>
+              <h2 className={'title title-sm'}>{messages.pages.debug.matcherTitle}</h2>
+              <p className={'subtitle'}>{messages.pages.debug.matcherSubtitle}</p>
             </>
           }
-          bodyClassName="stack"
+          bodyClassName={'stack'}
         >
           {matcherTests.map((test) => (
             <TestResultCard
@@ -350,22 +350,22 @@ export function DebugPage({
               passed={test.passed}
             />
           ))}
-          {!matcherHasFailures ? <div className="empty-state">{messages.pages.debug.allMatcherPass}</div> : null}
+          {!matcherHasFailures ? <div className={'empty-state'}>{messages.pages.debug.allMatcherPass}</div> : null}
         </Card>
       ) : null}
 
       {activeTab === 'quantity' ? (
         <Card
-          id="debug-panel-quantity"
-          role="tabpanel"
-          aria-labelledby="debug-tab-quantity"
+          id={'debug-panel-quantity'}
+          role={'tabpanel'}
+          aria-labelledby={'debug-tab-quantity'}
           header={
             <>
-              <h2 className="title title-sm">{messages.pages.debug.quantityTitle}</h2>
-              <p className="subtitle">{messages.pages.debug.quantitySubtitle}</p>
+              <h2 className={'title title-sm'}>{messages.pages.debug.quantityTitle}</h2>
+              <p className={'subtitle'}>{messages.pages.debug.quantitySubtitle}</p>
             </>
           }
-          bodyClassName="stack"
+          bodyClassName={'stack'}
         >
           {countQuantityTests.map((test) => (
             <TestResultCard
@@ -388,22 +388,22 @@ export function DebugPage({
               passed={test.passed}
             />
           ))}
-          {!countQuantityHasFailures ? <div className="empty-state">{messages.pages.debug.allQuantityPass}</div> : null}
+          {!countQuantityHasFailures ? <div className={'empty-state'}>{messages.pages.debug.allQuantityPass}</div> : null}
         </Card>
       ) : null}
 
       {activeTab === 'measurements' ? (
         <Card
-          id="debug-panel-measurements"
-          role="tabpanel"
-          aria-labelledby="debug-tab-measurements"
+          id={'debug-panel-measurements'}
+          role={'tabpanel'}
+          aria-labelledby={'debug-tab-measurements'}
           header={
             <>
-              <h2 className="title title-sm">{messages.pages.debug.measurementTitle}</h2>
-              <p className="subtitle">{messages.pages.debug.measurementSubtitle}</p>
+              <h2 className={'title title-sm'}>{messages.pages.debug.measurementTitle}</h2>
+              <p className={'subtitle'}>{messages.pages.debug.measurementSubtitle}</p>
             </>
           }
-          bodyClassName="stack"
+          bodyClassName={'stack'}
         >
           {measurementTests.map((test) => (
             <TestResultCard
@@ -417,23 +417,23 @@ export function DebugPage({
             />
           ))}
           {!measurementHasFailures ? (
-            <div className="empty-state">{messages.pages.debug.allMeasurementPass}</div>
+            <div className={'empty-state'}>{messages.pages.debug.allMeasurementPass}</div>
           ) : null}
         </Card>
       ) : null}
 
       {activeTab === 'weights' ? (
         <Card
-          id="debug-panel-weights"
-          role="tabpanel"
-          aria-labelledby="debug-tab-weights"
+          id={'debug-panel-weights'}
+          role={'tabpanel'}
+          aria-labelledby={'debug-tab-weights'}
           header={
             <>
-              <h2 className="title title-sm">{messages.pages.debug.weightTitle}</h2>
-              <p className="subtitle">{messages.pages.debug.weightSubtitle}</p>
+              <h2 className={'title title-sm'}>{messages.pages.debug.weightTitle}</h2>
+              <p className={'subtitle'}>{messages.pages.debug.weightSubtitle}</p>
             </>
           }
-          bodyClassName="stack"
+          bodyClassName={'stack'}
         >
           {unitQuantityTests.map((test) => (
             <TestResultCard
@@ -464,22 +464,22 @@ export function DebugPage({
               passed={test.passed}
             />
           ))}
-          {!unitQuantityHasFailures ? <div className="empty-state">{messages.pages.debug.allWeightPass}</div> : null}
+          {!unitQuantityHasFailures ? <div className={'empty-state'}>{messages.pages.debug.allWeightPass}</div> : null}
         </Card>
       ) : null}
 
       {activeTab === 'variants' ? (
         <Card
-          id="debug-panel-variants"
-          role="tabpanel"
-          aria-labelledby="debug-tab-variants"
+          id={'debug-panel-variants'}
+          role={'tabpanel'}
+          aria-labelledby={'debug-tab-variants'}
           header={
             <>
-              <h2 className="title title-sm">{messages.pages.debug.variantTitle}</h2>
-              <p className="subtitle">{messages.pages.debug.variantSubtitle}</p>
+              <h2 className={'title title-sm'}>{messages.pages.debug.variantTitle}</h2>
+              <p className={'subtitle'}>{messages.pages.debug.variantSubtitle}</p>
             </>
           }
-          bodyClassName="stack"
+          bodyClassName={'stack'}
         >
           {variantTests.map((test) => (
             <TestResultCard
@@ -494,22 +494,22 @@ export function DebugPage({
               passed={test.passed}
             />
           ))}
-          {!variantHasFailures ? <div className="empty-state">{messages.pages.debug.allVariantPass}</div> : null}
+          {!variantHasFailures ? <div className={'empty-state'}>{messages.pages.debug.allVariantPass}</div> : null}
         </Card>
       ) : null}
 
       {activeTab === 'storage' ? (
         <Card
-          id="debug-panel-storage"
-          role="tabpanel"
-          aria-labelledby="debug-tab-storage"
+          id={'debug-panel-storage'}
+          role={'tabpanel'}
+          aria-labelledby={'debug-tab-storage'}
           header={
             <>
-              <h2 className="title title-sm">{messages.pages.debug.storageTitle}</h2>
-              <p className="subtitle">{messages.pages.debug.storageSubtitle}</p>
+              <h2 className={'title title-sm'}>{messages.pages.debug.storageTitle}</h2>
+              <p className={'subtitle'}>{messages.pages.debug.storageSubtitle}</p>
             </>
           }
-          bodyClassName="stack"
+          bodyClassName={'stack'}
         >
           {storageTests.map((test) => (
             <TestResultCard
@@ -520,61 +520,61 @@ export function DebugPage({
               passed={test.passed}
             />
           ))}
-          {!storageHasFailures ? <div className="empty-state">{messages.pages.debug.allStoragePass}</div> : null}
+          {!storageHasFailures ? <div className={'empty-state'}>{messages.pages.debug.allStoragePass}</div> : null}
         </Card>
       ) : null}
 
       {activeTab === 'layout' ? (
         <Card
-          id="debug-panel-layout"
-          role="tabpanel"
-          aria-labelledby="debug-tab-layout"
+          id={'debug-panel-layout'}
+          role={'tabpanel'}
+          aria-labelledby={'debug-tab-layout'}
           header={
             <>
-              <h2 className="title title-sm">{messages.pages.debug.layoutTitle}</h2>
-              <p className="subtitle">{messages.pages.debug.layoutSubtitle}</p>
+              <h2 className={'title title-sm'}>{messages.pages.debug.layoutTitle}</h2>
+              <p className={'subtitle'}>{messages.pages.debug.layoutSubtitle}</p>
             </>
           }
-          bodyClassName="stack"
+          bodyClassName={'stack'}
         >
-          <div className="table-wrap">
-            <table className="debug-table">
+          <div className={'table-wrap'}>
+            <table className={'debug-table'}>
               <tbody>
                 <tr>
-                  <th scope="row">{messages.labels.countryProfile}</th>
+                  <th scope={'row'}>{messages.labels.countryProfile}</th>
                   <td>
                     {config.flag} {config.label} ({config.code.toUpperCase()})
                   </td>
                 </tr>
                 <tr>
-                  <th scope="row">{messages.labels.measurementMode}</th>
+                  <th scope={'row'}>{messages.labels.measurementMode}</th>
                   <td>
                     {measurementModeLabels[config.measurement.displayMode]} · {config.measurement.unitSystem}
                   </td>
                 </tr>
                 <tr>
-                  <th scope="row">{messages.labels.group}</th>
+                  <th scope={'row'}>{messages.labels.group}</th>
                   <td>{config.groups.length}</td>
                 </tr>
                 <tr>
-                  <th scope="row">{messages.labels.section}</th>
+                  <th scope={'row'}>{messages.labels.section}</th>
                   <td>{layoutSectionCount}</td>
                 </tr>
                 <tr>
-                  <th scope="row">{messages.labels.keywords}</th>
+                  <th scope={'row'}>{messages.labels.keywords}</th>
                   <td>{layoutKeywordCount}</td>
                 </tr>
               </tbody>
             </table>
           </div>
-          <div className="table-wrap">
-            <table className="debug-table">
+          <div className={'table-wrap'}>
+            <table className={'debug-table'}>
               <thead>
                 <tr>
-                  <th scope="col">{messages.labels.order}</th>
-                  <th scope="col">{messages.labels.group}</th>
-                  <th scope="col">{messages.labels.section}</th>
-                  <th scope="col">{messages.labels.keywords}</th>
+                  <th scope={'col'}>{messages.labels.order}</th>
+                  <th scope={'col'}>{messages.labels.group}</th>
+                  <th scope={'col'}>{messages.labels.section}</th>
+                  <th scope={'col'}>{messages.labels.keywords}</th>
                 </tr>
               </thead>
               <tbody>
@@ -584,12 +584,12 @@ export function DebugPage({
                     <td>
                       {group.label}
                       <br />
-                      <span className="muted">{group.key}</span>
+                      <span className={'muted'}>{group.key}</span>
                     </td>
                     <td>
                       {section.label}
                       <br />
-                      <span className="muted">{section.key}</span>
+                      <span className={'muted'}>{section.key}</span>
                     </td>
                     <td>
                       {section.keywords.length}
@@ -604,7 +604,7 @@ export function DebugPage({
       ) : null}
 
       {activeTab === 'sections' ? (
-        <div id="debug-panel-sections" role="tabpanel" aria-labelledby="debug-tab-sections">
+        <div id={'debug-panel-sections'} role={'tabpanel'} aria-labelledby={'debug-tab-sections'}>
           <SectionsPage config={config} />
         </div>
       ) : null}

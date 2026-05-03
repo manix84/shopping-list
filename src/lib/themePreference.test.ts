@@ -27,10 +27,23 @@ describe('theme preference', () => {
     expect(loadThemeMode()).toBe('dark');
   });
 
+  it('falls back when the saved theme is invalid or storage is unavailable', () => {
+    vi.stubGlobal('window', createWindowMock({ storageSeed: { [THEME_STORAGE_KEY]: 'sepia' } }));
+    expect(loadThemeMode()).toBe('system');
+
+    vi.unstubAllGlobals();
+    expect(loadThemeMode()).toBe('system');
+    expect(() => saveThemeMode('dark')).not.toThrow();
+  });
+
   it('resolves theme from system preference', () => {
     vi.stubGlobal('window', createWindowMock({ prefersDark: true }));
     expect(getResolvedTheme('system')).toBe('dark');
     expect(getResolvedTheme('light')).toBe('light');
+  });
+
+  it('resolves system theme to light when dark preference is unavailable', () => {
+    expect(getResolvedTheme('system')).toBe('light');
   });
 
   it('formats labels', () => {

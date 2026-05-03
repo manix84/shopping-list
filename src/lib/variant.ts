@@ -126,7 +126,7 @@ const keywordCandidates = (config: CountryConfig | undefined): string[] =>
   ).sort((a, b) => b.length - a.length);
 
 const findVariantableSuffix = (normalizedName: string, candidates: string[]): string | undefined => {
-  if (VARIANT_EXTRACTION_EXCLUSIONS.has(normalizedName)) return undefined;
+  if (VARIANT_EXTRACTION_EXCLUSIONS.has(normalizedName)) { return undefined; }
 
   return candidates
     .filter((keyword) => keyword !== normalizedName && VARIANTABLE_BASE_KEYWORDS.has(keyword))
@@ -135,7 +135,7 @@ const findVariantableSuffix = (normalizedName: string, candidates: string[]): st
 
 const extractByRule = (normalizedName: string): ExtractedVariant | undefined => {
   for (const rule of DRINK_VARIANT_RULES) {
-    if (normalizedName === rule.base) continue;
+    if (normalizedName === rule.base) { continue; }
 
     for (const variant of rule.variants) {
       if (normalizedName === `${variant} ${rule.base}` || normalizedName === `${rule.base} ${variant}`) {
@@ -171,12 +171,12 @@ export const extractVariant = (value: unknown, config: CountryConfig | undefined
   }
 
   const normalizedName = normalize(trimmed);
-  if (!normalizedName) return { name: trimmed };
-  if (VARIANT_EXTRACTION_EXCLUSIONS.has(normalizedName)) return { name: trimmed };
+  if (!normalizedName) { return { name: trimmed }; }
+  if (VARIANT_EXTRACTION_EXCLUSIONS.has(normalizedName)) { return { name: trimmed }; }
 
   const candidates = keywordCandidates(config);
   const ruleMatch = extractByRule(normalizedName);
-  if (ruleMatch) return ruleMatch;
+  if (ruleMatch) { return ruleMatch; }
 
   const defaultVariant = DEFAULT_VARIANTS.get(normalizedName);
   if (defaultVariant) {
@@ -202,7 +202,7 @@ export const extractVariant = (value: unknown, config: CountryConfig | undefined
   }
 
   const match = candidates.find((keyword) => normalizedName.endsWith(` ${keyword}`));
-  if (!match) return { name: trimmed };
+  if (!match) { return { name: trimmed }; }
 
   const variant = normalizedName.slice(0, -match.length).trim();
   if (!variant || cleanEntryName(variant) === cleanEntryName(match)) {

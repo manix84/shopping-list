@@ -11,9 +11,9 @@ export function PageTabs({ page, hasItems, onChange }: PageTabsProps) {
   const { messages } = useI18n();
 
   return (
-    <nav className="button-row" aria-label={messages.app.title}>
+    <nav className={'button-row'} aria-label={messages.app.title}>
       <button
-        type="button"
+        type={'button'}
         className={`button ${page === 'edit' ? 'button-active' : ''}`}
         aria-current={page === 'edit' ? 'page' : undefined}
         onClick={() => onChange('edit')}
@@ -21,7 +21,7 @@ export function PageTabs({ page, hasItems, onChange }: PageTabsProps) {
         {messages.nav.editList}
       </button>
       <button
-        type="button"
+        type={'button'}
         className={`button ${page === 'route' ? 'button-active' : ''}`}
         aria-current={page === 'route' ? 'page' : undefined}
         aria-disabled={!hasItems}
@@ -30,7 +30,7 @@ export function PageTabs({ page, hasItems, onChange }: PageTabsProps) {
         {messages.nav.route}
       </button>
       <button
-        type="button"
+        type={'button'}
         className={`button ${page === 'settings' ? 'button-active' : ''}`}
         aria-current={page === 'settings' ? 'page' : undefined}
         onClick={() => onChange('settings')}
@@ -38,7 +38,7 @@ export function PageTabs({ page, hasItems, onChange }: PageTabsProps) {
         {messages.nav.settings}
       </button>
       <button
-        type="button"
+        type={'button'}
         className={`button ${page === 'about' ? 'button-active' : ''}`}
         aria-current={page === 'about' ? 'page' : undefined}
         onClick={() => onChange('about')}

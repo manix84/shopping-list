@@ -23,7 +23,7 @@ export const Link: Story = {
   },
   render: (args) => (
     <StoryCanvas>
-      <Card bodyClassName="stack">
+      <Card bodyClassName={'stack'}>
         <DebugLink {...args} />
       </Card>
     </StoryCanvas>

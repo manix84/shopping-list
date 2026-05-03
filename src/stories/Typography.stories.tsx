@@ -20,21 +20,21 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   render: () => (
     <DesignSystemStory>
-      <StorySection title="Typography">
-        <div className="stack">
+      <StorySection title={'Typography'}>
+        <div className={'stack'}>
           <div>
-            <h1 className="title">Page title</h1>
-            <p className="subtitle">A short supporting line for page-level context.</p>
+            <h1 className={'title'}>Page title</h1>
+            <p className={'subtitle'}>A short supporting line for page-level context.</p>
           </div>
           <div>
-            <h2 className="title title-md">Section title</h2>
-            <p className="subtitle">Used for primary cards and app-level views.</p>
+            <h2 className={'title title-md'}>Section title</h2>
+            <p className={'subtitle'}>Used for primary cards and app-level views.</p>
           </div>
           <div>
-            <h3 className="title title-sm">Panel title</h3>
-            <p className="small-text">Small text carries helper copy, metadata, and quieter labels.</p>
+            <h3 className={'title title-sm'}>Panel title</h3>
+            <p className={'small-text'}>Small text carries helper copy, metadata, and quieter labels.</p>
           </div>
-          <div className="section-group">Section group label</div>
+          <div className={'section-group'}>Section group label</div>
         </div>
       </StorySection>
     </DesignSystemStory>

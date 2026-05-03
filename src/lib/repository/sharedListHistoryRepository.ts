@@ -15,7 +15,7 @@ const isHistoryEntry = (value: unknown): value is SharedListHistoryEntry =>
   );
 
 const sanitizeEntries = (value: unknown): SharedListHistoryEntry[] => {
-  if (!Array.isArray(value)) return [];
+  if (!Array.isArray(value)) { return []; }
 
   return value
     .filter(isHistoryEntry)
@@ -32,7 +32,7 @@ const sanitizeEntries = (value: unknown): SharedListHistoryEntry[] => {
 
 export const sharedListHistoryRepository = {
   load(): SharedListHistoryEntry[] {
-    if (typeof window === 'undefined') return [];
+    if (typeof window === 'undefined') { return []; }
 
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
@@ -42,7 +42,7 @@ export const sharedListHistoryRepository = {
     }
   },
   save(entries: SharedListHistoryEntry[]): void {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined') { return; }
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitizeEntries(entries)));
   },
   remember(entry: SharedListHistoryEntry): SharedListHistoryEntry[] {

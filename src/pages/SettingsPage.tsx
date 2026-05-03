@@ -31,12 +31,12 @@ type ThemeIconProps = {
 };
 
 function ThemeIcon({ mode }: ThemeIconProps) {
-  return <span aria-hidden="true" className={`theme-option-icon theme-option-icon-${mode}`} />;
+  return <span aria-hidden={'true'} className={`theme-option-icon theme-option-icon-${mode}`} />;
 }
 
 function LocaleIcon({ locale }: { locale: LocaleCode }) {
   return (
-    <span aria-hidden="true" className="locale-option-icon">
+    <span aria-hidden={'true'} className={'locale-option-icon'}>
       {locale.toUpperCase()}
     </span>
   );
@@ -44,19 +44,19 @@ function LocaleIcon({ locale }: { locale: LocaleCode }) {
 
 function RouteDensityPreview({ mode }: { mode: RouteViewMode }) {
   return (
-    <span aria-hidden="true" className={`route-density-preview route-density-preview-${mode}`}>
-      <span className="route-density-preview-shell">
-        <span className="route-density-preview-row">
-          <span className="route-density-preview-dot" />
-          <span className="route-density-preview-line route-density-preview-line-title" />
+    <span aria-hidden={'true'} className={`route-density-preview route-density-preview-${mode}`}>
+      <span className={'route-density-preview-shell'}>
+        <span className={'route-density-preview-row'}>
+          <span className={'route-density-preview-dot'} />
+          <span className={'route-density-preview-line route-density-preview-line-title'} />
         </span>
-        <span className="route-density-preview-row">
-          <span className="route-density-preview-dot" />
-          <span className="route-density-preview-line" />
+        <span className={'route-density-preview-row'}>
+          <span className={'route-density-preview-dot'} />
+          <span className={'route-density-preview-line'} />
         </span>
-        <span className="route-density-preview-row">
-          <span className="route-density-preview-dot" />
-          <span className="route-density-preview-line route-density-preview-line-short" />
+        <span className={'route-density-preview-row'}>
+          <span className={'route-density-preview-dot'} />
+          <span className={'route-density-preview-line route-density-preview-line-short'} />
         </span>
       </span>
     </span>
@@ -80,7 +80,7 @@ function SettingsSelect<T extends string>({
 
   return (
     <div
-      className="settings-select"
+      className={'settings-select'}
       onBlur={(event) => {
         if (!(event.relatedTarget instanceof Node) || !event.currentTarget.contains(event.relatedTarget)) {
           setOpen(false);
@@ -89,9 +89,9 @@ function SettingsSelect<T extends string>({
     >
       <button
         id={id}
-        type="button"
-        className="select settings-select-button"
-        aria-haspopup="listbox"
+        type={'button'}
+        className={'select settings-select-button'}
+        aria-haspopup={'listbox'}
         aria-expanded={open}
         aria-controls={open ? menuId : undefined}
         onClick={() => setOpen((current) => !current)}
@@ -101,22 +101,22 @@ function SettingsSelect<T extends string>({
           }
         }}
       >
-        <span className="settings-option-content">
-          {selectedOption.icon ? <span className="settings-option-icon-slot">{selectedOption.icon}</span> : null}
+        <span className={'settings-option-content'}>
+          {selectedOption.icon ? <span className={'settings-option-icon-slot'}>{selectedOption.icon}</span> : null}
           <span>{selectedOption.label}</span>
         </span>
-        <svg aria-hidden="true" className="settings-select-chevron-svg" viewBox="0 0 24 24">
-          <path d={mdiChevronDown} fill="currentColor" />
+        <svg aria-hidden={'true'} className={'settings-select-chevron-svg'} viewBox={'0 0 24 24'}>
+          <path d={mdiChevronDown} fill={'currentColor'} />
         </svg>
       </button>
 
       {open ? (
-        <div id={menuId} className="settings-select-menu" role="listbox" aria-labelledby={id}>
+        <div id={menuId} className={'settings-select-menu'} role={'listbox'} aria-labelledby={id}>
           {options.map((option) => (
             <button
               key={option.value}
-              type="button"
-              role="option"
+              type={'button'}
+              role={'option'}
               aria-selected={value === option.value}
               className={`settings-select-option ${value === option.value ? 'settings-select-option-active' : ''}`}
               onClick={() => {
@@ -124,8 +124,8 @@ function SettingsSelect<T extends string>({
                 setOpen(false);
               }}
             >
-              <span className="settings-option-content">
-                {option.icon ? <span className="settings-option-icon-slot">{option.icon}</span> : null}
+              <span className={'settings-option-content'}>
+                {option.icon ? <span className={'settings-option-icon-slot'}>{option.icon}</span> : null}
                 <span>{option.label}</span>
               </span>
             </button>
@@ -177,18 +177,18 @@ export function SettingsPage({
     : messages.pwaInstall.unavailableDescription;
 
   const installSetting = shouldShowInstallSetting ? (
-    <div className="settings-install-row">
-      <div className="settings-install-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24">
-          <path d={mdiDownload} fill="currentColor" />
+    <div className={'settings-install-row'}>
+      <div className={'settings-install-icon'} aria-hidden={'true'}>
+        <svg viewBox={'0 0 24 24'}>
+          <path d={mdiDownload} fill={'currentColor'} />
         </svg>
       </div>
-      <div className="settings-install-copy">
+      <div className={'settings-install-copy'}>
         <h3>{installTitle}</h3>
         <p>{installDescription}</p>
       </div>
       {canPromptInstall && !isInstalled ? (
-        <button type="button" className="button button-primary" onClick={onInstall}>
+        <button type={'button'} className={'button button-primary'} onClick={onInstall}>
           {messages.pwaInstall.installAction}
         </button>
       ) : null}
@@ -200,40 +200,40 @@ export function SettingsPage({
       <Card
         header={
           <>
-            <h2 className="title title-md">{messages.pages.settings.title}</h2>
-            <p className="subtitle">{messages.pages.settings.subtitle}</p>
+            <h2 className={'title title-md'}>{messages.pages.settings.title}</h2>
+            <p className={'subtitle'}>{messages.pages.settings.subtitle}</p>
           </>
         }
-        bodyClassName="stack"
+        bodyClassName={'stack'}
       >
-        <div className="field field-compact">
+        <div className={'field field-compact'}>
           <div>
-            <label htmlFor="locale-select">{messages.pages.settings.localeLabel}</label>
-            <div className="small-text">{messages.pages.settings.localeSubtitle}</div>
+            <label htmlFor={'locale-select'}>{messages.pages.settings.localeLabel}</label>
+            <div className={'small-text'}>{messages.pages.settings.localeSubtitle}</div>
           </div>
           <SettingsSelect
-            id="locale-select"
+            id={'locale-select'}
             value={locale}
             options={localeOptions}
             onChange={setLocale}
           />
         </div>
 
-        <div className="field field-compact">
+        <div className={'field field-compact'}>
           <div>
-            <label htmlFor="theme-select">{messages.pages.settings.themeLabel}</label>
-            <div className="small-text">{messages.pages.settings.themeSubtitle}</div>
+            <label htmlFor={'theme-select'}>{messages.pages.settings.themeLabel}</label>
+            <div className={'small-text'}>{messages.pages.settings.themeSubtitle}</div>
           </div>
-          <SettingsSelect id="theme-select" value={themeMode} options={themeOptions} onChange={onThemeChange} />
+          <SettingsSelect id={'theme-select'} value={themeMode} options={themeOptions} onChange={onThemeChange} />
         </div>
 
-        <div className="field field-compact">
+        <div className={'field field-compact'}>
           <div>
-            <label htmlFor="route-density-select">{messages.pages.settings.routeDensityLabel}</label>
-            <div className="small-text">{messages.pages.settings.routeDensitySubtitle}</div>
+            <label htmlFor={'route-density-select'}>{messages.pages.settings.routeDensityLabel}</label>
+            <div className={'small-text'}>{messages.pages.settings.routeDensitySubtitle}</div>
           </div>
           <SettingsSelect
-            id="route-density-select"
+            id={'route-density-select'}
             value={routeViewMode}
             options={routeDensityOptions}
             onChange={onRouteViewModeChange}
@@ -241,7 +241,7 @@ export function SettingsPage({
         </div>
 
         <DebugLink onOpen={onOpenDebug} />
-        <div className="settings-footnote small-text">{messages.labels.storedLocally}</div>
+        <div className={'settings-footnote small-text'}>{messages.labels.storedLocally}</div>
       </Card>
       {installSetting}
     </>

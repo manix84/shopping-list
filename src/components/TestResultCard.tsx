@@ -17,17 +17,17 @@ export function TestResultCard({ title, expected, actual, passed, tone, label }:
   const badgeLabel = label ?? (passed ? messages.pages.debug.pass : messages.pages.debug.fail);
 
   return (
-    <div className="test-card">
-      <div className="card-body">
-        <div className="item-row">
+    <div className={'test-card'}>
+      <div className={'card-body'}>
+        <div className={'item-row'}>
           <div>
             <div>
               <strong>{title}</strong>
             </div>
-            <div className="small-text">
+            <div className={'small-text'}>
               {messages.pages.debug.expected} {expected}
             </div>
-            <div className="small-text">
+            <div className={'small-text'}>
               {messages.pages.debug.got} {actual}
             </div>
           </div>

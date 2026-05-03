@@ -10,7 +10,7 @@ type DecodeShoppingListRecordOptions = {
 };
 
 const isValidItem = (value: unknown, config: CountryConfig): value is Item => {
-  if (!value || typeof value !== 'object') return false;
+  if (!value || typeof value !== 'object') { return false; }
 
   const item = value as Partial<Item>;
   const sectionKeys = new Set(config.groups.flatMap((group) => group.sections.map((section) => section.key)));

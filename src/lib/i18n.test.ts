@@ -20,7 +20,7 @@ import {
 } from './i18n';
 
 const flattenMessageKeys = (value: unknown, prefix = ''): string[] => {
-  if (!value || typeof value !== 'object') return [prefix];
+  if (!value || typeof value !== 'object') { return [prefix]; }
 
   return Object.entries(value).flatMap(([key, nestedValue]) =>
     flattenMessageKeys(nestedValue, prefix ? `${prefix}.${key}` : key),
@@ -28,8 +28,8 @@ const flattenMessageKeys = (value: unknown, prefix = ''): string[] => {
 };
 
 const flattenMessageValues = (value: unknown): string[] => {
-  if (typeof value === 'string') return [value];
-  if (!value || typeof value !== 'object') return [];
+  if (typeof value === 'string') { return [value]; }
+  if (!value || typeof value !== 'object') { return []; }
   return Object.values(value).flatMap(flattenMessageValues);
 };
 

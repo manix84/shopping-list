@@ -20,18 +20,18 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   render: () => (
     <DesignSystemStory>
-      <StorySection title="Actions">
-        <div className="button-row">
-          <button type="button" className="button button-primary">
+      <StorySection title={'Actions'}>
+        <div className={'button-row'}>
+          <button type={'button'} className={'button button-primary'}>
             Primary action
           </button>
-          <button type="button" className="button">
+          <button type={'button'} className={'button'}>
             Secondary action
           </button>
-          <button type="button" className="button button-danger">
+          <button type={'button'} className={'button button-danger'}>
             Dangerous action
           </button>
-          <button type="button" className="button button-link">
+          <button type={'button'} className={'button button-link'}>
             Link action
           </button>
         </div>

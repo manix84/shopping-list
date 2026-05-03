@@ -8,13 +8,13 @@ export const parseQuantityValue = (quantity: unknown): number | undefined => {
   const cleanedQuantity = cleanLine(quantity).toLowerCase().replace(/\s+/g, ' ');
 
   let match = cleanedQuantity.match(/^x\s*(\d+(?:\.\d+)?)$/i);
-  if (match) return Number(match[1]);
+  if (match) { return Number(match[1]); }
 
   match = cleanedQuantity.match(/^(\d+(?:\.\d+)?)\s*x$/i);
-  if (match) return Number(match[1]);
+  if (match) { return Number(match[1]); }
 
   match = cleanedQuantity.match(/^(\d+(?:\.\d+)?)$/i);
-  if (match) return Number(match[1]);
+  if (match) { return Number(match[1]); }
 
   return undefined;
 };
@@ -72,7 +72,7 @@ const extractUnitQuantity = (value: string): { quantity?: string; name: string }
 export const extractQuantifiedItem = (value: unknown, config?: CountryConfig): ExtractedQuantifiedItem => {
   const trimmed = cleanLine(value);
   const measured = extractMeasurementQuantity(trimmed, config);
-  if (measured) return measured;
+  if (measured) { return measured; }
 
   const counted = extractCountQuantity(trimmed);
   const unitized = extractUnitQuantity(counted.name);

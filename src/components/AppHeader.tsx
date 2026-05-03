@@ -19,9 +19,9 @@ type AppHeaderProps = {
 };
 
 const backendBadge = (status: BackendStatus, messages: Messages) => {
-  if (status.state === 'connected') return { tone: 'success' as const, label: messages.backendStatus.connected };
-  if (status.state === 'checking') return undefined;
-  if (status.state === 'error') return { tone: 'danger' as const, label: messages.backendStatus.issue };
+  if (status.state === 'connected') { return { tone: 'success' as const, label: messages.backendStatus.connected }; }
+  if (status.state === 'checking') { return undefined; }
+  if (status.state === 'error') { return { tone: 'danger' as const, label: messages.backendStatus.issue }; }
   return { tone: 'danger' as const, label: messages.backendStatus.frontendOnly };
 };
 
@@ -60,7 +60,7 @@ export function AppHeader({
     setConnectionBadgeVisible(true);
     setConnectionBadgeLeaving(false);
 
-    if (backendStatus.state !== 'connected') return;
+    if (backendStatus.state !== 'connected') { return; }
 
     const fadeTimer = window.setTimeout(() => {
       setConnectionBadgeLeaving(true);
@@ -85,28 +85,28 @@ export function AppHeader({
   const logoHref = `${import.meta.env.BASE_URL}logo-mark.png`;
 
   return (
-    <header className="app-header">
-      <div className="app-header-inner">
+    <header className={'app-header'}>
+      <div className={'app-header-inner'}>
         <Card
-          className="app-header-card"
+          className={'app-header-card'}
           header={
-            <div className="title-row">
-              <div className="title-block">
-                <div className="app-icon">
-                  <img className="app-icon-image" src={logoHref} alt="" width="48" height="48" />
+            <div className={'title-row'}>
+              <div className={'title-block'}>
+                <div className={'app-icon'}>
+                  <img className={'app-icon-image'} src={logoHref} alt={''} width={'48'} height={'48'} />
                 </div>
                 <div>
-                  <h1 className="title">{messages.app.title}</h1>
-                  <p className="subtitle">{messages.app.subtitle}</p>
+                  <h1 className={'title'}>{messages.app.title}</h1>
+                  <p className={'subtitle'}>{messages.app.subtitle}</p>
                 </div>
               </div>
 
-              <div className="header-actions">
+              <div className={'header-actions'}>
                 {badge && connectionBadgeVisible ? (
-                  <div className="connection-badge-shell" aria-live="polite">
+                  <div className={'connection-badge-shell'} aria-live={'polite'}>
                     <button
-                      type="button"
-                      className="connection-badge-button"
+                      type={'button'}
+                      className={'connection-badge-button'}
                       aria-expanded={canShowOfflineInfo ? offlineInfoOpen : undefined}
                       aria-describedby={canShowOfflineInfo && offlineInfoOpen ? 'offline-status-popover' : undefined}
                       disabled={!canShowOfflineInfo}
@@ -124,7 +124,7 @@ export function AppHeader({
                       </Badge>
                     </button>
                     {canShowOfflineInfo && offlineInfoOpen ? (
-                      <div id="offline-status-popover" className="connection-popover" role="tooltip">
+                      <div id={'offline-status-popover'} className={'connection-popover'} role={'tooltip'}>
                         <strong>{messages.backendStatus.offlineTitle}</strong>
                         <p>{messages.backendStatus.offlineDescription}</p>
                         <p>{messages.backendStatus.offlineSyncDescription}</p>
@@ -132,28 +132,28 @@ export function AppHeader({
                     ) : null}
                   </div>
                 ) : null}
-                <div className="desktop-menu-shell">
+                <div className={'desktop-menu-shell'}>
                   <PageTabs page={page} hasItems={hasItems} onChange={handleChangePage} />
                 </div>
 
-                <div className="mobile-menu-shell">
+                <div className={'mobile-menu-shell'}>
                   <button
-                    type="button"
-                    className="button mobile-menu-trigger"
+                    type={'button'}
+                    className={'button mobile-menu-trigger'}
                     aria-label={mobileMenuLabel}
                     aria-expanded={mobileMenuOpen}
                     aria-controls={mobileMenuOpen ? 'mobile-menu-panel' : undefined}
                     title={mobileMenuLabel}
                     onClick={() => setMobileMenuOpen((current) => !current)}
                   >
-                    <span className="sr-only">{mobileMenuLabel}</span>
-                    <svg aria-hidden="true" className="button-icon-svg" viewBox="0 0 24 24">
-                      <path d={mdiMenu} fill="currentColor" />
+                    <span className={'sr-only'}>{mobileMenuLabel}</span>
+                    <svg aria-hidden={'true'} className={'button-icon-svg'} viewBox={'0 0 24 24'}>
+                      <path d={mdiMenu} fill={'currentColor'} />
                     </svg>
                   </button>
 
                   {mobileMenuOpen ? (
-                    <div id="mobile-menu-panel" className="mobile-menu-panel">
+                    <div id={'mobile-menu-panel'} className={'mobile-menu-panel'}>
                       <PageTabs page={page} hasItems={hasItems} onChange={handleChangePage} />
                     </div>
                   ) : null}

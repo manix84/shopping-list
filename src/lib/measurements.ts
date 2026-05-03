@@ -109,7 +109,7 @@ const findUnitDefinition = (unit: string): UnitDefinition | undefined => {
 
 export const parseMeasurementNumber = (value: unknown): number | undefined => {
   const cleaned = cleanLine(value).replace(/⁄/g, '/');
-  if (!cleaned) return undefined;
+  if (!cleaned) { return undefined; }
 
   const mixedFraction = cleaned.match(/^(\d+)\s*([¼½¾⅓⅔⅛⅜⅝⅞])$/);
   if (mixedFraction) {
@@ -119,32 +119,32 @@ export const parseMeasurementNumber = (value: unknown): number | undefined => {
   const spacedMixedFraction = cleaned.match(/^(\d+)\s+(\d+)\s*\/\s*(\d+)$/);
   if (spacedMixedFraction) {
     const denominator = Number(spacedMixedFraction[3]);
-    if (denominator === 0) return undefined;
+    if (denominator === 0) { return undefined; }
     return Number(spacedMixedFraction[1]) + Number(spacedMixedFraction[2]) / denominator;
   }
 
   const fraction = cleaned.match(/^(\d+)\s*\/\s*(\d+)$/);
   if (fraction) {
     const denominator = Number(fraction[2]);
-    if (denominator === 0) return undefined;
+    if (denominator === 0) { return undefined; }
     return Number(fraction[1]) / denominator;
   }
 
   const unicodeFraction = FRACTION_VALUES.get(cleaned);
-  if (typeof unicodeFraction === 'number') return unicodeFraction;
+  if (typeof unicodeFraction === 'number') { return unicodeFraction; }
 
   const decimal = Number(cleaned);
   return Number.isFinite(decimal) ? decimal : undefined;
 };
 
 const roundMetricValue = (value: number): number => {
-  if (value >= 100) return Math.round(value);
-  if (value >= 10) return Math.round(value * 10) / 10;
+  if (value >= 100) { return Math.round(value); }
+  if (value >= 10) { return Math.round(value * 10) / 10; }
   return Math.round(value * 100) / 100;
 };
 
 const formatNumber = (value: number): string => {
-  if (Number.isInteger(value)) return String(value);
+  if (Number.isInteger(value)) { return String(value); }
   return String(value).replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '');
 };
 
@@ -152,7 +152,7 @@ export const formatMetricMeasurement = (value: number, unit: MetricMeasurementUn
   `${formatNumber(value)}${unit}`;
 
 const roundDisplayValue = (value: number): number => {
-  if (value >= 10) return Math.round(value * 10) / 10;
+  if (value >= 10) { return Math.round(value * 10) / 10; }
   return Math.round(value * 100) / 100;
 };
 
@@ -235,11 +235,11 @@ const parseMeasurementParts = (
     }
   | undefined => {
   const match = cleanLine(value).match(measurementPattern);
-  if (!match) return undefined;
+  if (!match) { return undefined; }
 
   const amount = parseMeasurementNumber(match[1]);
   const unitDefinition = findUnitDefinition(match[2]);
-  if (typeof amount !== 'number' || !unitDefinition) return undefined;
+  if (typeof amount !== 'number' || !unitDefinition) { return undefined; }
 
   const displayMetricValue = amount * unitDefinition.metricFactor[unitSystem];
   const metricValue = roundMetricValue(displayMetricValue);
@@ -256,7 +256,7 @@ export const parseMeasurement = (
   const cleaned = cleanLine(value);
   const sourceDisplayMatch = cleaned.match(/\(\s*(?:~|approx\.?)?\s*([^)]+?)\s*\)\s*$/i);
   const parsed = parseMeasurementParts(cleaned.replace(/\s*\([^)]*\)\s*$/, ''), unitSystem);
-  if (!parsed) return undefined;
+  if (!parsed) { return undefined; }
 
   const sourceDisplay = sourceDisplayMatch
     ? parseMeasurementParts(sourceDisplayMatch[1], unitSystem)
@@ -290,25 +290,25 @@ export const extractMeasurementQuantity = (
   const dashMatch = cleaned.match(/^(.+?)\s+[–—-]\s+(.+)$/);
   if (dashMatch) {
     const measurement = parseMeasurement(dashMatch[2], config);
-    if (measurement) return { name: dashMatch[1], ...measurement };
+    if (measurement) { return { name: dashMatch[1], ...measurement }; }
   }
 
   const parentheticalMatch = cleaned.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
   if (parentheticalMatch) {
     const measurement = parseMeasurement(parentheticalMatch[2], config);
-    if (measurement) return { name: parentheticalMatch[1], ...measurement };
+    if (measurement) { return { name: parentheticalMatch[1], ...measurement }; }
   }
 
   const leadingMatch = cleaned.match(new RegExp(String.raw`^(${numberPattern})\s*(${unitPattern})\.?\s+(.+)$`, 'i'));
   if (leadingMatch) {
     const measurement = parseMeasurement(`${leadingMatch[1]} ${leadingMatch[2]}`, config);
-    if (measurement) return { name: leadingMatch[3], ...measurement };
+    if (measurement) { return { name: leadingMatch[3], ...measurement }; }
   }
 
   const trailingMatch = cleaned.match(new RegExp(String.raw`^(.+?)\s+(${numberPattern})\s*(${unitPattern})\.?$`, 'i'));
   if (trailingMatch) {
     const measurement = parseMeasurement(`${trailingMatch[2]} ${trailingMatch[3]}`, config);
-    if (measurement) return { name: trailingMatch[1], ...measurement };
+    if (measurement) { return { name: trailingMatch[1], ...measurement }; }
   }
 
   return undefined;

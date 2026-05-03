@@ -85,7 +85,7 @@ function colorValueToCssVariable(value: string) {
 function formatResolvedColor(color: string) {
   const match = color.match(/^rgba?\(([^)]+)\)$/);
 
-  if (!match) return color;
+  if (!match) { return color; }
 
   const [red, green, blue, alpha = '1'] = match[1].split(',').map((part) => part.trim());
   const alphaValue = Number(alpha);
@@ -106,45 +106,45 @@ function ColorSwatch({ groupTitle, name, value }: { groupTitle: string; name: st
   const cssVariable = colorValueToCssVariable(value);
 
   useEffect(() => {
-    if (!swatchRef.current) return;
+    if (!swatchRef.current) { return; }
 
     setResolvedValue(formatResolvedColor(window.getComputedStyle(swatchRef.current).backgroundColor));
   }, [value]);
 
   return (
-    <article className="color-token-card">
+    <article className={'color-token-card'}>
       <div
         ref={swatchRef}
-        aria-hidden="true"
-        className="color-token-preview"
+        aria-hidden={'true'}
+        className={'color-token-preview'}
         style={{ '--color-token-value': value } as CSSProperties}
       />
-      <div className="color-token-content">
-        <h4 className="color-token-name">{name}</h4>
-        <dl className="color-token-details">
-          <div className="color-token-detail color-token-detail-stacked">
+      <div className={'color-token-content'}>
+        <h4 className={'color-token-name'}>{name}</h4>
+        <dl className={'color-token-details'}>
+          <div className={'color-token-detail color-token-detail-stacked'}>
             <dt>CSS Variable</dt>
-            <dd className="color-token-variable">{cssVariable}</dd>
+            <dd className={'color-token-variable'}>{cssVariable}</dd>
           </div>
-          <div className="color-token-detail">
+          <div className={'color-token-detail'}>
             <dt>Value</dt>
             <dd>{resolvedValue}</dd>
           </div>
         </dl>
       </div>
-      <span className="sr-only">{groupTitle}</span>
+      <span className={'sr-only'}>{groupTitle}</span>
     </article>
   );
 }
 
 function ColorSection({ title, subtitle, colors }: ColorGroup) {
   return (
-    <section className="color-token-section">
-      <h3 className="title title-xs" style={{ margin: '0 0 0.25rem' }}>
+    <section className={'color-token-section'}>
+      <h3 className={'title title-xs'} style={{ margin: '0 0 0.25rem' }}>
         {title}
       </h3>
-      {subtitle && <p className="subtitle">{subtitle}</p>}
-      <div className="color-token-grid">
+      {subtitle && <p className={'subtitle'}>{subtitle}</p>}
+      <div className={'color-token-grid'}>
         {Object.entries(colors).map(([name, value]) => (
           <ColorSwatch key={`${title}-${name}`} groupTitle={title} name={name} value={value} />
         ))}
@@ -156,8 +156,8 @@ function ColorSection({ title, subtitle, colors }: ColorGroup) {
 export const Default: Story = {
   render: () => (
     <DesignSystemStory>
-      <StorySection title="Color Tokens">
-        <p className="subtitle" style={{ marginTop: 0 }}>
+      <StorySection title={'Color Tokens'}>
+        <p className={'subtitle'} style={{ marginTop: 0 }}>
           CSS color variables defined in src/styles/main.scss.
         </p>
         {colorGroups.map((group) => (

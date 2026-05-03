@@ -69,6 +69,24 @@ describe('measurement display mode preference', () => {
     expect(loadMeasurementDisplayMode()).toBe('imperial');
   });
 
+  it('defaults to metric and no-ops when storage is unavailable', () => {
+    expect(loadMeasurementDisplayMode()).toBe('metric');
+    expect(() => saveMeasurementDisplayMode('imperial')).not.toThrow();
+    expect(() => saveIngredientMode(true)).not.toThrow();
+  });
+
+  it('ignores old ingredient mode storage when it is false', () => {
+    const storage = new Map<string, string>([[INGREDIENT_MODE_STORAGE_KEY, 'false']]);
+    vi.stubGlobal('window', {
+      localStorage: {
+        getItem: (key: string) => storage.get(key) ?? null,
+        setItem: (key: string, value: string) => storage.set(key, value),
+      },
+    });
+
+    expect(loadMeasurementDisplayMode()).toBe('metric');
+  });
+
   it('migrates the old ingredient mode toggle when no display mode is stored', () => {
     const storage = new Map<string, string>([[INGREDIENT_MODE_STORAGE_KEY, 'true']]);
     vi.stubGlobal('window', {
