@@ -162,6 +162,20 @@ export const MEASUREMENT_TEST_CASES: MeasurementTestCase[] = [
     expectedQuantity: '20ml',
     expectedQuantityDisplay: '4tsp',
   },
+  {
+    input: '2 1/2 tsp',
+    countryCode: 'uk',
+    displayMode: 'metric',
+    expectedQuantity: '12.5ml',
+    expectedQuantityDisplay: '12.5ml',
+  },
+  {
+    input: '8 fl. oz',
+    countryCode: 'uk',
+    displayMode: 'metric',
+    expectedQuantity: '227ml',
+    expectedQuantityDisplay: '227ml',
+  },
 ];
 
 export const VARIANT_TEST_CASES: VariantTestCase[] = [

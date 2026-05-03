@@ -62,7 +62,7 @@ const UNIT_DEFINITIONS: UnitDefinition[] = [
     displayUnit: 'cup',
   },
   {
-    aliases: ['fl oz', 'fluid ounce', 'fluid ounces'],
+    aliases: ['fl oz', 'fl. oz', 'floz', 'fluid ounce', 'fluid ounces'],
     metricUnit: 'ml',
     metricFactor: { metric: 28.4130625, 'us-customary': 29.5735295625, 'canadian-customary': 28.4130625 },
     displayUnit: 'fl oz',
@@ -98,7 +98,7 @@ const unitPattern = UNIT_DEFINITIONS.flatMap((definition) => definition.aliases)
   .map((unit) => unit.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s+'))
   .join('|');
 
-const numberPattern = String.raw`(?:\d+(?:\.\d+)?|\d+\s*[\/⁄]\s*\d+|[¼½¾⅓⅔⅛⅜⅝⅞]|\d+\s*[¼½¾⅓⅔⅛⅜⅝⅞])`;
+const numberPattern = String.raw`(?:\d+(?:\.\d+)?|\d+\s+\d+\s*[\/⁄]\s*\d+|\d+\s*[\/⁄]\s*\d+|[¼½¾⅓⅔⅛⅜⅝⅞]|\d+\s*[¼½¾⅓⅔⅛⅜⅝⅞])`;
 const measurementPattern = new RegExp(String.raw`^\s*(${numberPattern})\s*(${unitPattern})\.?\s*$`, 'i');
 
 const findUnitDefinition = (unit: string): UnitDefinition | undefined => {
@@ -114,6 +114,13 @@ export const parseMeasurementNumber = (value: unknown): number | undefined => {
   const mixedFraction = cleaned.match(/^(\d+)\s*([¼½¾⅓⅔⅛⅜⅝⅞])$/);
   if (mixedFraction) {
     return Number(mixedFraction[1]) + (FRACTION_VALUES.get(mixedFraction[2]) ?? 0);
+  }
+
+  const spacedMixedFraction = cleaned.match(/^(\d+)\s+(\d+)\s*\/\s*(\d+)$/);
+  if (spacedMixedFraction) {
+    const denominator = Number(spacedMixedFraction[3]);
+    if (denominator === 0) return undefined;
+    return Number(spacedMixedFraction[1]) + Number(spacedMixedFraction[2]) / denominator;
   }
 
   const fraction = cleaned.match(/^(\d+)\s*\/\s*(\d+)$/);
