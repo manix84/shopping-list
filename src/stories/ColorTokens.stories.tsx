@@ -65,7 +65,6 @@ const colorGroups: ColorGroup[] = [
 
 const meta = {
   title: 'Design System/Color Tokens',
-  tags: ['autodocs'],
   parameters: {
     docs: {
       description: {

@@ -61,7 +61,6 @@ const localeStats = localeRows.map(({ locale, messages }) => {
 
 const meta = {
   title: 'Design System/Internationalisation',
-  tags: ['autodocs'],
   parameters: {
     docs: {
       description: {

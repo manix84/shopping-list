@@ -55,7 +55,6 @@ const displayMeasurement = (
 
 const meta = {
   title: 'Design System/Measurements',
-  tags: ['autodocs'],
   parameters: {
     docs: {
       description: {
