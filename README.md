@@ -48,6 +48,14 @@ npm install
 npm run dev
 ```
 
+Run Storybook for component and design-system documentation:
+
+```bash
+npm run storybook
+```
+
+Storybook includes component stories with autodocs plus design-system reference pages for actions, accessibility, colour tokens, empty states, forms, internationalisation, measurements, and typography. The theme button in the Storybook toolbar switches the preview and Storybook chrome between light and dark mode.
+
 ## 🗄️ Optional backend mode
 
 The app can run in two modes:
@@ -167,6 +175,17 @@ npm run build
 npm run preview
 ```
 
+Run the automated checks:
+
+```bash
+npm run lint
+npm run typecheck
+npm run test:unit
+npm run test:storybook
+```
+
+`npm run test:storybook` runs the Storybook interaction tests, including role/name checks for component stories and design-system documentation examples.
+
 Run a local Lighthouse audit against the production build:
 
 ```bash
@@ -195,6 +214,8 @@ npm run lighthouse
 
 The app version shown on the About page comes from `package.json`. Use `npm run version:major`, `npm run version:minor`, or `npm run version:patch` when preparing an intentional release bump.
 
+The repo installs `.githooks/pre-commit` through `npm run prepare`. The pre-commit hook runs lint, applies the configured automatic version bump, and stages `package.json` plus `package-lock.json`. Set `VERSION_BUMP=major`, `VERSION_BUMP=minor`, or `VERSION_BUMP=patch` when you need to control the bump for a specific commit.
+
 ## 🚢 Deployment
 
 The repo includes a GitHub Actions workflow in `.github/workflows/deploy-gh-pages.yml` that builds on push to `main` and publishes `dist/` to GitHub Pages.
@@ -207,7 +228,9 @@ The repo includes a GitHub Actions workflow in `.github/workflows/deploy-gh-page
 - `src/lib/repository` persistence layer
 - `src/components` reusable UI pieces
 - `src/pages` top-level views
+- `src/stories` design-system Storybook reference pages
 - `src/styles` SCSS styling
+- `.storybook` Storybook configuration, global theme toggle, i18n provider, and accessibility addon setup
 - `.github/workflows` GitHub Pages deployment
 
 ## 📄 License
