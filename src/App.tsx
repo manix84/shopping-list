@@ -943,9 +943,9 @@ export default function App() {
   return (
     <I18nProvider value={{ locale, messages, setLocale }}>
       <PwaSplashScreen />
-      <div className="shopping-app">
-        <div className="shopping-shell">
-          <a className="skip-link" href="#main-content">
+      <div className={'shopping-app'}>
+        <div className={'shopping-shell'}>
+          <a className={'skip-link'} href={'#main-content'}>
             {messages.actions.skipToMainContent}
           </a>
           <AppHeader
@@ -956,7 +956,7 @@ export default function App() {
             onChangePage={changePage}
           />
 
-          <main id="main-content" className="main-content" tabIndex={-1}>
+          <main id={'main-content'} className={'main-content'} tabIndex={-1}>
             {page === 'edit' ? (
               <EditPage
                 input={input}

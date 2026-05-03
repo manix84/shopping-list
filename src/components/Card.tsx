@@ -9,7 +9,7 @@ type CardProps = PropsWithChildren<ComponentPropsWithoutRef<'section'> & {
 export function Card({ header, className = '', bodyClassName = '', children, ...sectionProps }: CardProps) {
   return (
     <section {...sectionProps} className={`card ${className}`.trim()}>
-      {header ? <div className="card-header">{header}</div> : null}
+      {header ? <div className={'card-header'}>{header}</div> : null}
       {children ? <div className={`card-body ${bodyClassName}`.trim()}>{children}</div> : null}
     </section>
   );

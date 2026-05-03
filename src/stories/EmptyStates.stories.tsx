@@ -20,8 +20,8 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   render: () => (
     <DesignSystemStory>
-      <StorySection title="Empty States">
-        <div className="empty-state">Empty, loading, and unavailable states use this quiet dashed treatment.</div>
+      <StorySection title={'Empty States'}>
+        <div className={'empty-state'}>Empty, loading, and unavailable states use this quiet dashed treatment.</div>
       </StorySection>
     </DesignSystemStory>
   ),

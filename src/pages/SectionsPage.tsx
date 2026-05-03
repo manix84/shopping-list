@@ -14,22 +14,22 @@ export function SectionsPage({ config }: SectionsPageProps) {
     <Card
       header={
         <>
-          <h2 className="title title-md">{messages.pages.sections.title}</h2>
-          <p className="subtitle">{messages.pages.sections.subtitle}</p>
+          <h2 className={'title title-md'}>{messages.pages.sections.title}</h2>
+          <p className={'subtitle'}>{messages.pages.sections.subtitle}</p>
         </>
       }
-      bodyClassName="stack"
+      bodyClassName={'stack'}
     >
-      <div className="stack">
+      <div className={'stack'}>
         {config.groups.map((group) => (
-          <div key={group.key} className="section-card">
-            <div className="section-heading section-spacing">
-              <div className="section-group">
+          <div key={group.key} className={'section-card'}>
+            <div className={'section-heading section-spacing'}>
+              <div className={'section-group'}>
                 {messages.labels.routeOrder} {group.order}
               </div>
-              <h3 className="section-title">{group.label}</h3>
+              <h3 className={'section-title'}>{group.label}</h3>
             </div>
-            <div className="badge-row">
+            <div className={'badge-row'}>
               {group.sections.map((section) => (
                 <Badge key={section.key}>{section.label}</Badge>
               ))}

@@ -20,17 +20,17 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   render: () => (
     <DesignSystemStory>
-      <StorySection title="Forms">
-        <div className="field field-compact">
-          <label htmlFor="storybook-input">Field label</label>
-          <div className="small-text">Helper text explains the expected input.</div>
-          <input id="storybook-input" className="input" placeholder="Input text" />
+      <StorySection title={'Forms'}>
+        <div className={'field field-compact'}>
+          <label htmlFor={'storybook-input'}>Field label</label>
+          <div className={'small-text'}>Helper text explains the expected input.</div>
+          <input id={'storybook-input'} className={'input'} placeholder={'Input text'} />
         </div>
-        <div className="field field-compact">
-          <label htmlFor="storybook-select">Select label</label>
-          <select id="storybook-select" className="select" defaultValue="one">
-            <option value="one">One option</option>
-            <option value="two">Another option</option>
+        <div className={'field field-compact'}>
+          <label htmlFor={'storybook-select'}>Select label</label>
+          <select id={'storybook-select'} className={'select'} defaultValue={'one'}>
+            <option value={'one'}>One option</option>
+            <option value={'two'}>Another option</option>
           </select>
         </div>
       </StorySection>

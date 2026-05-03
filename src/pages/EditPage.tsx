@@ -75,90 +75,90 @@ export function EditPage({
   const { messages } = useI18n();
 
   return (
-    <div className="layout-split">
+    <div className={'layout-split'}>
       <Card
         header={
           <>
-            <h2 className="title title-sm">{messages.pages.edit.title}</h2>
-            <p className="subtitle">{messages.pages.edit.subtitle}</p>
+            <h2 className={'title title-sm'}>{messages.pages.edit.title}</h2>
+            <p className={'subtitle'}>{messages.pages.edit.subtitle}</p>
           </>
         }
-        bodyClassName="stack"
+        bodyClassName={'stack'}
       >
-        <div className="field field-compact">
-          <label htmlFor="list-country-select">{messages.pages.settings.countryLabel}</label>
-          <CountrySelect id="list-country-select" value={countryCode} onChange={onCountryChange} />
-          <div className="small-text">{messages.pages.edit.countryProfileHint}</div>
+        <div className={'field field-compact'}>
+          <label htmlFor={'list-country-select'}>{messages.pages.settings.countryLabel}</label>
+          <CountrySelect id={'list-country-select'} value={countryCode} onChange={onCountryChange} />
+          <div className={'small-text'}>{messages.pages.edit.countryProfileHint}</div>
         </div>
 
-        <div className="field">
-          <label htmlFor="shopping-list-input">{messages.pages.edit.pasteLabel}</label>
+        <div className={'field'}>
+          <label htmlFor={'shopping-list-input'}>{messages.pages.edit.pasteLabel}</label>
           <textarea
-            id="shopping-list-input"
-            className="textarea"
+            id={'shopping-list-input'}
+            className={'textarea'}
             value={input}
             onChange={(event) => onInputChange(event.target.value)}
             placeholder={messages.pages.edit.pastePlaceholder}
           />
         </div>
 
-        <div className="field">
-          <label htmlFor="shopping-quick-add">{messages.pages.edit.quickAddLabel}</label>
-          <div className="inline-row quick-add-row">
+        <div className={'field'}>
+          <label htmlFor={'shopping-quick-add'}>{messages.pages.edit.quickAddLabel}</label>
+          <div className={'inline-row quick-add-row'}>
             <input
-              id="shopping-quick-add"
-              className="input"
+              id={'shopping-quick-add'}
+              className={'input'}
               value={draftItem}
               onChange={(event) => onDraftItemChange(event.target.value)}
               placeholder={messages.pages.edit.quickAddPlaceholder}
             />
             <button
-              type="button"
-              className="button button-primary button-icon"
+              type={'button'}
+              className={'button button-primary button-icon'}
               onClick={onAddSingleItem}
               aria-label={messages.actions.add}
               title={messages.actions.add}
             >
-              <svg aria-hidden="true" className="button-icon-svg" viewBox="0 0 24 24">
-                <path d={mdiPlus} fill="currentColor" />
+              <svg aria-hidden={'true'} className={'button-icon-svg'} viewBox={'0 0 24 24'}>
+                <path d={mdiPlus} fill={'currentColor'} />
               </svg>
             </button>
             <button
-              type="button"
-              className="button button-primary button-icon"
+              type={'button'}
+              className={'button button-primary button-icon'}
               onClick={onParse}
               aria-label={messages.actions.saveAndSort}
               title={messages.actions.saveAndSort}
             >
-              <svg aria-hidden="true" className="button-icon-svg" viewBox="0 0 24 24">
-                <path d={mdiContentSave} fill="currentColor" />
+              <svg aria-hidden={'true'} className={'button-icon-svg'} viewBox={'0 0 24 24'}>
+                <path d={mdiContentSave} fill={'currentColor'} />
               </svg>
             </button>
           </div>
         </div>
 
-        <div className="button-row">
-          <button type="button" className="button" onClick={onResetChecks}>
+        <div className={'button-row'}>
+          <button type={'button'} className={'button'} onClick={onResetChecks}>
             {messages.actions.resetTicks}
           </button>
-          <button type="button" className="button" onClick={onResetAll}>
+          <button type={'button'} className={'button'} onClick={onResetAll}>
             {messages.actions.fullReset}
           </button>
         </div>
 
-        <div className="separator" />
+        <div className={'separator'} />
         <StatsGrid total={total} checkedTotal={checkedTotal} progress={progress} />
       </Card>
 
-      <div className="stack">
+      <div className={'stack'}>
         <Card
           header={
             <>
-              <h2 className="title title-sm">{messages.pages.edit.sharingTitle}</h2>
-              <p className="subtitle">{messages.pages.edit.sharingSubtitle}</p>
+              <h2 className={'title title-sm'}>{messages.pages.edit.sharingTitle}</h2>
+              <p className={'subtitle'}>{messages.pages.edit.sharingSubtitle}</p>
             </>
           }
-          bodyClassName="stack"
+          bodyClassName={'stack'}
         >
           <SharedListPanel
             canUseBackend={canUseBackend}

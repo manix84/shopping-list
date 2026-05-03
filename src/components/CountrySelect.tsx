@@ -21,10 +21,10 @@ export function CountrySelect({ id, value, onChange }: CountrySelectProps) {
   );
 
   return (
-    <div className="select-shell">
+    <div className={'select-shell'}>
       <select
         id={id}
-        className="select select-with-icon"
+        className={'select select-with-icon'}
         value={value}
         aria-label={messages.labels.countryProfile}
         onChange={(event) => onChange(event.target.value as CountryCode)}
@@ -35,8 +35,8 @@ export function CountrySelect({ id, value, onChange }: CountrySelectProps) {
           </option>
         ))}
       </select>
-      <svg aria-hidden="true" className="select-chevron-svg" viewBox="0 0 24 24">
-        <path d={mdiChevronDown} fill="currentColor" />
+      <svg aria-hidden={'true'} className={'select-chevron-svg'} viewBox={'0 0 24 24'}>
+        <path d={mdiChevronDown} fill={'currentColor'} />
       </svg>
     </div>
   );

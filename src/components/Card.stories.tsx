@@ -51,17 +51,17 @@ function CardExample({ heading, subtitle, body, showHeader, bodyClassName }: Car
         header={
           showHeader ? (
             <>
-              <h2 className="title title-md">{heading}</h2>
-              <p className="subtitle">{subtitle}</p>
+              <h2 className={'title title-md'}>{heading}</h2>
+              <p className={'subtitle'}>{subtitle}</p>
             </>
           ) : undefined
         }
         bodyClassName={bodyClassName}
       >
         <p>{body}</p>
-        <div className="badge-row">
+        <div className={'badge-row'}>
           <Badge>Default badge</Badge>
-          <Badge tone="success">Ready</Badge>
+          <Badge tone={'success'}>Ready</Badge>
         </div>
       </Card>
     </StoryCanvas>
