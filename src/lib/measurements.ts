@@ -229,6 +229,7 @@ const parseMeasurementParts = (
   | {
       amount: number;
       unitDefinition: UnitDefinition;
+      displayMetricValue: number;
       metricValue: number;
       quantity: string;
     }
@@ -240,10 +241,11 @@ const parseMeasurementParts = (
   const unitDefinition = findUnitDefinition(match[2]);
   if (typeof amount !== 'number' || !unitDefinition) return undefined;
 
-  const metricValue = roundMetricValue(amount * unitDefinition.metricFactor[unitSystem]);
+  const displayMetricValue = amount * unitDefinition.metricFactor[unitSystem];
+  const metricValue = roundMetricValue(displayMetricValue);
   const quantity = formatMetricMeasurement(metricValue, unitDefinition.metricUnit);
 
-  return { amount, unitDefinition, metricValue, quantity };
+  return { amount, unitDefinition, displayMetricValue, metricValue, quantity };
 };
 
 export const parseMeasurement = (
@@ -265,7 +267,12 @@ export const parseMeasurement = (
     : undefined;
   const quantityDisplay = displayMode === 'cooking' && hintedQuantityDisplay
     ? hintedQuantityDisplay
-    : formatDisplayMeasurement(parsed.metricValue, parsed.unitDefinition.metricUnit, displayMode, unitSystem);
+    : formatDisplayMeasurement(
+        displayMode === 'metric' ? parsed.metricValue : parsed.displayMetricValue,
+        parsed.unitDefinition.metricUnit,
+        displayMode,
+        unitSystem,
+      );
 
   return {
     quantity: parsed.quantity,

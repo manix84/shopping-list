@@ -176,6 +176,13 @@ export const MEASUREMENT_TEST_CASES: MeasurementTestCase[] = [
     expectedQuantity: '227ml',
     expectedQuantityDisplay: '227ml',
   },
+  {
+    input: '8 floz',
+    countryCode: 'uk',
+    displayMode: 'imperial',
+    expectedQuantity: '227ml',
+    expectedQuantityDisplay: '8fl oz',
+  },
 ];
 
 export const VARIANT_TEST_CASES: VariantTestCase[] = [
