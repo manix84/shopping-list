@@ -139,8 +139,10 @@ export function AppHeader({
                   <button
                     type="button"
                     className="button mobile-menu-trigger"
+                    aria-label={messages.mobileMenu.openNavigation}
                     aria-expanded={mobileMenuOpen}
                     aria-controls={mobileMenuOpen ? 'mobile-menu-panel' : undefined}
+                    title={messages.mobileMenu.openNavigation}
                     onClick={() => setMobileMenuOpen((current) => !current)}
                   >
                     <span className="sr-only">{messages.mobileMenu.openNavigation}</span>

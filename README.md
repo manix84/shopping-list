@@ -9,8 +9,9 @@ A React + TypeScript shopping list app that turns a rough grocery list into an o
 ## ✨ What it does
 
 - accepts pasted or typed shopping lists
-- groups items into supermarket sections using country configs
-- understands quantities like `bananas x2`, `2x apples`, `500g mince`
+- groups items into supermarket sections using country configs for Belgium, Canada, France, Germany, Italy, Mexico, the Netherlands, Romania, Spain, the UK, and the US
+- understands quantities and measurements like `bananas x2`, `2x apples`, `500g mince`, `½ tsp`, and `8 fl. oz`
+- stores liquid and weight quantities in metric form, then displays metric, imperial, or cooking measurements from the route toolbar
 - supports size qualifiers like `small milk` and renders them as a badge
 - applies display aliases for common milk shorthand like `blue milk`, `gold milk`, `green milk`, and `red milk`
 - persists data locally so the app can be reopened without losing state
@@ -18,9 +19,9 @@ A React + TypeScript shopping list app that turns a rough grocery list into an o
 - generates themed QR codes for shared lists and can scan shared-list QR codes when the browser supports camera scanning
 - remembers recently opened shared lists locally on the device for quick reopening
 - stores the country profile in the backend when available, with local fallback
-- supports English and Spanish UI text, defaulting from the browser language
+- supports English, Spanish, French, German, Dutch, Italian, Romanian, and Pirate UI text, defaulting from the browser language
 - supports light, dark, and system themes, including PWA chrome theme colours
-- includes debug self-checks for backend health, database state, quantity parsing, and section matching
+- includes debug self-checks for backend health, database state, state consistency, quantity parsing, measurement conversion, variants, storage, section matching, and active shop layout
 - deploys to GitHub Pages via GitHub Actions
 
 ## 🧭 Routes
@@ -31,7 +32,7 @@ The app uses hash-based routing so direct links work on GitHub Pages:
 - `#/route` - shopping list route view
 - `#/sections` - read-only section and route-order reference
 - `#/settings` - language, country profile, and theme preferences
-- `#/debug` - parser self-checks
+- `#/debug` - parser, storage, backend, measurement, and layout self-checks
 
 Backend-backed shared lists use path routes:
 
@@ -83,6 +84,8 @@ Backend utility routes:
 - `GET /api/database/status`
 - `GET /api/settings`
 - `PUT /api/settings`
+
+Backend records are validated before they are stored. Shopping-list timestamps must use canonical ISO format, country codes must match the supported country profiles, and persisted section keys must be known route sections.
 
 ### 🏠 Home Assistant
 
@@ -171,6 +174,26 @@ npm run lighthouse
 ```
 
 The audit writes `lighthouse/report.json` and `lighthouse/report.html`, and fails if the main Lighthouse category scores fall below the configured thresholds. You can audit an already deployed URL with `LIGHTHOUSE_URL=https://example.com npm run lighthouse`. On Apple Silicon, run this with an arm64 Node install; x64 Node under Rosetta is blocked by Lighthouse because it makes Chrome performance results unreliable.
+
+## ✅ Release checks
+
+Before tagging a release, run the same local checks used by CI:
+
+```bash
+npm run lint
+npm run typecheck
+npm run test:unit
+npm run test:storybook
+npm run build
+```
+
+For accessibility and PWA confidence, also run:
+
+```bash
+npm run lighthouse
+```
+
+The app version shown on the About page comes from `package.json`. Use `npm run version:major`, `npm run version:minor`, or `npm run version:patch` when preparing an intentional release bump.
 
 ## 🚢 Deployment
 

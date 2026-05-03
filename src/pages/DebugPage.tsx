@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type KeyboardEvent } from 'react';
 import type {
   BackendStatus,
   ConfigTestResult,
@@ -133,6 +133,30 @@ export function DebugPage({
     imperial: messages.labels.measurementModeImperial,
     cooking: messages.labels.measurementModeCooking,
   };
+  const handleTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
+    const lastIndex = debugTabs.length - 1;
+    const nextIndex =
+      event.key === 'ArrowRight'
+        ? index === lastIndex
+          ? 0
+          : index + 1
+        : event.key === 'ArrowLeft'
+          ? index === 0
+            ? lastIndex
+            : index - 1
+          : event.key === 'Home'
+            ? 0
+            : event.key === 'End'
+              ? lastIndex
+              : undefined;
+
+    if (nextIndex === undefined) return;
+
+    event.preventDefault();
+    const nextTab = debugTabs[nextIndex];
+    setActiveTab(nextTab.key);
+    document.getElementById(`debug-tab-${nextTab.key}`)?.focus();
+  };
 
   return (
     <Card
@@ -155,14 +179,18 @@ export function DebugPage({
       bodyClassName="stack"
     >
       <div className="debug-tablist" role="tablist" aria-label={messages.pages.debug.title}>
-        {debugTabs.map((tab) => (
+        {debugTabs.map((tab, index) => (
           <button
             key={tab.key}
+            id={`debug-tab-${tab.key}`}
             type="button"
             role="tab"
             aria-selected={activeTab === tab.key}
+            aria-controls={`debug-panel-${tab.key}`}
+            tabIndex={activeTab === tab.key ? 0 : -1}
             className={`button ${activeTab === tab.key ? 'button-active' : ''}`}
             onClick={() => setActiveTab(tab.key)}
+            onKeyDown={(event) => handleTabKeyDown(event, index)}
           >
             {tab.label}
           </button>
@@ -171,6 +199,9 @@ export function DebugPage({
 
       {activeTab === 'parsed' ? (
         <Card
+          id="debug-panel-parsed"
+          role="tabpanel"
+          aria-labelledby="debug-tab-parsed"
           header={
             <>
               <h2 className="title title-sm">{messages.pages.debug.parsedTitle}</h2>
@@ -199,6 +230,9 @@ export function DebugPage({
 
       {activeTab === 'state' ? (
         <Card
+          id="debug-panel-state"
+          role="tabpanel"
+          aria-labelledby="debug-tab-state"
           header={
             <>
               <h2 className="title title-sm">{messages.pages.debug.stateTitle}</h2>
@@ -222,6 +256,9 @@ export function DebugPage({
 
       {activeTab === 'backend' ? (
         <Card
+          id="debug-panel-backend"
+          role="tabpanel"
+          aria-labelledby="debug-tab-backend"
           header={
             <>
               <h2 className="title title-sm">{messages.pages.debug.backendTitle}</h2>
@@ -267,6 +304,9 @@ export function DebugPage({
 
       {activeTab === 'config' ? (
         <Card
+          id="debug-panel-config"
+          role="tabpanel"
+          aria-labelledby="debug-tab-config"
           header={
             <>
               <h2 className="title title-sm">{messages.pages.debug.configTitle}</h2>
@@ -290,6 +330,9 @@ export function DebugPage({
 
       {activeTab === 'matcher' ? (
         <Card
+          id="debug-panel-matcher"
+          role="tabpanel"
+          aria-labelledby="debug-tab-matcher"
           header={
             <>
               <h2 className="title title-sm">{messages.pages.debug.matcherTitle}</h2>
@@ -313,6 +356,9 @@ export function DebugPage({
 
       {activeTab === 'quantity' ? (
         <Card
+          id="debug-panel-quantity"
+          role="tabpanel"
+          aria-labelledby="debug-tab-quantity"
           header={
             <>
               <h2 className="title title-sm">{messages.pages.debug.quantityTitle}</h2>
@@ -348,6 +394,9 @@ export function DebugPage({
 
       {activeTab === 'measurements' ? (
         <Card
+          id="debug-panel-measurements"
+          role="tabpanel"
+          aria-labelledby="debug-tab-measurements"
           header={
             <>
               <h2 className="title title-sm">{messages.pages.debug.measurementTitle}</h2>
@@ -375,6 +424,9 @@ export function DebugPage({
 
       {activeTab === 'weights' ? (
         <Card
+          id="debug-panel-weights"
+          role="tabpanel"
+          aria-labelledby="debug-tab-weights"
           header={
             <>
               <h2 className="title title-sm">{messages.pages.debug.weightTitle}</h2>
@@ -418,6 +470,9 @@ export function DebugPage({
 
       {activeTab === 'variants' ? (
         <Card
+          id="debug-panel-variants"
+          role="tabpanel"
+          aria-labelledby="debug-tab-variants"
           header={
             <>
               <h2 className="title title-sm">{messages.pages.debug.variantTitle}</h2>
@@ -445,6 +500,9 @@ export function DebugPage({
 
       {activeTab === 'storage' ? (
         <Card
+          id="debug-panel-storage"
+          role="tabpanel"
+          aria-labelledby="debug-tab-storage"
           header={
             <>
               <h2 className="title title-sm">{messages.pages.debug.storageTitle}</h2>
@@ -468,6 +526,9 @@ export function DebugPage({
 
       {activeTab === 'layout' ? (
         <Card
+          id="debug-panel-layout"
+          role="tabpanel"
+          aria-labelledby="debug-tab-layout"
           header={
             <>
               <h2 className="title title-sm">{messages.pages.debug.layoutTitle}</h2>
@@ -542,7 +603,11 @@ export function DebugPage({
         </Card>
       ) : null}
 
-      {activeTab === 'sections' ? <SectionsPage config={config} /> : null}
+      {activeTab === 'sections' ? (
+        <div id="debug-panel-sections" role="tabpanel" aria-labelledby="debug-tab-sections">
+          <SectionsPage config={config} />
+        </div>
+      ) : null}
     </Card>
   );
 }
