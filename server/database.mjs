@@ -1,6 +1,7 @@
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { randomBytes } from 'node:crypto';
+import { COUNTRY_CODES } from './constants.mjs';
 
 const DEFAULT_RECORD = {
   input: '',
@@ -13,8 +14,6 @@ const DEFAULT_SETTINGS = {
   countryCode: 'uk',
   updatedAt: '1970-01-01T00:00:00.000Z',
 };
-const COUNTRY_CODES = new Set(['ca', 'uk', 'us']);
-
 const databasePath = resolve(process.env.SHOPPING_LIST_DB_PATH ?? 'data/shopping-list-db.json');
 let databaseWriteQueue = Promise.resolve();
 
