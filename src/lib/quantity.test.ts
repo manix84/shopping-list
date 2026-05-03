@@ -82,6 +82,13 @@ describe('quantity helpers', () => {
       quantityMetricValue: 25,
       quantityMetricUnit: 'ml',
     });
+    expect(extractQuantifiedItem('Smoked paprika – 2 1/2 tsp', UK_CONFIG)).toMatchObject({
+      name: 'Smoked paprika',
+      quantity: '12.5ml',
+      quantityDisplay: '12.5ml',
+      quantityMetricValue: 12.5,
+      quantityMetricUnit: 'ml',
+    });
   });
 
   it('stores metric values while using metric display for US and Canada by default', () => {

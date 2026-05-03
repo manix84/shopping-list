@@ -2016,6 +2016,7 @@ select {
 
   .route-toolbar-row {
     flex-wrap: wrap;
+    gap: 8px;
     justify-content: flex-start;
     width: 100%;
   }
@@ -2025,9 +2026,13 @@ select {
     flex: 0 0 auto;
   }
 
+  .route-toolbar .button-icon {
+    height: 42px;
+    width: 42px;
+  }
+
   .route-tools-divider {
-    display: block;
-    min-height: 40px;
+    display: none;
   }
 
   .route-filter-input {

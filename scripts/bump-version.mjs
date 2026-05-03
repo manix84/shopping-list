@@ -94,6 +94,16 @@ if (!explicitReleaseTypes.has(nextReleaseType)) {
 }
 
 const taggedVersion = latestTaggedVersion();
+if (releaseType === 'precommit') {
+  const currentVersion = packageVersion();
+  const headVersion = packageVersionAtRef('HEAD');
+
+  if (headVersion && compareVersions(currentVersion, headVersion) > 0) {
+    console.log(`Version ${currentVersion} is already ahead of HEAD ${headVersion}; skipping pre-commit bump.`);
+    process.exit(0);
+  }
+}
+
 if (automaticReleaseTypes.has(releaseType)) {
   const currentVersion = packageVersion();
   const upstreamVersion = packageVersionAtRef(prepushBaseRef);

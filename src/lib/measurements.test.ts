@@ -16,7 +16,9 @@ describe('measurement helpers', () => {
     ['1/2', 0.5],
     ['½', 0.5],
     ['2½', 2.5],
+    ['2 1/2', 2.5],
     ['1¼', 1.25],
+    ['1 1/4', 1.25],
     ['⅓', 1 / 3],
     ['1 / 0', undefined],
     ['roughly half', undefined],
@@ -43,6 +45,18 @@ describe('measurement helpers', () => {
       quantityDisplay: '2.5ml',
       quantityMetricValue: 2.5,
       quantityMetricUnit: 'ml',
+    });
+    expect(parseMeasurement('2 1/2 tsp', UK_CONFIG)).toMatchObject({
+      quantity: '12.5ml',
+      quantityDisplay: '12.5ml',
+    });
+    expect(parseMeasurement('8 fl. oz', UK_CONFIG)).toMatchObject({
+      quantity: '227ml',
+      quantityDisplay: '227ml',
+    });
+    expect(parseMeasurement('8 floz', UK_CONFIG)).toMatchObject({
+      quantity: '227ml',
+      quantityDisplay: '227ml',
     });
   });
 
@@ -79,6 +93,14 @@ describe('measurement helpers', () => {
       quantity: '250ml',
       quantityDisplay: '8.8fl oz',
     });
+    expect(parseMeasurement('8 fl. oz', imperialConfig)).toMatchObject({
+      quantity: '227ml',
+      quantityDisplay: '8fl oz',
+    });
+    expect(parseMeasurement('8 floz', imperialConfig)).toMatchObject({
+      quantity: '227ml',
+      quantityDisplay: '8fl oz',
+    });
   });
 
   it('prefers parenthetical cup and spoon display hints when ingredient mode is enabled', () => {
@@ -110,6 +132,16 @@ describe('measurement helpers', () => {
     expect(extractMeasurementQuantity('Mayonnaise (25ml)', UK_CONFIG)).toMatchObject({
       name: 'Mayonnaise',
       quantity: '25ml',
+    });
+    expect(extractMeasurementQuantity('Smoked paprika – 2 1/2 tsp', UK_CONFIG)).toMatchObject({
+      name: 'Smoked paprika',
+      quantity: '12.5ml',
+      quantityDisplay: '12.5ml',
+    });
+    expect(extractMeasurementQuantity('2 1/2 tsp smoked paprika', UK_CONFIG)).toMatchObject({
+      name: 'smoked paprika',
+      quantity: '12.5ml',
+      quantityDisplay: '12.5ml',
     });
   });
 
