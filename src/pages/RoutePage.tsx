@@ -7,7 +7,7 @@ import {
   mdiViewListOutline,
   mdiWeightPound,
 } from '@mdi/js';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { GroupedSectionView, MeasurementDisplayMode } from '../types';
 import { Card } from '../components/Card';
 import { RouteSectionCard } from '../components/RouteSectionCard';
@@ -70,6 +70,19 @@ export function RoutePage({
     onResetChecks();
     setIsResetTicksModalOpen(false);
   };
+
+  useEffect(() => {
+    if (!isResetTicksModalOpen) { return; }
+
+    const handleEscape = (event: globalThis.KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsResetTicksModalOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [isResetTicksModalOpen]);
 
   return (
     <Card
