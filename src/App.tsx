@@ -245,6 +245,10 @@ export default function App() {
   const [predatorEasterEggRun, setPredatorEasterEggRun] = useState(0);
   const saveRequestIdRef = useRef(0);
   const suppressNextAutosaveStatusRef = useRef(true);
+  const suppressNextAutosaveStatus = () => {
+    suppressNextAutosaveStatusRef.current = true;
+    setSaveStatus('idle');
+  };
 
   const config = useMemo(
     () => withMeasurementDisplayMode(COUNTRY_CONFIGS[countryCode], measurementDisplayMode),
@@ -543,7 +547,7 @@ export default function App() {
 
   useEffect(() => {
     let cancelled = false;
-    suppressNextAutosaveStatusRef.current = true;
+    suppressNextAutosaveStatus();
     setIsLoaded(false);
     setShareError(undefined);
 
@@ -737,7 +741,7 @@ export default function App() {
             updatedAt: remotePayload.updatedAt ?? selectedRecord.updatedAt,
           });
         }
-        suppressNextAutosaveStatusRef.current = true;
+        suppressNextAutosaveStatus();
         setStorageMode('backend');
         setIsServerBackedList(true);
         setRoute((current) => ({
@@ -1067,7 +1071,7 @@ export default function App() {
   };
 
   const applyRecord = (record: ShoppingListRecord) => {
-    suppressNextAutosaveStatusRef.current = true;
+    suppressNextAutosaveStatus();
     if (record.listId) {
       setActiveListId(record.listId);
     }

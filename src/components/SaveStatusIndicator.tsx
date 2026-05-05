@@ -61,9 +61,9 @@ export function SaveStatusIndicator({ status }: SaveStatusIndicatorProps) {
       className={`save-status save-status-${status} ${isLeaving ? 'save-status-leaving' : ''}`}
       role={'status'}
       aria-live={'polite'}
+      aria-label={indicator.label}
       title={indicator.label}
     >
-      <span className={'sr-only'}>{indicator.label}</span>
       <svg aria-hidden={'true'} className={'save-status-svg'} viewBox={'0 0 24 24'}>
         <path d={indicator.icon} fill={'currentColor'} />
       </svg>
