@@ -21,16 +21,18 @@ export const createLocalStorageMock = (seed: StorageSeed = {}) => {
 };
 
 export const createWindowMock = (
-  options: { storageSeed?: StorageSeed; prefersDark?: boolean; language?: string } = {},
+  options: { storageSeed?: StorageSeed; prefersDark?: boolean; language?: string; languages?: string[] } = {},
 ) => {
   const localStorage = createLocalStorageMock(options.storageSeed);
   const prefersDark = options.prefersDark ?? false;
   const language = options.language ?? 'en-GB';
+  const languages = options.languages ?? [language];
 
   return {
     localStorage,
     navigator: {
       language,
+      languages,
     },
     matchMedia: (query: string) => ({
       matches: prefersDark && query.includes('prefers-color-scheme: dark'),
