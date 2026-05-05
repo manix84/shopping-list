@@ -4,14 +4,14 @@ import type { Messages } from '../lib/i18n';
 import { useI18n } from '../lib/i18n';
 import type { SaveStatus } from '../types';
 
-const BADGE_FADE_DURATION_MS = 250;
-const SAVE_CONFIRMATION_DURATION_MS = 1_000;
+export const SAVE_STATUS_FADE_DURATION_MS = 250;
+export const SAVE_CONFIRMATION_DURATION_MS = 1_000;
 
 type SaveStatusIndicatorProps = {
   status: SaveStatus;
 };
 
-const saveStatusIndicator = (status: SaveStatus, messages: Messages) => {
+export const getSaveStatusIndicatorConfig = (status: SaveStatus, messages: Messages) => {
   if (status === 'idle') { return undefined; }
   if (status === 'saving') {
     return { icon: mdiCloudSync, label: messages.labels.saving };
@@ -26,7 +26,7 @@ export function SaveStatusIndicator({ status }: SaveStatusIndicatorProps) {
   const { messages } = useI18n();
   const [isVisible, setIsVisible] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
-  const indicator = saveStatusIndicator(status, messages);
+  const indicator = getSaveStatusIndicatorConfig(status, messages);
 
   useEffect(() => {
     if (status === 'idle') {
@@ -46,7 +46,7 @@ export function SaveStatusIndicator({ status }: SaveStatusIndicatorProps) {
     const removeTimer = window.setTimeout(() => {
       setIsVisible(false);
       setIsLeaving(false);
-    }, SAVE_CONFIRMATION_DURATION_MS + BADGE_FADE_DURATION_MS);
+    }, SAVE_CONFIRMATION_DURATION_MS + SAVE_STATUS_FADE_DURATION_MS);
 
     return () => {
       window.clearTimeout(fadeTimer);
