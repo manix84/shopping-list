@@ -68,6 +68,7 @@ const KONAMI_SEQUENCE = ['up', 'up', 'down', 'down', 'left', 'right', 'left', 'r
 const KONAMI_TOUCH_SWIPE_MIN_PX = 42;
 const KONAMI_TOUCH_TAP_MAX_PX = 14;
 const KONAMI_TOUCH_TAP_MAX_MS = 260;
+const KONAMI_TOUCH_LOCK_START_INDEX = 2;
 const KONAMI_TOUCH_SEQUENCE_TIMEOUT_MS = 1_600;
 type StorageMode = 'local' | 'backend';
 type BeforeInstallPromptChoice = {
@@ -359,7 +360,7 @@ export default function App() {
       sequenceResetTimer = window.setTimeout(resetKonamiSequence, KONAMI_TOUCH_SEQUENCE_TIMEOUT_MS);
     };
 
-    const acceptKonamiInput = (input: (typeof KONAMI_SEQUENCE)[number]) => {
+    const acceptKonamiInput = (input: (typeof KONAMI_SEQUENCE)[number], source: 'keyboard' | 'touch') => {
       sequenceIndex = nextKonamiIndex(sequenceIndex, input);
       if (sequenceIndex >= KONAMI_SEQUENCE.length) {
         resetKonamiSequence();
@@ -372,7 +373,11 @@ export default function App() {
         return;
       }
 
-      setKonamiTouchState(true, sequenceIndex >= KONAMI_SEQUENCE.length - 2);
+      const isTouchSequence = source === 'touch';
+      setKonamiTouchState(
+        isTouchSequence && sequenceIndex >= KONAMI_TOUCH_LOCK_START_INDEX,
+        isTouchSequence && sequenceIndex >= KONAMI_SEQUENCE.length - 2,
+      );
       scheduleKonamiSequenceReset();
     };
 
@@ -381,7 +386,7 @@ export default function App() {
 
       const input = konamiKeyFromEvent(event);
       if (input) {
-        acceptKonamiInput(input);
+        acceptKonamiInput(input, 'keyboard');
       }
     };
 
@@ -421,18 +426,18 @@ export default function App() {
         if (sequenceIndex >= KONAMI_SEQUENCE.length - 2) {
           event.preventDefault();
         }
-        acceptKonamiInput(sequenceIndex === KONAMI_SEQUENCE.length - 2 ? 'b' : 'a');
+        acceptKonamiInput(sequenceIndex === KONAMI_SEQUENCE.length - 2 ? 'b' : 'a', 'touch');
         return;
       }
 
       if (Math.max(absX, absY) < KONAMI_TOUCH_SWIPE_MIN_PX) { return; }
 
       if (absY > absX) {
-        acceptKonamiInput(deltaY < 0 ? 'up' : 'down');
+        acceptKonamiInput(deltaY < 0 ? 'up' : 'down', 'touch');
         return;
       }
 
-      acceptKonamiInput(deltaX < 0 ? 'left' : 'right');
+      acceptKonamiInput(deltaX < 0 ? 'left' : 'right', 'touch');
     };
 
     window.addEventListener('keydown', handleKeyDown);
