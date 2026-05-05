@@ -1,4 +1,5 @@
 import { mdiClose, mdiStarFourPoints } from '@mdi/js';
+import type { PointerEvent } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { useI18n } from '../lib/i18n';
 
@@ -148,6 +149,23 @@ const harpStringPath = (x: number, offset = 0) => (
 
 const harpStringWidth = (index: number) => Math.max(0.55, 1.25 - index * 0.045);
 
+const harpStringFromPointer = (event: PointerEvent<SVGSVGElement>) => {
+  const rect = event.currentTarget.getBoundingClientRect();
+  const x = ((event.clientX - rect.left) / rect.width) * HARP_VIEWBOX_WIDTH;
+  const y = ((event.clientY - rect.top) / rect.height) * HARP_VIEWBOX_HEIGHT;
+  const nearestString = Math.round((x - HARP_X_START) / HARP_X_GAP);
+  const nearestStringX = harpStringX(nearestString);
+  const isWithinStringRun = (
+    nearestString >= 0
+    && nearestString < HARP_STRING_COUNT
+    && Math.abs(x - nearestStringX) <= HARP_X_GAP / 2
+    && y >= HARP_TOP_Y - 18
+    && y <= HARP_BOTTOM_Y + 18
+  );
+
+  return isWithinStringRun ? nearestString : undefined;
+};
+
 export function EasterEggOverlay({ isVisible, onDismiss }: EasterEggOverlayProps) {
   const { messages } = useI18n();
   const [activePluck, setActivePluck] = useState<{ offset: number; string: number }>();
@@ -263,17 +281,47 @@ export function EasterEggOverlay({ isVisible, onDismiss }: EasterEggOverlayProps
     lastPointerStringRef.current = undefined;
   };
 
-  const handleStringPointerDown = (string: number) => {
+  const startPointerPlucking = (string: number) => {
     isPointerPluckingRef.current = true;
     lastPointerStringRef.current = string;
     pluckString(string);
   };
 
-  const handleStringPointerEnter = (string: number) => {
+  const continuePointerPlucking = (string: number) => {
     if (!isPointerPluckingRef.current || lastPointerStringRef.current === string) { return; }
 
     lastPointerStringRef.current = string;
     pluckString(string);
+  };
+
+  const handleHarpPointerDown = (event: PointerEvent<SVGSVGElement>) => {
+    if (event.pointerType === 'mouse' && event.button !== 0) { return; }
+
+    const string = harpStringFromPointer(event);
+    if (string === undefined) { return; }
+
+    event.currentTarget.setPointerCapture(event.pointerId);
+    startPointerPlucking(string);
+  };
+
+  const handleHarpPointerMove = (event: PointerEvent<SVGSVGElement>) => {
+    if (!isPointerPluckingRef.current) { return; }
+    if (event.pointerType === 'mouse' && event.buttons !== 1) {
+      stopPointerPlucking();
+      return;
+    }
+
+    const string = harpStringFromPointer(event);
+    if (string !== undefined) {
+      continuePointerPlucking(string);
+    }
+  };
+
+  const handleHarpPointerEnd = (event: PointerEvent<SVGSVGElement>) => {
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    stopPointerPlucking();
   };
 
   const handleReplayMelody = () => {
@@ -345,17 +393,16 @@ export function EasterEggOverlay({ isVisible, onDismiss }: EasterEggOverlayProps
             aria-hidden={'true'}
             viewBox={`0 0 ${HARP_VIEWBOX_WIDTH} ${HARP_VIEWBOX_HEIGHT}`}
             preserveAspectRatio={'none'}
-            onPointerUp={stopPointerPlucking}
-            onPointerLeave={stopPointerPlucking}
-            onPointerCancel={stopPointerPlucking}
+            onPointerDown={handleHarpPointerDown}
+            onPointerMove={handleHarpPointerMove}
+            onPointerUp={handleHarpPointerEnd}
+            onPointerCancel={handleHarpPointerEnd}
           >
             {Array.from({ length: HARP_STRING_COUNT }, (_, index) => (
               <g key={index}>
                 <path
                   className={'easter-egg-string-hit'}
                   d={harpStringPath(harpStringX(index))}
-                  onPointerDown={() => handleStringPointerDown(index)}
-                  onPointerEnter={() => handleStringPointerEnter(index)}
                 />
                 <path
                   className={`easter-egg-string ${activePluck?.string === index ? 'easter-egg-string-active' : ''}`}
