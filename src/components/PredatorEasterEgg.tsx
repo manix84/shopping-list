@@ -9,6 +9,7 @@ type Predator = {
   className: string;
   render: () => ReactNode;
 };
+type PredatorDirection = 'left-to-right' | 'right-to-left';
 
 const RUN_DURATION_MS = 4_800;
 const GROWL_DURATION_SECONDS = 1.65;
@@ -333,6 +334,7 @@ const playGrowl = () => {
 
 export function PredatorEasterEgg({ onComplete }: PredatorEasterEggProps) {
   const predator = useMemo(() => predators[Math.floor(Math.random() * predators.length)] ?? predators[0], []);
+  const direction = useMemo<PredatorDirection>(() => Math.random() < 0.5 ? 'left-to-right' : 'right-to-left', []);
   const onCompleteRef = useRef(onComplete);
 
   useEffect(() => {
@@ -373,14 +375,16 @@ export function PredatorEasterEgg({ onComplete }: PredatorEasterEggProps) {
   }, []);
 
   return (
-    <div className={'predator-easter-egg'} aria-hidden={'true'}>
+    <div className={`predator-easter-egg predator-easter-egg-${direction}`} aria-hidden={'true'}>
       <div className={'predator-shadow'} />
-      <svg
-        className={`predator-puppet ${predator.className}`}
-        viewBox={'-18 0 196 150'}
-      >
-        {predator.render()}
-      </svg>
+      <div className={'predator-puppet-facing'}>
+        <svg
+          className={`predator-puppet ${predator.className}`}
+          viewBox={'-18 0 196 150'}
+        >
+          {predator.render()}
+        </svg>
+      </div>
     </div>
   );
 }

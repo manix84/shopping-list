@@ -1561,12 +1561,30 @@ select {
 .predator-easter-egg {
   bottom: max(10px, env(safe-area-inset-bottom));
   height: 150px;
-  left: -190px;
   pointer-events: none;
   position: fixed;
   width: 190px;
   z-index: 1150;
+}
+
+.predator-easter-egg-left-to-right {
+  left: -190px;
   animation: predator-run-across 4.8s linear both;
+}
+
+.predator-easter-egg-right-to-left {
+  right: -190px;
+  animation: predator-run-across-reverse 4.8s linear both;
+
+  .predator-puppet-facing {
+    transform: scaleX(-1);
+  }
+}
+
+.predator-puppet-facing {
+  height: 150px;
+  transform-origin: 50% 100%;
+  width: 190px;
 }
 
 .predator-puppet {
@@ -1745,6 +1763,16 @@ select {
 
   100% {
     transform: translateX(calc(100vw + 380px));
+  }
+}
+
+@keyframes predator-run-across-reverse {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(calc(-100vw - 380px));
   }
 }
 
