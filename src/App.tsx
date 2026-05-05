@@ -301,10 +301,36 @@ export default function App() {
     let touchStartTime = 0;
     let hasValidTouchStart = false;
     let sequenceResetTimer: number | undefined;
+    let isTouchMoveListenerActive = false;
+
+    function handleTouchMove(event: TouchEvent) {
+      if (!hasValidTouchStart || isTextInputTarget(event.target)) { return; }
+
+      event.preventDefault();
+    }
+
+    const addTouchMoveListener = () => {
+      if (isTouchMoveListenerActive) { return; }
+
+      window.addEventListener('touchmove', handleTouchMove, { passive: false });
+      isTouchMoveListenerActive = true;
+    };
+
+    const removeTouchMoveListener = () => {
+      if (!isTouchMoveListenerActive) { return; }
+
+      window.removeEventListener('touchmove', handleTouchMove);
+      isTouchMoveListenerActive = false;
+    };
 
     const setKonamiTouchState = (isActive: boolean, isTapStage: boolean) => {
       document.documentElement.classList.toggle('konami-touch-active', isActive);
       document.documentElement.classList.toggle('konami-touch-tap-stage', isTapStage);
+      if (isActive) {
+        addTouchMoveListener();
+      } else {
+        removeTouchMoveListener();
+      }
     };
 
     const resetTouchStart = () => {
@@ -323,6 +349,7 @@ export default function App() {
 
     const resetKonamiSequence = () => {
       sequenceIndex = 0;
+      resetTouchStart();
       clearSequenceResetTimer();
       setKonamiTouchState(false, false);
     };
@@ -371,12 +398,6 @@ export default function App() {
       touchStartTime = Date.now();
     };
 
-    const handleTouchMove = (event: TouchEvent) => {
-      if (sequenceIndex === 0 || !hasValidTouchStart || isTextInputTarget(event.target)) { return; }
-
-      event.preventDefault();
-    };
-
     const handleTouchEnd = (event: TouchEvent) => {
       if (isTextInputTarget(event.target) || !hasValidTouchStart) {
         resetTouchStart();
@@ -416,18 +437,16 @@ export default function App() {
 
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('touchstart', handleTouchStart, { passive: true });
-    window.addEventListener('touchmove', handleTouchMove, { passive: false });
     window.addEventListener('touchend', handleTouchEnd, { passive: false });
-    window.addEventListener('touchcancel', resetTouchStart);
+    window.addEventListener('touchcancel', resetKonamiSequence);
 
     return () => {
       clearSequenceResetTimer();
       setKonamiTouchState(false, false);
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('touchstart', handleTouchStart);
-      window.removeEventListener('touchmove', handleTouchMove);
       window.removeEventListener('touchend', handleTouchEnd);
-      window.removeEventListener('touchcancel', resetTouchStart);
+      window.removeEventListener('touchcancel', resetKonamiSequence);
     };
   }, []);
 
