@@ -1590,7 +1590,8 @@ select {
 
 .predator-body,
 .predator-head,
-.predator-fin {
+.predator-fin,
+.predator-snout {
   fill: color-mix(in srgb, $primary 58%, #f7b955);
   stroke: color-mix(in srgb, $text 58%, $primary);
   stroke-linejoin: round;
@@ -1598,14 +1599,17 @@ select {
 }
 
 .predator-tiger .predator-body,
-.predator-tiger .predator-head {
+.predator-tiger .predator-head,
+.predator-tiger .predator-snout {
   fill: #f4a340;
 }
 
 .predator-rex .predator-body,
 .predator-rex .predator-head,
+.predator-rex .predator-snout,
 .predator-raptor .predator-body,
-.predator-raptor .predator-head {
+.predator-raptor .predator-head,
+.predator-raptor .predator-snout {
   fill: #67b56b;
 }
 
@@ -1615,20 +1619,33 @@ select {
 }
 
 .predator-croc .predator-body,
-.predator-croc .predator-head {
+.predator-croc .predator-head,
+.predator-croc .predator-snout {
   fill: #5a9e63;
 }
 
 .predator-wolf .predator-body,
 .predator-wolf .predator-head,
+.predator-wolf .predator-snout,
 .predator-bear .predator-body,
-.predator-bear .predator-head {
+.predator-bear .predator-head,
+.predator-bear .predator-snout {
   fill: #8e705a;
+}
+
+.predator-belly {
+  fill: color-mix(in srgb, #fff 44%, transparent);
+  opacity: 0.42;
+  stroke: color-mix(in srgb, $text 22%, transparent);
+  stroke-linejoin: round;
+  stroke-width: 2;
 }
 
 .predator-mark,
 .predator-arm,
+.predator-claw,
 .predator-ear,
+.predator-gill,
 .predator-leg,
 .predator-mouth,
 .predator-tail,
@@ -1638,6 +1655,11 @@ select {
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 4;
+}
+
+.predator-claw,
+.predator-gill {
+  stroke-width: 3;
 }
 
 .predator-tail {
@@ -1651,6 +1673,10 @@ select {
 
 .predator-eye {
   fill: $text;
+}
+
+.predator-nose {
+  fill: color-mix(in srgb, $text 78%, $primary);
 }
 
 .predator-leg-front {
