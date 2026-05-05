@@ -1569,11 +1569,13 @@ select {
 
 .predator-easter-egg-left-to-right {
   left: -190px;
+  --predator-facing-direction: 1;
   animation: predator-run-across 4.8s linear both;
 }
 
 .predator-easter-egg-right-to-left {
   right: -190px;
+  --predator-facing-direction: -1;
   animation: predator-run-across-reverse 4.8s linear both;
 
   .predator-puppet-facing {
@@ -1779,15 +1781,23 @@ select {
 @keyframes predator-cartoon-hop {
   0%,
   100% {
-    transform: translateY(0) rotate(-1deg) scaleX(1);
+    transform: translateY(0) rotate(0deg) scaleX(1);
+  }
+
+  24% {
+    transform: translateY(-16px) rotate(calc(-4deg * var(--predator-facing-direction, 1))) scaleX(1.02);
   }
 
   42% {
-    transform: translateY(-22px) rotate(3deg) scaleX(1.03);
+    transform: translateY(-22px) rotate(calc(-2deg * var(--predator-facing-direction, 1))) scaleX(1.03);
   }
 
   68% {
-    transform: translateY(-6px) rotate(-3deg) scaleX(0.98);
+    transform: translateY(-6px) rotate(calc(4deg * var(--predator-facing-direction, 1))) scaleX(0.98);
+  }
+
+  82% {
+    transform: translateY(0) rotate(0deg) scaleX(1);
   }
 }
 
