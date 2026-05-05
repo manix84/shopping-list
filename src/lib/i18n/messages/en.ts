@@ -152,6 +152,18 @@ export const en: Messages = {
         'Sponsorship helps keep this app independent, maintained, and free to use.',
       authorProfileLabel: "Open Rob's GitHub profile",
     },
+    error: {
+      notFoundCode: '404',
+      notFoundEyebrow: 'Aisle not found',
+      notFoundTitle: "This aisle isn't on the store map.",
+      notFoundSubtitle:
+        'The route you opened does not match a shopping list page. The rest of the list is still ready when you are.',
+      serverCode: '500',
+      serverEyebrow: 'Checkout jammed',
+      serverTitle: 'Something went sideways behind the counter.',
+      serverSubtitle:
+        'The app hit a server problem. Local list editing should still work, and the debug tools can help inspect backend status.',
+    },
     debug: {
       title: 'Debug tools',
       subtitle:

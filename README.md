@@ -34,6 +34,8 @@ The app uses normal path-based routing:
 - `/settings` - language, country profile, and theme preferences
 - `/about` - app version, install status, and release information
 - `/debug` - parser, storage, backend, measurement, and layout self-checks
+- `/404` - not-found page for unknown routes
+- `/500` - server-error page for backend failure states
 
 Backend-backed shared lists use path routes:
 

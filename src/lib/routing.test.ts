@@ -16,6 +16,10 @@ describe('routing', () => {
       page: 'edit',
       listId: LIST_ID,
     });
+    expect(readRouteFromLocationParts({ pathname: `/list/${LIST_ID}` })).toEqual({
+      page: 'edit',
+      listId: LIST_ID,
+    });
   });
 
   it('reads shared list routes under a configured base path', () => {
@@ -25,20 +29,32 @@ describe('routing', () => {
     });
   });
 
-  it('falls back to edit for unknown shared-list pages', () => {
-    expect(readRouteFromLocationParts({ pathname: `/list/${LIST_ID}/unknown` })).toEqual({
-      page: 'edit',
-      listId: LIST_ID,
-    });
+  it('keeps compatibility with short shared-list URLs', () => {
     expect(readRouteFromLocationParts({ pathname: `/${LIST_ID}/unknown` })).toEqual({
       page: 'edit',
       listId: LIST_ID,
     });
   });
 
-  it('reads regular path routes and defaults unknown paths to edit', () => {
+  it('uses the not-found page for unknown canonical shared-list pages', () => {
+    expect(readRouteFromLocationParts({ pathname: `/list/${LIST_ID}/unknown` })).toEqual({
+      page: 'not-found',
+      listId: LIST_ID,
+    });
+  });
+
+  it('reads error pages', () => {
+    expect(readRouteFromLocationParts({ pathname: '/404' })).toEqual({ page: 'not-found' });
+    expect(readRouteFromLocationParts({ pathname: '/500' })).toEqual({ page: 'server-error' });
+  });
+
+  it('keeps the root route on edit and sends unknown paths to not found', () => {
+    expect(readRouteFromLocationParts({ pathname: '/' })).toEqual({ page: 'edit' });
+    expect(readRouteFromLocationParts({ pathname: '/unknown' })).toEqual({ page: 'not-found' });
+  });
+
+  it('reads regular path routes', () => {
     expect(readRouteFromLocationParts({ pathname: '/settings' })).toEqual({ page: 'settings' });
-    expect(readRouteFromLocationParts({ pathname: '/unknown' })).toEqual({ page: 'edit' });
   });
 
   it('keeps settings, sections, and about app-level when rendering URLs', () => {
@@ -54,6 +70,11 @@ describe('routing', () => {
 
   it('uses path routes when there is no visible shared list id', () => {
     expect(routeToUrl({ page: 'edit' })).toBe('/edit');
+  });
+
+  it('renders error page URLs', () => {
+    expect(routeToUrl({ page: 'not-found' })).toBe('/404');
+    expect(routeToUrl({ page: 'server-error' })).toBe('/500');
   });
 
   it('renders URLs under a configured base path', () => {
