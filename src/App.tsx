@@ -68,6 +68,7 @@ const KONAMI_SEQUENCE = ['up', 'up', 'down', 'down', 'left', 'right', 'left', 'r
 const KONAMI_TOUCH_SWIPE_MIN_PX = 42;
 const KONAMI_TOUCH_TAP_MAX_PX = 14;
 const KONAMI_TOUCH_TAP_MAX_MS = 260;
+const KONAMI_TOUCH_SEQUENCE_TIMEOUT_MS = 1_600;
 type StorageMode = 'local' | 'backend';
 type BeforeInstallPromptChoice = {
   outcome: 'accepted' | 'dismissed';
@@ -299,8 +300,10 @@ export default function App() {
     let touchStartY = 0;
     let touchStartTime = 0;
     let hasValidTouchStart = false;
+    let sequenceResetTimer: number | undefined;
 
-    const setKonamiTapStage = (isTapStage: boolean) => {
+    const setKonamiTouchState = (isActive: boolean, isTapStage: boolean) => {
+      document.documentElement.classList.toggle('konami-touch-active', isActive);
       document.documentElement.classList.toggle('konami-touch-tap-stage', isTapStage);
     };
 
@@ -311,16 +314,39 @@ export default function App() {
       touchStartTime = 0;
     };
 
+    const clearSequenceResetTimer = () => {
+      if (sequenceResetTimer === undefined) { return; }
+
+      window.clearTimeout(sequenceResetTimer);
+      sequenceResetTimer = undefined;
+    };
+
+    const resetKonamiSequence = () => {
+      sequenceIndex = 0;
+      clearSequenceResetTimer();
+      setKonamiTouchState(false, false);
+    };
+
+    const scheduleKonamiSequenceReset = () => {
+      clearSequenceResetTimer();
+      sequenceResetTimer = window.setTimeout(resetKonamiSequence, KONAMI_TOUCH_SEQUENCE_TIMEOUT_MS);
+    };
+
     const acceptKonamiInput = (input: (typeof KONAMI_SEQUENCE)[number]) => {
       sequenceIndex = nextKonamiIndex(sequenceIndex, input);
       if (sequenceIndex >= KONAMI_SEQUENCE.length) {
-        sequenceIndex = 0;
-        setKonamiTapStage(false);
+        resetKonamiSequence();
         setPredatorEasterEggRun((current) => current + 1);
         return;
       }
 
-      setKonamiTapStage(sequenceIndex >= KONAMI_SEQUENCE.length - 2);
+      if (sequenceIndex === 0) {
+        resetKonamiSequence();
+        return;
+      }
+
+      setKonamiTouchState(true, sequenceIndex >= KONAMI_SEQUENCE.length - 2);
+      scheduleKonamiSequenceReset();
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -343,6 +369,12 @@ export default function App() {
       touchStartX = touch.clientX;
       touchStartY = touch.clientY;
       touchStartTime = Date.now();
+    };
+
+    const handleTouchMove = (event: TouchEvent) => {
+      if (sequenceIndex === 0 || !hasValidTouchStart || isTextInputTarget(event.target)) { return; }
+
+      event.preventDefault();
     };
 
     const handleTouchEnd = (event: TouchEvent) => {
@@ -384,13 +416,16 @@ export default function App() {
 
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
     window.addEventListener('touchend', handleTouchEnd, { passive: false });
     window.addEventListener('touchcancel', resetTouchStart);
 
     return () => {
-      setKonamiTapStage(false);
+      clearSequenceResetTimer();
+      setKonamiTouchState(false, false);
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
       window.removeEventListener('touchend', handleTouchEnd);
       window.removeEventListener('touchcancel', resetTouchStart);
     };
