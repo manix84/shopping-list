@@ -135,6 +135,7 @@ export const it: Messages = {
       countryLabel: 'Profilo disposizione negozio',
       defaultCountryLabel: 'Profilo negozio predefinito',
       defaultCountrySubtitle: 'Usato per le nuove liste su questo dispositivo.',
+      defaultCountryAutoDetect: 'Rileva automaticamente',
       detectedCountrySuffix: 'rilevato',
       themeLabel: 'Tema',
       themeSubtitle: 'Scegli l’aspetto più comodo da usare.',

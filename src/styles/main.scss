@@ -776,6 +776,13 @@ select {
   line-height: 1;
 }
 
+.country-option-icon-auto {
+  border: 1px dashed $muted;
+  border-radius: 3px;
+  height: 14px;
+  width: 19px;
+}
+
 .locale-option-icon {
   align-items: center;
   background: $panel-alt;

@@ -132,6 +132,7 @@ export type Messages = {
       countryLabel: string;
       defaultCountryLabel: string;
       defaultCountrySubtitle: string;
+      defaultCountryAutoDetect: string;
       detectedCountrySuffix: string;
       themeLabel: string;
       themeSubtitle: string;

@@ -5,6 +5,8 @@ import type { CountryCode, RouteViewMode, ThemeMode } from '../types';
 import { Card } from '../components/Card';
 import { DebugLink } from '../components/DebugLink';
 import {
+  AUTO_DETECT_COUNTRY,
+  type DefaultCountryPreference,
   inferDefaultCountryCode,
   loadDefaultCountryPreference,
   saveDefaultCountryPreference,
@@ -54,6 +56,10 @@ function CountryIcon({ countryCode }: { countryCode: CountryCode }) {
       {COUNTRY_CONFIGS[countryCode].flag}
     </span>
   );
+}
+
+function AutoDetectCountryIcon() {
+  return <span aria-hidden={'true'} className={'country-option-icon country-option-icon-auto'} />;
 }
 
 function RouteDensityPreview({ mode }: { mode: RouteViewMode }) {
@@ -164,24 +170,24 @@ export function SettingsPage({
 }: SettingsPageProps) {
   const { locale, setLocale, messages } = useI18n();
   const [detectedCountryCode] = useState<CountryCode>(() => inferDefaultCountryCode());
-  const [defaultCountryCode, setDefaultCountryCode] = useState<CountryCode>(
-    () => loadDefaultCountryPreference() ?? detectedCountryCode,
+  const [defaultCountryPreference, setDefaultCountryPreference] = useState<DefaultCountryPreference>(
+    () => loadDefaultCountryPreference() ?? AUTO_DETECT_COUNTRY,
   );
   const routeViewOptions: RouteViewMode[] = ['default', 'comfortable', 'compact'];
-  const detectedCountry = COUNTRY_CONFIGS[detectedCountryCode];
-  const defaultCountryOptions: SelectOption<CountryCode>[] = [
+  const defaultCountryOptions: SelectOption<DefaultCountryPreference>[] = [
     {
-      value: detectedCountryCode,
-      label: `${detectedCountry.label} (${messages.pages.settings.detectedCountrySuffix})`,
-      icon: <CountryIcon countryCode={detectedCountryCode} />,
+      value: AUTO_DETECT_COUNTRY,
+      label: messages.pages.settings.defaultCountryAutoDetect,
+      icon: <AutoDetectCountryIcon />,
     },
     ...Object.values(COUNTRY_CONFIGS)
-      .filter((country) => country.code !== detectedCountryCode)
       .slice()
       .sort((a, b) => a.label.localeCompare(b.label))
-      .map((country): SelectOption<CountryCode> => ({
+      .map((country): SelectOption<DefaultCountryPreference> => ({
         value: country.code,
-        label: country.label,
+        label: country.code === detectedCountryCode
+          ? `${country.label} (${messages.pages.settings.detectedCountrySuffix})`
+          : country.label,
         icon: <CountryIcon countryCode={country.code} />,
       })),
   ];
@@ -229,9 +235,9 @@ export function SettingsPage({
       ) : null}
     </div>
   ) : null;
-  const handleDefaultCountryChange = (countryCode: CountryCode) => {
-    setDefaultCountryCode(countryCode);
-    saveDefaultCountryPreference(countryCode);
+  const handleDefaultCountryChange = (preference: DefaultCountryPreference) => {
+    setDefaultCountryPreference(preference);
+    saveDefaultCountryPreference(preference);
   };
 
   return (
@@ -265,7 +271,7 @@ export function SettingsPage({
           </div>
           <SettingsSelect
             id={'default-country-select'}
-            value={defaultCountryCode}
+            value={defaultCountryPreference}
             options={defaultCountryOptions}
             onChange={handleDefaultCountryChange}
           />

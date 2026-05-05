@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createWindowMock } from '../test/testUtils';
 import {
+  AUTO_DETECT_COUNTRY,
   DEFAULT_COUNTRY_STORAGE_KEY,
   defaultCountryCode,
   inferDefaultCountryCode,
@@ -42,6 +43,18 @@ describe('default country preference', () => {
 
     expect(windowMock.localStorage.getItem(DEFAULT_COUNTRY_STORAGE_KEY)).toBe('nl');
     expect(loadDefaultCountryPreference()).toBe('nl');
+  });
+
+  it('saves auto-detect as a preference and still uses detection for defaults', () => {
+    const windowMock = createWindowMock({ language: 'en-US' });
+    vi.stubGlobal('window', windowMock);
+    vi.stubGlobal('navigator', windowMock.navigator);
+
+    saveDefaultCountryPreference(AUTO_DETECT_COUNTRY);
+
+    expect(windowMock.localStorage.getItem(DEFAULT_COUNTRY_STORAGE_KEY)).toBe(AUTO_DETECT_COUNTRY);
+    expect(loadDefaultCountryPreference()).toBe(AUTO_DETECT_COUNTRY);
+    expect(defaultCountryCode()).toBe('us');
   });
 
   it('uses a saved preference before detected defaults', () => {

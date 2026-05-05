@@ -130,6 +130,7 @@ export const en: Messages = {
       countryLabel: 'Store layout profile',
       defaultCountryLabel: 'Default store layout profile',
       defaultCountrySubtitle: 'Used for new lists on this device.',
+      defaultCountryAutoDetect: 'Auto Detect',
       detectedCountrySuffix: 'detected',
       themeLabel: 'Theme',
       themeSubtitle: 'Choose the look that feels easiest to use.',

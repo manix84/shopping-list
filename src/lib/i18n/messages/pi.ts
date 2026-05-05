@@ -135,6 +135,7 @@ export const pi: Messages = {
       countryLabel: 'Market layout profile',
       defaultCountryLabel: 'Default market layout profile',
       defaultCountrySubtitle: 'Used fer new ledgers on this device.',
+      defaultCountryAutoDetect: 'Spy it out',
       detectedCountrySuffix: 'spotted',
       themeLabel: 'Look',
       themeSubtitle: 'Choose the look that sits easiest on yer eyes.',

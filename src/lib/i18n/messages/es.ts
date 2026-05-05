@@ -131,6 +131,7 @@ export const es: Messages = {
       countryLabel: 'Perfil de distribución de tienda',
       defaultCountryLabel: 'Perfil de tienda predeterminado',
       defaultCountrySubtitle: 'Se usa para nuevas listas en este dispositivo.',
+      defaultCountryAutoDetect: 'Detectar automáticamente',
       detectedCountrySuffix: 'detectado',
       themeLabel: 'Tema',
       themeSubtitle: 'Elige el aspecto que te resulte más cómodo de usar.',

@@ -135,6 +135,7 @@ export const ro: Messages = {
       countryLabel: 'Profil de aranjare a magazinului',
       defaultCountryLabel: 'Profil implicit de magazin',
       defaultCountrySubtitle: 'Folosit pentru liste noi pe acest dispozitiv.',
+      defaultCountryAutoDetect: 'Detectare automată',
       detectedCountrySuffix: 'detectat',
       themeLabel: 'Temă',
       themeSubtitle: 'Alege aspectul cel mai confortabil pentru tine.',

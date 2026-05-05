@@ -137,6 +137,7 @@ export const de: Messages = {
       countryLabel: 'Ladenlayout-Profil',
       defaultCountryLabel: 'Standard-Ladenlayout-Profil',
       defaultCountrySubtitle: 'Wird für neue Listen auf diesem Gerät verwendet.',
+      defaultCountryAutoDetect: 'Automatisch erkennen',
       detectedCountrySuffix: 'erkannt',
       themeLabel: 'Design',
       themeSubtitle: 'Wähle die Darstellung, die für dich am angenehmsten ist.',

@@ -136,6 +136,7 @@ export const nl: Messages = {
       countryLabel: 'Winkelindelingsprofiel',
       defaultCountryLabel: 'Standaard winkelindelingsprofiel',
       defaultCountrySubtitle: 'Gebruikt voor nieuwe lijsten op dit apparaat.',
+      defaultCountryAutoDetect: 'Automatisch detecteren',
       detectedCountrySuffix: 'gedetecteerd',
       themeLabel: 'Thema',
       themeSubtitle: 'Kies de weergave die voor jou het prettigst werkt.',
