@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
 type PredatorEasterEggProps = {
   onComplete: () => void;
@@ -11,6 +11,14 @@ type Predator = {
 };
 
 const RUN_DURATION_MS = 4_800;
+const GROWL_DURATION_SECONDS = 1.65;
+const GROWL_DURATION_MS = GROWL_DURATION_SECONDS * 1_000;
+const GROWL_CLOSE_GRACE_MS = 350;
+const GROWL_MIN_GAP_MS = 300;
+const FIRST_GROWL_EARLIEST_MS = 280;
+const FIRST_GROWL_LATEST_MS = 620;
+const SECOND_GROWL_EARLIEST_MS = 2_520;
+const SECOND_GROWL_LATEST_MS = RUN_DURATION_MS - GROWL_DURATION_MS - 280;
 
 const predators: Predator[] = [
   {
@@ -184,6 +192,19 @@ const createGrowlContext = (): AudioContext | undefined => {
   return AudioContextConstructor ? new AudioContextConstructor() : undefined;
 };
 
+const randomBetween = (min: number, max: number) =>
+  min + Math.random() * (max - min);
+
+const predatorGrowlDelays = (): [number, number] => {
+  const first = randomBetween(FIRST_GROWL_EARLIEST_MS, FIRST_GROWL_LATEST_MS);
+  const secondEarliest = Math.max(
+    SECOND_GROWL_EARLIEST_MS,
+    first + GROWL_DURATION_MS + GROWL_MIN_GAP_MS,
+  );
+  const second = randomBetween(secondEarliest, SECOND_GROWL_LATEST_MS);
+  return [first, second];
+};
+
 const createDistortionCurve = (amount: number) => {
   const samples = 256;
   const curve = new Float32Array(samples);
@@ -201,7 +222,7 @@ const playGrowl = () => {
 
   void audioContext.resume();
   const now = audioContext.currentTime;
-  const duration = 1.65;
+  const duration = GROWL_DURATION_SECONDS;
   const noiseBuffer = audioContext.createBuffer(1, audioContext.sampleRate * duration, audioContext.sampleRate);
   const samples = noiseBuffer.getChannelData(0);
   let previousSample = 0;
@@ -302,7 +323,7 @@ const playGrowl = () => {
 
   const closeTimer = window.setTimeout(() => {
     void audioContext.close();
-  }, 2_000);
+  }, GROWL_DURATION_MS + GROWL_CLOSE_GRACE_MS);
 
   return () => {
     window.clearTimeout(closeTimer);
@@ -312,16 +333,44 @@ const playGrowl = () => {
 
 export function PredatorEasterEgg({ onComplete }: PredatorEasterEggProps) {
   const predator = useMemo(() => predators[Math.floor(Math.random() * predators.length)] ?? predators[0], []);
+  const onCompleteRef = useRef(onComplete);
 
   useEffect(() => {
-    const stopGrowl = playGrowl();
-    const completeTimer = window.setTimeout(onComplete, RUN_DURATION_MS);
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
+
+  useEffect(() => {
+    let isCancelled = false;
+    const stopGrowls: Array<() => void> = [];
+    const growlTimers = predatorGrowlDelays().map((delay) =>
+      window.setTimeout(() => {
+        if (isCancelled) { return; }
+
+        const stopGrowl = playGrowl();
+        if (stopGrowl) {
+          stopGrowls.push(stopGrowl);
+        }
+      }, delay),
+    );
+    const completeTimer = window.setTimeout(() => {
+      isCancelled = true;
+      for (const growlTimer of growlTimers) {
+        window.clearTimeout(growlTimer);
+      }
+      onCompleteRef.current();
+    }, RUN_DURATION_MS);
 
     return () => {
+      isCancelled = true;
+      for (const growlTimer of growlTimers) {
+        window.clearTimeout(growlTimer);
+      }
       window.clearTimeout(completeTimer);
-      stopGrowl?.();
+      for (const stopGrowl of stopGrowls) {
+        stopGrowl();
+      }
     };
-  }, [onComplete]);
+  }, []);
 
   return (
     <div className={'predator-easter-egg'} aria-hidden={'true'}>
