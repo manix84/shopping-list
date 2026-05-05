@@ -84,7 +84,6 @@ export function EditPage({
   return (
     <div className={'layout-split'}>
       <Card
-        className={'edit-list-card'}
         header={
           <div className={'title-row edit-page-header'}>
             <div className={'edit-page-header-copy'}>

@@ -11,16 +11,19 @@ type CountrySelectProps = {
 };
 
 export function CountrySelect({ id, value, onChange }: CountrySelectProps) {
-  const { messages } = useI18n();
+  const { locale, messages } = useI18n();
   const [open, setOpen] = useState(false);
   const countryOptions = useMemo(
     () =>
       Object.values(COUNTRY_CONFIGS)
         .slice()
         .sort((a, b) =>
-          (messages.countryOptions[a.code] ?? a.label).localeCompare(messages.countryOptions[b.code] ?? b.label),
+          (messages.countryOptions[a.code] ?? a.label).localeCompare(
+            messages.countryOptions[b.code] ?? b.label,
+            locale,
+          ),
         ),
-    [messages.countryOptions],
+    [locale, messages.countryOptions],
   );
   const selectedCountry = COUNTRY_CONFIGS[value];
   const selectedCountryLabel = messages.countryOptions[value] ?? selectedCountry.label;
