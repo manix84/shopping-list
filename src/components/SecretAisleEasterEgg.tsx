@@ -1,6 +1,5 @@
 import { mdiClose, mdiStarFourPoints } from '@mdi/js';
-import type { CSSProperties } from 'react';
-import type { KeyboardEvent as ReactKeyboardEvent, PointerEvent } from 'react';
+import type { CSSProperties, PointerEvent, KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { useI18n } from '../lib/i18n';
 
@@ -108,6 +107,7 @@ const tuneFromStrings = (strings: number[]): Melody => (
 );
 
 const melodies: Melody[] = [
+  tuneFromStrings([4, 5, 7, 5, 4, 2, 4, 5, 7, 8, 7, 5, 4, 2, 0, 2]), // Toryanse Crossing Melody
   tuneFromStrings([0, 2, 4, 7, 6, 4, 2, 3, 5, 7, 9, 8, 7, 5, 4, 7]),
   tuneFromStrings([4, 5, 7, 9, 7, 5, 4, 2, 3, 5, 6, 8, 7, 5, 4, 2]),
   tuneFromStrings([7, 9, 11, 10, 9, 7, 5, 7, 8, 9, 11, 9, 8, 7, 5, 7]),
