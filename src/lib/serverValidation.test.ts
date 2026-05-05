@@ -46,4 +46,27 @@ describe('server validation', () => {
 
     expect(isShoppingListRecord(record)).toBe(false);
   });
+
+  it('allows optional shopping-list names but rejects malformed names', async () => {
+    const { isShoppingListRecord } = await loadValidation();
+    const record = {
+      listName: 'Weekly shop',
+      input: 'milk',
+      items: [
+        {
+          id: 'milk',
+          raw: 'milk',
+          normalized: 'milk',
+          cleaned: 'milk',
+          checked: false,
+          matchedSection: 'chilled_milk_juice_cream',
+        },
+      ],
+      updatedAt: '2026-04-22T00:00:00.000Z',
+      countryCode: 'uk',
+    };
+
+    expect(isShoppingListRecord(record)).toBe(true);
+    expect(isShoppingListRecord({ ...record, listName: 123 })).toBe(false);
+  });
 });

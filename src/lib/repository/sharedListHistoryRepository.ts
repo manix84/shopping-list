@@ -21,6 +21,7 @@ const sanitizeEntries = (value: unknown): SharedListHistoryEntry[] => {
     .filter(isHistoryEntry)
     .map((entry) => ({
       listId: entry.listId,
+      listName: typeof entry.listName === 'string' && entry.listName.trim() ? entry.listName.trim() : undefined,
       itemPreview: entry.itemPreview.filter((item) => typeof item === 'string').slice(0, MAX_PREVIEW_ITEMS),
       createdAt: typeof entry.createdAt === 'string' ? entry.createdAt : undefined,
       updatedAt: entry.updatedAt,
@@ -46,8 +47,18 @@ export const sharedListHistoryRepository = {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitizeEntries(entries)));
   },
   remember(entry: SharedListHistoryEntry): SharedListHistoryEntry[] {
-    const current = this.load().filter((existing) => existing.listId !== entry.listId);
-    const next = [{ ...entry, itemPreview: entry.itemPreview.slice(0, MAX_PREVIEW_ITEMS) }, ...current].slice(0, MAX_ENTRIES);
+    const loaded = this.load();
+    const existing = loaded.find((current) => current.listId === entry.listId);
+    const current = loaded.filter((currentEntry) => currentEntry.listId !== entry.listId);
+    const next = [
+      {
+        ...entry,
+        createdAt: entry.createdAt ?? existing?.createdAt,
+        listName: entry.listName?.trim() || undefined,
+        itemPreview: entry.itemPreview.slice(0, MAX_PREVIEW_ITEMS),
+      },
+      ...current,
+    ].slice(0, MAX_ENTRIES);
     this.save(next);
     return next;
   },

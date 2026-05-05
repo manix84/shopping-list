@@ -64,6 +64,7 @@ export type Item = {
 export type ShoppingListRecord = {
   listId?: string;
   serverBacked?: boolean;
+  listName?: string;
   input: string;
   items: Item[];
   updatedAt: string;
@@ -77,6 +78,7 @@ export type AppSettingsRecord = {
 
 export type SharedListHistoryEntry = {
   listId: string;
+  listName?: string;
   itemPreview: string[];
   createdAt?: string;
   updatedAt: string;
@@ -208,6 +210,8 @@ export type StateTestResult = {
 };
 
 export type BackendConnectionState = 'checking' | 'connected' | 'offline' | 'error';
+
+export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 
 export type BackendStatus = {
   state: BackendConnectionState;

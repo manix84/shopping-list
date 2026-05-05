@@ -25,6 +25,7 @@ export const isShoppingListRecord = (value, sharedListId) =>
   typeof value === 'object' &&
   (value.listId === undefined || UUID_V7_PATTERN.test(value.listId)) &&
   (sharedListId === undefined || value.listId === undefined || value.listId === sharedListId) &&
+  (value.listName === undefined || typeof value.listName === 'string') &&
   typeof value.input === 'string' &&
   Array.isArray(value.items) &&
   value.items.every(isShoppingListItem) &&

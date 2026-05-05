@@ -179,7 +179,7 @@ select {
   justify-content: center;
 }
 
-.mobile-menu-panel {
+  .mobile-menu-panel {
   position: absolute;
   top: calc(100% + 10px);
   right: 0;
@@ -413,6 +413,51 @@ select {
   flex-wrap: wrap;
 }
 
+.save-status {
+  animation: connection-badge-fade-in 0.25s ease-out both;
+  align-items: center;
+  background: var(--muted-bg);
+  border: 1px solid var(--muted-border);
+  border-radius: 999px;
+  color: $muted;
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: 34px;
+  justify-content: center;
+  width: 34px;
+}
+
+.save-status-svg {
+  height: 18px;
+  width: 18px;
+}
+
+.save-status-saving {
+  background: color-mix(in srgb, $primary 10%, $panel);
+  border-color: color-mix(in srgb, $primary 26%, $border);
+  color: $primary;
+
+  .save-status-svg {
+    animation: save-status-pulse 1s ease-in-out infinite;
+  }
+}
+
+.save-status-saved {
+  background: $success-bg;
+  border-color: $success-border;
+  color: $success-text;
+}
+
+.save-status-error {
+  background: $danger-bg;
+  border-color: $danger-border;
+  color: $danger-text;
+}
+
+.save-status-leaving {
+  animation: connection-badge-fade-out 0.25s ease-in both;
+}
+
 .app-icon {
   width: 52px;
   height: 52px;
@@ -462,6 +507,18 @@ select {
   &.title-xs {
     font-size: 18px;
   }
+}
+
+.page-title-with-status {
+  align-items: center;
+  display: inline-flex;
+  gap: 8px;
+  min-height: 34px;
+  min-width: 0;
+}
+
+.page-title-with-status .title {
+  min-width: 0;
 }
 
 .subtitle,
@@ -586,6 +643,24 @@ select {
   display: block;
   height: 20px;
   width: 20px;
+}
+
+.button-full,
+.edit-save-actions .button {
+  align-items: center;
+  display: inline-flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.button-full {
+  width: 100%;
+}
+
+.edit-save-actions {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .quick-add-row {
@@ -913,6 +988,14 @@ select {
   width: 74%;
 }
 
+.route-reset-actions {
+  border-top: 1px solid $border;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+  padding-top: 16px;
+}
+
 .textarea {
   min-height: 320px;
   resize: vertical;
@@ -945,6 +1028,13 @@ select {
 .share-link-row > .button,
 .share-load-row > .button {
   flex: 0 0 auto;
+}
+
+.shared-current-list-name {
+  color: $text;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.2;
 }
 
 .share-qr-card-blurred .share-qr-frame {
@@ -1774,6 +1864,19 @@ select {
   }
 }
 
+@keyframes save-status-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.94);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 @keyframes easter-egg-scan {
   0%,
   100% {
@@ -1868,6 +1971,9 @@ select {
   .connection-badge-leaving,
   .easter-egg-overlay,
   .easter-egg-scanline,
+  .save-status,
+  .save-status-leaving,
+  .save-status-saving .save-status-svg,
   .predator-easter-egg,
   .predator-puppet,
   .predator-shadow,

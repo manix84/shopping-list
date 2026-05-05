@@ -62,6 +62,7 @@ export const decodeShoppingListRecord = (
     return {
       listId: isUuidV7(parsed.listId) ? parsed.listId : undefined,
       serverBacked: parsed.serverBacked === true,
+      listName: ensureString(parsed.listName).trim() || undefined,
       input,
       items: sanitizeItems(parsed.items, input, config),
       updatedAt: normalizedUpdatedAt(parsed.updatedAt),

@@ -191,6 +191,7 @@ describe('apiRepository', () => {
     await saveSharedShoppingList(sharedListId, {
       listId: '019dbf30-56de-7b2b-aacc-a5ae59430d80',
       serverBacked: false,
+      listName: 'Weekly shop',
       input,
       items: parseItems(input, UK_CONFIG),
       updatedAt: '2026-04-22T00:00:00.000Z',
@@ -207,6 +208,7 @@ describe('apiRepository', () => {
     expect(body).toMatchObject({
       listId: sharedListId,
       serverBacked: true,
+      listName: 'Weekly shop',
       input,
       countryCode: 'uk',
     });

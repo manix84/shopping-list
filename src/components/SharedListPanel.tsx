@@ -27,6 +27,7 @@ type QrRender = {
 };
 
 type SharedListPanelProps = {
+  listName: string;
   canUseBackend: boolean;
   canCreateSharedLink: boolean;
   resolvedTheme: 'light' | 'dark';
@@ -83,6 +84,7 @@ const createThemedQrRender = async (shareLink: string, theme: 'light' | 'dark'):
 };
 
 export function SharedListPanel({
+  listName,
   canUseBackend,
   canCreateSharedLink,
   resolvedTheme,
@@ -366,6 +368,9 @@ export function SharedListPanel({
   };
 
   const localeCode = locale === 'en' ? 'en-GB' : locale;
+  const displayListName = listName.trim();
+  const historyTitle = (entry: SharedListHistoryEntry): string =>
+    entry.listName?.trim() || entry.itemPreview.join(' · ') || messages.sharing.emptyList;
   const handleQrCardClick = () => {
     if (!qrRevealed) {
       setQrRevealed(true);
@@ -454,6 +459,10 @@ export function SharedListPanel({
     <div className={'stack'}>
       {shareLink ? (
         <>
+          {displayListName ? (
+            <div className={'shared-current-list-name'}>{displayListName}</div>
+          ) : null}
+
           <div className={'field'}>
             <label htmlFor={'shopping-share-link'}>{messages.labels.sharedLink}</label>
             <div className={'inline-row share-link-row'}>
@@ -578,7 +587,7 @@ export function SharedListPanel({
               >
                 <div className={'stack shared-history-content'}>
                   <div className={'shared-history-title-wrap'}>
-                    <div className={'shared-history-title'}>{entry.itemPreview.join(' · ') || messages.sharing.emptyList}</div>
+                    <div className={'shared-history-title'}>{historyTitle(entry)}</div>
                   </div>
                   <div className={'small-text'}>
                     {messages.labels.created} {formatTimestamp(entry.createdAt, localeCode)} · {messages.labels.updated}{' '}
@@ -594,9 +603,7 @@ export function SharedListPanel({
                       void onLoadHistoryEntry(entry.listId);
                     }}
                     disabled={isLoadingSharedList || !canUseBackend}
-                    aria-label={`${messages.actions.loadSharedList}: ${
-                      entry.itemPreview.join(', ') || messages.sharing.emptyList
-                    }`}
+                    aria-label={`${messages.actions.loadSharedList}: ${historyTitle(entry)}`}
                     title={messages.actions.loadSharedList}
                   >
                     <svg aria-hidden={'true'} className={'button-icon-svg'} viewBox={'0 0 24 24'}>
