@@ -44,29 +44,12 @@ const formatTimestamp = (value: string | undefined, locale: string): string =>
   value ? new Date(value).toLocaleString(locale) : '';
 
 const QR_CANVAS_SIZE = 320;
-const QR_LOGO_SIZE = 72;
 const HISTORY_CARD_TAP_THRESHOLD_PX = 10;
 const appBasePath = import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_URL.replace(/\/$/, '');
 const qrLogoPath = (theme: 'light' | 'dark'): string =>
   `${import.meta.env.BASE_URL}${theme === 'dark' ? 'qr-logo-dark.png' : 'qr-logo-light.png'}`;
 
-const loadImage = async (src: string): Promise<HTMLImageElement> =>
-  await new Promise((resolve, reject) => {
-    const image = new Image();
-    image.onload = () => resolve(image);
-    image.onerror = () => reject(new Error(`Unable to load image: ${src}`));
-    image.src = src;
-  });
-
-const createThemedQrDataUrl = async (shareLink: string, theme: 'light' | 'dark'): Promise<string> => {
-  const canvas = document.createElement('canvas');
-  canvas.width = QR_CANVAS_SIZE;
-  canvas.height = QR_CANVAS_SIZE;
-  const context = canvas.getContext('2d');
-  if (!context) {
-    throw new Error('Unable to create QR canvas context');
-  }
-
+const createThemedQrSvgDataUrl = async (shareLink: string, theme: 'light' | 'dark'): Promise<string> => {
   const palette =
     theme === 'dark'
       ? {
@@ -78,12 +61,8 @@ const createThemedQrDataUrl = async (shareLink: string, theme: 'light' | 'dark')
           dots: '#18202b',
         };
 
-  context.clearRect(0, 0, QR_CANVAS_SIZE, QR_CANVAS_SIZE);
-  context.fillStyle = palette.background;
-  context.fillRect(0, 0, QR_CANVAS_SIZE, QR_CANVAS_SIZE);
-
-  const qrCanvas = document.createElement('canvas');
-  await QRCode.toCanvas(qrCanvas, shareLink, {
+  const svg = await QRCode.toString(shareLink, {
+    type: 'svg',
     errorCorrectionLevel: 'H',
     margin: 0,
     width: QR_CANVAS_SIZE,
@@ -93,15 +72,7 @@ const createThemedQrDataUrl = async (shareLink: string, theme: 'light' | 'dark')
     },
   });
 
-  const qrSize = qrCanvas.width;
-  const qrOffset = Math.round((QR_CANVAS_SIZE - qrSize) / 2);
-  context.drawImage(qrCanvas, qrOffset, qrOffset, qrSize, qrSize);
-
-  const logo = await loadImage(qrLogoPath(theme));
-  const logoImageOffset = Math.round((QR_CANVAS_SIZE - QR_LOGO_SIZE) / 2);
-  context.drawImage(logo, logoImageOffset, logoImageOffset, QR_LOGO_SIZE, QR_LOGO_SIZE);
-
-  return canvas.toDataURL('image/png');
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
 };
 
 export function SharedListPanel({
@@ -122,7 +93,7 @@ export function SharedListPanel({
   onDeleteHistoryEntry,
 }: SharedListPanelProps) {
   const { locale, messages } = useI18n();
-  const [qrDataUrl, setQrDataUrl] = useState<string>();
+  const [qrSvgDataUrl, setQrSvgDataUrl] = useState<string>();
   const [qrRevealed, setQrRevealed] = useState(false);
   const [qrModalOpen, setQrModalOpen] = useState(false);
   const [scannerOpen, setScannerOpen] = useState(false);
@@ -167,20 +138,20 @@ export function SharedListPanel({
     let cancelled = false;
 
     if (!shareLink) {
-      setQrDataUrl(undefined);
+      setQrSvgDataUrl(undefined);
       return;
     }
 
-    void createThemedQrDataUrl(shareLink, resolvedTheme)
+    void createThemedQrSvgDataUrl(shareLink, resolvedTheme)
       .then((value) => {
         if (!cancelled) {
-          setQrDataUrl(value);
+          setQrSvgDataUrl(value);
         }
       })
       .catch((error: unknown) => {
         console.warn('Unable to generate themed QR code.', error);
         if (!cancelled) {
-          setQrDataUrl(undefined);
+          setQrSvgDataUrl(undefined);
         }
       });
 
@@ -494,14 +465,17 @@ export function SharedListPanel({
             </div>
           </div>
 
-          {qrDataUrl ? (
+          {qrSvgDataUrl ? (
             <button
               type={'button'}
               className={`share-qr-card ${qrRevealed ? '' : 'share-qr-card-blurred'}`.trim()}
               onClick={handleQrCardClick}
               aria-label={qrRevealed ? messages.labels.sharedLink : messages.actions.revealQrCode}
             >
-              <img className={'share-qr-image'} src={qrDataUrl} alt={messages.labels.sharedLink} />
+              <span className={'share-qr-frame'}>
+                <img className={'share-qr-image'} src={qrSvgDataUrl} alt={messages.labels.sharedLink} />
+                <img className={'share-qr-logo'} src={qrLogoPath(resolvedTheme)} alt={''} aria-hidden={'true'} />
+              </span>
               {!qrRevealed ? <span className={'share-qr-overlay'}>{messages.actions.revealQrCode}</span> : null}
             </button>
           ) : null}
@@ -669,7 +643,7 @@ export function SharedListPanel({
         </div>
       ) : null}
 
-      {qrModalOpen && qrDataUrl ? (
+      {qrModalOpen && qrSvgDataUrl ? (
         <div className={'share-scanner-modal'} onClick={closeQrModal} role={'presentation'}>
           <div
             className={'share-qr-dialog'}
@@ -681,7 +655,10 @@ export function SharedListPanel({
             <button type={'button'} className={'button'} onClick={closeQrModal} autoFocus>
               {messages.actions.close}
             </button>
-            <img className={'share-qr-image share-qr-image-large'} src={qrDataUrl} alt={messages.labels.sharedLink} />
+            <span className={'share-qr-frame share-qr-frame-large'}>
+              <img className={'share-qr-image'} src={qrSvgDataUrl} alt={messages.labels.sharedLink} />
+              <img className={'share-qr-logo'} src={qrLogoPath(resolvedTheme)} alt={''} aria-hidden={'true'} />
+            </span>
           </div>
         </div>
       ) : null}
