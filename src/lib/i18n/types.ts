@@ -1,3 +1,5 @@
+import type { CountryCode } from '../../types';
+
 export const SUPPORTED_LOCALES = [
   'en',
   'es',
@@ -234,6 +236,7 @@ export type Messages = {
     };
   };
   localeOptions: Record<LocaleCode, string>;
+  countryOptions: Record<CountryCode, string>;
   themeOptions: {
     system: string;
     light: string;

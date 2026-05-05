@@ -179,6 +179,8 @@ export function SettingsPage({
   );
   const settingsSaveTimerRef = useRef<number>();
   const routeViewOptions: RouteViewMode[] = ['default', 'comfortable', 'compact'];
+  const countryLabel = (countryCode: CountryCode) =>
+    messages.countryOptions[countryCode] ?? COUNTRY_CONFIGS[countryCode].label;
   const defaultCountryOptions: SelectOption<DefaultCountryPreference>[] = [
     {
       value: AUTO_DETECT_COUNTRY,
@@ -187,12 +189,12 @@ export function SettingsPage({
     },
     ...Object.values(COUNTRY_CONFIGS)
       .slice()
-      .sort((a, b) => a.label.localeCompare(b.label))
+      .sort((a, b) => countryLabel(a.code).localeCompare(countryLabel(b.code), locale))
       .map((country): SelectOption<DefaultCountryPreference> => ({
         value: country.code,
         label: country.code === detectedCountryCode
-          ? `${country.label} (${messages.pages.settings.detectedCountrySuffix})`
-          : country.label,
+          ? `${countryLabel(country.code)} (${messages.pages.settings.detectedCountrySuffix})`
+          : countryLabel(country.code),
         icon: <CountryIcon countryCode={country.code} />,
       })),
   ];
