@@ -1,5 +1,5 @@
 import { mdiClose, mdiStarFourPoints } from '@mdi/js';
-import type { PointerEvent } from 'react';
+import type { KeyboardEvent as ReactKeyboardEvent, PointerEvent } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { useI18n } from '../lib/i18n';
 
@@ -45,6 +45,7 @@ const stringFrequencies = [
   noteFrequencies.f5,
   noteFrequencies.g5,
 ];
+const stringNoteNames = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F5', 'G5'];
 
 type MelodyNote = {
   beat: number;
@@ -169,6 +170,7 @@ const harpStringFromPointer = (event: PointerEvent<SVGSVGElement>) => {
 export function EasterEggOverlay({ isVisible, onDismiss }: EasterEggOverlayProps) {
   const { messages } = useI18n();
   const [activePluck, setActivePluck] = useState<{ offset: number; string: number }>();
+  const [previewString, setPreviewString] = useState<number>();
   const audioContextRef = useRef<AudioContext>();
   const timersRef = useRef<number[]>([]);
   const melodyNodesRef = useRef<PlayingHarpNote[]>([]);
@@ -274,6 +276,7 @@ export function EasterEggOverlay({ isVisible, onDismiss }: EasterEggOverlayProps
     }
 
     scheduleStringWobble(string);
+    setPreviewString(string);
   };
 
   const stopPointerPlucking = () => {
@@ -305,13 +308,15 @@ export function EasterEggOverlay({ isVisible, onDismiss }: EasterEggOverlayProps
   };
 
   const handleHarpPointerMove = (event: PointerEvent<SVGSVGElement>) => {
+    const string = harpStringFromPointer(event);
+    setPreviewString(string);
+
     if (!isPointerPluckingRef.current) { return; }
     if (event.pointerType === 'mouse' && event.buttons !== 1) {
       stopPointerPlucking();
       return;
     }
 
-    const string = harpStringFromPointer(event);
     if (string !== undefined) {
       continuePointerPlucking(string);
     }
@@ -322,6 +327,27 @@ export function EasterEggOverlay({ isVisible, onDismiss }: EasterEggOverlayProps
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
     stopPointerPlucking();
+  };
+
+  const handleHarpPointerLeave = () => {
+    if (!isPointerPluckingRef.current) {
+      setPreviewString(undefined);
+    }
+  };
+
+  const handleStringFocus = (string: number) => {
+    setPreviewString(string);
+  };
+
+  const handleStringBlur = (string: number) => {
+    setPreviewString((current) => (current === string ? undefined : current));
+  };
+
+  const handleStringKeyDown = (event: ReactKeyboardEvent<SVGPathElement>, string: number) => {
+    if (event.key !== 'Enter' && event.key !== ' ') { return; }
+
+    event.preventDefault();
+    pluckString(string);
   };
 
   const handleReplayMelody = () => {
@@ -346,6 +372,7 @@ export function EasterEggOverlay({ isVisible, onDismiss }: EasterEggOverlayProps
       clearStringTimers();
       stopMelodyNotes(audioContextRef.current);
       setActivePluck(undefined);
+      setPreviewString(undefined);
       stopPointerPlucking();
       void audioContextRef.current?.close();
       audioContextRef.current = undefined;
@@ -390,19 +417,27 @@ export function EasterEggOverlay({ isVisible, onDismiss }: EasterEggOverlayProps
           </button>
           <svg
             className={'easter-egg-harp'}
-            aria-hidden={'true'}
+            role={'group'}
+            aria-label={'Harp strings'}
             viewBox={`0 0 ${HARP_VIEWBOX_WIDTH} ${HARP_VIEWBOX_HEIGHT}`}
             preserveAspectRatio={'none'}
             onPointerDown={handleHarpPointerDown}
             onPointerMove={handleHarpPointerMove}
             onPointerUp={handleHarpPointerEnd}
             onPointerCancel={handleHarpPointerEnd}
+            onPointerLeave={handleHarpPointerLeave}
           >
             {Array.from({ length: HARP_STRING_COUNT }, (_, index) => (
               <g key={index}>
                 <path
                   className={'easter-egg-string-hit'}
                   d={harpStringPath(harpStringX(index))}
+                  role={'button'}
+                  tabIndex={0}
+                  aria-label={`${stringNoteNames[index]} string`}
+                  onFocus={() => handleStringFocus(index)}
+                  onBlur={() => handleStringBlur(index)}
+                  onKeyDown={(event) => handleStringKeyDown(event, index)}
                 />
                 <path
                   className={`easter-egg-string ${activePluck?.string === index ? 'easter-egg-string-active' : ''}`}
@@ -415,6 +450,9 @@ export function EasterEggOverlay({ isVisible, onDismiss }: EasterEggOverlayProps
               </g>
             ))}
           </svg>
+          <div className={`easter-egg-note-preview ${previewString === undefined ? 'easter-egg-note-preview-hidden' : ''}`}>
+            <span>{previewString === undefined ? 'NOTE' : stringNoteNames[previewString]}</span>
+          </div>
         </div>
 
         <div className={'easter-egg-copy'}>

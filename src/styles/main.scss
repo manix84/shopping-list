@@ -1472,7 +1472,7 @@ select {
   left: 86px;
   position: absolute;
   touch-action: none;
-  top: 42px;
+  top: 28px;
   user-select: none;
   width: calc(100% - 112px);
   z-index: 1;
@@ -1484,6 +1484,16 @@ select {
   stroke: transparent;
   stroke-linecap: round;
   stroke-width: 12;
+}
+
+.easter-egg-string-hit:focus-visible {
+  outline: none;
+}
+
+.easter-egg-string-hit:focus-visible + .easter-egg-string {
+  filter: drop-shadow(0 0 8px color-mix(in srgb, $primary 72%, transparent));
+  opacity: 1;
+  stroke: color-mix(in srgb, $primary 86%, #fff);
 }
 
 .easter-egg-string {
@@ -1500,6 +1510,36 @@ select {
   filter: drop-shadow(0 0 8px color-mix(in srgb, $primary 72%, transparent));
   opacity: 1;
   stroke: color-mix(in srgb, $primary 86%, #fff);
+}
+
+.easter-egg-note-preview {
+  align-items: center;
+  background: color-mix(in srgb, $panel 86%, transparent);
+  border: 1px solid color-mix(in srgb, $primary 28%, $border);
+  border-radius: 999px;
+  bottom: 14px;
+  box-shadow: 0 8px 24px color-mix(in srgb, $shadow 12%, transparent);
+  color: color-mix(in srgb, $primary 70%, $text);
+  display: inline-flex;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  font-weight: 700;
+  justify-content: center;
+  left: 14px;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  min-width: 48px;
+  padding: 8px 10px;
+  pointer-events: none;
+  position: absolute;
+  text-transform: uppercase;
+  transition: opacity 0.14s ease, transform 0.14s ease;
+  z-index: 2;
+}
+
+.easter-egg-note-preview-hidden {
+  opacity: 0;
+  transform: translateY(4px);
 }
 
 .easter-egg-copy {
@@ -2589,7 +2629,7 @@ select {
   .easter-egg-harp {
     height: 132px;
     left: 70px;
-    top: 38px;
+    top: 24px;
     width: calc(100% - 88px);
   }
 
