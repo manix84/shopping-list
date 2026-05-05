@@ -162,15 +162,15 @@ export const fr: Messages = {
     },
     error: {
       notFoundCode: '404',
-      notFoundEyebrow: 'Aisle not found',
-      notFoundTitle: "This aisle isn't on the store map.",
+      notFoundEyebrow: 'Allée introuvable',
+      notFoundTitle: 'Cette allée n’est pas sur le plan du magasin.',
       notFoundSubtitle:
-        'The route you opened does not match a shopping list page. The rest of the list is still ready when you are.',
+        'Le parcours ouvert ne correspond à aucune page de liste de courses. Le reste de la liste sera prêt quand vous le serez.',
       serverCode: '500',
-      serverEyebrow: 'Checkout jammed',
-      serverTitle: 'Something went sideways behind the counter.',
+      serverEyebrow: 'Caisse bloquée',
+      serverTitle: 'Quelque chose a déraillé derrière le comptoir.',
       serverSubtitle:
-        'The app hit a server problem. Local list editing should still work, and the debug tools can help inspect backend status.',
+        'L’application a rencontré un problème serveur. L’édition locale de la liste devrait continuer à fonctionner, et les outils de débogage peuvent aider à vérifier le backend.',
     },
     debug: {
       title: 'Outils de débogage',
@@ -267,8 +267,26 @@ export const fr: Messages = {
     closeNavigation: 'Fermer le menu de navigation',
     openNavigation: 'Ouvrir le menu de navigation',
   },
+  easterEgg: {
+    title: 'Allée secrète déverrouillée',
+    body: 'Vous avez trouvé le coin tranquille du magasin. Tout y est parfaitement trié.',
+    dismiss: 'Fermer l’allée secrète',
+    replay: 'Rejouer la mélodie de l’allée secrète',
+    harpStringsLabel: 'Cordes de la harpe',
+    harpStringLabel: 'Corde {note}, touche {key}',
+  },
   pwaInstall: {
-    ...en.pwaInstall,
+    title: 'Installer l’application',
+    description: 'Gardez votre liste de courses à portée de main sur cet appareil.',
+    installAction: 'Installer',
+    dismissAction: 'Pas maintenant',
+    dismissLabel: 'Masquer l’invite d’installation',
+    settingsTitle: 'Installer sur cet appareil',
+    settingsDescription:
+      'Ajoutez Smart Shopping List à votre écran d’accueil pour y accéder plus vite.',
+    unavailableTitle: 'Installer depuis le menu du navigateur',
+    unavailableDescription:
+      'Utilisez le bouton de partage ou le menu du navigateur, puis choisissez Ajouter à l’écran d’accueil ou Installer l’application.',
   },
   backendStatus: {
     connected: 'En ligne',

@@ -161,15 +161,15 @@ export const nl: Messages = {
     },
     error: {
       notFoundCode: '404',
-      notFoundEyebrow: 'Aisle not found',
-      notFoundTitle: "This aisle isn't on the store map.",
+      notFoundEyebrow: 'Gangpad niet gevonden',
+      notFoundTitle: 'Dit gangpad staat niet op de winkelkaart.',
       notFoundSubtitle:
-        'The route you opened does not match a shopping list page. The rest of the list is still ready when you are.',
+        'De route die je opende hoort niet bij een boodschappenlijstpagina. De rest van de lijst staat klaar wanneer jij dat bent.',
       serverCode: '500',
-      serverEyebrow: 'Checkout jammed',
-      serverTitle: 'Something went sideways behind the counter.',
+      serverEyebrow: 'Kassa vastgelopen',
+      serverTitle: 'Er ging iets mis achter de balie.',
       serverSubtitle:
-        'The app hit a server problem. Local list editing should still work, and the debug tools can help inspect backend status.',
+        'De app liep tegen een serverprobleem aan. Lokaal lijsten bewerken zou nog moeten werken, en de debugtools kunnen helpen de backendstatus te controleren.',
     },
     debug: {
       title: 'Debughulpmiddelen',
@@ -262,8 +262,26 @@ export const nl: Messages = {
     closeNavigation: 'Navigatiemenu sluiten',
     openNavigation: 'Navigatiemenu openen',
   },
+  easterEgg: {
+    title: 'Geheim gangpad ontgrendeld',
+    body: 'Je hebt de rustige hoek van de winkel gevonden. Alles hier is perfect gesorteerd.',
+    dismiss: 'Geheim gangpad sluiten',
+    replay: 'Speel het deuntje van het geheime gangpad opnieuw',
+    harpStringsLabel: 'Harpsnaren',
+    harpStringLabel: 'Snaar {note}, toets {key}',
+  },
   pwaInstall: {
-    ...en.pwaInstall,
+    title: 'App installeren',
+    description: 'Houd je boodschappenlijst op dit apparaat binnen handbereik.',
+    installAction: 'Installeren',
+    dismissAction: 'Niet nu',
+    dismissLabel: 'Installatiemelding sluiten',
+    settingsTitle: 'Installeren op dit apparaat',
+    settingsDescription:
+      'Voeg Smart Shopping List toe aan je startscherm voor snellere toegang.',
+    unavailableTitle: 'Installeren via het browsermenu',
+    unavailableDescription:
+      'Gebruik de deelknop of het browsermenu en kies Toevoegen aan startscherm of App installeren.',
   },
   backendStatus: {
     connected: 'Online',

@@ -21,6 +21,7 @@ import { isSettingsRecord, isShoppingListRecord } from './validation.mjs';
 const port = Number(process.env.PORT ?? 8787);
 const distDir = resolve('dist');
 const homeAssistantIntegrationEnabled = process.env.ENABLE_HOME_ASSISTANT_INTEGRATION === 'true';
+const clacksOverhead = 'GNU Terry Pratchett';
 
 const contentTypes = {
   '.css': 'text/css; charset=utf-8',
@@ -36,6 +37,7 @@ const contentTypes = {
 const sendJson = (response, statusCode, payload) => {
   response.writeHead(statusCode, {
     'Content-Type': 'application/json; charset=utf-8',
+    'X-Clacks-Overhead': clacksOverhead,
   });
   response.end(JSON.stringify(payload));
 };
@@ -220,11 +222,15 @@ const serveStatic = async (request, response, pathname) => {
     await readFile(filePath);
     response.writeHead(200, {
       'Content-Type': contentTypes[extname(filePath)] ?? 'application/octet-stream',
+      'X-Clacks-Overhead': clacksOverhead,
     });
     createReadStream(filePath).pipe(response);
   } catch {
     const indexPath = join(distDir, 'index.html');
-    response.writeHead(200, { 'Content-Type': contentTypes['.html'] });
+    response.writeHead(200, {
+      'Content-Type': contentTypes['.html'],
+      'X-Clacks-Overhead': clacksOverhead,
+    });
     createReadStream(indexPath).pipe(response);
   }
 };

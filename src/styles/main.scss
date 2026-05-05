@@ -426,6 +426,13 @@ select {
   background: $panel-alt;
 }
 
+.app-icon-easter-egg-trigger,
+.konami-touch-tap-stage,
+.konami-touch-tap-stage body,
+.konami-touch-tap-stage .shopping-app {
+  touch-action: manipulation;
+}
+
 .app-icon-image {
   display: block;
   height: 32px;
@@ -1378,6 +1385,348 @@ select {
   animation: connection-badge-fade-out 0.25s ease-in both;
 }
 
+.easter-egg-overlay {
+  align-items: center;
+  animation: modal-backdrop-in 0.24s ease;
+  background: rgba(8, 13, 24, 0.54);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 20px;
+  position: fixed;
+  z-index: 1100;
+}
+
+.easter-egg-dialog {
+  background: $panel;
+  border: 1px solid $border;
+  border-radius: 22px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+  display: grid;
+  gap: 20px;
+  max-width: 560px;
+  overflow: hidden;
+  padding: 24px;
+  position: relative;
+  width: min(100%, 560px);
+}
+
+.easter-egg-close {
+  position: absolute;
+  right: 14px;
+  top: 14px;
+  z-index: 2;
+}
+
+.easter-egg-visual {
+  background:
+    radial-gradient(circle at 11% 28%, color-mix(in srgb, $primary 18%, transparent) 0 18%, transparent 34%),
+    linear-gradient(90deg, color-mix(in srgb, $primary 12%, transparent), transparent 52%),
+    $panel-alt;
+  border: 1px solid $border;
+  border-radius: 16px;
+  min-height: 220px;
+  overflow: hidden;
+  position: relative;
+}
+
+.easter-egg-scanline {
+  animation: easter-egg-scan 1.35s ease-in-out infinite;
+  background: color-mix(in srgb, $primary 38%, transparent);
+  box-shadow: 0 0 22px color-mix(in srgb, $primary 48%, transparent);
+  height: 2px;
+  left: 0;
+  opacity: 0.7;
+  position: absolute;
+  right: 0;
+  top: 18px;
+  z-index: 0;
+}
+
+.easter-egg-star {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: $primary;
+  cursor: pointer;
+  display: grid;
+  height: 54px;
+  left: 26px;
+  padding: 0;
+  place-items: center;
+  position: absolute;
+  top: 30px;
+  transition: color 0.14s ease, filter 0.14s ease, transform 0.14s ease;
+  width: 54px;
+  z-index: 2;
+
+  svg {
+    height: 100%;
+    width: 100%;
+  }
+}
+
+.easter-egg-star:hover,
+.easter-egg-star:focus-visible {
+  color: color-mix(in srgb, $primary 76%, #fff);
+  filter: drop-shadow(0 0 10px color-mix(in srgb, $primary 46%, transparent));
+  transform: scale(1.04);
+}
+
+.easter-egg-harp {
+  cursor: pointer;
+  height: 164px;
+  left: 86px;
+  position: absolute;
+  touch-action: none;
+  top: 28px;
+  user-select: none;
+  width: calc(100% - 112px);
+  z-index: 1;
+}
+
+.easter-egg-string-hit {
+  fill: none;
+  pointer-events: stroke;
+  stroke: transparent;
+  stroke-linecap: round;
+  stroke-width: 12;
+}
+
+.easter-egg-string-hit:focus-visible {
+  outline: none;
+}
+
+.easter-egg-string-hit:focus-visible + .easter-egg-string {
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--easter-egg-note-color, #2563eb) 72%, transparent));
+  opacity: 1;
+  stroke: color-mix(in srgb, var(--easter-egg-note-color, #2563eb) 86%, #fff);
+}
+
+.easter-egg-string {
+  fill: none;
+  pointer-events: none;
+  filter: drop-shadow(0 0 3px color-mix(in srgb, $primary 10%, transparent));
+  opacity: 0.34;
+  stroke: color-mix(in srgb, $primary 52%, $text);
+  stroke-linecap: round;
+  transition: filter 0.34s ease, opacity 0.34s ease, stroke 0.34s ease;
+}
+
+.easter-egg-string-active {
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--easter-egg-note-color, #2563eb) 72%, transparent));
+  opacity: 1;
+  stroke: color-mix(in srgb, var(--easter-egg-note-color, #2563eb) 86%, #fff);
+  transition: filter 0.06s ease, opacity 0.06s ease, stroke 0.06s ease;
+}
+
+.easter-egg-note-preview {
+  align-items: center;
+  background: color-mix(in srgb, var(--easter-egg-note-color, #2563eb) 14%, $panel);
+  border: 1px solid color-mix(in srgb, var(--easter-egg-note-color, #2563eb) 48%, $border);
+  border-radius: 999px;
+  bottom: 14px;
+  box-shadow: 0 8px 24px color-mix(in srgb, $shadow 12%, transparent);
+  color: color-mix(in srgb, var(--easter-egg-note-color, #2563eb) 76%, $text);
+  display: inline-flex;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  font-weight: 700;
+  justify-content: center;
+  left: 14px;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  min-width: 48px;
+  padding: 8px 10px;
+  pointer-events: none;
+  position: absolute;
+  text-transform: uppercase;
+  transition: opacity 0.14s ease, transform 0.14s ease;
+  z-index: 2;
+}
+
+.easter-egg-note-preview-hidden {
+  opacity: 0;
+  transform: translateY(4px);
+}
+
+.easter-egg-copy {
+  padding-right: 44px;
+
+  .title {
+    line-height: 1.15;
+  }
+}
+
+.predator-easter-egg {
+  bottom: max(10px, env(safe-area-inset-bottom));
+  height: 150px;
+  pointer-events: none;
+  position: fixed;
+  width: 190px;
+  z-index: 1150;
+}
+
+.predator-easter-egg-left-to-right {
+  left: -190px;
+  --predator-facing-direction: 1;
+  animation: predator-run-across 4.8s linear both;
+}
+
+.predator-easter-egg-right-to-left {
+  right: -190px;
+  --predator-facing-direction: -1;
+  animation: predator-run-across-reverse 4.8s linear both;
+
+  .predator-puppet-facing {
+    transform: scaleX(-1);
+  }
+}
+
+.predator-puppet-facing {
+  height: 150px;
+  transform-origin: 50% 100%;
+  width: 190px;
+}
+
+.predator-puppet {
+  animation: predator-cartoon-hop 0.46s cubic-bezier(0.2, 0.7, 0.25, 1) infinite;
+  display: block;
+  filter: drop-shadow(0 10px 14px color-mix(in srgb, $shadow 22%, transparent));
+  height: 150px;
+  overflow: visible;
+  transform-origin: 50% 100%;
+  width: 190px;
+}
+
+.predator-shadow {
+  animation: predator-shadow-hop 0.46s cubic-bezier(0.2, 0.7, 0.25, 1) infinite;
+  background: color-mix(in srgb, $shadow 18%, transparent);
+  border-radius: 999px;
+  bottom: 8px;
+  height: 14px;
+  left: 38px;
+  position: absolute;
+  width: 112px;
+}
+
+.predator-body,
+.predator-head,
+.predator-fin,
+.predator-snout {
+  fill: color-mix(in srgb, $primary 58%, #f7b955);
+  stroke: color-mix(in srgb, $text 58%, $primary);
+  stroke-linejoin: round;
+  stroke-width: 3;
+}
+
+.predator-tiger .predator-body,
+.predator-tiger .predator-head,
+.predator-tiger .predator-snout {
+  fill: #f4a340;
+}
+
+.predator-rex .predator-body,
+.predator-rex .predator-head,
+.predator-rex .predator-snout,
+.predator-raptor .predator-body,
+.predator-raptor .predator-head,
+.predator-raptor .predator-snout {
+  fill: #67b56b;
+}
+
+.predator-shark .predator-body,
+.predator-shark .predator-fin {
+  fill: #6fa7d8;
+}
+
+.predator-croc .predator-body,
+.predator-croc .predator-head,
+.predator-croc .predator-snout {
+  fill: #5a9e63;
+}
+
+.predator-wolf .predator-body,
+.predator-wolf .predator-head,
+.predator-wolf .predator-snout,
+.predator-bear .predator-body,
+.predator-bear .predator-head,
+.predator-bear .predator-snout {
+  fill: #8e705a;
+}
+
+.predator-chest,
+.predator-belly {
+  fill: color-mix(in srgb, #fff 44%, transparent);
+  opacity: 0.42;
+  stroke: color-mix(in srgb, $text 22%, transparent);
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.predator-cheek {
+  fill: color-mix(in srgb, #fff 34%, transparent);
+  opacity: 0.5;
+}
+
+.predator-mark,
+.predator-arm,
+.predator-claw,
+.predator-ear,
+.predator-gill,
+.predator-leg,
+.predator-mouth,
+.predator-tail,
+.predator-tooth {
+  fill: none;
+  stroke: color-mix(in srgb, $text 70%, $primary);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 4;
+}
+
+.predator-claw,
+.predator-gill {
+  stroke-width: 3;
+}
+
+.predator-tail {
+  stroke-width: 6;
+}
+
+.predator-tooth {
+  stroke: #fff;
+  stroke-width: 3;
+}
+
+.predator-eye {
+  fill: $text;
+}
+
+.predator-eye-shine {
+  fill: #fff;
+}
+
+.predator-nose {
+  fill: color-mix(in srgb, $text 78%, $primary);
+}
+
+.predator-paw {
+  fill: color-mix(in srgb, #fff 18%, currentColor);
+  stroke: color-mix(in srgb, $text 58%, $primary);
+  stroke-width: 2.5;
+}
+
+.predator-leg-front {
+  animation: predator-leg-front 0.46s ease-in-out infinite;
+  transform-origin: 90px 108px;
+}
+
+.predator-leg-back {
+  animation: predator-leg-back 0.46s ease-in-out infinite;
+  transform-origin: 44px 108px;
+}
+
 @keyframes connection-badge-fade-in {
   from {
     opacity: 0;
@@ -1398,9 +1747,105 @@ select {
   }
 }
 
+@keyframes easter-egg-scan {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(174px);
+  }
+}
+
+@keyframes predator-run-across {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(calc(100vw + 380px));
+  }
+}
+
+@keyframes predator-run-across-reverse {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(calc(-100vw - 380px));
+  }
+}
+
+@keyframes predator-cartoon-hop {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg) scaleX(1);
+  }
+
+  24% {
+    transform: translateY(-16px) rotate(calc(-4deg * var(--predator-facing-direction, 1))) scaleX(1.02);
+  }
+
+  42% {
+    transform: translateY(-22px) rotate(calc(-2deg * var(--predator-facing-direction, 1))) scaleX(1.03);
+  }
+
+  68% {
+    transform: translateY(-6px) rotate(calc(4deg * var(--predator-facing-direction, 1))) scaleX(0.98);
+  }
+
+  82% {
+    transform: translateY(0) rotate(0deg) scaleX(1);
+  }
+}
+
+@keyframes predator-shadow-hop {
+  0%,
+  100% {
+    opacity: 0.34;
+    transform: scaleX(1);
+  }
+
+  42% {
+    opacity: 0.14;
+    transform: scaleX(0.72);
+  }
+}
+
+@keyframes predator-leg-front {
+  0%,
+  100% {
+    transform: rotate(-7deg);
+  }
+
+  50% {
+    transform: rotate(10deg);
+  }
+}
+
+@keyframes predator-leg-back {
+  0%,
+  100% {
+    transform: rotate(8deg);
+  }
+
+  50% {
+    transform: rotate(-12deg);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .connection-badge,
-  .connection-badge-leaving {
+  .connection-badge-leaving,
+  .easter-egg-overlay,
+  .easter-egg-scanline,
+  .predator-easter-egg,
+  .predator-puppet,
+  .predator-shadow,
+  .predator-leg-front,
+  .predator-leg-back {
     animation-duration: 0.01ms;
   }
 }
@@ -2419,5 +2864,36 @@ select {
     .subtitle {
       font-size: 15px;
     }
+  }
+
+  .easter-egg-overlay {
+    padding: 12px;
+  }
+
+  .easter-egg-dialog {
+    border-radius: 18px;
+    padding: 18px;
+  }
+
+  .easter-egg-visual {
+    min-height: 180px;
+  }
+
+  .easter-egg-star {
+    height: 44px;
+    left: 20px;
+    top: 28px;
+    width: 44px;
+  }
+
+  .easter-egg-harp {
+    height: 132px;
+    left: 70px;
+    top: 24px;
+    width: calc(100% - 88px);
+  }
+
+  .easter-egg-copy {
+    padding-right: 0;
   }
 }

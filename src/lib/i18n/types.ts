@@ -228,6 +228,14 @@ export type Messages = {
     closeNavigation: string;
     openNavigation: string;
   };
+  easterEgg: {
+    title: string;
+    body: string;
+    dismiss: string;
+    replay: string;
+    harpStringsLabel: string;
+    harpStringLabel: string;
+  };
   pwaInstall: {
     title: string;
     description: string;

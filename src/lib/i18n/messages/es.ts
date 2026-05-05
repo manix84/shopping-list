@@ -156,15 +156,15 @@ export const es: Messages = {
     },
     error: {
       notFoundCode: '404',
-      notFoundEyebrow: 'Aisle not found',
-      notFoundTitle: "This aisle isn't on the store map.",
+      notFoundEyebrow: 'Pasillo no encontrado',
+      notFoundTitle: 'Este pasillo no está en el mapa de la tienda.',
       notFoundSubtitle:
-        'The route you opened does not match a shopping list page. The rest of the list is still ready when you are.',
+        'La ruta que abriste no coincide con una página de lista de la compra. El resto de la lista seguirá listo cuando quieras.',
       serverCode: '500',
-      serverEyebrow: 'Checkout jammed',
-      serverTitle: 'Something went sideways behind the counter.',
+      serverEyebrow: 'Caja atascada',
+      serverTitle: 'Algo se torció detrás del mostrador.',
       serverSubtitle:
-        'The app hit a server problem. Local list editing should still work, and the debug tools can help inspect backend status.',
+        'La app encontró un problema del servidor. La edición local de listas debería seguir funcionando, y las herramientas de depuración pueden ayudar a revisar el backend.',
     },
     debug: {
       title: 'Herramientas de depuración',
@@ -258,6 +258,14 @@ export const es: Messages = {
   mobileMenu: {
     closeNavigation: 'Cerrar menú de navegación',
     openNavigation: 'Abrir menú de navegación',
+  },
+  easterEgg: {
+    title: 'Pasillo secreto desbloqueado',
+    body: 'Has encontrado el rincón tranquilo de la tienda. Todo aquí está perfectamente ordenado.',
+    dismiss: 'Cerrar pasillo secreto',
+    replay: 'Volver a reproducir la melodía del pasillo secreto',
+    harpStringsLabel: 'Cuerdas del arpa',
+    harpStringLabel: 'Cuerda {note}, tecla {key}',
   },
   pwaInstall: {
     title: 'Instalar la app',

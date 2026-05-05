@@ -1,4 +1,5 @@
 import { mdiMenu } from '@mdi/js';
+import type { PointerEvent } from 'react';
 import { useEffect, useState } from 'react';
 import type { Messages } from '../lib/i18n';
 import { useI18n } from '../lib/i18n';
@@ -9,6 +10,8 @@ import { PageTabs } from './PageTabs';
 
 const ONLINE_BADGE_DURATION_MS = 6_000;
 const BADGE_FADE_DURATION_MS = 250;
+const EASTER_EGG_TAP_COUNT = 7;
+const EASTER_EGG_TAP_RESET_MS = 1_500;
 
 type AppHeaderProps = {
   page: PageKey;
@@ -16,6 +19,7 @@ type AppHeaderProps = {
   backendStatus: BackendStatus;
   resolvedTheme: 'light' | 'dark';
   onChangePage: (page: PageKey) => void;
+  onRevealEasterEgg?: () => void;
 };
 
 const backendBadge = (status: BackendStatus, messages: Messages) => {
@@ -29,6 +33,7 @@ export function AppHeader({
   page,
   hasItems,
   backendStatus,
+  onRevealEasterEgg,
   onChangePage,
 }: AppHeaderProps) {
   const { messages } = useI18n();
@@ -36,6 +41,7 @@ export function AppHeader({
   const [connectionBadgeVisible, setConnectionBadgeVisible] = useState(false);
   const [connectionBadgeLeaving, setConnectionBadgeLeaving] = useState(false);
   const [offlineInfoOpen, setOfflineInfoOpen] = useState(false);
+  const [logoTapCount, setLogoTapCount] = useState(0);
   const badge = backendBadge(backendStatus, messages);
   const canShowOfflineInfo = backendStatus.state === 'offline' || backendStatus.state === 'error';
   const mobileMenuLabel = mobileMenuOpen ? messages.mobileMenu.closeNavigation : messages.mobileMenu.openNavigation;
@@ -82,6 +88,29 @@ export function AppHeader({
     onChangePage(nextPage);
   };
 
+  useEffect(() => {
+    if (logoTapCount === 0) { return undefined; }
+
+    const resetTimer = window.setTimeout(() => setLogoTapCount(0), EASTER_EGG_TAP_RESET_MS);
+    return () => window.clearTimeout(resetTimer);
+  }, [logoTapCount]);
+
+  const handleLogoPointerDown = (event: PointerEvent<HTMLSpanElement>) => {
+    if (event.pointerType === 'mouse' && event.button !== 0) { return; }
+    if (event.pointerType !== 'mouse') {
+      event.preventDefault();
+    }
+
+    setLogoTapCount((current) => {
+      const next = current + 1;
+      if (next >= EASTER_EGG_TAP_COUNT) {
+        onRevealEasterEgg?.();
+        return 0;
+      }
+      return next;
+    });
+  };
+
   const logoHref = `${import.meta.env.BASE_URL}logo-mark.png`;
 
   return (
@@ -92,9 +121,13 @@ export function AppHeader({
           header={
             <div className={'title-row'}>
               <div className={'title-block'}>
-                <div className={'app-icon'}>
+                <span
+                  className={'app-icon app-icon-easter-egg-trigger'}
+                  aria-hidden={'true'}
+                  onPointerDown={handleLogoPointerDown}
+                >
                   <img className={'app-icon-image'} src={logoHref} alt={''} width={'48'} height={'48'} />
-                </div>
+                </span>
                 <div>
                   <h1 className={'title'}>{messages.app.title}</h1>
                   <p className={'subtitle'}>{messages.app.subtitle}</p>

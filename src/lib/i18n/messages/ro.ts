@@ -160,15 +160,15 @@ export const ro: Messages = {
     },
     error: {
       notFoundCode: '404',
-      notFoundEyebrow: 'Aisle not found',
-      notFoundTitle: "This aisle isn't on the store map.",
+      notFoundEyebrow: 'Raion negăsit',
+      notFoundTitle: 'Acest raion nu este pe harta magazinului.',
       notFoundSubtitle:
-        'The route you opened does not match a shopping list page. The rest of the list is still ready when you are.',
+        'Ruta pe care ai deschis-o nu corespunde unei pagini de listă de cumpărături. Restul listei va fi gata când ești și tu.',
       serverCode: '500',
-      serverEyebrow: 'Checkout jammed',
-      serverTitle: 'Something went sideways behind the counter.',
+      serverEyebrow: 'Casa s-a blocat',
+      serverTitle: 'Ceva a mers prost în spatele tejghelei.',
       serverSubtitle:
-        'The app hit a server problem. Local list editing should still work, and the debug tools can help inspect backend status.',
+        'Aplicația a întâmpinat o problemă de server. Editarea locală a listei ar trebui să funcționeze în continuare, iar instrumentele de depanare pot verifica starea backendului.',
     },
     debug: {
       title: 'Unelte de depanare',
@@ -261,8 +261,26 @@ export const ro: Messages = {
     closeNavigation: 'Închide meniul de navigare',
     openNavigation: 'Deschide meniul de navigare',
   },
+  easterEgg: {
+    title: 'Raion secret deblocat',
+    body: 'Ai găsit colțul liniștit al magazinului. Totul aici este sortat perfect.',
+    dismiss: 'Închide raionul secret',
+    replay: 'Redă din nou melodia raionului secret',
+    harpStringsLabel: 'Corzile harpei',
+    harpStringLabel: 'Coarda {note}, tasta {key}',
+  },
   pwaInstall: {
-    ...en.pwaInstall,
+    title: 'Instalează aplicația',
+    description: 'Ține lista de cumpărături la o atingere distanță pe acest dispozitiv.',
+    installAction: 'Instalează',
+    dismissAction: 'Nu acum',
+    dismissLabel: 'Închide invitația de instalare',
+    settingsTitle: 'Instalează pe acest dispozitiv',
+    settingsDescription:
+      'Adaugă Smart Shopping List pe ecranul de pornire pentru acces mai rapid.',
+    unavailableTitle: 'Instalează din meniul browserului',
+    unavailableDescription:
+      'Folosește butonul de partajare sau meniul browserului, apoi alege Adaugă pe ecranul de pornire sau Instalează aplicația.',
   },
   backendStatus: {
     connected: 'Online',

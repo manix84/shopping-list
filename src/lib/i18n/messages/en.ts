@@ -254,6 +254,14 @@ export const en: Messages = {
     closeNavigation: 'Close navigation menu',
     openNavigation: 'Open navigation menu',
   },
+  easterEgg: {
+    title: 'Secret aisle unlocked',
+    body: 'You found the quiet corner of the store. Everything here is perfectly sorted.',
+    dismiss: 'Close secret aisle',
+    replay: 'Play the secret aisle tune again',
+    harpStringsLabel: 'Harp strings',
+    harpStringLabel: '{note} string, {key} key',
+  },
   pwaInstall: {
     title: 'Install the app',
     description: 'Keep your shopping list one tap away on this device.',

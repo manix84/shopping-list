@@ -2,6 +2,7 @@ import { createElement } from 'react';
 import { renderToString } from 'react-dom/server';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createWindowMock } from '../test/testUtils';
+import type { Messages } from './i18n';
 import {
   I18nProvider,
   LOCALE_STORAGE_KEY,
@@ -82,6 +83,46 @@ describe('i18n', () => {
       expect(messages.pages.sections.title).toBeTruthy();
       expect(messages.pages.debug.backendTitle).toBeTruthy();
       expect(messages.pages.debug.databaseExpected).toBeTruthy();
+    }
+  });
+
+  it('keeps recent visible UI copy localized instead of falling back to English', () => {
+    const englishMessages = createMessages('en');
+    const translatedLocales = SUPPORTED_LOCALES.filter((locale) => locale !== 'en');
+    const keysToCompare = [
+      ['pages', 'error', 'notFoundEyebrow'],
+      ['pages', 'error', 'notFoundTitle'],
+      ['pages', 'error', 'notFoundSubtitle'],
+      ['pages', 'error', 'serverEyebrow'],
+      ['pages', 'error', 'serverTitle'],
+      ['pages', 'error', 'serverSubtitle'],
+      ['easterEgg', 'title'],
+      ['easterEgg', 'body'],
+      ['easterEgg', 'dismiss'],
+      ['easterEgg', 'replay'],
+      ['easterEgg', 'harpStringsLabel'],
+      ['easterEgg', 'harpStringLabel'],
+      ['pwaInstall', 'title'],
+      ['pwaInstall', 'description'],
+      ['pwaInstall', 'dismissLabel'],
+      ['pwaInstall', 'settingsTitle'],
+      ['pwaInstall', 'settingsDescription'],
+      ['pwaInstall', 'unavailableTitle'],
+      ['pwaInstall', 'unavailableDescription'],
+    ] as const;
+
+    const readMessage = (messages: Messages, keys: readonly string[]) =>
+      keys.reduce<unknown>(
+        (value, key) => value && typeof value === 'object' ? (value as Record<string, unknown>)[key] : undefined,
+        messages,
+      );
+
+    for (const locale of translatedLocales) {
+      const messages = createMessages(locale);
+
+      for (const keys of keysToCompare) {
+        expect(readMessage(messages, keys)).not.toBe(readMessage(englishMessages, keys));
+      }
     }
   });
 
