@@ -521,6 +521,29 @@ select {
   min-width: 0;
 }
 
+.edit-page-header {
+  align-items: flex-start;
+  display: block;
+}
+
+.edit-page-header-copy {
+  min-width: 0;
+}
+
+.edit-list-card {
+  position: relative;
+}
+
+.edit-list-card .card-header {
+  padding-right: 150px;
+}
+
+.edit-new-list-button {
+  position: absolute;
+  right: 24px;
+  top: 24px;
+}
+
 .subtitle,
 .small-text,
 .section-group,
@@ -2691,6 +2714,15 @@ select {
 
   .card-header {
     padding: 18px 18px 0;
+  }
+
+  .edit-list-card .card-header {
+    padding-right: 130px;
+  }
+
+  .edit-new-list-button {
+    right: 18px;
+    top: 18px;
   }
 
   .card-body {

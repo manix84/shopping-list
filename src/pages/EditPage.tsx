@@ -84,23 +84,23 @@ export function EditPage({
   return (
     <div className={'layout-split'}>
       <Card
+        className={'edit-list-card'}
         header={
-          <>
-            <div className={'page-title-with-status'}>
-              <h2 className={'title title-sm'}>{messages.pages.edit.title}</h2>
-              <SaveStatusIndicator status={saveStatus} />
+          <div className={'title-row edit-page-header'}>
+            <div className={'edit-page-header-copy'}>
+              <div className={'page-title-with-status'}>
+                <h2 className={'title title-sm'}>{messages.pages.edit.title}</h2>
+                <SaveStatusIndicator status={saveStatus} />
+              </div>
+              <p className={'subtitle'}>{messages.pages.edit.subtitle}</p>
             </div>
-            <p className={'subtitle'}>{messages.pages.edit.subtitle}</p>
-          </>
+            <button type={'button'} className={'button edit-new-list-button'} onClick={onResetAll}>
+              {messages.actions.fullReset}
+            </button>
+          </div>
         }
         bodyClassName={'stack'}
       >
-        <div className={'button-row'}>
-          <button type={'button'} className={'button'} onClick={onResetAll}>
-            {messages.actions.fullReset}
-          </button>
-        </div>
-
         <div className={'field field-compact'}>
           <label htmlFor={'list-country-select'}>{messages.pages.settings.countryLabel}</label>
           <CountrySelect id={'list-country-select'} value={countryCode} onChange={onCountryChange} />
