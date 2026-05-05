@@ -47,6 +47,21 @@ const stringFrequencies = [
   noteFrequencies.g5,
 ];
 const stringNoteNames = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F5', 'G5'];
+const stringKeyboardKeys = ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ';', '\'', '\\'];
+const stringKeyboardCodes = [
+  'KeyA',
+  'KeyS',
+  'KeyD',
+  'KeyF',
+  'KeyG',
+  'KeyH',
+  'KeyJ',
+  'KeyK',
+  'KeyL',
+  'Semicolon',
+  'Quote',
+  'Backslash',
+];
 const stringNoteColors = [
   '#ef4444',
   '#f97316',
@@ -209,6 +224,15 @@ export function SecretAisleEasterEgg({ isVisible, onDismiss }: SecretAisleEaster
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         onDismiss();
+        return;
+      }
+
+      if (event.repeat || isMelodyPlayingRef.current) { return; }
+
+      const string = stringKeyboardCodes.indexOf(event.code);
+      if (string >= 0) {
+        event.preventDefault();
+        pluckString(string);
       }
     };
 
@@ -501,7 +525,7 @@ export function SecretAisleEasterEgg({ isVisible, onDismiss }: SecretAisleEaster
                   role={'button'}
                   tabIndex={isMelodyPlaying ? -1 : 0}
                   aria-disabled={isMelodyPlaying}
-                  aria-label={`${stringNoteNames[index]} string`}
+                  aria-label={`${stringNoteNames[index]} string, ${stringKeyboardKeys[index]} key`}
                   onFocus={() => handleStringFocus(index)}
                   onBlur={() => handleStringBlur(index)}
                   onKeyDown={(event) => handleStringKeyDown(event, index)}
