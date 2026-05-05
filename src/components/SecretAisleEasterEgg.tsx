@@ -18,6 +18,8 @@ const HARP_BOTTOM_Y = 168;
 const HARP_X_START = 18;
 const HARP_X_GAP = 18.5;
 const BACKDROP_DISMISS_DELAY_MS = 2_000;
+const HARP_NOTE_RELEASE_SECONDS = 0.05;
+const MELODY_START_DELAY_SECONDS = 0.05;
 const noteFrequencies = {
   c4: 261.63,
   d4: 293.66,
@@ -170,8 +172,8 @@ const playHarpNote = (
 
   oscillator.start(startTime);
   overtone.start(startTime);
-  oscillator.stop(startTime + duration + 0.05);
-  overtone.stop(startTime + duration + 0.05);
+  oscillator.stop(startTime + duration + HARP_NOTE_RELEASE_SECONDS);
+  overtone.stop(startTime + duration + HARP_NOTE_RELEASE_SECONDS);
 
   return { oscillator, overtone };
 };
@@ -338,7 +340,7 @@ export function SecretAisleEasterEgg({ isVisible, onDismiss }: SecretAisleEaster
 
     if (audioContext) {
       void audioContext.resume();
-      const startTime = audioContext.currentTime + 0.05;
+      const startTime = audioContext.currentTime + MELODY_START_DELAY_SECONDS;
       melody.forEach((note) => {
         melodyNodesRef.current.push(
           playHarpNote(audioContext, note.frequency, startTime + (note.beat * BEAT_MS) / 1_000, note.duration),
@@ -349,10 +351,12 @@ export function SecretAisleEasterEgg({ isVisible, onDismiss }: SecretAisleEaster
     timersRef.current = melody.map((note) => (
       window.setTimeout(() => scheduleStringWobble(note.string), note.beat * BEAT_MS)
     ));
-    const melodyEndBeat = melody.at(-1)?.beat ?? 0;
+    const melodyEndMs = melody.reduce((endMs, note) => (
+      Math.max(endMs, ((note.beat * BEAT_MS) + ((note.duration + HARP_NOTE_RELEASE_SECONDS) * 1_000)))
+    ), 0);
     timersRef.current.push(window.setTimeout(() => {
       setMelodyPlaying(false);
-    }, melodyEndBeat * BEAT_MS + 1_050));
+    }, melodyEndMs + (MELODY_START_DELAY_SECONDS * 1_000)));
   };
 
   const pluckString = (string: number) => {
