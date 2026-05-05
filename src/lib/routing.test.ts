@@ -46,6 +46,14 @@ describe('routing', () => {
   it('reads error pages', () => {
     expect(readRouteFromLocationParts({ pathname: '/404' })).toEqual({ page: 'not-found' });
     expect(readRouteFromLocationParts({ pathname: '/500' })).toEqual({ page: 'server-error' });
+    expect(readRouteFromLocationParts({ pathname: `/list/${LIST_ID}/404` })).toEqual({
+      page: 'not-found',
+      listId: LIST_ID,
+    });
+    expect(readRouteFromLocationParts({ pathname: `/list/${LIST_ID}/500` })).toEqual({
+      page: 'server-error',
+      listId: LIST_ID,
+    });
   });
 
   it('keeps the root route on edit and sends unknown paths to not found', () => {
@@ -75,6 +83,8 @@ describe('routing', () => {
   it('renders error page URLs', () => {
     expect(routeToUrl({ page: 'not-found' })).toBe('/404');
     expect(routeToUrl({ page: 'server-error' })).toBe('/500');
+    expect(routeToUrl({ page: 'not-found', listId: LIST_ID })).toBe(`/list/${LIST_ID}/404`);
+    expect(routeToUrl({ page: 'server-error', listId: LIST_ID })).toBe(`/list/${LIST_ID}/500`);
   });
 
   it('renders URLs under a configured base path', () => {

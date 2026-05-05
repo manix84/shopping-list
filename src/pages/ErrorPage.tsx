@@ -18,7 +18,6 @@ const errorPageContent = {
     subtitleKey: 'notFoundSubtitle',
     icon: mdiMapSearchOutline,
     accentIcon: mdiAlertOctagonOutline,
-    shelves: ['Produce', 'Bakery', 'Pantry', 'Frozen', 'Checkout'],
   },
   'server-error': {
     codeKey: 'serverCode',
@@ -27,14 +26,12 @@ const errorPageContent = {
     subtitleKey: 'serverSubtitle',
     icon: mdiServerNetworkOff,
     accentIcon: mdiBugOutline,
-    shelves: ['Request', 'API', 'Database', 'Sync', 'Retry'],
   },
 } satisfies Record<ErrorPageVariant, {
   accentIcon: string;
   codeKey: 'notFoundCode' | 'serverCode';
   eyebrowKey: 'notFoundEyebrow' | 'serverEyebrow';
   icon: string;
-  shelves: string[];
   subtitleKey: 'notFoundSubtitle' | 'serverSubtitle';
   titleKey: 'notFoundTitle' | 'serverTitle';
 }>;
@@ -55,10 +52,8 @@ export function ErrorPage({ variant, onBackToEdit, onOpenDebug }: ErrorPageProps
             </svg>
           </div>
           <div className={'error-map-route'}>
-            {content.shelves.map((shelf, index) => (
-              <div key={shelf} className={`error-map-stop ${index === 2 ? 'error-map-stop-lost' : ''}`}>
-                <span>{shelf}</span>
-              </div>
+            {Array.from({ length: 5 }, (_, index) => (
+              <div key={index} className={`error-map-stop ${index === 2 ? 'error-map-stop-lost' : ''}`} />
             ))}
           </div>
         </div>

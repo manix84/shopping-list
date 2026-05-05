@@ -1972,6 +1972,15 @@ select {
   min-height: 42px;
   padding: 10px 12px;
 
+  &::before {
+    background: currentColor;
+    border-radius: 999px;
+    content: "";
+    height: 10px;
+    opacity: 0.55;
+    width: min(46%, 128px);
+  }
+
   &::after {
     background: $border;
     border-radius: 999px;

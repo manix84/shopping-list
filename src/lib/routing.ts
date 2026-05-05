@@ -1,7 +1,7 @@
 import type { AppRoute, PageKey } from '../types';
 import { isUuidV7 } from './uuid';
 
-const APP_LEVEL_PAGES: PageKey[] = ['sections', 'settings', 'about', 'not-found', 'server-error'];
+const APP_LEVEL_PAGES: PageKey[] = ['sections', 'settings', 'about'];
 const PATH_PAGE_MAP: Record<string, PageKey> = {
   '404': 'not-found',
   '500': 'server-error',
