@@ -338,6 +338,9 @@ export default function App() {
       const duration = Date.now() - touchStartTime;
 
       if (absX <= KONAMI_TOUCH_TAP_MAX_PX && absY <= KONAMI_TOUCH_TAP_MAX_PX && duration <= KONAMI_TOUCH_TAP_MAX_MS) {
+        if (sequenceIndex >= KONAMI_SEQUENCE.length - 2) {
+          event.preventDefault();
+        }
         acceptKonamiInput(sequenceIndex === KONAMI_SEQUENCE.length - 2 ? 'b' : 'a');
         return;
       }
@@ -354,7 +357,7 @@ export default function App() {
 
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('touchstart', handleTouchStart, { passive: true });
-    window.addEventListener('touchend', handleTouchEnd, { passive: true });
+    window.addEventListener('touchend', handleTouchEnd, { passive: false });
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
