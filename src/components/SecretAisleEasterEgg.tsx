@@ -62,6 +62,10 @@ const stringKeyboardCodes = [
   'Quote',
   'Backslash',
 ];
+
+const formatHarpStringLabel = (template: string, note: string, key: string) =>
+  template.replace(/\{note\}/g, note).replace(/\{key\}/g, key);
+
 const stringNoteColors = [
   '#ef4444',
   '#f97316',
@@ -508,7 +512,7 @@ export function SecretAisleEasterEgg({ isVisible, onDismiss }: SecretAisleEaster
           <svg
             className={'easter-egg-harp'}
             role={'group'}
-            aria-label={'Harp strings'}
+            aria-label={messages.easterEgg.harpStringsLabel}
             viewBox={`0 0 ${HARP_VIEWBOX_WIDTH} ${HARP_VIEWBOX_HEIGHT}`}
             preserveAspectRatio={'none'}
             onPointerDown={handleHarpPointerDown}
@@ -525,7 +529,11 @@ export function SecretAisleEasterEgg({ isVisible, onDismiss }: SecretAisleEaster
                   role={'button'}
                   tabIndex={isMelodyPlaying ? -1 : 0}
                   aria-disabled={isMelodyPlaying}
-                  aria-label={`${stringNoteNames[index]} string, ${stringKeyboardKeys[index]} key`}
+                  aria-label={formatHarpStringLabel(
+                    messages.easterEgg.harpStringLabel,
+                    stringNoteNames[index],
+                    stringKeyboardKeys[index],
+                  )}
                   onFocus={() => handleStringFocus(index)}
                   onBlur={() => handleStringBlur(index)}
                   onKeyDown={(event) => handleStringKeyDown(event, index)}

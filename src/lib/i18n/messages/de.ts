@@ -162,15 +162,15 @@ export const de: Messages = {
     },
     error: {
       notFoundCode: '404',
-      notFoundEyebrow: 'Aisle not found',
-      notFoundTitle: "This aisle isn't on the store map.",
+      notFoundEyebrow: 'Gang nicht gefunden',
+      notFoundTitle: 'Dieser Gang ist nicht auf dem Ladenplan.',
       notFoundSubtitle:
-        'The route you opened does not match a shopping list page. The rest of the list is still ready when you are.',
+        'Die geöffnete Route passt zu keiner Einkaufslistenseite. Der Rest der Liste ist bereit, sobald du es bist.',
       serverCode: '500',
-      serverEyebrow: 'Checkout jammed',
-      serverTitle: 'Something went sideways behind the counter.',
+      serverEyebrow: 'Kasse blockiert',
+      serverTitle: 'Hinter der Theke ist etwas schiefgelaufen.',
       serverSubtitle:
-        'The app hit a server problem. Local list editing should still work, and the debug tools can help inspect backend status.',
+        'Die App ist auf ein Serverproblem gestoßen. Lokales Bearbeiten der Liste sollte weiter funktionieren, und die Debug-Werkzeuge können den Backend-Status prüfen.',
     },
     debug: {
       title: 'Debug-Werkzeuge',
@@ -265,10 +265,25 @@ export const de: Messages = {
     openNavigation: 'Navigationsmenü öffnen',
   },
   easterEgg: {
-    ...en.easterEgg,
+    title: 'Geheimer Gang freigeschaltet',
+    body: 'Du hast die ruhige Ecke des Ladens gefunden. Hier ist alles perfekt sortiert.',
+    dismiss: 'Geheimen Gang schließen',
+    replay: 'Melodie des geheimen Gangs erneut abspielen',
+    harpStringsLabel: 'Harfensaiten',
+    harpStringLabel: 'Saite {note}, Taste {key}',
   },
   pwaInstall: {
-    ...en.pwaInstall,
+    title: 'App installieren',
+    description: 'Halte deine Einkaufsliste auf diesem Gerät griffbereit.',
+    installAction: 'Installieren',
+    dismissAction: 'Nicht jetzt',
+    dismissLabel: 'Installationshinweis ausblenden',
+    settingsTitle: 'Auf diesem Gerät installieren',
+    settingsDescription:
+      'Füge Smart Shopping List zum Startbildschirm hinzu, um schneller darauf zuzugreifen.',
+    unavailableTitle: 'Über das Browsermenü installieren',
+    unavailableDescription:
+      'Nutze die Teilen-Funktion oder das Browsermenü und wähle Zum Startbildschirm hinzufügen oder App installieren.',
   },
   backendStatus: {
     connected: 'Online',

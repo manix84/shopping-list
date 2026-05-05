@@ -160,15 +160,15 @@ export const it: Messages = {
     },
     error: {
       notFoundCode: '404',
-      notFoundEyebrow: 'Aisle not found',
-      notFoundTitle: "This aisle isn't on the store map.",
+      notFoundEyebrow: 'Corsia non trovata',
+      notFoundTitle: 'Questa corsia non è sulla mappa del negozio.',
       notFoundSubtitle:
-        'The route you opened does not match a shopping list page. The rest of the list is still ready when you are.',
+        'Il percorso che hai aperto non corrisponde a una pagina della lista della spesa. Il resto della lista sarà pronto quando lo sarai tu.',
       serverCode: '500',
-      serverEyebrow: 'Checkout jammed',
-      serverTitle: 'Something went sideways behind the counter.',
+      serverEyebrow: 'Cassa bloccata',
+      serverTitle: 'Qualcosa è andato storto dietro il banco.',
       serverSubtitle:
-        'The app hit a server problem. Local list editing should still work, and the debug tools can help inspect backend status.',
+        'L’app ha incontrato un problema del server. La modifica locale della lista dovrebbe continuare a funzionare, e gli strumenti di debug possono aiutare a controllare il backend.',
     },
     debug: {
       title: 'Strumenti di debug',
@@ -263,10 +263,25 @@ export const it: Messages = {
     openNavigation: 'Apri menu di navigazione',
   },
   easterEgg: {
-    ...en.easterEgg,
+    title: 'Corsia segreta sbloccata',
+    body: 'Hai trovato l’angolo tranquillo del negozio. Qui tutto è perfettamente ordinato.',
+    dismiss: 'Chiudi la corsia segreta',
+    replay: 'Riproduci di nuovo la melodia della corsia segreta',
+    harpStringsLabel: 'Corde dell’arpa',
+    harpStringLabel: 'Corda {note}, tasto {key}',
   },
   pwaInstall: {
-    ...en.pwaInstall,
+    title: 'Installa l’app',
+    description: 'Tieni la lista della spesa a portata di tocco su questo dispositivo.',
+    installAction: 'Installa',
+    dismissAction: 'Non ora',
+    dismissLabel: 'Chiudi l’avviso di installazione',
+    settingsTitle: 'Installa su questo dispositivo',
+    settingsDescription:
+      'Aggiungi Smart Shopping List alla schermata Home per accedervi più rapidamente.',
+    unavailableTitle: 'Installa dal menu del browser',
+    unavailableDescription:
+      'Usa il pulsante di condivisione o il menu del browser, poi scegli Aggiungi alla schermata Home o Installa app.',
   },
   backendStatus: {
     connected: 'Online',

@@ -159,15 +159,15 @@ export const pi: Messages = {
     },
     error: {
       notFoundCode: '404',
-      notFoundEyebrow: 'Aisle not found',
-      notFoundTitle: "This aisle isn't on the store map.",
+      notFoundEyebrow: 'Aisle be missin’',
+      notFoundTitle: 'This aisle be not on the market chart.',
       notFoundSubtitle:
-        'The route you opened does not match a shopping list page. The rest of the list is still ready when you are.',
+        'The route ye opened matches no shopping-list page. The rest o’ the list be ready when ye are.',
       serverCode: '500',
-      serverEyebrow: 'Checkout jammed',
-      serverTitle: 'Something went sideways behind the counter.',
+      serverEyebrow: 'Checkout be jammed',
+      serverTitle: 'Somethin’ went sideways behind the counter.',
       serverSubtitle:
-        'The app hit a server problem. Local list editing should still work, and the debug tools can help inspect backend status.',
+        'The app struck a server problem. Local list editin’ should still work, and the debug tools can inspect the backend hold.',
     },
     debug: {
       title: 'Bilge tools',
@@ -261,10 +261,25 @@ export const pi: Messages = {
     openNavigation: 'Open the nav chart',
   },
   easterEgg: {
-    ...en.easterEgg,
+    title: 'Secret aisle found, matey',
+    body: 'Ye found the quiet corner of the market. Every bit o’ cargo be perfectly sorted.',
+    dismiss: 'Close the secret aisle, matey',
+    replay: 'Play the secret aisle shanty again',
+    harpStringsLabel: 'Harp strings fer pluckin’',
+    harpStringLabel: '{note} string, {key} key fer pluckin’',
   },
   pwaInstall: {
-    ...en.pwaInstall,
+    title: 'Install the app, matey',
+    description: 'Keep yer shopping list one tap away on this device.',
+    installAction: 'Install',
+    dismissAction: 'Not now',
+    dismissLabel: 'Dismiss the install prompt',
+    settingsTitle: 'Install on this device, matey',
+    settingsDescription:
+      'Add Smart Shopping List to yer home screen fer faster access.',
+    unavailableTitle: 'Install from yer browser menu',
+    unavailableDescription:
+      'Use yer browser share or menu button, then choose Add to Home Screen or Install app.',
   },
   backendStatus: {
     connected: 'Ahoy',

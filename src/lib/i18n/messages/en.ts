@@ -259,6 +259,8 @@ export const en: Messages = {
     body: 'You found the quiet corner of the store. Everything here is perfectly sorted.',
     dismiss: 'Close secret aisle',
     replay: 'Play the secret aisle tune again',
+    harpStringsLabel: 'Harp strings',
+    harpStringLabel: '{note} string, {key} key',
   },
   pwaInstall: {
     title: 'Install the app',
