@@ -51,6 +51,7 @@ import { extractVariant } from './lib/variant';
 import { AboutPage } from './pages/AboutPage';
 import { DebugPage } from './pages/DebugPage';
 import { EditPage } from './pages/EditPage';
+import { ErrorPage } from './pages/ErrorPage';
 import { RoutePage } from './pages/RoutePage';
 import { SectionsPage } from './pages/SectionsPage';
 import { SettingsPage } from './pages/SettingsPage';
@@ -1050,6 +1051,14 @@ export default function App() {
                 onDeleteItem={handleDeleteItem}
                 onBackToEdit={() => changePage('edit')}
                 onBackToSettings={() => changePage('settings')}
+              />
+            ) : null}
+
+            {page === 'not-found' || page === 'server-error' ? (
+              <ErrorPage
+                variant={page}
+                onBackToEdit={() => changePage('edit')}
+                onOpenDebug={() => changePage('debug')}
               />
             ) : null}
           </main>

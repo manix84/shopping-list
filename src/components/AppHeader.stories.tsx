@@ -15,7 +15,7 @@ const meta = {
   argTypes: {
     page: {
       control: 'select',
-      options: ['edit', 'route', 'sections', 'settings', 'about', 'debug'],
+      options: ['edit', 'route', 'sections', 'settings', 'about', 'debug', 'not-found', 'server-error'],
     },
     hasItems: { control: 'boolean' },
     resolvedTheme: {

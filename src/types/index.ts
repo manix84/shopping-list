@@ -1,4 +1,4 @@
-export type PageKey = 'edit' | 'route' | 'sections' | 'settings' | 'about' | 'debug';
+export type PageKey = 'edit' | 'route' | 'sections' | 'settings' | 'about' | 'debug' | 'not-found' | 'server-error';
 export type AppRoute = {
   page: PageKey;
   listId?: string;

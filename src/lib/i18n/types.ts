@@ -149,6 +149,16 @@ export type Messages = {
       sponsorFootnote: string;
       authorProfileLabel: string;
     };
+    error: {
+      notFoundCode: string;
+      notFoundEyebrow: string;
+      notFoundTitle: string;
+      notFoundSubtitle: string;
+      serverCode: string;
+      serverEyebrow: string;
+      serverTitle: string;
+      serverSubtitle: string;
+    };
     debug: {
       title: string;
       subtitle: string;

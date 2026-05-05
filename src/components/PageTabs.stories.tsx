@@ -16,7 +16,7 @@ const meta = {
   argTypes: {
     page: {
       control: 'select',
-      options: ['edit', 'route', 'settings', 'about'],
+      options: ['edit', 'route', 'settings', 'about', 'not-found', 'server-error'],
     },
     hasItems: { control: 'boolean' },
   },
