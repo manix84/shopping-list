@@ -21,6 +21,13 @@ describe('default country preference', () => {
     expect(inferDefaultCountryCode()).toBe('ca');
   });
 
+  it('infers the country from lowercase language region subtags', () => {
+    const windowMock = createWindowMock({ language: 'en-gb', languages: ['en-us'] });
+    vi.stubGlobal('navigator', windowMock.navigator);
+
+    expect(inferDefaultCountryCode()).toBe('us');
+  });
+
   it('falls back to timezone when browser language has no supported region', () => {
     const windowMock = createWindowMock({ language: 'en' });
     vi.stubGlobal('navigator', windowMock.navigator);

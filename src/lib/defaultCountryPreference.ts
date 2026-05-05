@@ -44,9 +44,18 @@ const COUNTRY_BY_TIME_ZONE: Record<string, CountryCode> = {
 };
 
 const countryFromLanguage = (language: string): CountryCode | undefined => {
-  const region = language
+  let canonicalLanguage = language;
+  if (typeof Intl !== 'undefined' && typeof Intl.getCanonicalLocales === 'function') {
+    try {
+      canonicalLanguage = Intl.getCanonicalLocales(language)[0] ?? language;
+    } catch {
+      canonicalLanguage = language;
+    }
+  }
+
+  const region = canonicalLanguage
     .split('-')
-    .find((part) => part.length === 2 && part.toUpperCase() === part)?.toUpperCase();
+    .find((part, index) => index > 0 && /^[a-z]{2}$/i.test(part))?.toUpperCase();
 
   return region ? COUNTRY_BY_REGION[region] : undefined;
 };

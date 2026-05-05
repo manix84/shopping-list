@@ -12,9 +12,7 @@ import {
   loadDefaultCountryPreference,
   saveDefaultCountryPreference,
 } from '../lib/defaultCountryPreference';
-import { getRouteViewLabel, saveLocale, type LocaleCode, useI18n } from '../lib/i18n';
-import { saveRouteViewMode } from '../lib/routeViewPreference';
-import { saveThemeMode } from '../lib/themePreference';
+import { getRouteViewLabel, type LocaleCode, useI18n } from '../lib/i18n';
 
 const THEME_OPTIONS: ThemeMode[] = ['system', 'light', 'dark'];
 
@@ -242,16 +240,16 @@ export function SettingsPage({
       ) : null}
     </div>
   ) : null;
-  const writeSetting = (write: () => void, apply: () => void) => {
+  const writeSetting = (apply: () => void, write?: () => void) => {
     if (settingsSaveTimerRef.current) {
       window.clearTimeout(settingsSaveTimerRef.current);
     }
 
     setSettingsSaveStatus('saving');
+    apply();
 
     try {
-      write();
-      apply();
+      write?.();
       settingsSaveTimerRef.current = window.setTimeout(() => {
         setSettingsSaveStatus('saved');
       }, 120);
@@ -261,19 +259,19 @@ export function SettingsPage({
     }
   };
   const handleLocaleChange = (nextLocale: LocaleCode) => {
-    writeSetting(() => saveLocale(nextLocale), () => setLocale(nextLocale));
+    writeSetting(() => setLocale(nextLocale));
   };
   const handleDefaultCountryChange = (preference: DefaultCountryPreference) => {
     writeSetting(
-      () => saveDefaultCountryPreference(preference),
       () => setDefaultCountryPreference(preference),
+      () => saveDefaultCountryPreference(preference),
     );
   };
   const handleThemeChange = (nextThemeMode: ThemeMode) => {
-    writeSetting(() => saveThemeMode(nextThemeMode), () => onThemeChange(nextThemeMode));
+    writeSetting(() => onThemeChange(nextThemeMode));
   };
   const handleRouteViewModeChange = (nextRouteViewMode: RouteViewMode) => {
-    writeSetting(() => saveRouteViewMode(nextRouteViewMode), () => onRouteViewModeChange(nextRouteViewMode));
+    writeSetting(() => onRouteViewModeChange(nextRouteViewMode));
   };
 
   useEffect(() => () => {
