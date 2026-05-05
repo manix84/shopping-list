@@ -244,6 +244,7 @@ export default function App() {
   const [isSecretAisleEasterEggVisible, setIsSecretAisleEasterEggVisible] = useState(false);
   const [predatorEasterEggRun, setPredatorEasterEggRun] = useState(0);
   const saveRequestIdRef = useRef(0);
+  const suppressNextAutosaveStatusRef = useRef(true);
 
   const config = useMemo(
     () => withMeasurementDisplayMode(COUNTRY_CONFIGS[countryCode], measurementDisplayMode),
@@ -542,6 +543,7 @@ export default function App() {
 
   useEffect(() => {
     let cancelled = false;
+    suppressNextAutosaveStatusRef.current = true;
     setIsLoaded(false);
     setShareError(undefined);
 
@@ -735,6 +737,7 @@ export default function App() {
             updatedAt: remotePayload.updatedAt ?? selectedRecord.updatedAt,
           });
         }
+        suppressNextAutosaveStatusRef.current = true;
         setStorageMode('backend');
         setIsServerBackedList(true);
         setRoute((current) => ({
@@ -812,7 +815,11 @@ export default function App() {
     if (!isLoaded) { return; }
     const saveRequestId = saveRequestIdRef.current + 1;
     saveRequestIdRef.current = saveRequestId;
-    setSaveStatus('saving');
+    const shouldReportSaveStatus = !suppressNextAutosaveStatusRef.current;
+    suppressNextAutosaveStatusRef.current = false;
+    if (shouldReportSaveStatus) {
+      setSaveStatus('saving');
+    }
 
     const record = buildRecord(input, items, countryCode, activeListId, isServerBackedList, listName);
 
@@ -820,7 +827,7 @@ export default function App() {
       localStorageRepository.save(record);
     } catch (error) {
       console.warn('Unable to save shopping list locally.', error);
-      if (saveRequestIdRef.current === saveRequestId) {
+      if (shouldReportSaveStatus && saveRequestIdRef.current === saveRequestId) {
         setSaveStatus('error');
       }
       return;
@@ -839,20 +846,22 @@ export default function App() {
       const backendRecord = { ...record, serverBacked: true };
       void saveSharedShoppingList(activeListId, backendRecord)
         .then(() => {
-          if (saveRequestIdRef.current === saveRequestId) {
+          if (shouldReportSaveStatus && saveRequestIdRef.current === saveRequestId) {
             setSaveStatus('saved');
           }
         })
         .catch((error: unknown) => {
           console.warn('Unable to save shared shopping list to backend.', error);
-          if (saveRequestIdRef.current === saveRequestId) {
+          if (shouldReportSaveStatus && saveRequestIdRef.current === saveRequestId) {
             setSaveStatus('error');
           }
         });
       return;
     }
 
-    setSaveStatus('saved');
+    if (shouldReportSaveStatus) {
+      setSaveStatus('saved');
+    }
   }, [activeListId, backendStatus.state, countryCode, input, isLoaded, isServerBackedList, items, listName, storageMode]);
 
   useEffect(() => {
@@ -1058,6 +1067,7 @@ export default function App() {
   };
 
   const applyRecord = (record: ShoppingListRecord) => {
+    suppressNextAutosaveStatusRef.current = true;
     if (record.listId) {
       setActiveListId(record.listId);
     }
