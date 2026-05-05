@@ -3,7 +3,7 @@ import type { KeyboardEvent as ReactKeyboardEvent, PointerEvent } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { useI18n } from '../lib/i18n';
 
-type EasterEggOverlayProps = {
+type SecretAisleEasterEggProps = {
   isVisible: boolean;
   onDismiss: () => void;
 };
@@ -167,7 +167,7 @@ const harpStringFromPointer = (event: PointerEvent<SVGSVGElement>) => {
   return isWithinStringRun ? nearestString : undefined;
 };
 
-export function EasterEggOverlay({ isVisible, onDismiss }: EasterEggOverlayProps) {
+export function SecretAisleEasterEgg({ isVisible, onDismiss }: SecretAisleEasterEggProps) {
   const { messages } = useI18n();
   const [activePluck, setActivePluck] = useState<{ offset: number; string: number }>();
   const [previewString, setPreviewString] = useState<number>();

@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { COUNTRY_CONFIGS } from './config/countries';
 import { AppHeader } from './components/AppHeader';
-import { EasterEggOverlay } from './components/EasterEggOverlay';
 import { PredatorEasterEgg } from './components/PredatorEasterEgg';
 import { PwaInstallBadge } from './components/PwaInstallBadge';
 import { PwaSplashScreen } from './components/PwaSplashScreen';
+import { SecretAisleEasterEgg } from './components/SecretAisleEasterEgg';
 import {
   runCountQuantityTests,
   runConfigTests,
@@ -235,7 +235,7 @@ export default function App() {
   const [isPwaInstalled, setIsPwaInstalled] = useState(() => isRunningInstalledPwa());
   const [isPwaInstallNudgeVisible, setIsPwaInstallNudgeVisible] = useState(() => !hasDismissedPwaInstallNudge());
   const [isLikelyMobileForInstall, setIsLikelyMobileForInstall] = useState(() => isMobileOrTabletDevice());
-  const [isEasterEggVisible, setIsEasterEggVisible] = useState(false);
+  const [isSecretAisleEasterEggVisible, setIsSecretAisleEasterEggVisible] = useState(false);
   const [predatorEasterEggRun, setPredatorEasterEggRun] = useState(0);
 
   const config = useMemo(
@@ -1067,7 +1067,7 @@ export default function App() {
             backendStatus={backendStatus}
             resolvedTheme={resolvedTheme}
             onChangePage={changePage}
-            onRevealEasterEgg={() => setIsEasterEggVisible(true)}
+            onRevealEasterEgg={() => setIsSecretAisleEasterEggVisible(true)}
           />
 
           <main id={'main-content'} className={'main-content'} tabIndex={-1}>
@@ -1185,7 +1185,10 @@ export default function App() {
           onDismiss={dismissPwaInstallNudge}
           onInstall={promptPwaInstall}
         />
-        <EasterEggOverlay isVisible={isEasterEggVisible} onDismiss={() => setIsEasterEggVisible(false)} />
+        <SecretAisleEasterEgg
+          isVisible={isSecretAisleEasterEggVisible}
+          onDismiss={() => setIsSecretAisleEasterEggVisible(false)}
+        />
         {predatorEasterEggRun > 0 ? (
           <PredatorEasterEgg
             key={predatorEasterEggRun}
