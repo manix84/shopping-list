@@ -68,6 +68,8 @@ const KONAMI_SEQUENCE = ['up', 'up', 'down', 'down', 'left', 'right', 'left', 'r
 const KONAMI_TOUCH_SWIPE_MIN_PX = 42;
 const KONAMI_TOUCH_TAP_MAX_PX = 14;
 const KONAMI_TOUCH_TAP_MAX_MS = 260;
+const KONAMI_TOUCH_LOCK_START_INDEX = 2;
+const KONAMI_TOUCH_SEQUENCE_TIMEOUT_MS = 1_600;
 type StorageMode = 'local' | 'backend';
 type BeforeInstallPromptChoice = {
   outcome: 'accepted' | 'dismissed';
@@ -299,9 +301,37 @@ export default function App() {
     let touchStartY = 0;
     let touchStartTime = 0;
     let hasValidTouchStart = false;
+    let sequenceResetTimer: number | undefined;
+    let isTouchMoveListenerActive = false;
 
-    const setKonamiTapStage = (isTapStage: boolean) => {
+    function handleTouchMove(event: TouchEvent) {
+      if (!hasValidTouchStart || isTextInputTarget(event.target)) { return; }
+
+      event.preventDefault();
+    }
+
+    const addTouchMoveListener = () => {
+      if (isTouchMoveListenerActive) { return; }
+
+      window.addEventListener('touchmove', handleTouchMove, { passive: false });
+      isTouchMoveListenerActive = true;
+    };
+
+    const removeTouchMoveListener = () => {
+      if (!isTouchMoveListenerActive) { return; }
+
+      window.removeEventListener('touchmove', handleTouchMove);
+      isTouchMoveListenerActive = false;
+    };
+
+    const setKonamiTouchState = (isActive: boolean, isTapStage: boolean) => {
+      document.documentElement.classList.toggle('konami-touch-active', isActive);
       document.documentElement.classList.toggle('konami-touch-tap-stage', isTapStage);
+      if (isActive) {
+        addTouchMoveListener();
+      } else {
+        removeTouchMoveListener();
+      }
     };
 
     const resetTouchStart = () => {
@@ -311,16 +341,44 @@ export default function App() {
       touchStartTime = 0;
     };
 
-    const acceptKonamiInput = (input: (typeof KONAMI_SEQUENCE)[number]) => {
+    const clearSequenceResetTimer = () => {
+      if (sequenceResetTimer === undefined) { return; }
+
+      window.clearTimeout(sequenceResetTimer);
+      sequenceResetTimer = undefined;
+    };
+
+    const resetKonamiSequence = () => {
+      sequenceIndex = 0;
+      resetTouchStart();
+      clearSequenceResetTimer();
+      setKonamiTouchState(false, false);
+    };
+
+    const scheduleKonamiSequenceReset = () => {
+      clearSequenceResetTimer();
+      sequenceResetTimer = window.setTimeout(resetKonamiSequence, KONAMI_TOUCH_SEQUENCE_TIMEOUT_MS);
+    };
+
+    const acceptKonamiInput = (input: (typeof KONAMI_SEQUENCE)[number], source: 'keyboard' | 'touch') => {
       sequenceIndex = nextKonamiIndex(sequenceIndex, input);
       if (sequenceIndex >= KONAMI_SEQUENCE.length) {
-        sequenceIndex = 0;
-        setKonamiTapStage(false);
+        resetKonamiSequence();
         setPredatorEasterEggRun((current) => current + 1);
         return;
       }
 
-      setKonamiTapStage(sequenceIndex >= KONAMI_SEQUENCE.length - 2);
+      if (sequenceIndex === 0) {
+        resetKonamiSequence();
+        return;
+      }
+
+      const isTouchSequence = source === 'touch';
+      setKonamiTouchState(
+        isTouchSequence && sequenceIndex >= KONAMI_TOUCH_LOCK_START_INDEX,
+        isTouchSequence && sequenceIndex >= KONAMI_SEQUENCE.length - 2,
+      );
+      scheduleKonamiSequenceReset();
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -328,7 +386,7 @@ export default function App() {
 
       const input = konamiKeyFromEvent(event);
       if (input) {
-        acceptKonamiInput(input);
+        acceptKonamiInput(input, 'keyboard');
       }
     };
 
@@ -368,31 +426,32 @@ export default function App() {
         if (sequenceIndex >= KONAMI_SEQUENCE.length - 2) {
           event.preventDefault();
         }
-        acceptKonamiInput(sequenceIndex === KONAMI_SEQUENCE.length - 2 ? 'b' : 'a');
+        acceptKonamiInput(sequenceIndex === KONAMI_SEQUENCE.length - 2 ? 'b' : 'a', 'touch');
         return;
       }
 
       if (Math.max(absX, absY) < KONAMI_TOUCH_SWIPE_MIN_PX) { return; }
 
       if (absY > absX) {
-        acceptKonamiInput(deltaY < 0 ? 'up' : 'down');
+        acceptKonamiInput(deltaY < 0 ? 'up' : 'down', 'touch');
         return;
       }
 
-      acceptKonamiInput(deltaX < 0 ? 'left' : 'right');
+      acceptKonamiInput(deltaX < 0 ? 'left' : 'right', 'touch');
     };
 
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('touchstart', handleTouchStart, { passive: true });
     window.addEventListener('touchend', handleTouchEnd, { passive: false });
-    window.addEventListener('touchcancel', resetTouchStart);
+    window.addEventListener('touchcancel', resetKonamiSequence);
 
     return () => {
-      setKonamiTapStage(false);
+      clearSequenceResetTimer();
+      setKonamiTouchState(false, false);
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('touchstart', handleTouchStart);
       window.removeEventListener('touchend', handleTouchEnd);
-      window.removeEventListener('touchcancel', resetTouchStart);
+      window.removeEventListener('touchcancel', resetKonamiSequence);
     };
   }, []);
 

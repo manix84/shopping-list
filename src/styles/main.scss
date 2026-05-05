@@ -433,6 +433,13 @@ select {
   touch-action: manipulation;
 }
 
+.konami-touch-active,
+.konami-touch-active body,
+.konami-touch-active .shopping-app {
+  overscroll-behavior-y: contain;
+  touch-action: none;
+}
+
 .app-icon-image {
   display: block;
   height: 32px;
