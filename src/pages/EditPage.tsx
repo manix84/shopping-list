@@ -94,7 +94,7 @@ export function EditPage({
               </div>
               <p className={'subtitle'}>{messages.pages.edit.subtitle}</p>
             </div>
-            <button type={'button'} className={'button edit-new-list-button'} onClick={onResetAll}>
+            <button type={'button'} className={'button edit-reset-all-button'} onClick={onResetAll}>
               {messages.actions.fullReset}
             </button>
           </div>

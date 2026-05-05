@@ -523,25 +523,16 @@ select {
 
 .edit-page-header {
   align-items: flex-start;
-  display: block;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
 }
 
 .edit-page-header-copy {
   min-width: 0;
 }
 
-.edit-list-card {
-  position: relative;
-}
-
-.edit-list-card .card-header {
-  padding-right: 150px;
-}
-
-.edit-new-list-button {
-  position: absolute;
-  right: 24px;
-  top: 24px;
+.edit-reset-all-button {
+  white-space: nowrap;
 }
 
 .subtitle,
@@ -2721,15 +2712,6 @@ select {
 
   .card-header {
     padding: 18px 18px 0;
-  }
-
-  .edit-list-card .card-header {
-    padding-right: 130px;
-  }
-
-  .edit-new-list-button {
-    right: 18px;
-    top: 18px;
   }
 
   .card-body {
