@@ -1550,6 +1550,119 @@ select {
   }
 }
 
+.predator-easter-egg {
+  bottom: max(10px, env(safe-area-inset-bottom));
+  height: 150px;
+  left: -190px;
+  pointer-events: none;
+  position: fixed;
+  width: 190px;
+  z-index: 1150;
+  animation: predator-run-across 4.8s linear both;
+}
+
+.predator-puppet {
+  animation: predator-child-hop 0.46s cubic-bezier(0.2, 0.7, 0.25, 1) infinite;
+  display: block;
+  filter: drop-shadow(0 10px 14px color-mix(in srgb, $shadow 22%, transparent));
+  height: 150px;
+  overflow: visible;
+  transform-origin: 50% 100%;
+  width: 190px;
+}
+
+.predator-shadow {
+  animation: predator-shadow-hop 0.46s cubic-bezier(0.2, 0.7, 0.25, 1) infinite;
+  background: color-mix(in srgb, $shadow 18%, transparent);
+  border-radius: 999px;
+  bottom: 8px;
+  height: 14px;
+  left: 38px;
+  position: absolute;
+  width: 112px;
+}
+
+.predator-stick {
+  stroke: color-mix(in srgb, $text 34%, transparent);
+  stroke-linecap: round;
+  stroke-width: 3;
+}
+
+.predator-body,
+.predator-head,
+.predator-fin {
+  fill: color-mix(in srgb, $primary 58%, #f7b955);
+  stroke: color-mix(in srgb, $text 58%, $primary);
+  stroke-linejoin: round;
+  stroke-width: 3;
+}
+
+.predator-tiger .predator-body,
+.predator-tiger .predator-head {
+  fill: #f4a340;
+}
+
+.predator-rex .predator-body,
+.predator-rex .predator-head,
+.predator-raptor .predator-body,
+.predator-raptor .predator-head {
+  fill: #67b56b;
+}
+
+.predator-shark .predator-body,
+.predator-shark .predator-fin {
+  fill: #6fa7d8;
+}
+
+.predator-croc .predator-body,
+.predator-croc .predator-head {
+  fill: #5a9e63;
+}
+
+.predator-wolf .predator-body,
+.predator-wolf .predator-head,
+.predator-bear .predator-body,
+.predator-bear .predator-head {
+  fill: #8e705a;
+}
+
+.predator-mark,
+.predator-arm,
+.predator-ear,
+.predator-leg,
+.predator-mouth,
+.predator-tail,
+.predator-tooth {
+  fill: none;
+  stroke: color-mix(in srgb, $text 70%, $primary);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 4;
+}
+
+.predator-tail {
+  stroke-width: 6;
+}
+
+.predator-tooth {
+  stroke: #fff;
+  stroke-width: 3;
+}
+
+.predator-eye {
+  fill: $text;
+}
+
+.predator-leg-front {
+  animation: predator-leg-front 0.46s ease-in-out infinite;
+  transform-origin: 90px 108px;
+}
+
+.predator-leg-back {
+  animation: predator-leg-back 0.46s ease-in-out infinite;
+  transform-origin: 44px 108px;
+}
+
 @keyframes connection-badge-fade-in {
   from {
     opacity: 0;
@@ -1581,11 +1694,76 @@ select {
   }
 }
 
+@keyframes predator-run-across {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(calc(100vw + 380px));
+  }
+}
+
+@keyframes predator-child-hop {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+
+  42% {
+    transform: translateY(-24px) rotate(4deg);
+  }
+
+  68% {
+    transform: translateY(-6px) rotate(-5deg);
+  }
+}
+
+@keyframes predator-shadow-hop {
+  0%,
+  100% {
+    opacity: 0.34;
+    transform: scaleX(1);
+  }
+
+  42% {
+    opacity: 0.14;
+    transform: scaleX(0.72);
+  }
+}
+
+@keyframes predator-leg-front {
+  0%,
+  100% {
+    transform: rotate(-7deg);
+  }
+
+  50% {
+    transform: rotate(10deg);
+  }
+}
+
+@keyframes predator-leg-back {
+  0%,
+  100% {
+    transform: rotate(8deg);
+  }
+
+  50% {
+    transform: rotate(-12deg);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .connection-badge,
   .connection-badge-leaving,
   .easter-egg-overlay,
-  .easter-egg-scanline {
+  .easter-egg-scanline,
+  .predator-easter-egg,
+  .predator-puppet,
+  .predator-shadow,
+  .predator-leg-front,
+  .predator-leg-back {
     animation-duration: 0.01ms;
   }
 }

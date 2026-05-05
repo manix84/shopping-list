@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { COUNTRY_CONFIGS } from './config/countries';
 import { AppHeader } from './components/AppHeader';
 import { EasterEggOverlay } from './components/EasterEggOverlay';
+import { PredatorEasterEgg } from './components/PredatorEasterEgg';
 import { PwaInstallBadge } from './components/PwaInstallBadge';
 import { PwaSplashScreen } from './components/PwaSplashScreen';
 import {
@@ -63,6 +64,10 @@ const BACKEND_HEARTBEAT_CONNECTED_MS = 5_000;
 const BACKEND_HEARTBEAT_RETRY_MS = 1_500;
 const PWA_INSTALL_NUDGE_DISMISSED_KEY = 'smart-shopping-list-pwa-install-nudge-dismissed-v1';
 const PWA_INSTALL_PROMPT_SETTLE_MS = 1_200;
+const KONAMI_SEQUENCE = ['up', 'up', 'down', 'down', 'left', 'right', 'left', 'right', 'b', 'a'] as const;
+const KONAMI_TOUCH_SWIPE_MIN_PX = 42;
+const KONAMI_TOUCH_TAP_MAX_PX = 14;
+const KONAMI_TOUCH_TAP_MAX_MS = 260;
 type StorageMode = 'local' | 'backend';
 type BeforeInstallPromptChoice = {
   outcome: 'accepted' | 'dismissed';
@@ -107,6 +112,31 @@ const isMobileOrTabletDevice = (): boolean => {
   if (typeof window === 'undefined') { return false; }
 
   return window.matchMedia('(hover: none), (pointer: coarse)').matches && window.matchMedia('(max-width: 1180px)').matches;
+};
+
+const isTextInputTarget = (target: EventTarget | null): boolean => {
+  if (!(target instanceof HTMLElement)) { return false; }
+
+  const tagName = target.tagName.toLowerCase();
+  return tagName === 'input' || tagName === 'textarea' || tagName === 'select' || target.isContentEditable;
+};
+
+const konamiKeyFromEvent = (event: KeyboardEvent): (typeof KONAMI_SEQUENCE)[number] | undefined => {
+  if (event.key === 'ArrowUp') { return 'up'; }
+  if (event.key === 'ArrowDown') { return 'down'; }
+  if (event.key === 'ArrowLeft') { return 'left'; }
+  if (event.key === 'ArrowRight') { return 'right'; }
+  if (event.key.toLowerCase() === 'b') { return 'b'; }
+  if (event.key.toLowerCase() === 'a') { return 'a'; }
+  return undefined;
+};
+
+const nextKonamiIndex = (currentIndex: number, input: (typeof KONAMI_SEQUENCE)[number]): number => {
+  if (KONAMI_SEQUENCE[currentIndex] === input) {
+    return currentIndex + 1;
+  }
+
+  return KONAMI_SEQUENCE[0] === input ? 1 : 0;
 };
 
 const hasDismissedPwaInstallNudge = (): boolean => {
@@ -206,6 +236,7 @@ export default function App() {
   const [isPwaInstallNudgeVisible, setIsPwaInstallNudgeVisible] = useState(() => !hasDismissedPwaInstallNudge());
   const [isLikelyMobileForInstall, setIsLikelyMobileForInstall] = useState(() => isMobileOrTabletDevice());
   const [isEasterEggVisible, setIsEasterEggVisible] = useState(false);
+  const [predatorEasterEggRun, setPredatorEasterEggRun] = useState(0);
 
   const config = useMemo(
     () => withMeasurementDisplayMode(COUNTRY_CONFIGS[countryCode], measurementDisplayMode),
@@ -261,6 +292,76 @@ export default function App() {
       }),
     );
   };
+
+  useEffect(() => {
+    let sequenceIndex = 0;
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchStartTime = 0;
+
+    const acceptKonamiInput = (input: (typeof KONAMI_SEQUENCE)[number]) => {
+      sequenceIndex = nextKonamiIndex(sequenceIndex, input);
+      if (sequenceIndex >= KONAMI_SEQUENCE.length) {
+        sequenceIndex = 0;
+        setPredatorEasterEggRun((current) => current + 1);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (isTextInputTarget(event.target)) { return; }
+
+      const input = konamiKeyFromEvent(event);
+      if (input) {
+        acceptKonamiInput(input);
+      }
+    };
+
+    const handleTouchStart = (event: TouchEvent) => {
+      if (event.touches.length !== 1 || isTextInputTarget(event.target)) { return; }
+
+      const touch = event.touches[0];
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+      touchStartTime = Date.now();
+    };
+
+    const handleTouchEnd = (event: TouchEvent) => {
+      if (isTextInputTarget(event.target)) { return; }
+
+      const touch = event.changedTouches[0];
+      if (!touch) { return; }
+
+      const deltaX = touch.clientX - touchStartX;
+      const deltaY = touch.clientY - touchStartY;
+      const absX = Math.abs(deltaX);
+      const absY = Math.abs(deltaY);
+      const duration = Date.now() - touchStartTime;
+
+      if (absX <= KONAMI_TOUCH_TAP_MAX_PX && absY <= KONAMI_TOUCH_TAP_MAX_PX && duration <= KONAMI_TOUCH_TAP_MAX_MS) {
+        acceptKonamiInput(sequenceIndex === KONAMI_SEQUENCE.length - 2 ? 'b' : 'a');
+        return;
+      }
+
+      if (Math.max(absX, absY) < KONAMI_TOUCH_SWIPE_MIN_PX) { return; }
+
+      if (absY > absX) {
+        acceptKonamiInput(deltaY < 0 ? 'up' : 'down');
+        return;
+      }
+
+      acceptKonamiInput(deltaX < 0 ? 'left' : 'right');
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchend', handleTouchEnd, { passive: true });
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, []);
 
   const removeSharedListFromHistory = (nextListId: string) => {
     setSharedListHistory(sharedListHistoryRepository.remove(nextListId));
@@ -1073,6 +1174,12 @@ export default function App() {
           onInstall={promptPwaInstall}
         />
         <EasterEggOverlay isVisible={isEasterEggVisible} onDismiss={() => setIsEasterEggVisible(false)} />
+        {predatorEasterEggRun > 0 ? (
+          <PredatorEasterEgg
+            key={predatorEasterEggRun}
+            onComplete={() => setPredatorEasterEggRun(0)}
+          />
+        ) : null}
       </div>
     </I18nProvider>
   );
