@@ -521,6 +521,20 @@ select {
   min-width: 0;
 }
 
+.edit-page-header {
+  align-items: flex-start;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.edit-page-header-copy {
+  min-width: 0;
+}
+
+.edit-reset-all-button {
+  white-space: nowrap;
+}
+
 .subtitle,
 .small-text,
 .section-group,
@@ -751,6 +765,14 @@ select {
 .country-option-icon {
   font-size: 17px;
   line-height: 1;
+}
+
+.country-option-icon-auto {
+  border: 1px dashed $muted;
+  border-radius: 3px;
+  display: inline-block;
+  height: 14px;
+  width: 19px;
 }
 
 .locale-option-icon {

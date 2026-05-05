@@ -1,8 +1,17 @@
 import { mdiChevronDown, mdiDownload } from '@mdi/js';
-import { type ReactNode, useState } from 'react';
-import type { RouteViewMode, ThemeMode } from '../types';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
+import { COUNTRY_CONFIGS } from '../config/countries';
+import type { CountryCode, RouteViewMode, SaveStatus, ThemeMode } from '../types';
 import { Card } from '../components/Card';
 import { DebugLink } from '../components/DebugLink';
+import { SaveStatusIndicator } from '../components/SaveStatusIndicator';
+import {
+  AUTO_DETECT_COUNTRY,
+  type DefaultCountryPreference,
+  inferDefaultCountryCode,
+  loadDefaultCountryPreference,
+  saveDefaultCountryPreference,
+} from '../lib/defaultCountryPreference';
 import { getRouteViewLabel, type LocaleCode, useI18n } from '../lib/i18n';
 
 const THEME_OPTIONS: ThemeMode[] = ['system', 'light', 'dark'];
@@ -40,6 +49,18 @@ function LocaleIcon({ locale }: { locale: LocaleCode }) {
       {locale.toUpperCase()}
     </span>
   );
+}
+
+function CountryIcon({ countryCode }: { countryCode: CountryCode }) {
+  return (
+    <span aria-hidden={'true'} className={'country-option-icon'}>
+      {COUNTRY_CONFIGS[countryCode].flag}
+    </span>
+  );
+}
+
+function AutoDetectCountryIcon() {
+  return <span aria-hidden={'true'} className={'country-option-icon country-option-icon-auto'} />;
 }
 
 function RouteDensityPreview({ mode }: { mode: RouteViewMode }) {
@@ -149,7 +170,32 @@ export function SettingsPage({
   onInstall,
 }: SettingsPageProps) {
   const { locale, setLocale, messages } = useI18n();
+  const [settingsSaveStatus, setSettingsSaveStatus] = useState<SaveStatus>('idle');
+  const [detectedCountryCode] = useState<CountryCode>(() => inferDefaultCountryCode());
+  const [defaultCountryPreference, setDefaultCountryPreference] = useState<DefaultCountryPreference>(
+    () => loadDefaultCountryPreference() ?? AUTO_DETECT_COUNTRY,
+  );
+  const settingsSaveTimerRef = useRef<number>();
   const routeViewOptions: RouteViewMode[] = ['default', 'comfortable', 'compact'];
+  const countryLabel = (countryCode: CountryCode) =>
+    messages.countryOptions[countryCode] ?? COUNTRY_CONFIGS[countryCode].label;
+  const defaultCountryOptions: SelectOption<DefaultCountryPreference>[] = [
+    {
+      value: AUTO_DETECT_COUNTRY,
+      label: messages.pages.settings.defaultCountryAutoDetect,
+      icon: <AutoDetectCountryIcon />,
+    },
+    ...Object.values(COUNTRY_CONFIGS)
+      .slice()
+      .sort((a, b) => countryLabel(a.code).localeCompare(countryLabel(b.code), locale))
+      .map((country): SelectOption<DefaultCountryPreference> => ({
+        value: country.code,
+        label: country.code === detectedCountryCode
+          ? `${countryLabel(country.code)} (${messages.pages.settings.detectedCountrySuffix})`
+          : countryLabel(country.code),
+        icon: <CountryIcon countryCode={country.code} />,
+      })),
+  ];
   const routeDensityOptions = routeViewOptions.map((mode): SelectOption<RouteViewMode> => ({
     value: mode,
     label: getRouteViewLabel(mode, messages),
@@ -194,13 +240,55 @@ export function SettingsPage({
       ) : null}
     </div>
   ) : null;
+  const writeSetting = (apply: () => void, write?: () => void) => {
+    if (settingsSaveTimerRef.current) {
+      window.clearTimeout(settingsSaveTimerRef.current);
+    }
+
+    setSettingsSaveStatus('saving');
+    apply();
+
+    try {
+      write?.();
+      settingsSaveTimerRef.current = window.setTimeout(() => {
+        setSettingsSaveStatus('saved');
+      }, 120);
+    } catch (error) {
+      console.warn('Unable to save settings preference.', error);
+      setSettingsSaveStatus('error');
+    }
+  };
+  const handleLocaleChange = (nextLocale: LocaleCode) => {
+    writeSetting(() => setLocale(nextLocale));
+  };
+  const handleDefaultCountryChange = (preference: DefaultCountryPreference) => {
+    writeSetting(
+      () => setDefaultCountryPreference(preference),
+      () => saveDefaultCountryPreference(preference),
+    );
+  };
+  const handleThemeChange = (nextThemeMode: ThemeMode) => {
+    writeSetting(() => onThemeChange(nextThemeMode));
+  };
+  const handleRouteViewModeChange = (nextRouteViewMode: RouteViewMode) => {
+    writeSetting(() => onRouteViewModeChange(nextRouteViewMode));
+  };
+
+  useEffect(() => () => {
+    if (settingsSaveTimerRef.current) {
+      window.clearTimeout(settingsSaveTimerRef.current);
+    }
+  }, []);
 
   return (
     <>
       <Card
         header={
           <>
-            <h2 className={'title title-md'}>{messages.pages.settings.title}</h2>
+            <div className={'page-title-with-status'}>
+              <h2 className={'title title-md'}>{messages.pages.settings.title}</h2>
+              <SaveStatusIndicator status={settingsSaveStatus} />
+            </div>
             <p className={'subtitle'}>{messages.pages.settings.subtitle}</p>
           </>
         }
@@ -215,7 +303,20 @@ export function SettingsPage({
             id={'locale-select'}
             value={locale}
             options={localeOptions}
-            onChange={setLocale}
+            onChange={handleLocaleChange}
+          />
+        </div>
+
+        <div className={'field field-compact'}>
+          <div>
+            <label htmlFor={'default-country-select'}>{messages.pages.settings.defaultCountryLabel}</label>
+            <div className={'small-text'}>{messages.pages.settings.defaultCountrySubtitle}</div>
+          </div>
+          <SettingsSelect
+            id={'default-country-select'}
+            value={defaultCountryPreference}
+            options={defaultCountryOptions}
+            onChange={handleDefaultCountryChange}
           />
         </div>
 
@@ -224,7 +325,7 @@ export function SettingsPage({
             <label htmlFor={'theme-select'}>{messages.pages.settings.themeLabel}</label>
             <div className={'small-text'}>{messages.pages.settings.themeSubtitle}</div>
           </div>
-          <SettingsSelect id={'theme-select'} value={themeMode} options={themeOptions} onChange={onThemeChange} />
+          <SettingsSelect id={'theme-select'} value={themeMode} options={themeOptions} onChange={handleThemeChange} />
         </div>
 
         <div className={'field field-compact'}>
@@ -236,7 +337,7 @@ export function SettingsPage({
             id={'route-density-select'}
             value={routeViewMode}
             options={routeDensityOptions}
-            onChange={onRouteViewModeChange}
+            onChange={handleRouteViewModeChange}
           />
         </div>
 

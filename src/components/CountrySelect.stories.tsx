@@ -27,11 +27,15 @@ type Story = StoryObj<typeof meta>;
 
 const playCountrySelect: Story['play'] = async ({ args, canvasElement }) => {
   const canvas = within(canvasElement);
-  const select = canvas.getByLabelText('Store layout profile');
+  const trigger = canvas.getByLabelText('Store layout profile');
 
-  await expect(select).toHaveValue(args.value);
-  await userEvent.selectOptions(select, 'us');
-  await expect(select).toHaveValue('us');
+  await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+  await expect(trigger).toHaveTextContent(args.value === 'uk' ? /united kingdom/i : args.value === 'ca' ? /canada/i : /united states/i);
+  await userEvent.click(trigger);
+  await expect(canvas.getByRole('option', { name: /united states/i })).toHaveAttribute('aria-selected', String(args.value === 'us'));
+  await userEvent.click(canvas.getByRole('option', { name: /united states/i }));
+  await expect(canvas.getByLabelText('Store layout profile')).toHaveAttribute('aria-expanded', 'false');
+  await expect(canvas.getByLabelText('Store layout profile')).toHaveTextContent(/united states/i);
 };
 
 function CountrySelectExample({ value }: { value: CountryCode }) {

@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { UK_CONFIG } from '../../config/countries/uk';
+import { DEFAULT_COUNTRY_STORAGE_KEY, inferDefaultCountryCode } from '../defaultCountryPreference';
 import { STORAGE_KEY, hasStoredShoppingListRecord, localStorageRepository } from './localStorageRepository';
 import { parseItems } from '../parser';
 import { createWindowMock } from '../../test/testUtils';
@@ -11,13 +12,15 @@ describe('localStorageRepository', () => {
   });
 
   it('loads a blank record when storage is empty', () => {
-    vi.stubGlobal('window', createWindowMock());
+    const windowMock = createWindowMock({ language: 'en-US' });
+    vi.stubGlobal('window', windowMock);
+    vi.stubGlobal('navigator', windowMock.navigator);
 
     const loaded = localStorageRepository.load();
 
     expect(loaded).toMatchObject({
       input: '',
-      countryCode: 'uk',
+      countryCode: 'us',
       serverBacked: false,
     });
     expect(isUuidV7(loaded.listId)).toBe(true);
@@ -56,16 +59,48 @@ describe('localStorageRepository', () => {
   });
 
   it('falls back to a blank record when stored JSON is invalid', () => {
-    vi.stubGlobal('window', createWindowMock({ storageSeed: { [STORAGE_KEY]: 'not json' } }));
+    const windowMock = createWindowMock({ language: 'fr-FR', storageSeed: { [STORAGE_KEY]: 'not json' } });
+    vi.stubGlobal('window', windowMock);
+    vi.stubGlobal('navigator', windowMock.navigator);
 
     const loaded = localStorageRepository.load();
 
     expect(loaded).toMatchObject({
       input: '',
-      countryCode: 'uk',
+      countryCode: 'fr',
       serverBacked: false,
     });
     expect(loaded.items).toHaveLength(0);
+  });
+
+  it('infers the default country from browser language preferences', () => {
+    const windowMock = createWindowMock({ language: 'en-GB', languages: ['en-CA', 'en-US'] });
+    vi.stubGlobal('navigator', windowMock.navigator);
+
+    expect(inferDefaultCountryCode()).toBe('ca');
+  });
+
+  it('uses the stored default country preference before detection for blank records', () => {
+    const windowMock = createWindowMock({
+      language: 'en-US',
+      storageSeed: { [DEFAULT_COUNTRY_STORAGE_KEY]: 'nl' },
+    });
+    vi.stubGlobal('window', windowMock);
+    vi.stubGlobal('navigator', windowMock.navigator);
+
+    expect(localStorageRepository.load()).toMatchObject({ input: '', countryCode: 'nl' });
+  });
+
+  it('falls back to timezone when browser language has no supported region', () => {
+    const windowMock = createWindowMock({ language: 'en' });
+    vi.stubGlobal('navigator', windowMock.navigator);
+    vi.stubGlobal('Intl', {
+      DateTimeFormat: () => ({
+        resolvedOptions: () => ({ timeZone: 'Europe/Rome' }),
+      }),
+    });
+
+    expect(inferDefaultCountryCode()).toBe('it');
   });
 
   it('reports whether a local record exists', () => {
@@ -88,6 +123,6 @@ describe('localStorageRepository', () => {
       countryCode: 'uk',
     })).not.toThrow();
     expect(() => localStorageRepository.clear()).not.toThrow();
-    expect(localStorageRepository.load()).toMatchObject({ input: '', countryCode: 'uk' });
+    expect(localStorageRepository.load()).toMatchObject({ input: '', countryCode: inferDefaultCountryCode() });
   });
 });

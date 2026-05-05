@@ -1,5 +1,6 @@
 import { COUNTRY_CONFIGS } from '../../config/countries';
 import type { ShoppingListRecord } from '../../types';
+import { defaultCountryCode } from '../defaultCountryPreference';
 import { parseItems } from '../parser';
 import { createUuidV7 } from '../uuid';
 import { decodeShoppingListRecord, encodeShoppingListRecord } from './recordCodec';
@@ -13,7 +14,7 @@ export const defaultRecord = (): ShoppingListRecord => ({
   input: '',
   items: [],
   updatedAt: new Date().toISOString(),
-  countryCode: 'uk',
+  countryCode: defaultCountryCode(),
 });
 
 export const localStorageRepository = {
