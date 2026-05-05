@@ -426,6 +426,13 @@ select {
   background: $panel-alt;
 }
 
+.app-icon-easter-egg-trigger,
+.konami-touch-tap-stage,
+.konami-touch-tap-stage body,
+.konami-touch-tap-stage .shopping-app {
+  touch-action: manipulation;
+}
+
 .app-icon-image {
   display: block;
   height: 32px;

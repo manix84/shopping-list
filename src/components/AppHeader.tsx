@@ -97,6 +97,9 @@ export function AppHeader({
 
   const handleLogoPointerDown = (event: PointerEvent<HTMLSpanElement>) => {
     if (event.pointerType === 'mouse' && event.button !== 0) { return; }
+    if (event.pointerType !== 'mouse') {
+      event.preventDefault();
+    }
 
     setLogoTapCount((current) => {
       const next = current + 1;
@@ -119,7 +122,7 @@ export function AppHeader({
             <div className={'title-row'}>
               <div className={'title-block'}>
                 <span
-                  className={'app-icon'}
+                  className={'app-icon app-icon-easter-egg-trigger'}
                   aria-hidden={'true'}
                   onPointerDown={handleLogoPointerDown}
                 >

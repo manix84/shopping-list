@@ -299,12 +299,20 @@ export default function App() {
     let touchStartY = 0;
     let touchStartTime = 0;
 
+    const setKonamiTapStage = (isTapStage: boolean) => {
+      document.documentElement.classList.toggle('konami-touch-tap-stage', isTapStage);
+    };
+
     const acceptKonamiInput = (input: (typeof KONAMI_SEQUENCE)[number]) => {
       sequenceIndex = nextKonamiIndex(sequenceIndex, input);
       if (sequenceIndex >= KONAMI_SEQUENCE.length) {
         sequenceIndex = 0;
+        setKonamiTapStage(false);
         setPredatorEasterEggRun((current) => current + 1);
+        return;
       }
+
+      setKonamiTapStage(sequenceIndex >= KONAMI_SEQUENCE.length - 2);
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -360,6 +368,7 @@ export default function App() {
     window.addEventListener('touchend', handleTouchEnd, { passive: false });
 
     return () => {
+      setKonamiTapStage(false);
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('touchstart', handleTouchStart);
       window.removeEventListener('touchend', handleTouchEnd);
