@@ -1,4 +1,5 @@
 import { mdiClose, mdiStarFourPoints } from '@mdi/js';
+import type { CSSProperties } from 'react';
 import type { KeyboardEvent as ReactKeyboardEvent, PointerEvent } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { useI18n } from '../lib/i18n';
@@ -46,6 +47,20 @@ const stringFrequencies = [
   noteFrequencies.g5,
 ];
 const stringNoteNames = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F5', 'G5'];
+const stringNoteColors = [
+  '#ef4444',
+  '#f97316',
+  '#f59e0b',
+  '#84cc16',
+  '#22c55e',
+  '#14b8a6',
+  '#06b6d4',
+  '#3b82f6',
+  '#6366f1',
+  '#8b5cf6',
+  '#d946ef',
+  '#ec4899',
+];
 
 type MelodyNote = {
   beat: number;
@@ -148,7 +163,13 @@ const harpStringPath = (x: number, offset = 0) => (
   `M ${x} ${HARP_TOP_Y} Q ${x + offset} ${HARP_VIEWBOX_HEIGHT / 2} ${x} ${HARP_BOTTOM_Y}`
 );
 
-const harpStringWidth = (index: number) => Math.max(0.55, 1.25 - index * 0.045);
+const harpStringWidth = () => 3;
+
+const noteColorStyle = (string: number | undefined): CSSProperties => (
+  string === undefined
+    ? {}
+    : { '--easter-egg-note-color': stringNoteColors[string] ?? stringNoteColors[0] } as CSSProperties
+);
 
 const harpStringFromPointer = (event: PointerEvent<SVGSVGElement>) => {
   const rect = event.currentTarget.getBoundingClientRect();
@@ -487,16 +508,20 @@ export function SecretAisleEasterEgg({ isVisible, onDismiss }: SecretAisleEaster
                 />
                 <path
                   className={`easter-egg-string ${activePluck?.string === index ? 'easter-egg-string-active' : ''}`}
+                  style={activePluck?.string === index ? noteColorStyle(index) : undefined}
                   d={harpStringPath(
                     harpStringX(index),
                     activePluck?.string === index ? activePluck.offset : 0,
                   )}
-                  strokeWidth={harpStringWidth(index)}
+                  strokeWidth={harpStringWidth()}
                 />
               </g>
             ))}
           </svg>
-          <div className={`easter-egg-note-preview ${previewString === undefined ? 'easter-egg-note-preview-hidden' : ''}`}>
+          <div
+            className={`easter-egg-note-preview ${previewString === undefined ? 'easter-egg-note-preview-hidden' : ''}`}
+            style={noteColorStyle(previewString)}
+          >
             <span>{previewString === undefined ? null : stringNoteNames[previewString]}</span>
           </div>
         </div>

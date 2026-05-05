@@ -1498,35 +1498,36 @@ select {
 }
 
 .easter-egg-string-hit:focus-visible + .easter-egg-string {
-  filter: drop-shadow(0 0 8px color-mix(in srgb, $primary 72%, transparent));
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--easter-egg-note-color, #2563eb) 72%, transparent));
   opacity: 1;
-  stroke: color-mix(in srgb, $primary 86%, #fff);
+  stroke: color-mix(in srgb, var(--easter-egg-note-color, #2563eb) 86%, #fff);
 }
 
 .easter-egg-string {
   fill: none;
   pointer-events: none;
   filter: drop-shadow(0 0 3px color-mix(in srgb, $primary 10%, transparent));
-  opacity: 0.76;
+  opacity: 0.34;
   stroke: color-mix(in srgb, $primary 52%, $text);
   stroke-linecap: round;
-  transition: filter 0.1s ease, opacity 0.1s ease, stroke 0.1s ease;
+  transition: filter 0.34s ease, opacity 0.34s ease, stroke 0.34s ease;
 }
 
 .easter-egg-string-active {
-  filter: drop-shadow(0 0 8px color-mix(in srgb, $primary 72%, transparent));
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--easter-egg-note-color, #2563eb) 72%, transparent));
   opacity: 1;
-  stroke: color-mix(in srgb, $primary 86%, #fff);
+  stroke: color-mix(in srgb, var(--easter-egg-note-color, #2563eb) 86%, #fff);
+  transition: filter 0.06s ease, opacity 0.06s ease, stroke 0.06s ease;
 }
 
 .easter-egg-note-preview {
   align-items: center;
-  background: color-mix(in srgb, $panel 86%, transparent);
-  border: 1px solid color-mix(in srgb, $primary 28%, $border);
+  background: color-mix(in srgb, var(--easter-egg-note-color, #2563eb) 14%, $panel);
+  border: 1px solid color-mix(in srgb, var(--easter-egg-note-color, #2563eb) 48%, $border);
   border-radius: 999px;
   bottom: 14px;
   box-shadow: 0 8px 24px color-mix(in srgb, $shadow 12%, transparent);
-  color: color-mix(in srgb, $primary 70%, $text);
+  color: color-mix(in srgb, var(--easter-egg-note-color, #2563eb) 76%, $text);
   display: inline-flex;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 12px;
