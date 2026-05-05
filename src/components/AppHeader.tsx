@@ -1,4 +1,5 @@
 import { mdiMenu } from '@mdi/js';
+import type { PointerEvent } from 'react';
 import { useEffect, useState } from 'react';
 import type { Messages } from '../lib/i18n';
 import { useI18n } from '../lib/i18n';
@@ -9,7 +10,7 @@ import { PageTabs } from './PageTabs';
 
 const ONLINE_BADGE_DURATION_MS = 6_000;
 const BADGE_FADE_DURATION_MS = 250;
-const EASTER_EGG_TAP_COUNT = 5;
+const EASTER_EGG_TAP_COUNT = 7;
 const EASTER_EGG_TAP_RESET_MS = 1_500;
 
 type AppHeaderProps = {
@@ -94,7 +95,9 @@ export function AppHeader({
     return () => window.clearTimeout(resetTimer);
   }, [logoTapCount]);
 
-  const handleLogoClick = () => {
+  const handleLogoPointerDown = (event: PointerEvent<HTMLSpanElement>) => {
+    if (event.pointerType === 'mouse' && event.button !== 0) { return; }
+
     setLogoTapCount((current) => {
       const next = current + 1;
       if (next >= EASTER_EGG_TAP_COUNT) {
@@ -115,14 +118,13 @@ export function AppHeader({
           header={
             <div className={'title-row'}>
               <div className={'title-block'}>
-                <button
-                  type={'button'}
-                  className={'app-icon app-icon-button'}
-                  aria-label={messages.easterEgg.logoLabel}
-                  onClick={handleLogoClick}
+                <span
+                  className={'app-icon'}
+                  aria-hidden={'true'}
+                  onPointerDown={handleLogoPointerDown}
                 >
                   <img className={'app-icon-image'} src={logoHref} alt={''} width={'48'} height={'48'} />
-                </button>
+                </span>
                 <div>
                   <h1 className={'title'}>{messages.app.title}</h1>
                   <p className={'subtitle'}>{messages.app.subtitle}</p>

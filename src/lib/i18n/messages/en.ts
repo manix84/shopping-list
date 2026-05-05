@@ -255,7 +255,6 @@ export const en: Messages = {
     openNavigation: 'Open navigation menu',
   },
   easterEgg: {
-    logoLabel: 'Smart Shopping List logo',
     title: 'Secret aisle unlocked',
     body: 'You found the quiet corner of the store. Everything here is perfectly sorted.',
     dismiss: 'Close secret aisle',

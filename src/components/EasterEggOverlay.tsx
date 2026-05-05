@@ -15,6 +15,7 @@ const HARP_TOP_Y = 12;
 const HARP_BOTTOM_Y = 168;
 const HARP_X_START = 18;
 const HARP_X_GAP = 18.5;
+const BACKDROP_DISMISS_DELAY_MS = 2_000;
 const noteFrequencies = {
   c4: 261.63,
   d4: 293.66,
@@ -156,6 +157,7 @@ export function EasterEggOverlay({ isVisible, onDismiss }: EasterEggOverlayProps
   const isPointerPluckingRef = useRef(false);
   const lastPointerStringRef = useRef<number>();
   const lastMelodyIndexRef = useRef<number>();
+  const openedAtRef = useRef(0);
 
   useEffect(() => {
     if (!isVisible) { return undefined; }
@@ -278,9 +280,16 @@ export function EasterEggOverlay({ isVisible, onDismiss }: EasterEggOverlayProps
     playMelody(getAudioContext());
   };
 
+  const handleBackdropClick = () => {
+    if (Date.now() - openedAtRef.current < BACKDROP_DISMISS_DELAY_MS) { return; }
+
+    onDismiss();
+  };
+
   useEffect(() => {
     if (!isVisible) { return undefined; }
 
+    openedAtRef.current = Date.now();
     const audioContext = createAudioContext();
     audioContextRef.current = audioContext;
     playMelody(audioContext);
@@ -298,7 +307,7 @@ export function EasterEggOverlay({ isVisible, onDismiss }: EasterEggOverlayProps
   if (!isVisible) { return null; }
 
   return (
-    <div className={'easter-egg-overlay'} role={'presentation'} onClick={onDismiss}>
+    <div className={'easter-egg-overlay'} role={'presentation'} onClick={handleBackdropClick}>
       <section
         className={'easter-egg-dialog'}
         role={'dialog'}

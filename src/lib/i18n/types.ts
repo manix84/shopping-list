@@ -229,7 +229,6 @@ export type Messages = {
     openNavigation: string;
   };
   easterEgg: {
-    logoLabel: string;
     title: string;
     body: string;
     dismiss: string;

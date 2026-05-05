@@ -260,7 +260,6 @@ export const es: Messages = {
     openNavigation: 'Abrir menú de navegación',
   },
   easterEgg: {
-    logoLabel: 'Logotipo de Lista de la compra inteligente',
     title: 'Pasillo secreto desbloqueado',
     body: 'Has encontrado el rincón tranquilo de la tienda. Todo aquí está perfectamente ordenado.',
     dismiss: 'Cerrar pasillo secreto',
