@@ -940,18 +940,36 @@ select {
   flex: 0 0 auto;
 }
 
-.share-qr-card-blurred .share-qr-image {
+.share-qr-card-blurred .share-qr-frame {
   filter: blur(10px);
   transform: scale(1.06);
+}
+
+.share-qr-frame {
+  display: block;
+  flex: 1 1 auto;
+  max-width: 100%;
+  position: relative;
+  transition:
+    filter 0.32s ease,
+    opacity 0.32s ease,
+    transform 0.32s ease;
 }
 
 .share-qr-image {
   display: block;
   max-width: 100%;
-  transition:
-    filter 0.32s ease,
-    opacity 0.32s ease,
-    transform 0.32s ease;
+  width: 100%;
+}
+
+.share-qr-logo {
+  height: 22.5%;
+  left: 50%;
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 22.5%;
 }
 
 .share-qr-overlay {
@@ -983,9 +1001,10 @@ select {
   animation: modal-card-in 0.26s ease;
 }
 
-.share-qr-image-large {
+.share-qr-frame-large {
   border-radius: 14px;
   display: block;
+  overflow: hidden;
   width: 100%;
 }
 
@@ -1172,6 +1191,7 @@ select {
   .button,
   .skip-link,
   .share-qr-card,
+  .share-qr-frame,
   .share-qr-image,
   .share-qr-overlay,
   .share-qr-dialog,
