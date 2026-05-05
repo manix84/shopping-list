@@ -1562,7 +1562,7 @@ select {
 }
 
 .predator-puppet {
-  animation: predator-child-hop 0.46s cubic-bezier(0.2, 0.7, 0.25, 1) infinite;
+  animation: predator-cartoon-hop 0.46s cubic-bezier(0.2, 0.7, 0.25, 1) infinite;
   display: block;
   filter: drop-shadow(0 10px 14px color-mix(in srgb, $shadow 22%, transparent));
   height: 150px;
@@ -1580,12 +1580,6 @@ select {
   left: 38px;
   position: absolute;
   width: 112px;
-}
-
-.predator-stick {
-  stroke: color-mix(in srgb, $text 34%, transparent);
-  stroke-linecap: round;
-  stroke-width: 3;
 }
 
 .predator-body,
@@ -1633,12 +1627,18 @@ select {
   fill: #8e705a;
 }
 
+.predator-chest,
 .predator-belly {
   fill: color-mix(in srgb, #fff 44%, transparent);
   opacity: 0.42;
   stroke: color-mix(in srgb, $text 22%, transparent);
   stroke-linejoin: round;
   stroke-width: 2;
+}
+
+.predator-cheek {
+  fill: color-mix(in srgb, #fff 34%, transparent);
+  opacity: 0.5;
 }
 
 .predator-mark,
@@ -1675,8 +1675,18 @@ select {
   fill: $text;
 }
 
+.predator-eye-shine {
+  fill: #fff;
+}
+
 .predator-nose {
   fill: color-mix(in srgb, $text 78%, $primary);
+}
+
+.predator-paw {
+  fill: color-mix(in srgb, #fff 18%, currentColor);
+  stroke: color-mix(in srgb, $text 58%, $primary);
+  stroke-width: 2.5;
 }
 
 .predator-leg-front {
@@ -1730,18 +1740,18 @@ select {
   }
 }
 
-@keyframes predator-child-hop {
+@keyframes predator-cartoon-hop {
   0%,
   100% {
-    transform: translateY(0) rotate(-2deg);
+    transform: translateY(0) rotate(-1deg) scaleX(1);
   }
 
   42% {
-    transform: translateY(-24px) rotate(4deg);
+    transform: translateY(-22px) rotate(3deg) scaleX(1.03);
   }
 
   68% {
-    transform: translateY(-6px) rotate(-5deg);
+    transform: translateY(-6px) rotate(-3deg) scaleX(0.98);
   }
 }
 
