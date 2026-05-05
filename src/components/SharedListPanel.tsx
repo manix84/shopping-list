@@ -21,6 +21,10 @@ type SharedInputValidation =
   | { state: 'unavailable' };
 type ScannerState = 'scanning' | 'ready' | 'missing';
 type SharedInputStatus = 'idle' | 'checking' | 'valid' | 'missing' | 'invalid';
+type QrRender = {
+  logoSrc: string;
+  svgDataUrl: string;
+};
 
 type SharedListPanelProps = {
   canUseBackend: boolean;
@@ -49,7 +53,7 @@ const appBasePath = import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE
 const qrLogoPath = (theme: 'light' | 'dark'): string =>
   `${import.meta.env.BASE_URL}${theme === 'dark' ? 'qr-logo-dark.png' : 'qr-logo-light.png'}`;
 
-const createThemedQrSvgDataUrl = async (shareLink: string, theme: 'light' | 'dark'): Promise<string> => {
+const createThemedQrRender = async (shareLink: string, theme: 'light' | 'dark'): Promise<QrRender> => {
   const palette =
     theme === 'dark'
       ? {
@@ -72,7 +76,10 @@ const createThemedQrSvgDataUrl = async (shareLink: string, theme: 'light' | 'dar
     },
   });
 
-  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+  return {
+    logoSrc: qrLogoPath(theme),
+    svgDataUrl: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
+  };
 };
 
 export function SharedListPanel({
@@ -93,7 +100,7 @@ export function SharedListPanel({
   onDeleteHistoryEntry,
 }: SharedListPanelProps) {
   const { locale, messages } = useI18n();
-  const [qrSvgDataUrl, setQrSvgDataUrl] = useState<string>();
+  const [qrRender, setQrRender] = useState<QrRender>();
   const [qrRevealed, setQrRevealed] = useState(false);
   const [qrModalOpen, setQrModalOpen] = useState(false);
   const [scannerOpen, setScannerOpen] = useState(false);
@@ -138,20 +145,20 @@ export function SharedListPanel({
     let cancelled = false;
 
     if (!shareLink) {
-      setQrSvgDataUrl(undefined);
+      setQrRender(undefined);
       return;
     }
 
-    void createThemedQrSvgDataUrl(shareLink, resolvedTheme)
+    void createThemedQrRender(shareLink, resolvedTheme)
       .then((value) => {
         if (!cancelled) {
-          setQrSvgDataUrl(value);
+          setQrRender(value);
         }
       })
       .catch((error: unknown) => {
         console.warn('Unable to generate themed QR code.', error);
         if (!cancelled) {
-          setQrSvgDataUrl(undefined);
+          setQrRender(undefined);
         }
       });
 
@@ -465,7 +472,7 @@ export function SharedListPanel({
             </div>
           </div>
 
-          {qrSvgDataUrl ? (
+          {qrRender ? (
             <button
               type={'button'}
               className={`share-qr-card ${qrRevealed ? '' : 'share-qr-card-blurred'}`.trim()}
@@ -473,8 +480,8 @@ export function SharedListPanel({
               aria-label={qrRevealed ? messages.labels.sharedLink : messages.actions.revealQrCode}
             >
               <span className={'share-qr-frame'}>
-                <img className={'share-qr-image'} src={qrSvgDataUrl} alt={messages.labels.sharedLink} />
-                <img className={'share-qr-logo'} src={qrLogoPath(resolvedTheme)} alt={''} aria-hidden={'true'} />
+                <img className={'share-qr-image'} src={qrRender.svgDataUrl} alt={messages.labels.sharedLink} />
+                <img className={'share-qr-logo'} src={qrRender.logoSrc} alt={''} aria-hidden={'true'} />
               </span>
               {!qrRevealed ? <span className={'share-qr-overlay'}>{messages.actions.revealQrCode}</span> : null}
             </button>
@@ -643,7 +650,7 @@ export function SharedListPanel({
         </div>
       ) : null}
 
-      {qrModalOpen && qrSvgDataUrl ? (
+      {qrModalOpen && qrRender ? (
         <div className={'share-scanner-modal'} onClick={closeQrModal} role={'presentation'}>
           <div
             className={'share-qr-dialog'}
@@ -656,8 +663,8 @@ export function SharedListPanel({
               {messages.actions.close}
             </button>
             <span className={'share-qr-frame share-qr-frame-large'}>
-              <img className={'share-qr-image'} src={qrSvgDataUrl} alt={messages.labels.sharedLink} />
-              <img className={'share-qr-logo'} src={qrLogoPath(resolvedTheme)} alt={''} aria-hidden={'true'} />
+              <img className={'share-qr-image'} src={qrRender.svgDataUrl} alt={messages.labels.sharedLink} />
+              <img className={'share-qr-logo'} src={qrRender.logoSrc} alt={''} aria-hidden={'true'} />
             </span>
           </div>
         </div>

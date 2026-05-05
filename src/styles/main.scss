@@ -1004,6 +1004,7 @@ select {
 .share-qr-frame-large {
   border-radius: 14px;
   display: block;
+  overflow: hidden;
   width: 100%;
 }
 
@@ -1190,6 +1191,7 @@ select {
   .button,
   .skip-link,
   .share-qr-card,
+  .share-qr-frame,
   .share-qr-image,
   .share-qr-overlay,
   .share-qr-dialog,
