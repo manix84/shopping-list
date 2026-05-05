@@ -171,12 +171,15 @@ export function EasterEggOverlay({ isVisible, onDismiss }: EasterEggOverlayProps
   const { messages } = useI18n();
   const [activePluck, setActivePluck] = useState<{ offset: number; string: number }>();
   const [previewString, setPreviewString] = useState<number>();
+  const [isMelodyPlaying, setIsMelodyPlaying] = useState(false);
   const audioContextRef = useRef<AudioContext>();
   const timersRef = useRef<number[]>([]);
   const melodyNodesRef = useRef<PlayingHarpNote[]>([]);
+  const isMelodyPlayingRef = useRef(false);
   const isPointerPluckingRef = useRef(false);
   const lastPointerStringRef = useRef<number>();
   const lastMelodyIndexRef = useRef<number>();
+  const notePreviewTokenRef = useRef(0);
   const openedAtRef = useRef(0);
 
   useEffect(() => {
@@ -216,7 +219,38 @@ export function EasterEggOverlay({ isVisible, onDismiss }: EasterEggOverlayProps
     return audioContext;
   };
 
+  const setNotePreview = (string: number | undefined) => {
+    notePreviewTokenRef.current += 1;
+    setPreviewString(string);
+  };
+
+  const setUserNotePreview = (string: number | undefined) => {
+    if (isMelodyPlayingRef.current) { return; }
+
+    setNotePreview(string);
+  };
+
+  const setMelodyPlaying = (isPlaying: boolean) => {
+    isMelodyPlayingRef.current = isPlaying;
+    setIsMelodyPlaying(isPlaying);
+  };
+
+  const showTimedNotePreview = (string: number) => {
+    const token = notePreviewTokenRef.current + 1;
+    notePreviewTokenRef.current = token;
+    setPreviewString(string);
+
+    const clearPreviewTimer = window.setTimeout(() => {
+      if (notePreviewTokenRef.current === token) {
+        setPreviewString(undefined);
+      }
+    }, 760);
+    timersRef.current.push(clearPreviewTimer);
+  };
+
   const scheduleStringWobble = (string: number) => {
+    showTimedNotePreview(string);
+
     const wobbleFrames = [
       { delay: 0, offset: 0 },
       { delay: 42, offset: 8 },
@@ -250,6 +284,7 @@ export function EasterEggOverlay({ isVisible, onDismiss }: EasterEggOverlayProps
     clearStringTimers();
     stopMelodyNotes(audioContext);
     setActivePluck(undefined);
+    setMelodyPlaying(true);
     const melody = selectRandomMelody();
 
     if (audioContext) {
@@ -265,9 +300,15 @@ export function EasterEggOverlay({ isVisible, onDismiss }: EasterEggOverlayProps
     timersRef.current = melody.map((note) => (
       window.setTimeout(() => scheduleStringWobble(note.string), note.beat * BEAT_MS)
     ));
+    const melodyEndBeat = melody.at(-1)?.beat ?? 0;
+    timersRef.current.push(window.setTimeout(() => {
+      setMelodyPlaying(false);
+    }, melodyEndBeat * BEAT_MS + 1_050));
   };
 
   const pluckString = (string: number) => {
+    if (isMelodyPlayingRef.current) { return; }
+
     const audioContext = getAudioContext();
     const frequency = stringFrequencies[string] ?? stringFrequencies[0];
     if (audioContext) {
@@ -276,7 +317,6 @@ export function EasterEggOverlay({ isVisible, onDismiss }: EasterEggOverlayProps
     }
 
     scheduleStringWobble(string);
-    setPreviewString(string);
   };
 
   const stopPointerPlucking = () => {
@@ -298,6 +338,7 @@ export function EasterEggOverlay({ isVisible, onDismiss }: EasterEggOverlayProps
   };
 
   const handleHarpPointerDown = (event: PointerEvent<SVGSVGElement>) => {
+    if (isMelodyPlayingRef.current) { return; }
     if (event.pointerType === 'mouse' && event.button !== 0) { return; }
 
     const string = harpStringFromPointer(event);
@@ -309,7 +350,7 @@ export function EasterEggOverlay({ isVisible, onDismiss }: EasterEggOverlayProps
 
   const handleHarpPointerMove = (event: PointerEvent<SVGSVGElement>) => {
     const string = harpStringFromPointer(event);
-    setPreviewString(string);
+    setUserNotePreview(string);
 
     if (!isPointerPluckingRef.current) { return; }
     if (event.pointerType === 'mouse' && event.buttons !== 1) {
@@ -331,19 +372,22 @@ export function EasterEggOverlay({ isVisible, onDismiss }: EasterEggOverlayProps
 
   const handleHarpPointerLeave = () => {
     if (!isPointerPluckingRef.current) {
-      setPreviewString(undefined);
+      setUserNotePreview(undefined);
     }
   };
 
   const handleStringFocus = (string: number) => {
-    setPreviewString(string);
+    setUserNotePreview(string);
   };
 
   const handleStringBlur = (string: number) => {
-    setPreviewString((current) => (current === string ? undefined : current));
+    if (previewString === string) {
+      setUserNotePreview(undefined);
+    }
   };
 
   const handleStringKeyDown = (event: ReactKeyboardEvent<SVGPathElement>, string: number) => {
+    if (isMelodyPlayingRef.current) { return; }
     if (event.key !== 'Enter' && event.key !== ' ') { return; }
 
     event.preventDefault();
@@ -372,7 +416,8 @@ export function EasterEggOverlay({ isVisible, onDismiss }: EasterEggOverlayProps
       clearStringTimers();
       stopMelodyNotes(audioContextRef.current);
       setActivePluck(undefined);
-      setPreviewString(undefined);
+      setNotePreview(undefined);
+      setMelodyPlaying(false);
       stopPointerPlucking();
       void audioContextRef.current?.close();
       audioContextRef.current = undefined;
@@ -433,7 +478,8 @@ export function EasterEggOverlay({ isVisible, onDismiss }: EasterEggOverlayProps
                   className={'easter-egg-string-hit'}
                   d={harpStringPath(harpStringX(index))}
                   role={'button'}
-                  tabIndex={0}
+                  tabIndex={isMelodyPlaying ? -1 : 0}
+                  aria-disabled={isMelodyPlaying}
                   aria-label={`${stringNoteNames[index]} string`}
                   onFocus={() => handleStringFocus(index)}
                   onBlur={() => handleStringBlur(index)}
@@ -451,7 +497,7 @@ export function EasterEggOverlay({ isVisible, onDismiss }: EasterEggOverlayProps
             ))}
           </svg>
           <div className={`easter-egg-note-preview ${previewString === undefined ? 'easter-egg-note-preview-hidden' : ''}`}>
-            <span>{previewString === undefined ? 'NOTE' : stringNoteNames[previewString]}</span>
+            <span>{previewString === undefined ? null : stringNoteNames[previewString]}</span>
           </div>
         </div>
 
