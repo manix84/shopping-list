@@ -133,6 +133,9 @@ export const it: Messages = {
       subtitle:
         'Preferenze che influenzano il modo in cui questo dispositivo mostra e raggruppa le liste della spesa.',
       countryLabel: 'Profilo disposizione negozio',
+      defaultCountryLabel: 'Profilo negozio predefinito',
+      defaultCountrySubtitle: 'Usato per le nuove liste su questo dispositivo.',
+      detectedCountrySuffix: 'rilevato',
       themeLabel: 'Tema',
       themeSubtitle: 'Scegli l’aspetto più comodo da usare.',
       localeLabel: 'Lingua',

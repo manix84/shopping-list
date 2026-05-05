@@ -133,6 +133,9 @@ export const pi: Messages = {
       subtitle:
         'Preferences fer how this device shows and groups yer shopping ledgers.',
       countryLabel: 'Market layout profile',
+      defaultCountryLabel: 'Default market layout profile',
+      defaultCountrySubtitle: 'Used fer new ledgers on this device.',
+      detectedCountrySuffix: 'spotted',
       themeLabel: 'Look',
       themeSubtitle: 'Choose the look that sits easiest on yer eyes.',
       localeLabel: 'Tongue',

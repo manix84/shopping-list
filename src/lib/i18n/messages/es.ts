@@ -129,6 +129,9 @@ export const es: Messages = {
       subtitle:
         'Preferencias que afectan a cómo este dispositivo muestra y agrupa las listas de la compra.',
       countryLabel: 'Perfil de distribución de tienda',
+      defaultCountryLabel: 'Perfil de tienda predeterminado',
+      defaultCountrySubtitle: 'Se usa para nuevas listas en este dispositivo.',
+      detectedCountrySuffix: 'detectado',
       themeLabel: 'Tema',
       themeSubtitle: 'Elige el aspecto que te resulte más cómodo de usar.',
       localeLabel: 'Idioma',

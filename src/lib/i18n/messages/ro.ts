@@ -133,6 +133,9 @@ export const ro: Messages = {
       subtitle:
         'Preferințe care influențează cum acest dispozitiv afișează și grupează listele de cumpărături.',
       countryLabel: 'Profil de aranjare a magazinului',
+      defaultCountryLabel: 'Profil implicit de magazin',
+      defaultCountrySubtitle: 'Folosit pentru liste noi pe acest dispozitiv.',
+      detectedCountrySuffix: 'detectat',
       themeLabel: 'Temă',
       themeSubtitle: 'Alege aspectul cel mai confortabil pentru tine.',
       localeLabel: 'Limbă',

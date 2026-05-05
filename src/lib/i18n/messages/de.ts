@@ -135,6 +135,9 @@ export const de: Messages = {
       subtitle:
         'Voreinstellungen dafür, wie dieses Gerät Einkaufslisten darstellt und gruppiert.',
       countryLabel: 'Ladenlayout-Profil',
+      defaultCountryLabel: 'Standard-Ladenlayout-Profil',
+      defaultCountrySubtitle: 'Wird für neue Listen auf diesem Gerät verwendet.',
+      detectedCountrySuffix: 'erkannt',
       themeLabel: 'Design',
       themeSubtitle: 'Wähle die Darstellung, die für dich am angenehmsten ist.',
       localeLabel: 'Sprache',

@@ -135,6 +135,9 @@ export const fr: Messages = {
       subtitle:
         'Préférences qui influencent la façon dont cet appareil affiche et groupe les listes de courses.',
       countryLabel: 'Profil d’agencement magasin',
+      defaultCountryLabel: 'Profil magasin par défaut',
+      defaultCountrySubtitle: 'Utilisé pour les nouvelles listes sur cet appareil.',
+      detectedCountrySuffix: 'détecté',
       themeLabel: 'Thème',
       themeSubtitle: 'Choisissez l’apparence la plus agréable à utiliser.',
       localeLabel: 'Langue',

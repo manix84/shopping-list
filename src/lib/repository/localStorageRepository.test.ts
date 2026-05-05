@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { UK_CONFIG } from '../../config/countries/uk';
-import { STORAGE_KEY, hasStoredShoppingListRecord, inferDefaultCountryCode, localStorageRepository } from './localStorageRepository';
+import { DEFAULT_COUNTRY_STORAGE_KEY, inferDefaultCountryCode } from '../defaultCountryPreference';
+import { STORAGE_KEY, hasStoredShoppingListRecord, localStorageRepository } from './localStorageRepository';
 import { parseItems } from '../parser';
 import { createWindowMock } from '../../test/testUtils';
 import { isUuidV7 } from '../uuid';
@@ -77,6 +78,17 @@ describe('localStorageRepository', () => {
     vi.stubGlobal('navigator', windowMock.navigator);
 
     expect(inferDefaultCountryCode()).toBe('ca');
+  });
+
+  it('uses the stored default country preference before detection for blank records', () => {
+    const windowMock = createWindowMock({
+      language: 'en-US',
+      storageSeed: { [DEFAULT_COUNTRY_STORAGE_KEY]: 'nl' },
+    });
+    vi.stubGlobal('window', windowMock);
+    vi.stubGlobal('navigator', windowMock.navigator);
+
+    expect(localStorageRepository.load()).toMatchObject({ input: '', countryCode: 'nl' });
   });
 
   it('falls back to timezone when browser language has no supported region', () => {

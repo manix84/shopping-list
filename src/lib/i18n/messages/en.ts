@@ -128,6 +128,9 @@ export const en: Messages = {
       subtitle:
         'Preferences that affect how this device displays and groups shopping lists.',
       countryLabel: 'Store layout profile',
+      defaultCountryLabel: 'Default store layout profile',
+      defaultCountrySubtitle: 'Used for new lists on this device.',
+      detectedCountrySuffix: 'detected',
       themeLabel: 'Theme',
       themeSubtitle: 'Choose the look that feels easiest to use.',
       localeLabel: 'Language',

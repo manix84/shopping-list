@@ -134,6 +134,9 @@ export const nl: Messages = {
       subtitle:
         'Voorkeuren die bepalen hoe dit apparaat boodschappenlijsten toont en groepeert.',
       countryLabel: 'Winkelindelingsprofiel',
+      defaultCountryLabel: 'Standaard winkelindelingsprofiel',
+      defaultCountrySubtitle: 'Gebruikt voor nieuwe lijsten op dit apparaat.',
+      detectedCountrySuffix: 'gedetecteerd',
       themeLabel: 'Thema',
       themeSubtitle: 'Kies de weergave die voor jou het prettigst werkt.',
       localeLabel: 'Taal',

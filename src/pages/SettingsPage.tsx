@@ -1,8 +1,14 @@
 import { mdiChevronDown, mdiDownload } from '@mdi/js';
 import { type ReactNode, useState } from 'react';
-import type { RouteViewMode, ThemeMode } from '../types';
+import { COUNTRY_CONFIGS } from '../config/countries';
+import type { CountryCode, RouteViewMode, ThemeMode } from '../types';
 import { Card } from '../components/Card';
 import { DebugLink } from '../components/DebugLink';
+import {
+  inferDefaultCountryCode,
+  loadDefaultCountryPreference,
+  saveDefaultCountryPreference,
+} from '../lib/defaultCountryPreference';
 import { getRouteViewLabel, type LocaleCode, useI18n } from '../lib/i18n';
 
 const THEME_OPTIONS: ThemeMode[] = ['system', 'light', 'dark'];
@@ -38,6 +44,14 @@ function LocaleIcon({ locale }: { locale: LocaleCode }) {
   return (
     <span aria-hidden={'true'} className={'locale-option-icon'}>
       {locale.toUpperCase()}
+    </span>
+  );
+}
+
+function CountryIcon({ countryCode }: { countryCode: CountryCode }) {
+  return (
+    <span aria-hidden={'true'} className={'country-option-icon'}>
+      {COUNTRY_CONFIGS[countryCode].flag}
     </span>
   );
 }
@@ -149,7 +163,28 @@ export function SettingsPage({
   onInstall,
 }: SettingsPageProps) {
   const { locale, setLocale, messages } = useI18n();
+  const [detectedCountryCode] = useState<CountryCode>(() => inferDefaultCountryCode());
+  const [defaultCountryCode, setDefaultCountryCode] = useState<CountryCode>(
+    () => loadDefaultCountryPreference() ?? detectedCountryCode,
+  );
   const routeViewOptions: RouteViewMode[] = ['default', 'comfortable', 'compact'];
+  const detectedCountry = COUNTRY_CONFIGS[detectedCountryCode];
+  const defaultCountryOptions: SelectOption<CountryCode>[] = [
+    {
+      value: detectedCountryCode,
+      label: `${detectedCountry.label} (${messages.pages.settings.detectedCountrySuffix})`,
+      icon: <CountryIcon countryCode={detectedCountryCode} />,
+    },
+    ...Object.values(COUNTRY_CONFIGS)
+      .filter((country) => country.code !== detectedCountryCode)
+      .slice()
+      .sort((a, b) => a.label.localeCompare(b.label))
+      .map((country): SelectOption<CountryCode> => ({
+        value: country.code,
+        label: country.label,
+        icon: <CountryIcon countryCode={country.code} />,
+      })),
+  ];
   const routeDensityOptions = routeViewOptions.map((mode): SelectOption<RouteViewMode> => ({
     value: mode,
     label: getRouteViewLabel(mode, messages),
@@ -194,6 +229,10 @@ export function SettingsPage({
       ) : null}
     </div>
   ) : null;
+  const handleDefaultCountryChange = (countryCode: CountryCode) => {
+    setDefaultCountryCode(countryCode);
+    saveDefaultCountryPreference(countryCode);
+  };
 
   return (
     <>
@@ -216,6 +255,19 @@ export function SettingsPage({
             value={locale}
             options={localeOptions}
             onChange={setLocale}
+          />
+        </div>
+
+        <div className={'field field-compact'}>
+          <div>
+            <label htmlFor={'default-country-select'}>{messages.pages.settings.defaultCountryLabel}</label>
+            <div className={'small-text'}>{messages.pages.settings.defaultCountrySubtitle}</div>
+          </div>
+          <SettingsSelect
+            id={'default-country-select'}
+            value={defaultCountryCode}
+            options={defaultCountryOptions}
+            onChange={handleDefaultCountryChange}
           />
         </div>
 
