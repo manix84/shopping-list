@@ -259,6 +259,7 @@ export const en: Messages = {
     title: 'Secret aisle unlocked',
     body: 'You found the quiet corner of the store. Everything here is perfectly sorted.',
     dismiss: 'Close secret aisle',
+    replay: 'Play the secret aisle tune again',
   },
   pwaInstall: {
     title: 'Install the app',

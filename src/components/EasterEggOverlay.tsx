@@ -26,31 +26,64 @@ const noteFrequencies = {
   c5: 523.25,
   d5: 587.33,
   e5: 659.25,
+  f5: 698.46,
   g5: 783.99,
 } as const;
-const melody = [
-  { beat: 0, duration: 1.8, frequency: noteFrequencies.c4, string: 2 },
-  { beat: 0.5, duration: 1.55, frequency: noteFrequencies.e4, string: 4 },
-  { beat: 1, duration: 1.6, frequency: noteFrequencies.g4, string: 6 },
-  { beat: 1.5, duration: 1.65, frequency: noteFrequencies.c5, string: 9 },
-  { beat: 2.25, duration: 1.4, frequency: noteFrequencies.b4, string: 8 },
-  { beat: 2.75, duration: 1.45, frequency: noteFrequencies.g4, string: 6 },
-  { beat: 3.25, duration: 1.6, frequency: noteFrequencies.e4, string: 4 },
-  { beat: 4, duration: 1.9, frequency: noteFrequencies.f4, string: 5 },
-  { beat: 4.5, duration: 1.45, frequency: noteFrequencies.a4, string: 7 },
-  { beat: 5, duration: 1.55, frequency: noteFrequencies.c5, string: 9 },
-  { beat: 5.5, duration: 1.55, frequency: noteFrequencies.e5, string: 11 },
-  { beat: 6.25, duration: 1.35, frequency: noteFrequencies.d5, string: 10 },
-  { beat: 6.75, duration: 1.45, frequency: noteFrequencies.c5, string: 9 },
-  { beat: 7.25, duration: 1.5, frequency: noteFrequencies.a4, string: 7 },
-  { beat: 8, duration: 1.85, frequency: noteFrequencies.g4, string: 6 },
-  { beat: 8.5, duration: 1.45, frequency: noteFrequencies.b4, string: 8 },
-  { beat: 9, duration: 1.55, frequency: noteFrequencies.d5, string: 10 },
-  { beat: 9.5, duration: 1.7, frequency: noteFrequencies.g5, string: 11 },
-  { beat: 10.25, duration: 1.35, frequency: noteFrequencies.e5, string: 11 },
-  { beat: 10.75, duration: 1.45, frequency: noteFrequencies.d5, string: 10 },
-  { beat: 11.25, duration: 1.55, frequency: noteFrequencies.b4, string: 8 },
-  { beat: 12, duration: 2.4, frequency: noteFrequencies.c5, string: 9 },
+const stringFrequencies = [
+  noteFrequencies.c4,
+  noteFrequencies.d4,
+  noteFrequencies.e4,
+  noteFrequencies.f4,
+  noteFrequencies.g4,
+  noteFrequencies.a4,
+  noteFrequencies.b4,
+  noteFrequencies.c5,
+  noteFrequencies.d5,
+  noteFrequencies.e5,
+  noteFrequencies.f5,
+  noteFrequencies.g5,
+];
+
+type MelodyNote = {
+  beat: number;
+  duration: number;
+  frequency: number;
+  string: number;
+};
+
+type Melody = MelodyNote[];
+type PlayingHarpNote = {
+  oscillator: OscillatorNode;
+  overtone: OscillatorNode;
+};
+
+const melodyNote = (beat: number, string: number, duration = 1.45): MelodyNote => ({
+  beat,
+  duration,
+  frequency: stringFrequencies[string] ?? stringFrequencies[0],
+  string,
+});
+
+const tuneFromStrings = (strings: number[]): Melody => (
+  strings.map((string, index) => melodyNote(index * 0.5, string, index === strings.length - 1 ? 2.2 : 1.45))
+);
+
+const melodies: Melody[] = [
+  tuneFromStrings([0, 2, 4, 7, 6, 4, 2, 3, 5, 7, 9, 8, 7, 5, 4, 7]),
+  tuneFromStrings([4, 5, 7, 9, 7, 5, 4, 2, 3, 5, 6, 8, 7, 5, 4, 2]),
+  tuneFromStrings([7, 9, 11, 10, 9, 7, 5, 7, 8, 9, 11, 9, 8, 7, 5, 7]),
+  tuneFromStrings([2, 4, 5, 7, 9, 7, 5, 4, 2, 3, 5, 7, 5, 4, 2, 0]),
+  tuneFromStrings([5, 7, 9, 11, 9, 8, 7, 5, 4, 5, 7, 9, 7, 5, 4, 5]),
+  tuneFromStrings([0, 3, 5, 7, 8, 7, 5, 3, 2, 4, 6, 8, 7, 5, 3, 2]),
+  tuneFromStrings([4, 7, 9, 11, 10, 9, 7, 9, 8, 7, 5, 7, 9, 7, 5, 4]),
+  tuneFromStrings([2, 5, 7, 8, 7, 5, 4, 2, 0, 2, 4, 5, 7, 5, 4, 2]),
+  tuneFromStrings([7, 8, 9, 11, 9, 8, 7, 5, 7, 9, 10, 11, 10, 9, 8, 7]),
+  tuneFromStrings([3, 5, 7, 10, 9, 7, 5, 3, 4, 6, 8, 9, 8, 6, 5, 4]),
+  tuneFromStrings([0, 2, 3, 5, 7, 8, 7, 5, 4, 5, 7, 9, 8, 7, 5, 3]),
+  tuneFromStrings([5, 8, 10, 11, 10, 8, 7, 5, 4, 5, 7, 8, 10, 8, 7, 5]),
+  tuneFromStrings([2, 4, 7, 9, 11, 9, 7, 4, 5, 7, 8, 10, 8, 7, 5, 4]),
+  tuneFromStrings([4, 6, 8, 9, 8, 6, 4, 2, 3, 5, 7, 8, 7, 5, 3, 4]),
+  tuneFromStrings([0, 4, 7, 9, 8, 7, 5, 4, 2, 5, 7, 10, 9, 7, 4, 0]),
 ];
 
 const createAudioContext = (): AudioContext | undefined => {
@@ -58,7 +91,20 @@ const createAudioContext = (): AudioContext | undefined => {
   return AudioContextConstructor ? new AudioContextConstructor() : undefined;
 };
 
-const playHarpNote = (audioContext: AudioContext, frequency: number, startTime: number, duration: number) => {
+const stopHarpNode = (node: OscillatorNode, stopTime: number) => {
+  try {
+    node.stop(stopTime);
+  } catch {
+    // Already stopped or never reached its scheduled start.
+  }
+};
+
+const playHarpNote = (
+  audioContext: AudioContext,
+  frequency: number,
+  startTime: number,
+  duration: number,
+): PlayingHarpNote => {
   const oscillator = audioContext.createOscillator();
   const overtone = audioContext.createOscillator();
   const gain = audioContext.createGain();
@@ -89,6 +135,8 @@ const playHarpNote = (audioContext: AudioContext, frequency: number, startTime: 
   overtone.start(startTime);
   oscillator.stop(startTime + duration + 0.05);
   overtone.stop(startTime + duration + 0.05);
+
+  return { oscillator, overtone };
 };
 
 const harpStringX = (index: number) => HARP_X_START + index * HARP_X_GAP;
@@ -104,6 +152,10 @@ export function EasterEggOverlay({ isVisible, onDismiss }: EasterEggOverlayProps
   const [activePluck, setActivePluck] = useState<{ offset: number; string: number }>();
   const audioContextRef = useRef<AudioContext>();
   const timersRef = useRef<number[]>([]);
+  const melodyNodesRef = useRef<PlayingHarpNote[]>([]);
+  const isPointerPluckingRef = useRef(false);
+  const lastPointerStringRef = useRef<number>();
+  const lastMelodyIndexRef = useRef<number>();
 
   useEffect(() => {
     if (!isVisible) { return undefined; }
@@ -118,21 +170,31 @@ export function EasterEggOverlay({ isVisible, onDismiss }: EasterEggOverlayProps
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isVisible, onDismiss]);
 
-  useEffect(() => {
-    if (!isVisible) { return undefined; }
+  const clearStringTimers = () => {
+    timersRef.current.forEach((timer) => window.clearTimeout(timer));
+    timersRef.current = [];
+  };
+
+  const stopMelodyNotes = (audioContext: AudioContext | undefined) => {
+    const stopTime = audioContext?.state === 'closed' ? 0 : audioContext?.currentTime ?? 0;
+    melodyNodesRef.current.forEach((note) => {
+      stopHarpNode(note.oscillator, stopTime);
+      stopHarpNode(note.overtone, stopTime);
+    });
+    melodyNodesRef.current = [];
+  };
+
+  const getAudioContext = () => {
+    if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+      return audioContextRef.current;
+    }
 
     const audioContext = createAudioContext();
     audioContextRef.current = audioContext;
-    setActivePluck(undefined);
+    return audioContext;
+  };
 
-    if (audioContext) {
-      void audioContext.resume();
-      const startTime = audioContext.currentTime + 0.05;
-      melody.forEach((note) => {
-        playHarpNote(audioContext, note.frequency, startTime + (note.beat * BEAT_MS) / 1_000, note.duration);
-      });
-    }
-
+  const scheduleStringWobble = (string: number) => {
     const wobbleFrames = [
       { delay: 0, offset: 0 },
       { delay: 42, offset: 8 },
@@ -142,21 +204,92 @@ export function EasterEggOverlay({ isVisible, onDismiss }: EasterEggOverlayProps
       { delay: 330, offset: 1 },
       { delay: 450, offset: 0 },
     ];
-    timersRef.current = melody.flatMap((note) => (
-      wobbleFrames.map((frame) => (
-        window.setTimeout(
-          () => setActivePluck({ offset: frame.offset, string: note.string }),
-          note.beat * BEAT_MS + frame.delay,
-        )
-      )).concat(
-        window.setTimeout(() => setActivePluck(undefined), note.beat * BEAT_MS + 560),
-      )
+    const wobbleTimers = wobbleFrames.map((frame) => (
+      window.setTimeout(() => setActivePluck({ offset: frame.offset, string }), frame.delay)
     ));
+    const clearTimer = window.setTimeout(() => {
+      setActivePluck((current) => (current?.string === string ? undefined : current));
+    }, 560);
+    timersRef.current.push(...wobbleTimers, clearTimer);
+  };
+
+  const selectRandomMelody = () => {
+    if (melodies.length === 1) { return melodies[0]; }
+
+    let melodyIndex = Math.floor(Math.random() * melodies.length);
+    if (melodyIndex === lastMelodyIndexRef.current) {
+      melodyIndex = (melodyIndex + 1) % melodies.length;
+    }
+    lastMelodyIndexRef.current = melodyIndex;
+    return melodies[melodyIndex] ?? melodies[0];
+  };
+
+  const playMelody = (audioContext: AudioContext | undefined) => {
+    clearStringTimers();
+    stopMelodyNotes(audioContext);
+    setActivePluck(undefined);
+    const melody = selectRandomMelody();
+
+    if (audioContext) {
+      void audioContext.resume();
+      const startTime = audioContext.currentTime + 0.05;
+      melody.forEach((note) => {
+        melodyNodesRef.current.push(
+          playHarpNote(audioContext, note.frequency, startTime + (note.beat * BEAT_MS) / 1_000, note.duration),
+        );
+      });
+    }
+
+    timersRef.current = melody.map((note) => (
+      window.setTimeout(() => scheduleStringWobble(note.string), note.beat * BEAT_MS)
+    ));
+  };
+
+  const pluckString = (string: number) => {
+    const audioContext = getAudioContext();
+    const frequency = stringFrequencies[string] ?? stringFrequencies[0];
+    if (audioContext) {
+      void audioContext.resume();
+      playHarpNote(audioContext, frequency, audioContext.currentTime, 1.35);
+    }
+
+    scheduleStringWobble(string);
+  };
+
+  const stopPointerPlucking = () => {
+    isPointerPluckingRef.current = false;
+    lastPointerStringRef.current = undefined;
+  };
+
+  const handleStringPointerDown = (string: number) => {
+    isPointerPluckingRef.current = true;
+    lastPointerStringRef.current = string;
+    pluckString(string);
+  };
+
+  const handleStringPointerEnter = (string: number) => {
+    if (!isPointerPluckingRef.current || lastPointerStringRef.current === string) { return; }
+
+    lastPointerStringRef.current = string;
+    pluckString(string);
+  };
+
+  const handleReplayMelody = () => {
+    playMelody(getAudioContext());
+  };
+
+  useEffect(() => {
+    if (!isVisible) { return undefined; }
+
+    const audioContext = createAudioContext();
+    audioContextRef.current = audioContext;
+    playMelody(audioContext);
 
     return () => {
-      timersRef.current.forEach((timer) => window.clearTimeout(timer));
-      timersRef.current = [];
+      clearStringTimers();
+      stopMelodyNotes(audioContextRef.current);
       setActivePluck(undefined);
+      stopPointerPlucking();
       void audioContextRef.current?.close();
       audioContextRef.current = undefined;
     };
@@ -185,26 +318,45 @@ export function EasterEggOverlay({ isVisible, onDismiss }: EasterEggOverlayProps
           </svg>
         </button>
 
-        <div className={'easter-egg-visual'} aria-hidden={'true'}>
-          <div className={'easter-egg-scanline'} />
-          <svg className={'easter-egg-star'} viewBox={'0 0 24 24'}>
-            <path d={mdiStarFourPoints} fill={'currentColor'} />
-          </svg>
+        <div className={'easter-egg-visual'}>
+          <div className={'easter-egg-scanline'} aria-hidden={'true'} />
+          <button
+            type={'button'}
+            className={'easter-egg-star'}
+            aria-label={messages.easterEgg.replay}
+            title={messages.easterEgg.replay}
+            onClick={handleReplayMelody}
+          >
+            <svg aria-hidden={'true'} viewBox={'0 0 24 24'}>
+              <path d={mdiStarFourPoints} fill={'currentColor'} />
+            </svg>
+          </button>
           <svg
             className={'easter-egg-harp'}
+            aria-hidden={'true'}
             viewBox={`0 0 ${HARP_VIEWBOX_WIDTH} ${HARP_VIEWBOX_HEIGHT}`}
             preserveAspectRatio={'none'}
+            onPointerUp={stopPointerPlucking}
+            onPointerLeave={stopPointerPlucking}
+            onPointerCancel={stopPointerPlucking}
           >
             {Array.from({ length: HARP_STRING_COUNT }, (_, index) => (
-              <path
-                key={index}
-                className={`easter-egg-string ${activePluck?.string === index ? 'easter-egg-string-active' : ''}`}
-                d={harpStringPath(
-                  harpStringX(index),
-                  activePluck?.string === index ? activePluck.offset : 0,
-                )}
-                strokeWidth={harpStringWidth(index)}
-              />
+              <g key={index}>
+                <path
+                  className={'easter-egg-string-hit'}
+                  d={harpStringPath(harpStringX(index))}
+                  onPointerDown={() => handleStringPointerDown(index)}
+                  onPointerEnter={() => handleStringPointerEnter(index)}
+                />
+                <path
+                  className={`easter-egg-string ${activePluck?.string === index ? 'easter-egg-string-active' : ''}`}
+                  d={harpStringPath(
+                    harpStringX(index),
+                    activePluck?.string === index ? activePluck.offset : 0,
+                  )}
+                  strokeWidth={harpStringWidth(index)}
+                />
+              </g>
             ))}
           </svg>
         </div>

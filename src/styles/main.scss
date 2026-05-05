@@ -1453,26 +1453,58 @@ select {
 }
 
 .easter-egg-star {
+  appearance: none;
+  background: transparent;
+  border: 0;
   color: $primary;
+  cursor: pointer;
+  display: grid;
   height: 54px;
   left: 26px;
+  padding: 0;
+  place-items: center;
   position: absolute;
   top: 30px;
+  transition: color 0.14s ease, filter 0.14s ease, transform 0.14s ease;
   width: 54px;
   z-index: 2;
+
+  svg {
+    height: 100%;
+    width: 100%;
+  }
+}
+
+.easter-egg-star:hover,
+.easter-egg-star:focus-visible {
+  color: color-mix(in srgb, $primary 76%, #fff);
+  filter: drop-shadow(0 0 10px color-mix(in srgb, $primary 46%, transparent));
+  transform: scale(1.04);
 }
 
 .easter-egg-harp {
+  cursor: pointer;
   height: 164px;
   left: 86px;
   position: absolute;
+  touch-action: none;
   top: 42px;
+  user-select: none;
   width: calc(100% - 112px);
   z-index: 1;
 }
 
+.easter-egg-string-hit {
+  fill: none;
+  pointer-events: stroke;
+  stroke: transparent;
+  stroke-linecap: round;
+  stroke-width: 12;
+}
+
 .easter-egg-string {
   fill: none;
+  pointer-events: none;
   filter: drop-shadow(0 0 3px color-mix(in srgb, $primary 10%, transparent));
   opacity: 0.76;
   stroke: color-mix(in srgb, $primary 52%, $text);

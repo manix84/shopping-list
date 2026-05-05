@@ -264,6 +264,7 @@ export const es: Messages = {
     title: 'Pasillo secreto desbloqueado',
     body: 'Has encontrado el rincón tranquilo de la tienda. Todo aquí está perfectamente ordenado.',
     dismiss: 'Cerrar pasillo secreto',
+    replay: 'Volver a reproducir la melodía del pasillo secreto',
   },
   pwaInstall: {
     title: 'Instalar la app',

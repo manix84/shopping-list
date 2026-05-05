@@ -233,6 +233,7 @@ export type Messages = {
     title: string;
     body: string;
     dismiss: string;
+    replay: string;
   };
   pwaInstall: {
     title: string;
