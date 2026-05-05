@@ -298,9 +298,17 @@ export default function App() {
     let touchStartX = 0;
     let touchStartY = 0;
     let touchStartTime = 0;
+    let hasValidTouchStart = false;
 
     const setKonamiTapStage = (isTapStage: boolean) => {
       document.documentElement.classList.toggle('konami-touch-tap-stage', isTapStage);
+    };
+
+    const resetTouchStart = () => {
+      hasValidTouchStart = false;
+      touchStartX = 0;
+      touchStartY = 0;
+      touchStartTime = 0;
     };
 
     const acceptKonamiInput = (input: (typeof KONAMI_SEQUENCE)[number]) => {
@@ -325,25 +333,36 @@ export default function App() {
     };
 
     const handleTouchStart = (event: TouchEvent) => {
-      if (event.touches.length !== 1 || isTextInputTarget(event.target)) { return; }
+      if (event.touches.length !== 1 || isTextInputTarget(event.target)) {
+        resetTouchStart();
+        return;
+      }
 
       const touch = event.touches[0];
+      hasValidTouchStart = true;
       touchStartX = touch.clientX;
       touchStartY = touch.clientY;
       touchStartTime = Date.now();
     };
 
     const handleTouchEnd = (event: TouchEvent) => {
-      if (isTextInputTarget(event.target)) { return; }
+      if (isTextInputTarget(event.target) || !hasValidTouchStart) {
+        resetTouchStart();
+        return;
+      }
 
       const touch = event.changedTouches[0];
-      if (!touch) { return; }
+      if (!touch) {
+        resetTouchStart();
+        return;
+      }
 
       const deltaX = touch.clientX - touchStartX;
       const deltaY = touch.clientY - touchStartY;
       const absX = Math.abs(deltaX);
       const absY = Math.abs(deltaY);
       const duration = Date.now() - touchStartTime;
+      resetTouchStart();
 
       if (absX <= KONAMI_TOUCH_TAP_MAX_PX && absY <= KONAMI_TOUCH_TAP_MAX_PX && duration <= KONAMI_TOUCH_TAP_MAX_MS) {
         if (sequenceIndex >= KONAMI_SEQUENCE.length - 2) {
@@ -366,12 +385,14 @@ export default function App() {
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('touchstart', handleTouchStart, { passive: true });
     window.addEventListener('touchend', handleTouchEnd, { passive: false });
+    window.addEventListener('touchcancel', resetTouchStart);
 
     return () => {
       setKonamiTapStage(false);
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('touchstart', handleTouchStart);
       window.removeEventListener('touchend', handleTouchEnd);
+      window.removeEventListener('touchcancel', resetTouchStart);
     };
   }, []);
 

@@ -490,6 +490,7 @@ export function SecretAisleEasterEgg({ isVisible, onDismiss }: SecretAisleEaster
           aria-label={messages.easterEgg.dismiss}
           title={messages.easterEgg.dismiss}
           onClick={onDismiss}
+          autoFocus={true}
         >
           <svg aria-hidden={'true'} className={'button-icon-svg'} viewBox={'0 0 24 24'}>
             <path d={mdiClose} fill={'currentColor'} />
@@ -559,8 +560,8 @@ export function SecretAisleEasterEgg({ isVisible, onDismiss }: SecretAisleEaster
         </div>
 
         <div className={'easter-egg-copy'}>
-          <p className={'section-group'}>{messages.easterEgg.title}</p>
-          <h2 id={'easter-egg-title'} className={'title title-md'}>{messages.easterEgg.body}</h2>
+          <h2 id={'easter-egg-title'} className={'section-group'}>{messages.easterEgg.title}</h2>
+          <p className={'title title-md'}>{messages.easterEgg.body}</p>
         </div>
       </section>
     </div>
