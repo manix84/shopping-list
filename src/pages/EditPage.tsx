@@ -1,24 +1,28 @@
-import { mdiContentSave, mdiPlus } from '@mdi/js';
+import { mdiContentSave, mdiDirections, mdiPlus } from '@mdi/js';
 import { Card } from '../components/Card';
 import { CountrySelect } from '../components/CountrySelect';
+import { SaveStatusIndicator } from '../components/SaveStatusIndicator';
 import { StatsGrid } from '../components/StatsGrid';
 import { SharedListPanel } from '../components/SharedListPanel';
 import { useI18n } from '../lib/i18n';
-import type { CountryCode, SharedListHistoryEntry } from '../types';
+import type { CountryCode, SaveStatus, SharedListHistoryEntry } from '../types';
 
 type EditPageProps = {
   input: string;
+  listName: string;
   draftItem: string;
   total: number;
   checkedTotal: number;
   progress: number;
   countryCode: CountryCode;
+  saveStatus: SaveStatus;
   onInputChange: (value: string) => void;
+  onListNameChange: (value: string) => void;
   onDraftItemChange: (value: string) => void;
   onCountryChange: (countryCode: CountryCode) => void;
   onParse: () => void;
+  onSaveAndStay: () => void;
   onResetAll: () => void;
-  onResetChecks: () => void;
   onAddSingleItem: () => void;
   onCreateSharedLink: () => void;
   onRefreshSharedList: () => void;
@@ -44,17 +48,20 @@ type EditPageProps = {
 
 export function EditPage({
   input,
+  listName,
   draftItem,
   total,
   checkedTotal,
   progress,
   countryCode,
+  saveStatus,
   onInputChange,
+  onListNameChange,
   onDraftItemChange,
   onCountryChange,
   onParse,
+  onSaveAndStay,
   onResetAll,
-  onResetChecks,
   onAddSingleItem,
   onCreateSharedLink,
   onRefreshSharedList,
@@ -79,12 +86,21 @@ export function EditPage({
       <Card
         header={
           <>
-            <h2 className={'title title-sm'}>{messages.pages.edit.title}</h2>
+            <div className={'page-title-with-status'}>
+              <h2 className={'title title-sm'}>{messages.pages.edit.title}</h2>
+              <SaveStatusIndicator status={saveStatus} />
+            </div>
             <p className={'subtitle'}>{messages.pages.edit.subtitle}</p>
           </>
         }
         bodyClassName={'stack'}
       >
+        <div className={'button-row'}>
+          <button type={'button'} className={'button'} onClick={onResetAll}>
+            {messages.actions.fullReset}
+          </button>
+        </div>
+
         <div className={'field field-compact'}>
           <label htmlFor={'list-country-select'}>{messages.pages.settings.countryLabel}</label>
           <CountrySelect id={'list-country-select'} value={countryCode} onChange={onCountryChange} />
@@ -123,26 +139,41 @@ export function EditPage({
                 <path d={mdiPlus} fill={'currentColor'} />
               </svg>
             </button>
-            <button
-              type={'button'}
-              className={'button button-primary button-icon'}
-              onClick={onParse}
-              aria-label={messages.actions.saveAndSort}
-              title={messages.actions.saveAndSort}
-            >
-              <svg aria-hidden={'true'} className={'button-icon-svg'} viewBox={'0 0 24 24'}>
-                <path d={mdiContentSave} fill={'currentColor'} />
-              </svg>
-            </button>
           </div>
         </div>
 
-        <div className={'button-row'}>
-          <button type={'button'} className={'button'} onClick={onResetChecks}>
-            {messages.actions.resetTicks}
+        <div className={'field'}>
+          <label htmlFor={'shopping-list-name'}>{messages.pages.edit.listNameLabel}</label>
+          <input
+            id={'shopping-list-name'}
+            className={'input'}
+            value={listName}
+            onChange={(event) => onListNameChange(event.target.value)}
+            placeholder={messages.pages.edit.listNamePlaceholder}
+          />
+          <div className={'small-text'}>{messages.pages.edit.listNameHint}</div>
+        </div>
+
+        <div className={'edit-save-actions'}>
+          <button
+            type={'button'}
+            className={'button'}
+            onClick={onSaveAndStay}
+          >
+            <svg aria-hidden={'true'} className={'button-icon-svg'} viewBox={'0 0 24 24'}>
+              <path d={mdiContentSave} fill={'currentColor'} />
+            </svg>
+            {messages.actions.saveAndStay}
           </button>
-          <button type={'button'} className={'button'} onClick={onResetAll}>
-            {messages.actions.fullReset}
+          <button
+            type={'button'}
+            className={'button button-primary'}
+            onClick={onParse}
+          >
+            <svg aria-hidden={'true'} className={'button-icon-svg'} viewBox={'0 0 24 24'}>
+              <path d={mdiDirections} fill={'currentColor'} />
+            </svg>
+            {messages.actions.saveAndRoute}
           </button>
         </div>
 
@@ -161,6 +192,7 @@ export function EditPage({
           bodyClassName={'stack'}
         >
           <SharedListPanel
+            listName={listName}
             canUseBackend={canUseBackend}
             canCreateSharedLink={canCreateSharedLink}
             resolvedTheme={resolvedTheme}

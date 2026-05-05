@@ -13,6 +13,7 @@ describe('sharedListHistoryRepository', () => {
 
     const first = {
       listId: '019dbf30-56de-7b2b-aacc-a5ae59430d7f',
+      listName: 'Weekend shop',
       itemPreview: ['milk', 'bread', 'apples', 'coffee'],
       createdAt: '2026-04-22T00:00:00.000Z',
       updatedAt: '2026-04-22T00:00:00.000Z',
@@ -31,6 +32,7 @@ describe('sharedListHistoryRepository', () => {
 
     expect(remembered).toHaveLength(2);
     expect(remembered[0].listId).toBe(second.listId);
+    expect(remembered[1].listName).toBe(first.listName);
     expect(remembered[1].itemPreview).toEqual(first.itemPreview);
     expect(windowMock.localStorage.getItem(STORAGE_KEY)).toContain(second.listId);
 
@@ -38,6 +40,39 @@ describe('sharedListHistoryRepository', () => {
     expect(remaining).toEqual([
       expect.objectContaining({
         listId: first.listId,
+      }),
+    ]);
+  });
+
+  it('updates an existing history entry while preserving its created timestamp', () => {
+    const windowMock = createWindowMock();
+    vi.stubGlobal('window', windowMock);
+
+    const original = {
+      listId: '019dbf30-56de-7b2b-aacc-a5ae59430d7f',
+      listName: 'Weekend shop',
+      itemPreview: ['milk', 'bread'],
+      createdAt: '2026-04-22T00:00:00.000Z',
+      updatedAt: '2026-04-22T00:00:00.000Z',
+      viewedAt: '2026-04-22T00:00:00.000Z',
+    };
+
+    sharedListHistoryRepository.remember(original);
+    const remembered = sharedListHistoryRepository.remember({
+      listId: original.listId,
+      listName: 'Party shop',
+      itemPreview: ['crisps', 'dip'],
+      updatedAt: '2026-04-23T00:00:00.000Z',
+      viewedAt: '2026-04-23T00:00:00.000Z',
+    });
+
+    expect(remembered).toEqual([
+      expect.objectContaining({
+        listId: original.listId,
+        listName: 'Party shop',
+        itemPreview: ['crisps', 'dip'],
+        createdAt: original.createdAt,
+        updatedAt: '2026-04-23T00:00:00.000Z',
       }),
     ]);
   });

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { COUNTRY_CONFIGS } from './config/countries';
 import { AppHeader } from './components/AppHeader';
 import { PredatorEasterEgg } from './components/PredatorEasterEgg';
@@ -57,7 +57,7 @@ import { ErrorPage } from './pages/ErrorPage';
 import { RoutePage } from './pages/RoutePage';
 import { SectionsPage } from './pages/SectionsPage';
 import { SettingsPage } from './pages/SettingsPage';
-import type { AppRoute, BackendStatus, CountryCode, GroupedSectionView, Item, MeasurementDisplayMode, PageKey, RouteViewMode, SectionKey, SharedListHistoryEntry, ThemeMode } from './types';
+import type { AppRoute, BackendStatus, CountryCode, GroupedSectionView, Item, MeasurementDisplayMode, PageKey, RouteViewMode, SaveStatus, SectionKey, SharedListHistoryEntry, ShoppingListRecord, ThemeMode } from './types';
 
 const DEFAULT_PAGE: PageKey = 'edit';
 const BACKEND_HEARTBEAT_CONNECTED_MS = 5_000;
@@ -182,9 +182,11 @@ const buildRecord = (
   countryCode: CountryCode,
   listId: string,
   serverBacked: boolean,
-) => ({
+  listName: string,
+): ShoppingListRecord => ({
   listId,
   serverBacked,
+  listName: listName.trim() || undefined,
   input,
   items,
   updatedAt: new Date().toISOString(),
@@ -210,6 +212,7 @@ function updateItemTextInInput(input: string, previousDisplay: string, nextDispl
 export default function App() {
   const [route, setRoute] = useState<AppRoute>(() => readRouteFromLocation());
   const [input, setInput] = useState('');
+  const [listName, setListName] = useState('');
   const [items, setItems] = useState<Item[]>([]);
   const [query, setQuery] = useState('');
   const [isRouteFilterVisible, setIsRouteFilterVisible] = useState(false);
@@ -231,6 +234,7 @@ export default function App() {
   const [isRefreshingSharedList, setIsRefreshingSharedList] = useState(false);
   const [isLoadingSharedList, setIsLoadingSharedList] = useState(false);
   const [shareError, setShareError] = useState<ShareErrorKey>();
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
   const [sharedListHistory, setSharedListHistory] = useState<SharedListHistoryEntry[]>(() => sharedListHistoryRepository.load());
   const [beforeInstallPromptEvent, setBeforeInstallPromptEvent] = useState<BeforeInstallPromptEvent>();
   const [hasInstallPromptCheckSettled, setHasInstallPromptCheckSettled] = useState(false);
@@ -239,6 +243,12 @@ export default function App() {
   const [isLikelyMobileForInstall, setIsLikelyMobileForInstall] = useState(() => isMobileOrTabletDevice());
   const [isSecretAisleEasterEggVisible, setIsSecretAisleEasterEggVisible] = useState(false);
   const [predatorEasterEggRun, setPredatorEasterEggRun] = useState(0);
+  const saveRequestIdRef = useRef(0);
+  const suppressNextAutosaveStatusRef = useRef(true);
+  const suppressNextAutosaveStatus = () => {
+    suppressNextAutosaveStatusRef.current = true;
+    setSaveStatus('idle');
+  };
 
   const config = useMemo(
     () => withMeasurementDisplayMode(COUNTRY_CONFIGS[countryCode], measurementDisplayMode),
@@ -275,11 +285,13 @@ export default function App() {
 
   const rememberSharedList = ({
     listId,
+    listName,
     items,
     createdAt,
     updatedAt,
   }: {
     listId: string;
+    listName?: string;
     items: Item[];
     createdAt?: string;
     updatedAt: string;
@@ -287,6 +299,7 @@ export default function App() {
     setSharedListHistory(
       sharedListHistoryRepository.remember({
         listId,
+        listName,
         itemPreview: getSharedListPreview(items),
         createdAt,
         updatedAt,
@@ -480,6 +493,7 @@ export default function App() {
       localStorageRepository.save(record);
       rememberSharedList({
         listId: nextListId,
+        listName: record.listName,
         items: record.items,
         createdAt: remotePayload.createdAt,
         updatedAt: remotePayload.updatedAt ?? record.updatedAt,
@@ -533,6 +547,7 @@ export default function App() {
 
   useEffect(() => {
     let cancelled = false;
+    suppressNextAutosaveStatus();
     setIsLoaded(false);
     setShareError(undefined);
 
@@ -577,6 +592,7 @@ export default function App() {
           if (remotePayload.exists) {
             rememberSharedList({
               listId: nextListId,
+              listName: selectedRecord.listName,
               items: selectedRecord.items,
               createdAt: remotePayload.createdAt,
               updatedAt: remotePayload.updatedAt ?? selectedRecord.updatedAt,
@@ -605,6 +621,7 @@ export default function App() {
         listId: nextServerBacked ? nextListId : undefined,
       }));
       setCountryCode(selectedRecord.countryCode);
+      setListName(selectedRecord.listName ?? '');
       setInput(selectedRecord.input);
       setItems(parseItems(
         selectedRecord.input,
@@ -718,11 +735,13 @@ export default function App() {
         if (remotePayload.exists) {
           rememberSharedList({
             listId: activeListId,
+            listName: selectedRecord.listName,
             items: selectedRecord.items,
             createdAt: remotePayload.createdAt,
             updatedAt: remotePayload.updatedAt ?? selectedRecord.updatedAt,
           });
         }
+        suppressNextAutosaveStatus();
         setStorageMode('backend');
         setIsServerBackedList(true);
         setRoute((current) => ({
@@ -730,6 +749,7 @@ export default function App() {
           listId: activeListId,
         }));
         setCountryCode(selectedRecord.countryCode);
+        setListName(selectedRecord.listName ?? '');
         setInput(selectedRecord.input);
         setItems(parseItems(
           selectedRecord.input,
@@ -797,17 +817,56 @@ export default function App() {
 
   useEffect(() => {
     if (!isLoaded) { return; }
-    const record = buildRecord(input, items, countryCode, activeListId, isServerBackedList);
+    const saveRequestId = saveRequestIdRef.current + 1;
+    saveRequestIdRef.current = saveRequestId;
+    const shouldReportSaveStatus = !suppressNextAutosaveStatusRef.current;
+    suppressNextAutosaveStatusRef.current = false;
+    if (shouldReportSaveStatus) {
+      setSaveStatus('saving');
+    }
 
-    localStorageRepository.save(record);
+    const record = buildRecord(input, items, countryCode, activeListId, isServerBackedList, listName);
+
+    try {
+      localStorageRepository.save(record);
+    } catch (error) {
+      console.warn('Unable to save shopping list locally.', error);
+      if (shouldReportSaveStatus && saveRequestIdRef.current === saveRequestId) {
+        setSaveStatus('error');
+      }
+      return;
+    }
+
+    if (isServerBackedList) {
+      rememberSharedList({
+        listId: activeListId,
+        listName: record.listName,
+        items: record.items,
+        updatedAt: record.updatedAt,
+      });
+    }
 
     if (storageMode === 'backend' && backendStatus.state === 'connected') {
       const backendRecord = { ...record, serverBacked: true };
-      void saveSharedShoppingList(activeListId, backendRecord).catch((error: unknown) => {
-        console.warn('Unable to save shared shopping list to backend.', error);
-      });
+      void saveSharedShoppingList(activeListId, backendRecord)
+        .then(() => {
+          if (shouldReportSaveStatus && saveRequestIdRef.current === saveRequestId) {
+            setSaveStatus('saved');
+          }
+        })
+        .catch((error: unknown) => {
+          console.warn('Unable to save shared shopping list to backend.', error);
+          if (shouldReportSaveStatus && saveRequestIdRef.current === saveRequestId) {
+            setSaveStatus('error');
+          }
+        });
+      return;
     }
-  }, [activeListId, backendStatus.state, countryCode, input, isLoaded, isServerBackedList, items, storageMode]);
+
+    if (shouldReportSaveStatus) {
+      setSaveStatus('saved');
+    }
+  }, [activeListId, backendStatus.state, countryCode, input, isLoaded, isServerBackedList, items, listName, storageMode]);
 
   useEffect(() => {
     syncRouteToUrl(route);
@@ -921,6 +980,12 @@ export default function App() {
     changePage('route');
   };
 
+  const handleSaveAndStay = () => {
+    setItems((current) => parseItems(input, config, current));
+    setQuery('');
+    setIsRouteFilterVisible(false);
+  };
+
   const handleAddSingleItem = () => {
     const cleaned = cleanLine(draftItem);
     if (!cleaned) { return; }
@@ -1005,12 +1070,14 @@ export default function App() {
     });
   };
 
-  const applyRecord = (record: ReturnType<typeof buildRecord>) => {
+  const applyRecord = (record: ShoppingListRecord) => {
+    suppressNextAutosaveStatus();
     if (record.listId) {
       setActiveListId(record.listId);
     }
     setIsServerBackedList(record.serverBacked === true);
     setCountryCode(record.countryCode);
+    setListName(record.listName ?? '');
     setInput(record.input);
     setItems(parseItems(
       record.input,
@@ -1029,11 +1096,12 @@ export default function App() {
     setShareError(undefined);
 
     try {
-      const record = buildRecord(input, items, countryCode, activeListId, true);
+      const record = buildRecord(input, items, countryCode, activeListId, true, listName);
       await saveSharedShoppingList(activeListId, record);
       localStorageRepository.save(record);
       rememberSharedList({
         listId: activeListId,
+        listName: record.listName,
         items: record.items,
         createdAt: record.updatedAt,
         updatedAt: record.updatedAt,
@@ -1067,6 +1135,7 @@ export default function App() {
       if (remotePayload.exists) {
         rememberSharedList({
           listId: activeListId,
+          listName: record.listName,
           items: record.items,
           createdAt: remotePayload.createdAt,
           updatedAt: remotePayload.updatedAt ?? record.updatedAt,
@@ -1095,6 +1164,7 @@ export default function App() {
     setIsServerBackedList(false);
     setStorageMode('local');
     setCountryCode(initial.countryCode);
+    setListName(initial.listName ?? '');
     setInput(initial.input);
     setItems(parseItems(
       initial.input,
@@ -1154,17 +1224,20 @@ export default function App() {
             {page === 'edit' ? (
               <EditPage
                 input={input}
+                listName={listName}
                 draftItem={draftItem}
                 total={total}
                 checkedTotal={checkedTotal}
                 progress={progress}
                 countryCode={countryCode}
+                saveStatus={saveStatus}
                 onInputChange={setInput}
+                onListNameChange={setListName}
                 onDraftItemChange={setDraftItem}
                 onCountryChange={handleCountryChange}
                 onParse={handleParse}
+                onSaveAndStay={handleSaveAndStay}
                 onResetAll={resetAll}
-                onResetChecks={resetChecks}
                 onAddSingleItem={handleAddSingleItem}
                 onCreateSharedLink={handleCreateSharedLink}
                 onRefreshSharedList={handleRefreshSharedList}
@@ -1186,8 +1259,10 @@ export default function App() {
 
             {page === 'route' ? (
               <RoutePage
+                listName={listName}
                 query={query}
                 isFilterVisible={isRouteFilterVisible}
+                saveStatus={saveStatus}
                 grouped={grouped}
                 hasItems={items.length > 0}
                 viewMode={routeViewMode}
@@ -1198,6 +1273,7 @@ export default function App() {
                 onMeasurementDisplayModeChange={handleMeasurementDisplayModeChange}
                 onToggleSection={toggleSection}
                 onToggleItem={toggleItem}
+                onResetChecks={resetChecks}
                 onOpenEdit={() => changePage('edit')}
               />
             ) : null}

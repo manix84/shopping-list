@@ -7,15 +7,19 @@ import {
   mdiViewListOutline,
   mdiWeightPound,
 } from '@mdi/js';
+import { useEffect, useState } from 'react';
 import type { GroupedSectionView, MeasurementDisplayMode } from '../types';
 import { Card } from '../components/Card';
 import { RouteSectionCard } from '../components/RouteSectionCard';
+import { SaveStatusIndicator } from '../components/SaveStatusIndicator';
 import { getRouteViewLabel, useI18n } from '../lib/i18n';
-import type { RouteViewMode } from '../types';
+import type { RouteViewMode, SaveStatus } from '../types';
 
 type RoutePageProps = {
+  listName: string;
   query: string;
   isFilterVisible: boolean;
+  saveStatus: SaveStatus;
   grouped: GroupedSectionView[];
   hasItems: boolean;
   viewMode: RouteViewMode;
@@ -26,13 +30,16 @@ type RoutePageProps = {
   onMeasurementDisplayModeChange: (mode: MeasurementDisplayMode) => void;
   onToggleSection: (sectionKey: GroupedSectionView['key'], checked: boolean) => void;
   onToggleItem: (itemId: string) => void;
+  onResetChecks: () => void;
   onOpenEdit: () => void;
 };
 
 export function RoutePage({
+  listName,
   grouped,
   query,
   isFilterVisible,
+  saveStatus,
   hasItems,
   viewMode,
   measurementDisplayMode,
@@ -42,9 +49,13 @@ export function RoutePage({
   onMeasurementDisplayModeChange,
   onToggleSection,
   onToggleItem,
+  onResetChecks,
   onOpenEdit,
 }: RoutePageProps) {
   const { messages } = useI18n();
+  const [isResetTicksModalOpen, setIsResetTicksModalOpen] = useState(false);
+  const routeTitle = listName.trim() || messages.pages.route.title;
+  const showDefaultSubtitle = !listName.trim();
   const viewOptions: Array<{ mode: RouteViewMode; icon: string }> = [
     { mode: 'default', icon: mdiViewAgendaOutline },
     { mode: 'comfortable', icon: mdiViewDayOutline },
@@ -55,6 +66,23 @@ export function RoutePage({
     { mode: 'imperial', icon: mdiWeightPound, label: messages.labels.measurementModeImperial },
     { mode: 'cooking', icon: mdiCupOutline, label: messages.labels.measurementModeCooking },
   ];
+  const confirmResetTicks = () => {
+    onResetChecks();
+    setIsResetTicksModalOpen(false);
+  };
+
+  useEffect(() => {
+    if (!isResetTicksModalOpen) { return; }
+
+    const handleEscape = (event: globalThis.KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsResetTicksModalOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [isResetTicksModalOpen]);
 
   return (
     <Card
@@ -62,8 +90,11 @@ export function RoutePage({
       header={
         <div className={'title-row route-page-header'}>
           <div className={'route-page-header-copy'}>
-            <h2 className={'title title-md'}>{messages.pages.route.title}</h2>
-            <p className={'subtitle'}>{messages.pages.route.subtitle}</p>
+            <div className={'page-title-with-status'}>
+              <h2 className={'title title-md'}>{routeTitle}</h2>
+              <SaveStatusIndicator status={saveStatus} />
+            </div>
+            {showDefaultSubtitle ? <p className={'subtitle'}>{messages.pages.route.subtitle}</p> : null}
           </div>
           <div className={'route-toolbar'}>
             <div className={'route-toolbar-row'}>
@@ -145,17 +176,50 @@ export function RoutePage({
         ) : grouped.length === 0 ? (
           <div className={'empty-state'}>{messages.pages.route.emptyNoResults}</div>
         ) : (
-          grouped.map((section) => (
-            <RouteSectionCard
-              key={section.key}
-              section={section}
-              viewMode={viewMode}
-              onToggleSection={onToggleSection}
-              onToggleItem={onToggleItem}
-            />
-          ))
+          <>
+            {grouped.map((section) => (
+              <RouteSectionCard
+                key={section.key}
+                section={section}
+                viewMode={viewMode}
+                onToggleSection={onToggleSection}
+                onToggleItem={onToggleItem}
+              />
+            ))}
+          </>
         )}
+        {hasItems ? (
+          <div className={'route-reset-actions'}>
+            <button type={'button'} className={'button'} onClick={() => setIsResetTicksModalOpen(true)}>
+              {messages.actions.resetTicks}
+            </button>
+          </div>
+        ) : null}
       </div>
+      {isResetTicksModalOpen ? (
+        <div className={'share-scanner-modal'} onClick={() => setIsResetTicksModalOpen(false)} role={'presentation'}>
+          <div
+            className={'share-scanner-dialog stack'}
+            role={'dialog'}
+            aria-modal={'true'}
+            aria-labelledby={'reset-ticks-title'}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className={'stack'}>
+              <h3 id={'reset-ticks-title'} className={'title title-xs'}>{messages.pages.route.resetTicksConfirmTitle}</h3>
+              <p className={'subtitle'}>{messages.pages.route.resetTicksConfirmBody}</p>
+            </div>
+            <div className={'button-row warning-actions'}>
+              <button type={'button'} className={'button'} onClick={() => setIsResetTicksModalOpen(false)} autoFocus>
+                {messages.actions.close}
+              </button>
+              <button type={'button'} className={'button button-danger'} onClick={confirmResetTicks}>
+                {messages.pages.route.resetTicksConfirmAction}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </Card>
   );
 }

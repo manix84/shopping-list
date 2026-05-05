@@ -9,6 +9,7 @@ describe('record codec', () => {
     const record = {
       listId: '019dbf30-56de-7b2b-aacc-a5ae59430d7f',
       serverBacked: true,
+      listName: 'Weekend shop',
       input,
       items: parseItems(input, CA_CONFIG),
       updatedAt: '2026-04-22T00:00:00.000Z',
@@ -20,6 +21,7 @@ describe('record codec', () => {
     expect(decoded).toMatchObject({
       listId: record.listId,
       serverBacked: true,
+      listName: 'Weekend shop',
       input,
       updatedAt: record.updatedAt,
       countryCode: 'ca',

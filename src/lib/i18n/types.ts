@@ -48,7 +48,9 @@ export type Messages = {
     resetTicks: string;
     revealQrCode: string;
     resortFromList: string;
+    saveAndRoute: string;
     saveAndSort: string;
+    saveAndStay: string;
     tick: string;
     tickAll: string;
     untick: string;
@@ -77,6 +79,9 @@ export type Messages = {
     progress: string;
     qty: string;
     routeOrder: string;
+    saveFailed: string;
+    saved: string;
+    saving: string;
     section: string;
     sharedLink: string;
     sharedLists: string;
@@ -98,6 +103,9 @@ export type Messages = {
       countryProfileHint: string;
       quickAddLabel: string;
       quickAddPlaceholder: string;
+      listNameLabel: string;
+      listNamePlaceholder: string;
+      listNameHint: string;
       sharingTitle: string;
       sharingSubtitle: string;
       sharingUnavailable: string;
@@ -111,6 +119,9 @@ export type Messages = {
       filterPlaceholder: string;
       emptyNoItems: string;
       emptyNoResults: string;
+      resetTicksConfirmTitle: string;
+      resetTicksConfirmBody: string;
+      resetTicksConfirmAction: string;
       viewDefault: string;
       viewComfortable: string;
       viewCompact: string;
