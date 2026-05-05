@@ -254,6 +254,12 @@ export const en: Messages = {
     closeNavigation: 'Close navigation menu',
     openNavigation: 'Open navigation menu',
   },
+  easterEgg: {
+    logoLabel: 'Smart Shopping List logo',
+    title: 'Secret aisle unlocked',
+    body: 'You found the quiet corner of the store. Everything here is perfectly sorted.',
+    dismiss: 'Close secret aisle',
+  },
   pwaInstall: {
     title: 'Install the app',
     description: 'Keep your shopping list one tap away on this device.',

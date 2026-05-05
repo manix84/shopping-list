@@ -261,6 +261,9 @@ export const ro: Messages = {
     closeNavigation: 'Închide meniul de navigare',
     openNavigation: 'Deschide meniul de navigare',
   },
+  easterEgg: {
+    ...en.easterEgg,
+  },
   pwaInstall: {
     ...en.pwaInstall,
   },

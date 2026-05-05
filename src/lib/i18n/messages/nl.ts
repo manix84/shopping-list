@@ -262,6 +262,9 @@ export const nl: Messages = {
     closeNavigation: 'Navigatiemenu sluiten',
     openNavigation: 'Navigatiemenu openen',
   },
+  easterEgg: {
+    ...en.easterEgg,
+  },
   pwaInstall: {
     ...en.pwaInstall,
   },

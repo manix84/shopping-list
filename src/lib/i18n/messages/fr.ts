@@ -267,6 +267,9 @@ export const fr: Messages = {
     closeNavigation: 'Fermer le menu de navigation',
     openNavigation: 'Ouvrir le menu de navigation',
   },
+  easterEgg: {
+    ...en.easterEgg,
+  },
   pwaInstall: {
     ...en.pwaInstall,
   },

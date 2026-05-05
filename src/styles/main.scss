@@ -426,6 +426,22 @@ select {
   background: $panel-alt;
 }
 
+.app-icon-button {
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.18s ease, border-color 0.18s ease;
+
+  &:hover {
+    border-color: color-mix(in srgb, $primary 48%, $border);
+    transform: translateY(-1px) rotate(-2deg);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $primary;
+    outline-offset: 3px;
+  }
+}
+
 .app-icon-image {
   display: block;
   height: 32px;
@@ -1378,6 +1394,106 @@ select {
   animation: connection-badge-fade-out 0.25s ease-in both;
 }
 
+.easter-egg-overlay {
+  align-items: center;
+  animation: modal-backdrop-in 0.24s ease;
+  background: rgba(8, 13, 24, 0.54);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 20px;
+  position: fixed;
+  z-index: 1100;
+}
+
+.easter-egg-dialog {
+  background: $panel;
+  border: 1px solid $border;
+  border-radius: 22px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+  display: grid;
+  gap: 20px;
+  max-width: 560px;
+  overflow: hidden;
+  padding: 24px;
+  position: relative;
+  width: min(100%, 560px);
+}
+
+.easter-egg-close {
+  position: absolute;
+  right: 14px;
+  top: 14px;
+  z-index: 2;
+}
+
+.easter-egg-visual {
+  background:
+    radial-gradient(circle at 11% 28%, color-mix(in srgb, $primary 18%, transparent) 0 18%, transparent 34%),
+    linear-gradient(90deg, color-mix(in srgb, $primary 12%, transparent), transparent 52%),
+    $panel-alt;
+  border: 1px solid $border;
+  border-radius: 16px;
+  min-height: 220px;
+  overflow: hidden;
+  position: relative;
+}
+
+.easter-egg-scanline {
+  animation: easter-egg-scan 1.35s ease-in-out infinite;
+  background: color-mix(in srgb, $primary 38%, transparent);
+  box-shadow: 0 0 22px color-mix(in srgb, $primary 48%, transparent);
+  height: 2px;
+  left: 0;
+  opacity: 0.7;
+  position: absolute;
+  right: 0;
+  top: 18px;
+  z-index: 0;
+}
+
+.easter-egg-star {
+  color: $primary;
+  height: 54px;
+  left: 26px;
+  position: absolute;
+  top: 30px;
+  width: 54px;
+  z-index: 2;
+}
+
+.easter-egg-harp {
+  height: 164px;
+  left: 86px;
+  position: absolute;
+  top: 42px;
+  width: calc(100% - 112px);
+  z-index: 1;
+}
+
+.easter-egg-string {
+  fill: none;
+  filter: drop-shadow(0 0 3px color-mix(in srgb, $primary 10%, transparent));
+  opacity: 0.76;
+  stroke: color-mix(in srgb, $primary 52%, $text);
+  stroke-linecap: round;
+  transition: filter 0.1s ease, opacity 0.1s ease, stroke 0.1s ease;
+}
+
+.easter-egg-string-active {
+  filter: drop-shadow(0 0 8px color-mix(in srgb, $primary 72%, transparent));
+  opacity: 1;
+  stroke: color-mix(in srgb, $primary 86%, #fff);
+}
+
+.easter-egg-copy {
+  padding-right: 44px;
+
+  .title {
+    line-height: 1.15;
+  }
+}
+
 @keyframes connection-badge-fade-in {
   from {
     opacity: 0;
@@ -1398,9 +1514,22 @@ select {
   }
 }
 
+@keyframes easter-egg-scan {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(174px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .connection-badge,
-  .connection-badge-leaving {
+  .connection-badge-leaving,
+  .easter-egg-overlay,
+  .easter-egg-scanline {
     animation-duration: 0.01ms;
   }
 }
@@ -2153,6 +2282,10 @@ select {
     font-size: 18px;
   }
 
+  .app-header .app-icon-button {
+    padding: 0;
+  }
+
   .app-header .subtitle {
     display: none;
   }
@@ -2419,5 +2552,36 @@ select {
     .subtitle {
       font-size: 15px;
     }
+  }
+
+  .easter-egg-overlay {
+    padding: 12px;
+  }
+
+  .easter-egg-dialog {
+    border-radius: 18px;
+    padding: 18px;
+  }
+
+  .easter-egg-visual {
+    min-height: 180px;
+  }
+
+  .easter-egg-star {
+    height: 44px;
+    left: 20px;
+    top: 28px;
+    width: 44px;
+  }
+
+  .easter-egg-harp {
+    height: 132px;
+    left: 70px;
+    top: 38px;
+    width: calc(100% - 88px);
+  }
+
+  .easter-egg-copy {
+    padding-right: 0;
   }
 }

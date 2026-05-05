@@ -260,6 +260,9 @@ export const pi: Messages = {
     closeNavigation: 'Close the nav chart',
     openNavigation: 'Open the nav chart',
   },
+  easterEgg: {
+    ...en.easterEgg,
+  },
   pwaInstall: {
     ...en.pwaInstall,
   },

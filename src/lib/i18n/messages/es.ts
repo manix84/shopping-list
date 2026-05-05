@@ -259,6 +259,12 @@ export const es: Messages = {
     closeNavigation: 'Cerrar menú de navegación',
     openNavigation: 'Abrir menú de navegación',
   },
+  easterEgg: {
+    logoLabel: 'Logotipo de Lista de la compra inteligente',
+    title: 'Pasillo secreto desbloqueado',
+    body: 'Has encontrado el rincón tranquilo de la tienda. Todo aquí está perfectamente ordenado.',
+    dismiss: 'Cerrar pasillo secreto',
+  },
   pwaInstall: {
     title: 'Instalar la app',
     description: 'Ten tu lista de la compra a un toque en este dispositivo.',
