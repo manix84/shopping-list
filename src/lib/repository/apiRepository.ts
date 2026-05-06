@@ -20,6 +20,10 @@ const skipBackendChecks = import.meta.env.VITE_SKIP_BACKEND_CHECKS === 'true';
 
 const apiUrl = (path: string): string => `${apiBaseUrl}${path}`;
 const isBackendDatabaseAdapter = (value: unknown): value is BackendDatabaseAdapter => value === 'json' || value === 'postgres';
+const backendDatabaseAdapter = (value: unknown, legacyPath: unknown): BackendDatabaseAdapter | undefined => {
+  if (isBackendDatabaseAdapter(value)) { return value; }
+  return typeof legacyPath === 'string' ? 'json' : undefined;
+};
 
 const fetchWithTimeout = async (path: string, init: RequestInit = {}, timeoutMs = DEFAULT_TIMEOUT_MS) => {
   const controller = new AbortController();
@@ -64,6 +68,7 @@ export const checkBackendStatus = async (): Promise<BackendStatus> => {
       ? ((await databaseResponse.json()) as {
           ok?: unknown;
           adapter?: unknown;
+          path?: unknown;
           settingsExists?: unknown;
           settingsCountryCode?: unknown;
           settingsUpdatedAt?: unknown;
@@ -81,7 +86,7 @@ export const checkBackendStatus = async (): Promise<BackendStatus> => {
       },
       database: {
         ok: databaseResponse.ok && database?.ok === true,
-        adapter: isBackendDatabaseAdapter(database?.adapter) ? database.adapter : undefined,
+        adapter: backendDatabaseAdapter(database?.adapter, database?.path),
         settingsExists: typeof database?.settingsExists === 'boolean' ? database.settingsExists : undefined,
         settingsCountryCode: isCountryCode(database?.settingsCountryCode) ? database.settingsCountryCode : undefined,
         settingsUpdatedAt: typeof database?.settingsUpdatedAt === 'string' ? database.settingsUpdatedAt : undefined,

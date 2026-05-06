@@ -75,6 +75,37 @@ describe('apiRepository', () => {
     });
   });
 
+  it('infers JSON backend status from legacy database path metadata', async () => {
+    stubBrowserApi();
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockResolvedValueOnce(new Response(JSON.stringify({ ok: true, mode: 'backend' }), { status: 200 }))
+        .mockResolvedValueOnce(
+          new Response(
+            JSON.stringify({
+              ok: true,
+              path: '/redacted/shopping-list-db.json',
+              settingsExists: true,
+              settingsCountryCode: 'uk',
+              shoppingListExists: true,
+              sharedListCount: 1,
+            }),
+            { status: 200 },
+          ),
+        ),
+    );
+
+    await expect(checkBackendStatus()).resolves.toMatchObject({
+      state: 'connected',
+      database: {
+        ok: true,
+        adapter: 'json',
+      },
+    });
+  });
+
   it('reports offline backend status when fetch fails', async () => {
     stubBrowserApi();
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('offline')));
