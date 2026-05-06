@@ -207,6 +207,7 @@ export const de: Messages = {
       tabLayout: 'Layout',
       tabSections: 'Bereiche',
       tabStorage: 'Speicher',
+      tabSettings: 'Einstellungen',
       backendTitle: 'Backend-Prüfungen',
       backendConnected: 'Backend-API und Datenbank sind verfügbar.',
       backendChecking: 'Backend-Status wird geprüft.',
@@ -243,6 +244,12 @@ export const de: Messages = {
       storageTitle: 'Speicher-Selbsttests',
       storageSubtitle:
         'Daten sollten sauber durch lokalen Speicher und spätere Datenbanken laufen.',
+      settingsTitle: 'Debug-Einstellungen',
+      settingsSubtitle:
+        'Steuerungen für reine Entwicklungsfunktionen, die nicht in den Hauptfluss gehören.',
+      debugModeLabel: 'Debug-Modus',
+      debugModeHint:
+        'Deaktiviere dies, um den Link zu den Debug-Werkzeugen wieder auszublenden.',
       stateTitle: 'Status-Selbsttests',
       stateSubtitle:
         'Prüft die aktuelle Liste gegen Parser, Matcher, Varianten, Fortschritt und Listenidentität.',

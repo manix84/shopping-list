@@ -207,6 +207,7 @@ export const fr: Messages = {
       tabLayout: 'Agencement',
       tabSections: 'Sections',
       tabStorage: 'Stockage',
+      tabSettings: 'Paramètres',
       backendTitle: 'Vérifications backend',
       backendConnected: 'L’API backend et la base de données sont disponibles.',
       backendChecking: 'L’état du backend est en cours de vérification.',
@@ -243,6 +244,12 @@ export const fr: Messages = {
       storageTitle: 'Auto-vérifications du stockage',
       storageSubtitle:
         'Les données doivent se relire proprement depuis le stockage local et toute future base.',
+      settingsTitle: 'Paramètres de débogage',
+      settingsSubtitle:
+        'Contrôles pour les fonctions de développement qui doivent rester hors du flux principal.',
+      debugModeLabel: 'Mode débogage',
+      debugModeHint:
+        'Désactivez-le pour masquer à nouveau le lien vers les outils de débogage.',
       stateTitle: 'Auto-vérifications de l’état',
       stateSubtitle:
         'Validez la liste actuelle avec le parseur, la correspondance, les variantes, la progression et l’identité.',

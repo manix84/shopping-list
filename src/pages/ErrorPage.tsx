@@ -6,6 +6,7 @@ type ErrorPageVariant = 'not-found' | 'server-error';
 
 type ErrorPageProps = {
   variant: ErrorPageVariant;
+  isDebugMode: boolean;
   onBackToEdit: () => void;
   onOpenDebug: () => void;
 };
@@ -36,7 +37,7 @@ const errorPageContent = {
   titleKey: 'notFoundTitle' | 'serverTitle';
 }>;
 
-export function ErrorPage({ variant, onBackToEdit, onOpenDebug }: ErrorPageProps) {
+export function ErrorPage({ variant, isDebugMode, onBackToEdit, onOpenDebug }: ErrorPageProps) {
   const { messages } = useI18n();
   const content = errorPageContent[variant];
   const errorMessages = messages.pages.error;
@@ -77,12 +78,14 @@ export function ErrorPage({ variant, onBackToEdit, onOpenDebug }: ErrorPageProps
           </svg>
           {messages.actions.backToEdit}
         </button>
-        <button type={'button'} className={'button'} onClick={onOpenDebug}>
-          <svg aria-hidden={'true'} className={'button-icon-svg'} viewBox={'0 0 24 24'}>
-            <path d={mdiBugOutline} fill={'currentColor'} />
-          </svg>
-          {messages.actions.openDebugTools}
-        </button>
+        {isDebugMode ? (
+          <button type={'button'} className={'button'} onClick={onOpenDebug}>
+            <svg aria-hidden={'true'} className={'button-icon-svg'} viewBox={'0 0 24 24'}>
+              <path d={mdiBugOutline} fill={'currentColor'} />
+            </svg>
+            {messages.actions.openDebugTools}
+          </button>
+        ) : null}
       </div>
     </Card>
   );

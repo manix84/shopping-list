@@ -205,6 +205,7 @@ export const it: Messages = {
       tabLayout: 'Layout',
       tabSections: 'Sezioni',
       tabStorage: 'Archiviazione',
+      tabSettings: 'Impostazioni',
       backendTitle: 'Controlli backend',
       backendConnected: 'API backend e database sono disponibili.',
       backendChecking: 'Lo stato del backend è in fase di controllo.',
@@ -241,6 +242,12 @@ export const it: Messages = {
       storageTitle: 'Autocontrolli archiviazione',
       storageSubtitle:
         'I dati devono attraversare correttamente lo storage locale e qualsiasi database futuro.',
+      settingsTitle: 'Impostazioni debug',
+      settingsSubtitle:
+        'Controlli per funzioni solo di sviluppo che devono restare fuori dal flusso principale.',
+      debugModeLabel: 'Modalità debug',
+      debugModeHint:
+        'Disattivala per nascondere di nuovo il link agli strumenti di debug.',
       stateTitle: 'Autocontrolli stato',
       stateSubtitle:
         'Convalida la lista corrente contro parser, matcher, varianti, avanzamento e identità lista.',
