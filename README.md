@@ -14,6 +14,8 @@ These are real app screenshots with numbered callouts. The README versions are g
 node scripts/generate-readme-screenshots.mjs
 ```
 
+The generator uses Playwright Chromium. If the browser binary is missing after installing dependencies, run `npx playwright install chromium`.
+
 | Route view | Edit and share |
 | --- | --- |
 | ![Annotated desktop route view showing toolbar controls, section grouping, quantity badges, and tickable items.](docs/screenshots/readme/readme-desktop-route.png) | ![Annotated desktop edit and share view showing store layout selection, pasted list input, save actions, shared link, QR preview, and recent shared lists.](docs/screenshots/readme/readme-desktop-edit-share.png) |

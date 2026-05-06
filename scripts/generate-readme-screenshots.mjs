@@ -17,7 +17,7 @@ const baseStyle = `
   }
   .frame {
     width: 1200px;
-    height: 760px;
+    height: var(--frame-height, 760px);
     position: relative;
     overflow: hidden;
     background:
@@ -130,6 +130,7 @@ const outputs = [
     source: 'desktop-edit-share.png',
     title: 'Edit and share',
     dark: false,
+    frameHeight: 820,
     img: { left: 28, top: 42, width: 884, height: 776 },
     markers: [
       { n: 1, x: 134, y: 274, text: 'Choose the store layout profile used to sort aisles.' },
@@ -172,10 +173,19 @@ const outputs = [
 
 await mkdir(outputDir, { recursive: true });
 
+const escapeHtml = (value) =>
+  String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
 const browser = await chromium.launch({ headless: true });
 try {
   for (const output of outputs) {
-    const page = await browser.newPage({ viewport: { width: 1200, height: 760 }, deviceScaleFactor: 2 });
+    const frameHeight = output.frameHeight ?? 760;
+    const page = await browser.newPage({ viewport: { width: 1200, height: frameHeight }, deviceScaleFactor: 2 });
     const sourceBytes = await readFile(resolve(sourceDir, output.source));
     const sourceUrl = `data:image/png;base64,${sourceBytes.toString('base64')}`;
     const frameClass = ['frame', output.dark ? 'dark' : '', output.mobile ? 'mobile-layout' : ''].filter(Boolean).join(' ');
@@ -199,19 +209,23 @@ try {
           <style>${baseStyle}</style>
         </head>
         <body>
-          <main class="${frameClass}">
+          <main class="${escapeHtml(frameClass)}" style="--frame-height: ${frameHeight}px;">
             ${screenshotMarkup}
             ${output.markers.map((marker) => `<div class="marker" style="left: ${marker.x}px; top: ${marker.y}px;">${marker.n}</div>`).join('')}
             <aside class="legend">
-              <h1>${output.title}</h1>
+              <h1>${escapeHtml(output.title)}</h1>
               <ol>
-                ${output.markers.map((marker) => `<li><b>${marker.n}</b><span>${marker.text}</span></li>`).join('')}
+                ${output.markers.map((marker) => `<li><b>${marker.n}</b><span>${escapeHtml(marker.text)}</span></li>`).join('')}
               </ol>
             </aside>
           </main>
         </body>
       </html>
     `);
+
+    await page.locator('img').evaluateAll(async (images) => {
+      await Promise.all(images.map((image) => image.decode().catch(() => undefined)));
+    });
 
     await page.screenshot({
       path: resolve(outputDir, output.file),
