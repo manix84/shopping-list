@@ -150,6 +150,7 @@ export type Messages = {
     about: {
       tagline: string;
       versionLabel: string;
+      hostLabel: string;
       authorLabel: string;
       authorValue: string;
       costLabel: string;
@@ -193,6 +194,7 @@ export type Messages = {
       tabLayout: string;
       tabSections: string;
       tabStorage: string;
+      tabHost: string;
       tabSettings: string;
       backendTitle: string;
       backendConnected: string;
@@ -223,6 +225,13 @@ export type Messages = {
       settingsSubtitle: string;
       debugModeLabel: string;
       debugModeHint: string;
+      runtimeTitle: string;
+      runtimeSubtitle: string;
+      runtimeHostnameLabel: string;
+      runtimeHostLabel: string;
+      runtimeOriginLabel: string;
+      runtimeProtocolLabel: string;
+      runtimeBasePathLabel: string;
       stateTitle: string;
       stateSubtitle: string;
       allMatcherPass: string;

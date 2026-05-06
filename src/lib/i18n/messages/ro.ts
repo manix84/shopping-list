@@ -153,6 +153,7 @@ export const ro: Messages = {
     about: {
       tagline: 'Un planificator gratuit al traseului de cumpărături, atent la confidențialitate.',
       versionLabel: 'Versiune',
+      hostLabel: 'Gazdă',
       authorLabel: 'Creat de',
       authorValue: 'Rob',
       costLabel: 'Cost',
@@ -205,6 +206,7 @@ export const ro: Messages = {
       tabLayout: 'Layout',
       tabSections: 'Secțiuni',
       tabStorage: 'Stocare',
+      tabHost: 'Gazdă',
       tabSettings: 'Setări',
       backendTitle: 'Verificări backend',
       backendConnected: 'API-ul backend și baza de date sunt disponibile.',
@@ -247,6 +249,14 @@ export const ro: Messages = {
       debugModeLabel: 'Mod depanare',
       debugModeHint:
         'Dezactivează pentru a ascunde din nou linkul către uneltele de depanare.',
+      runtimeTitle: 'Locație de rulare',
+      runtimeSubtitle:
+        'De unde este servită acum această aplicație instalată sau sesiune de browser.',
+      runtimeHostnameLabel: 'Nume gazdă',
+      runtimeHostLabel: 'Gazdă',
+      runtimeOriginLabel: 'Origine',
+      runtimeProtocolLabel: 'Protocol',
+      runtimeBasePathLabel: 'Cale de bază',
       stateTitle: 'Autoverificări de stare',
       stateSubtitle:
         'Validează lista curentă cu parserul, potrivirea, variantele, progresul și identitatea listei.',

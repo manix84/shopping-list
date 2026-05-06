@@ -152,6 +152,7 @@ export const pi: Messages = {
     about: {
       tagline: 'A free, privacy-minded grocery route planner fer yer market run.',
       versionLabel: 'Version',
+      hostLabel: 'Host',
       authorLabel: 'Built by',
       authorValue: 'Rob',
       costLabel: 'Cost',
@@ -204,6 +205,7 @@ export const pi: Messages = {
       tabLayout: 'Deck plan',
       tabSections: 'Decks',
       tabStorage: 'Stowage',
+      tabHost: 'Host',
       tabSettings: 'Rigging',
       backendTitle: 'Backend checks',
       backendConnected: 'Backend API and hold be available.',
@@ -246,6 +248,14 @@ export const pi: Messages = {
       debugModeLabel: 'Bilge mode',
       debugModeHint:
         'Turn this off to hide the bilge tools link again.',
+      runtimeTitle: 'Runtime berth',
+      runtimeSubtitle:
+        'Where this installed app or browser session be served from right now.',
+      runtimeHostnameLabel: 'Hostname',
+      runtimeHostLabel: 'Host',
+      runtimeOriginLabel: 'Origin',
+      runtimeProtocolLabel: 'Protocol',
+      runtimeBasePathLabel: 'Base path',
       stateTitle: 'State self-checks',
       stateSubtitle:
         'Check the current ledger against parser, matcher, variants, progress, and list mark.',

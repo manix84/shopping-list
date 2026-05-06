@@ -155,6 +155,7 @@ export const de: Messages = {
     about: {
       tagline: 'Ein kostenloser, datenschutzbewusster Einkaufsroutenplaner.',
       versionLabel: 'Version',
+      hostLabel: 'Host',
       authorLabel: 'Erstellt von',
       authorValue: 'Rob',
       costLabel: 'Kosten',
@@ -207,6 +208,7 @@ export const de: Messages = {
       tabLayout: 'Layout',
       tabSections: 'Bereiche',
       tabStorage: 'Speicher',
+      tabHost: 'Host',
       tabSettings: 'Einstellungen',
       backendTitle: 'Backend-Prüfungen',
       backendConnected: 'Backend-API und Datenbank sind verfügbar.',
@@ -250,6 +252,14 @@ export const de: Messages = {
       debugModeLabel: 'Debug-Modus',
       debugModeHint:
         'Deaktiviere dies, um den Link zu den Debug-Werkzeugen wieder auszublenden.',
+      runtimeTitle: 'Laufzeit-Adresse',
+      runtimeSubtitle:
+        'Von wo diese installierte App oder Browser-Sitzung gerade bereitgestellt wird.',
+      runtimeHostnameLabel: 'Hostname',
+      runtimeHostLabel: 'Host',
+      runtimeOriginLabel: 'Origin',
+      runtimeProtocolLabel: 'Protokoll',
+      runtimeBasePathLabel: 'Basispfad',
       stateTitle: 'Status-Selbsttests',
       stateSubtitle:
         'Prüft die aktuelle Liste gegen Parser, Matcher, Varianten, Fortschritt und Listenidentität.',

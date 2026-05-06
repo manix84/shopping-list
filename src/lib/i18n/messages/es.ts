@@ -149,6 +149,7 @@ export const es: Messages = {
     about: {
       tagline: 'Un planificador gratuito de rutas de compra que respeta tu privacidad.',
       versionLabel: 'Versión',
+      hostLabel: 'Host',
       authorLabel: 'Creado por',
       authorValue: 'Rob',
       costLabel: 'Coste',
@@ -201,6 +202,7 @@ export const es: Messages = {
       tabLayout: 'Diseño',
       tabSections: 'Secciones',
       tabStorage: 'Almacenamiento',
+      tabHost: 'Host',
       tabSettings: 'Ajustes',
       backendTitle: 'Comprobaciones del backend',
       backendConnected:
@@ -245,6 +247,14 @@ export const es: Messages = {
       debugModeLabel: 'Modo de depuración',
       debugModeHint:
         'Desactívalo para volver a ocultar el enlace a las herramientas de depuración.',
+      runtimeTitle: 'Ubicación de ejecución',
+      runtimeSubtitle:
+        'Desde dónde se está sirviendo esta app instalada o sesión del navegador.',
+      runtimeHostnameLabel: 'Nombre de host',
+      runtimeHostLabel: 'Host',
+      runtimeOriginLabel: 'Origen',
+      runtimeProtocolLabel: 'Protocolo',
+      runtimeBasePathLabel: 'Ruta base',
       stateTitle: 'Comprobaciones de estado',
       stateSubtitle:
         'Valida la lista actual contra el parser, el clasificador, las variantes, el progreso y la identidad.',

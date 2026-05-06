@@ -153,6 +153,7 @@ export const it: Messages = {
     about: {
       tagline: 'Un pianificatore gratuito del percorso spesa attento alla privacy.',
       versionLabel: 'Versione',
+      hostLabel: 'Host',
       authorLabel: 'Creato da',
       authorValue: 'Rob',
       costLabel: 'Costo',
@@ -205,6 +206,7 @@ export const it: Messages = {
       tabLayout: 'Layout',
       tabSections: 'Sezioni',
       tabStorage: 'Archiviazione',
+      tabHost: 'Host',
       tabSettings: 'Impostazioni',
       backendTitle: 'Controlli backend',
       backendConnected: 'API backend e database sono disponibili.',
@@ -248,6 +250,14 @@ export const it: Messages = {
       debugModeLabel: 'Modalità debug',
       debugModeHint:
         'Disattivala per nascondere di nuovo il link agli strumenti di debug.',
+      runtimeTitle: 'Posizione di esecuzione',
+      runtimeSubtitle:
+        'Da dove questa app installata o sessione del browser viene servita ora.',
+      runtimeHostnameLabel: 'Nome host',
+      runtimeHostLabel: 'Host',
+      runtimeOriginLabel: 'Origine',
+      runtimeProtocolLabel: 'Protocollo',
+      runtimeBasePathLabel: 'Percorso base',
       stateTitle: 'Autocontrolli stato',
       stateSubtitle:
         'Convalida la lista corrente contro parser, matcher, varianti, avanzamento e identità lista.',

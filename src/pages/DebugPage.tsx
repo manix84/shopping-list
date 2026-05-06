@@ -79,6 +79,7 @@ type DebugTabKey =
   | 'layout'
   | 'sections'
   | 'storage'
+  | 'host'
   | 'settings';
 
 export function DebugPage({
@@ -111,6 +112,16 @@ export function DebugPage({
 }: DebugPageProps) {
   const { messages } = useI18n();
   const [activeTab, setActiveTab] = useState<DebugTabKey>('parsed');
+  const runtimeLocation =
+    typeof window === 'undefined'
+      ? null
+      : {
+          basePath: import.meta.env.BASE_URL,
+          host: window.location.host,
+          hostname: window.location.hostname,
+          origin: window.location.origin,
+          protocol: window.location.protocol,
+        };
   const debugTabs: Array<{ key: DebugTabKey; label: string }> = [
     { key: 'parsed', label: messages.pages.debug.tabParsed },
     { key: 'state', label: messages.pages.debug.tabState },
@@ -124,6 +135,7 @@ export function DebugPage({
     { key: 'layout', label: messages.pages.debug.tabLayout },
     { key: 'sections', label: messages.pages.debug.tabSections },
     { key: 'storage', label: messages.pages.debug.tabStorage },
+    { key: 'host', label: messages.pages.debug.tabHost },
     { key: 'settings', label: messages.pages.debug.tabSettings },
   ];
   const layoutRows = config.groups.flatMap((group) =>
@@ -641,6 +653,49 @@ export function DebugPage({
               onChange={(event) => onDebugModeChange(event.target.checked)}
             />
           </label>
+        </Card>
+      ) : null}
+
+      {activeTab === 'host' ? (
+        <Card
+          id={'debug-panel-host'}
+          role={'tabpanel'}
+          aria-labelledby={'debug-tab-host'}
+          header={
+            <>
+              <h2 className={'title title-sm'}>{messages.pages.debug.runtimeTitle}</h2>
+              <p className={'subtitle'}>{messages.pages.debug.runtimeSubtitle}</p>
+            </>
+          }
+        >
+          <div className={'stack'}>
+            <div className={'table-wrap'}>
+              <table className={'debug-table'}>
+                <tbody>
+                  <tr>
+                    <th scope={'row'}>{messages.pages.debug.runtimeHostnameLabel}</th>
+                    <td>{runtimeLocation?.hostname || messages.pages.debug.unavailable}</td>
+                  </tr>
+                  <tr>
+                    <th scope={'row'}>{messages.pages.debug.runtimeHostLabel}</th>
+                    <td>{runtimeLocation?.host || messages.pages.debug.unavailable}</td>
+                  </tr>
+                  <tr>
+                    <th scope={'row'}>{messages.pages.debug.runtimeOriginLabel}</th>
+                    <td>{runtimeLocation?.origin || messages.pages.debug.unavailable}</td>
+                  </tr>
+                  <tr>
+                    <th scope={'row'}>{messages.pages.debug.runtimeProtocolLabel}</th>
+                    <td>{runtimeLocation?.protocol || messages.pages.debug.unavailable}</td>
+                  </tr>
+                  <tr>
+                    <th scope={'row'}>{messages.pages.debug.runtimeBasePathLabel}</th>
+                    <td>{runtimeLocation?.basePath || messages.pages.debug.unavailable}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </Card>
       ) : null}
     </Card>

@@ -155,6 +155,7 @@ export const fr: Messages = {
     about: {
       tagline: 'Un planificateur de parcours de courses gratuit et respectueux de la vie privée.',
       versionLabel: 'Version',
+      hostLabel: 'Hôte',
       authorLabel: 'Créé par',
       authorValue: 'Rob',
       costLabel: 'Coût',
@@ -207,6 +208,7 @@ export const fr: Messages = {
       tabLayout: 'Agencement',
       tabSections: 'Sections',
       tabStorage: 'Stockage',
+      tabHost: 'Hôte',
       tabSettings: 'Paramètres',
       backendTitle: 'Vérifications backend',
       backendConnected: 'L’API backend et la base de données sont disponibles.',
@@ -250,6 +252,14 @@ export const fr: Messages = {
       debugModeLabel: 'Mode débogage',
       debugModeHint:
         'Désactivez-le pour masquer à nouveau le lien vers les outils de débogage.',
+      runtimeTitle: 'Emplacement d’exécution',
+      runtimeSubtitle:
+        'Adresse depuis laquelle cette app installée ou session du navigateur est servie.',
+      runtimeHostnameLabel: 'Nom d’hôte',
+      runtimeHostLabel: 'Hôte',
+      runtimeOriginLabel: 'Origine',
+      runtimeProtocolLabel: 'Protocole',
+      runtimeBasePathLabel: 'Chemin de base',
       stateTitle: 'Auto-vérifications de l’état',
       stateSubtitle:
         'Validez la liste actuelle avec le parseur, la correspondance, les variantes, la progression et l’identité.',

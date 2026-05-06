@@ -147,6 +147,7 @@ export const en: Messages = {
     about: {
       tagline: 'A free, privacy-minded grocery route planner.',
       versionLabel: 'Version',
+      hostLabel: 'Host',
       authorLabel: 'Built by',
       authorValue: 'Rob',
       costLabel: 'Cost',
@@ -199,6 +200,7 @@ export const en: Messages = {
       tabLayout: 'Layout',
       tabSections: 'Sections',
       tabStorage: 'Storage',
+      tabHost: 'Host',
       tabSettings: 'Settings',
       backendTitle: 'Backend checks',
       backendConnected: 'Backend API and database are available.',
@@ -240,6 +242,14 @@ export const en: Messages = {
       debugModeLabel: 'Debug mode',
       debugModeHint:
         'Turn this off to hide the debug tools link again.',
+      runtimeTitle: 'Runtime location',
+      runtimeSubtitle:
+        'Where this installed or browser session is currently being served from.',
+      runtimeHostnameLabel: 'Hostname',
+      runtimeHostLabel: 'Host',
+      runtimeOriginLabel: 'Origin',
+      runtimeProtocolLabel: 'Protocol',
+      runtimeBasePathLabel: 'Base path',
       stateTitle: 'State self-checks',
       stateSubtitle:
         'Validate the current list state against the parser, matcher, variants, progress counters, and list identity.',

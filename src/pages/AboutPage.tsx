@@ -18,6 +18,8 @@ type AboutPageProps = {
 export function AboutPage({ isDebugMode, onEnableDebugMode, onOpenDebug }: AboutPageProps) {
   const { messages } = useI18n();
   const about = messages.pages.about;
+  const runtimeHostname =
+    typeof window === 'undefined' ? messages.pages.debug.unavailable : window.location.hostname || window.location.host;
   const versionTapCountRef = useRef(0);
   const versionTapResetTimerRef = useRef<number>();
 
@@ -77,6 +79,10 @@ export function AboutPage({ isDebugMode, onEnableDebugMode, onOpenDebug }: About
                 {appVersion}
               </span>
             </dd>
+          </div>
+          <div>
+            <dt>{about.hostLabel}</dt>
+            <dd>{runtimeHostname}</dd>
           </div>
           <div>
             <dt>{about.authorLabel}</dt>

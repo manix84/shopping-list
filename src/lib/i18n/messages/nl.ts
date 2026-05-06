@@ -154,6 +154,7 @@ export const nl: Messages = {
     about: {
       tagline: 'Een gratis, privacybewuste planner voor je boodschappenroute.',
       versionLabel: 'Versie',
+      hostLabel: 'Host',
       authorLabel: 'Gebouwd door',
       authorValue: 'Rob',
       costLabel: 'Kosten',
@@ -206,6 +207,7 @@ export const nl: Messages = {
       tabLayout: 'Indeling',
       tabSections: 'Secties',
       tabStorage: 'Opslag',
+      tabHost: 'Host',
       tabSettings: 'Instellingen',
       backendTitle: 'Backendcontroles',
       backendConnected: 'Backend-API en database zijn beschikbaar.',
@@ -248,6 +250,14 @@ export const nl: Messages = {
       debugModeLabel: 'Debugmodus',
       debugModeHint:
         'Zet dit uit om de link naar de debughulpmiddelen weer te verbergen.',
+      runtimeTitle: 'Runtime-locatie',
+      runtimeSubtitle:
+        'Waar deze geïnstalleerde app of browsersessie nu vandaan wordt geserveerd.',
+      runtimeHostnameLabel: 'Hostnaam',
+      runtimeHostLabel: 'Host',
+      runtimeOriginLabel: 'Origin',
+      runtimeProtocolLabel: 'Protocol',
+      runtimeBasePathLabel: 'Basispad',
       stateTitle: 'Status-zelftests',
       stateSubtitle:
         'Controleer de huidige lijst tegen parser, matcher, varianten, voortgang en lijstidentiteit.',
