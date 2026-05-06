@@ -1,11 +1,14 @@
 {
   "name": "shopping-list",
   "private": true,
-  "version": "0.15.55",
+  "version": "0.15.56",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "api": "node server/index.mjs",
+    "setup": "node scripts/setup-postgres.mjs",
+    "db:up": "docker compose up -d postgres",
+    "db:down": "docker compose down",
     "prepare": "git config core.hooksPath .githooks",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -29,6 +32,7 @@
   },
   "dependencies": {
     "@mdi/js": "^7.4.47",
+    "pg": "^8.20.0",
     "qrcode": "^1.5.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
