@@ -261,6 +261,7 @@ export default function App() {
   );
   const messages = useMemo(() => createMessages(locale), [locale]);
   const { page, listId } = route;
+  const visiblePage: PageKey = page === 'debug' && !isDebugMode ? 'not-found' : page;
   const activeDebugTab: DebugTabKey = page === 'debug' ? route.debugTab ?? 'parsed' : 'parsed';
   const canUseBackend = backendStatus.state === 'connected' && !debugSettings.forceLocalStorage;
   const canCreateSharedLink = items.length > 0 || cleanLine(input).length > 0;
@@ -1352,7 +1353,7 @@ export default function App() {
             {messages.actions.skipToMainContent}
           </a>
           <AppHeader
-            page={page}
+            page={visiblePage}
             hasItems={items.length > 0}
             backendStatus={backendStatus}
             resolvedTheme={resolvedTheme}
@@ -1365,7 +1366,7 @@ export default function App() {
           />
 
           <main id={'main-content'} className={'main-content'} tabIndex={-1}>
-            {page === 'edit' ? (
+            {visiblePage === 'edit' ? (
               <EditPage
                 input={input}
                 listName={listName}
@@ -1401,7 +1402,7 @@ export default function App() {
               />
             ) : null}
 
-            {page === 'route' ? (
+            {visiblePage === 'route' ? (
               <RoutePage
                 listName={listName}
                 query={query}
@@ -1422,7 +1423,7 @@ export default function App() {
               />
             ) : null}
 
-            {page === 'settings' ? (
+            {visiblePage === 'settings' ? (
               <SettingsPage
                 routeViewMode={routeViewMode}
                 themeMode={themeMode}
@@ -1436,9 +1437,9 @@ export default function App() {
               />
             ) : null}
 
-            {page === 'sections' ? <SectionsPage config={config} /> : null}
+            {visiblePage === 'sections' ? <SectionsPage config={config} /> : null}
 
-            {page === 'about' ? (
+            {visiblePage === 'about' ? (
               <AboutPage
                 isDebugMode={isDebugMode}
                 onEnableDebugMode={enableDebugMode}
@@ -1446,7 +1447,7 @@ export default function App() {
               />
             ) : null}
 
-            {page === 'debug' ? (
+            {visiblePage === 'debug' ? (
               <DebugPage
                 backendStatus={backendStatus}
                 heartbeatSamples={backendHeartbeatSamples}
@@ -1483,9 +1484,9 @@ export default function App() {
               />
             ) : null}
 
-            {page === 'not-found' || page === 'server-error' ? (
+            {visiblePage === 'not-found' || visiblePage === 'server-error' ? (
               <ErrorPage
-                variant={page}
+                variant={visiblePage}
                 isDebugMode={isDebugMode}
                 onBackToEdit={() => changePage('edit')}
                 onOpenDebug={() => changePage('debug')}
