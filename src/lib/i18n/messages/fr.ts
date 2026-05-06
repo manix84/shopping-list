@@ -222,6 +222,13 @@ export const fr: Messages = {
       databaseTitle: 'Base de données',
       databaseExpected:
         'GET /api/database/status peut lire le stockage backend',
+      databaseTypeTitle: 'Type de base actuel',
+      databaseTypeExpected: 'JSON DB, PostgreSQL ou LocalStorage',
+      databaseTypeLocalStorage: 'LocalStorage',
+      databaseTypeJson: 'JSON DB',
+      databaseTypePostgres: 'PostgreSQL',
+      appStorageModeLabel: 'Mode de stockage de l’app',
+      backendAdapterLabel: 'Adaptateur backend',
       configTitle: 'Auto-vérifications du profil pays',
       configSubtitle:
         'Validez la structure du profil, la couverture des mots-clés et leur section propriétaire.',

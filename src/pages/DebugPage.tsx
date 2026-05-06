@@ -21,6 +21,7 @@ import type { Messages } from '../lib/i18n';
 
 type DebugPageProps = {
   backendStatus: BackendStatus;
+  storageMode: 'local' | 'backend';
   items: Item[];
   config: CountryConfig;
   matcherTests: MatcherTestResult[];
@@ -66,6 +67,17 @@ const backendStateLabel = (status: BackendStatus, messages: Messages) => {
 
 const checkLabel = (passed: boolean, messages: Messages) => (passed ? messages.pages.debug.pass : messages.pages.debug.fail);
 
+const databaseAdapterLabel = (status: BackendStatus, messages: Messages) => {
+  if (status.database.adapter === 'postgres') { return messages.pages.debug.databaseTypePostgres; }
+  if (status.database.adapter === 'json') { return messages.pages.debug.databaseTypeJson; }
+  return messages.labels.unknown;
+};
+
+const currentDatabaseTypeLabel = (status: BackendStatus, storageMode: 'local' | 'backend', messages: Messages) => {
+  if (storageMode === 'local') { return messages.pages.debug.databaseTypeLocalStorage; }
+  return databaseAdapterLabel(status, messages);
+};
+
 type DebugTabKey =
   | 'parsed'
   | 'state'
@@ -84,6 +96,7 @@ type DebugTabKey =
 
 export function DebugPage({
   backendStatus,
+  storageMode,
   items,
   config,
   matcherTests,
@@ -286,6 +299,14 @@ export function DebugPage({
           bodyClassName={'stack'}
         >
           <TestResultCard
+            title={messages.pages.debug.databaseTypeTitle}
+            expected={messages.pages.debug.databaseTypeExpected}
+            actual={currentDatabaseTypeLabel(backendStatus, storageMode, messages)}
+            passed={storageMode === 'local' || Boolean(backendStatus.database.adapter)}
+            tone={'muted'}
+            label={storageMode === 'local' ? messages.pages.debug.databaseTypeLocalStorage : databaseAdapterLabel(backendStatus, messages)}
+          />
+          <TestResultCard
             title={messages.pages.debug.backendHealthTitle}
             expected={messages.pages.debug.backendHealthExpected}
             actual={
@@ -317,6 +338,42 @@ export function DebugPage({
             tone={checkTone(backendStatus.database.ok)}
             label={checkLabel(backendStatus.database.ok, messages)}
           />
+          <div className={'table-wrap'}>
+            <table className={'debug-table'}>
+              <tbody>
+                <tr>
+                  <th scope={'row'}>{messages.pages.debug.appStorageModeLabel}</th>
+                  <td>{currentDatabaseTypeLabel(backendStatus, storageMode, messages)}</td>
+                </tr>
+                <tr>
+                  <th scope={'row'}>{messages.pages.debug.backendAdapterLabel}</th>
+                  <td>
+                    {backendStatus.database.adapter
+                      ? databaseAdapterLabel(backendStatus, messages)
+                      : messages.pages.debug.unavailable}
+                  </td>
+                </tr>
+                <tr>
+                  <th scope={'row'}>{messages.labels.defaultList}</th>
+                  <td>
+                    {typeof backendStatus.database.shoppingListExists === 'boolean'
+                      ? backendStatus.database.shoppingListExists
+                        ? messages.labels.exists
+                        : messages.labels.empty
+                      : messages.pages.debug.unavailable}
+                  </td>
+                </tr>
+                <tr>
+                  <th scope={'row'}>{messages.labels.sharedLists}</th>
+                  <td>{backendStatus.database.sharedListCount ?? messages.pages.debug.unavailable}</td>
+                </tr>
+                <tr>
+                  <th scope={'row'}>{messages.labels.updated}</th>
+                  <td>{backendStatus.database.updatedAt ?? messages.pages.debug.unavailable}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </Card>
       ) : null}
 

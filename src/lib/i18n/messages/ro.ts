@@ -219,6 +219,13 @@ export const ro: Messages = {
       backendHealthExpected: 'GET /api/health returnează OK',
       databaseTitle: 'Bază de date',
       databaseExpected: 'GET /api/database/status poate citi stocarea backend',
+      databaseTypeTitle: 'Tipul curent de bază de date',
+      databaseTypeExpected: 'JSON DB, PostgreSQL sau LocalStorage',
+      databaseTypeLocalStorage: 'LocalStorage',
+      databaseTypeJson: 'JSON DB',
+      databaseTypePostgres: 'PostgreSQL',
+      appStorageModeLabel: 'Mod stocare aplicație',
+      backendAdapterLabel: 'Adaptor backend',
       configTitle: 'Autoverificări profil de țară',
       configSubtitle:
         'Validează structura profilului, acoperirea cuvintelor cheie și secțiunile lor proprietare.',

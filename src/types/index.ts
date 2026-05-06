@@ -210,6 +210,7 @@ export type StateTestResult = {
 };
 
 export type BackendConnectionState = 'checking' | 'connected' | 'offline' | 'error';
+export type BackendDatabaseAdapter = 'json' | 'postgres';
 
 export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 
@@ -221,6 +222,7 @@ export type BackendStatus = {
   };
   database: {
     ok: boolean;
+    adapter?: BackendDatabaseAdapter;
     settingsExists?: boolean;
     settingsCountryCode?: CountryCode;
     settingsUpdatedAt?: string;

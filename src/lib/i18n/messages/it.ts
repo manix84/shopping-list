@@ -220,6 +220,13 @@ export const it: Messages = {
       databaseTitle: 'Database',
       databaseExpected:
         'GET /api/database/status può leggere l’archiviazione backend',
+      databaseTypeTitle: 'Tipo database corrente',
+      databaseTypeExpected: 'JSON DB, PostgreSQL o LocalStorage',
+      databaseTypeLocalStorage: 'LocalStorage',
+      databaseTypeJson: 'JSON DB',
+      databaseTypePostgres: 'PostgreSQL',
+      appStorageModeLabel: 'Modalità archiviazione app',
+      backendAdapterLabel: 'Adapter backend',
       configTitle: 'Autocontrolli profilo paese',
       configSubtitle:
         'Convalida struttura del profilo, copertura delle parole chiave e sezioni proprietarie.',

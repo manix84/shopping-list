@@ -212,6 +212,13 @@ export const en: Messages = {
       backendHealthExpected: 'GET /api/health returns OK',
       databaseTitle: 'Database',
       databaseExpected: 'GET /api/database/status can read the backend store',
+      databaseTypeTitle: 'Current database type',
+      databaseTypeExpected: 'JSON DB, PostgreSQL, or LocalStorage',
+      databaseTypeLocalStorage: 'LocalStorage',
+      databaseTypeJson: 'JSON DB',
+      databaseTypePostgres: 'PostgreSQL',
+      appStorageModeLabel: 'App storage mode',
+      backendAdapterLabel: 'Backend adapter',
       configTitle: 'Country config self-checks',
       configSubtitle:
         'Validate the selected country profile shape, keyword coverage, and matcher ownership.',

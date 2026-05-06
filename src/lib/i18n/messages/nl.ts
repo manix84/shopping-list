@@ -220,6 +220,13 @@ export const nl: Messages = {
       backendHealthExpected: 'GET /api/health geeft OK terug',
       databaseTitle: 'Database',
       databaseExpected: 'GET /api/database/status kan de backend-opslag lezen',
+      databaseTypeTitle: 'Huidig databasetype',
+      databaseTypeExpected: 'JSON DB, PostgreSQL of LocalStorage',
+      databaseTypeLocalStorage: 'LocalStorage',
+      databaseTypeJson: 'JSON DB',
+      databaseTypePostgres: 'PostgreSQL',
+      appStorageModeLabel: 'App-opslagmodus',
+      backendAdapterLabel: 'Backendadapter',
       configTitle: 'Landprofiel-zelftests',
       configSubtitle:
         'Controleer profielstructuur, trefwoorddekking en de bijbehorende matcher-secties.',

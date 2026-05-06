@@ -1325,6 +1325,7 @@ export default function App() {
             {page === 'debug' ? (
               <DebugPage
                 backendStatus={backendStatus}
+                storageMode={storageMode}
                 items={items}
                 config={config}
                 matcherTests={matcherTests}

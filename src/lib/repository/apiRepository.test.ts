@@ -35,6 +35,7 @@ describe('apiRepository', () => {
           new Response(
             JSON.stringify({
               ok: true,
+              adapter: 'postgres',
               settingsExists: true,
               settingsCountryCode: 'fr',
               settingsUpdatedAt: '2026-04-22T00:00:00.000Z',
@@ -52,6 +53,7 @@ describe('apiRepository', () => {
       health: { ok: true, mode: 'backend' },
       database: {
         ok: true,
+        adapter: 'postgres',
         settingsExists: true,
         settingsCountryCode: 'fr',
         settingsUpdatedAt: '2026-04-22T00:00:00.000Z',

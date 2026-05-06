@@ -217,6 +217,13 @@ export const es: Messages = {
       databaseTitle: 'Base de datos',
       databaseExpected:
         'GET /api/database/status puede leer el almacenamiento del backend',
+      databaseTypeTitle: 'Tipo de base de datos actual',
+      databaseTypeExpected: 'JSON DB, PostgreSQL o LocalStorage',
+      databaseTypeLocalStorage: 'LocalStorage',
+      databaseTypeJson: 'JSON DB',
+      databaseTypePostgres: 'PostgreSQL',
+      appStorageModeLabel: 'Modo de almacenamiento de la app',
+      backendAdapterLabel: 'Adaptador backend',
       configTitle: 'Comprobaciones de configuración de país',
       configSubtitle:
         'Valida la estructura del perfil, la cobertura de palabras clave y su sección propietaria.',

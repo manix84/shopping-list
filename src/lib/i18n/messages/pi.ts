@@ -218,6 +218,13 @@ export const pi: Messages = {
       backendHealthExpected: 'GET /api/health returns OK',
       databaseTitle: 'Hold',
       databaseExpected: 'GET /api/database/status can read the backend hold',
+      databaseTypeTitle: 'Current hold type',
+      databaseTypeExpected: 'JSON DB, PostgreSQL, or LocalStorage',
+      databaseTypeLocalStorage: 'LocalStorage',
+      databaseTypeJson: 'JSON DB',
+      databaseTypePostgres: 'PostgreSQL',
+      appStorageModeLabel: 'App stowage mode',
+      backendAdapterLabel: 'Backend adapter',
       configTitle: 'Waters profile self-checks',
       configSubtitle:
         'Check profile shape, keyword coverage, and matcher ownership.',

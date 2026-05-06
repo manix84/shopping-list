@@ -205,6 +205,13 @@ export type Messages = {
       backendHealthExpected: string;
       databaseTitle: string;
       databaseExpected: string;
+      databaseTypeTitle: string;
+      databaseTypeExpected: string;
+      databaseTypeLocalStorage: string;
+      databaseTypeJson: string;
+      databaseTypePostgres: string;
+      appStorageModeLabel: string;
+      backendAdapterLabel: string;
       configTitle: string;
       configSubtitle: string;
       matcherTitle: string;
