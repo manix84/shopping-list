@@ -50,6 +50,16 @@ After i18n changes, run:
 npm run test:unit -- --run src/lib/i18n.test.ts
 ```
 
+## Scripts
+
+Automation scripts live in `scripts/`. They run directly with Node and do not need to be converted to TypeScript.
+
+- `bump-version.mjs` — increments `package.json` version; called automatically by the pre-commit hook (`npm run version:precommit`). Routine patch bumps in `package.json` and `package-lock.json` are expected and should not be flagged in reviews.
+- `create-spa-fallback.mjs` — copies `dist/index.html` to `dist/404.html` for GitHub Pages SPA support; runs as part of `npm run build`.
+- `generate-readme-screenshots.mjs` — generates annotated screenshots in `docs/screenshots/readme` from source images using Playwright. Re-run when source screenshots change.
+- `lighthouse-audit.mjs` — runs a Lighthouse performance/accessibility audit against the production build (`npm run lighthouse`).
+- `setup-postgres.mjs` — starts local Postgres via Docker, writes `.env.local`, and creates schema; used by `npm run setup`.
+
 ## Local Setup
 
 `npm run setup` requires Docker Desktop to be installed and running. It starts local Postgres, writes `.env.local`, and creates schema. Local defaults are only for development:

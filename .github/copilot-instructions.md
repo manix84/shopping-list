@@ -63,3 +63,7 @@ npm run test:storybook
 ## Merge Safety
 
 Do not suggest reverting unrelated changes. During conflict resolution, prefer robust behaviour, accessibility fixes, production-safe defaults, and current version metadata unless the conflict clearly indicates otherwise.
+
+## Versioning
+
+`package.json` version is auto-incremented by the pre-commit Git hook via `npm run version:precommit` (defaults to a patch bump unless `VERSION_BUMP` is set). Routine patch bumps in `package.json` and `package-lock.json` are expected on every commit and should not be flagged in reviews.
