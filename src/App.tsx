@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { COUNTRY_CONFIGS } from './config/countries';
 import { AppHeader } from './components/AppHeader';
 import { PredatorEasterEgg } from './components/PredatorEasterEgg';
@@ -15,7 +15,7 @@ import {
   runUnitQuantityTests,
   runVariantTests,
 } from './lib/debugTests';
-import { loadDebugMode, saveDebugMode } from './lib/debugModePreference';
+import { loadDebugMode, loadDebugSettings, saveDebugMode, saveDebugSettings } from './lib/debugModePreference';
 import {
   applyDocumentLocale,
   createMessages,
@@ -58,11 +58,12 @@ import { ErrorPage } from './pages/ErrorPage';
 import { RoutePage } from './pages/RoutePage';
 import { SectionsPage } from './pages/SectionsPage';
 import { SettingsPage } from './pages/SettingsPage';
-import type { AppRoute, BackendStatus, CountryCode, GroupedSectionView, Item, MeasurementDisplayMode, PageKey, RouteViewMode, SaveStatus, SectionKey, SharedListHistoryEntry, ShoppingListRecord, ThemeMode } from './types';
+import type { AppRoute, BackendHeartbeatSample, BackendStatus, CountryCode, DebugSettings, DebugTabKey, GroupedSectionView, Item, MeasurementDisplayMode, PageKey, RouteViewMode, SaveStatus, SectionKey, SharedListHistoryEntry, ShoppingListRecord, ThemeMode } from './types';
 
 const DEFAULT_PAGE: PageKey = 'edit';
 const BACKEND_HEARTBEAT_CONNECTED_MS = 5_000;
 const BACKEND_HEARTBEAT_RETRY_MS = 1_500;
+const BACKEND_HEARTBEAT_HISTORY_LIMIT = 36;
 const PWA_INSTALL_NUDGE_DISMISSED_KEY = 'smart-shopping-list-pwa-install-nudge-dismissed-v1';
 const PWA_INSTALL_PROMPT_SETTLE_MS = 1_200;
 const KONAMI_SEQUENCE = ['up', 'up', 'down', 'down', 'left', 'right', 'left', 'right', 'b', 'a'] as const;
@@ -167,10 +168,10 @@ const readRouteFromLocation = (): AppRoute => {
   });
 };
 
-const syncRouteToUrl = ({ page, listId }: AppRoute): void => {
+const syncRouteToUrl = ({ page, listId, debugTab }: AppRoute): void => {
   if (typeof window === 'undefined') { return; }
 
-  const nextUrl = routeToUrl({ page, listId }, appBasePath);
+  const nextUrl = routeToUrl({ page, listId, debugTab }, appBasePath);
   const currentUrl = window.location.pathname;
   if (currentUrl !== nextUrl) {
     window.history.replaceState(null, '', nextUrl);
@@ -221,6 +222,7 @@ export default function App() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [storageMode, setStorageMode] = useState<StorageMode>('local');
   const [backendStatus, setBackendStatus] = useState<BackendStatus>(() => defaultBackendStatus());
+  const [backendHeartbeatSamples, setBackendHeartbeatSamples] = useState<BackendHeartbeatSample[]>([]);
   const [activeListId, setActiveListId] = useState<string>(() => readRouteFromLocation().listId ?? createUuidV7());
   const [isServerBackedList, setIsServerBackedList] = useState(false);
   const [countryCode, setCountryCode] = useState<CountryCode>('uk');
@@ -232,6 +234,7 @@ export default function App() {
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>(() => getResolvedTheme(loadThemeMode()));
   const [locale, setLocale] = useState(() => loadLocale());
   const [isDebugMode, setIsDebugMode] = useState(() => loadDebugMode());
+  const [debugSettings, setDebugSettings] = useState<DebugSettings>(() => loadDebugSettings());
   const [isCreatingShareLink, setIsCreatingShareLink] = useState(false);
   const [isRefreshingSharedList, setIsRefreshingSharedList] = useState(false);
   const [isLoadingSharedList, setIsLoadingSharedList] = useState(false);
@@ -258,7 +261,9 @@ export default function App() {
   );
   const messages = useMemo(() => createMessages(locale), [locale]);
   const { page, listId } = route;
-  const canUseBackend = backendStatus.state === 'connected';
+  const visiblePage: PageKey = page === 'debug' && !isDebugMode ? 'not-found' : page;
+  const activeDebugTab: DebugTabKey = page === 'debug' ? route.debugTab ?? 'parsed' : 'parsed';
+  const canUseBackend = backendStatus.state === 'connected' && !debugSettings.forceLocalStorage;
   const canCreateSharedLink = items.length > 0 || cleanLine(input).length > 0;
   const shareLink =
     typeof window === 'undefined' || !canUseBackend || !isServerBackedList
@@ -267,7 +272,15 @@ export default function App() {
   const shareErrorMessage = shareError ? messages.sharing[shareError] : undefined;
 
   const changePage = (nextPage: PageKey) => {
-    setRoute((current) => ({ ...current, page: nextPage }));
+    setRoute((current) => ({
+      ...current,
+      page: nextPage,
+      debugTab: nextPage === 'debug' ? current.debugTab ?? 'parsed' : undefined,
+    }));
+  };
+
+  const changeDebugTab = (debugTab: DebugTabKey) => {
+    setRoute((current) => ({ ...current, page: 'debug', debugTab }));
   };
 
   const enableDebugMode = () => {
@@ -286,6 +299,37 @@ export default function App() {
     } catch (error) {
       console.warn('Unable to save debug mode preference.', error);
     }
+  };
+
+  const verboseDebugLog = useCallback((message: string, context?: Record<string, unknown>) => {
+    if (!debugSettings.verboseConsoleDiagnostics) { return; }
+    console.info(`[debug] ${message}`, context ?? {});
+  }, [debugSettings.verboseConsoleDiagnostics]);
+
+  const recordBackendHeartbeat = useCallback((status: BackendStatus, startedAt: number) => {
+    const sample: BackendHeartbeatSample = {
+      checkedAt: new Date().toISOString(),
+      state: status.state,
+      healthOk: status.health.ok,
+      databaseOk: status.database.ok,
+      adapter: status.database.adapter,
+      latencyMs: Math.max(0, Math.round(performance.now() - startedAt)),
+    };
+
+    setBackendHeartbeatSamples((current) => [...current, sample].slice(-BACKEND_HEARTBEAT_HISTORY_LIMIT));
+    return sample;
+  }, []);
+
+  const handleDebugSettingChange = (key: keyof DebugSettings, enabled: boolean) => {
+    setDebugSettings((current) => {
+      const next = { ...current, [key]: enabled };
+      try {
+        saveDebugSettings(next);
+      } catch (error) {
+        console.warn('Unable to save debug settings preference.', error);
+      }
+      return next;
+    });
   };
 
   const applyTheme = (mode: ThemeMode) => {
@@ -329,6 +373,8 @@ export default function App() {
   };
 
   useEffect(() => {
+    if (debugSettings.disableEasterEggs) { return; }
+
     let sequenceIndex = 0;
     let touchStartX = 0;
     let touchStartY = 0;
@@ -486,15 +532,23 @@ export default function App() {
       window.removeEventListener('touchend', handleTouchEnd);
       window.removeEventListener('touchcancel', resetKonamiSequence);
     };
-  }, []);
+  }, [debugSettings.disableEasterEggs]);
+
+  useEffect(() => {
+    if (!debugSettings.disableEasterEggs) { return; }
+
+    setIsSecretAisleEasterEggVisible(false);
+    setPredatorEasterEggRun(0);
+  }, [debugSettings.disableEasterEggs]);
 
   const removeSharedListFromHistory = (nextListId: string) => {
     setSharedListHistory(sharedListHistoryRepository.remove(nextListId));
   };
 
   const loadSharedListById = async (nextListId: string): Promise<boolean> => {
-    if (backendStatus.state !== 'connected') {
+    if (!canUseBackend) {
       setShareError('connectBackendFirst');
+      verboseDebugLog('shared list load blocked', { listId: nextListId, forceLocalStorage: debugSettings.forceLocalStorage });
       return false;
     }
 
@@ -522,6 +576,7 @@ export default function App() {
       setIsServerBackedList(true);
       setRoute({ page: 'edit', listId: nextListId });
       setShareError(undefined);
+      verboseDebugLog('shared list loaded', { listId: nextListId });
       return true;
     } catch (error) {
       console.warn('Unable to load shared list from input.', error);
@@ -549,7 +604,7 @@ export default function App() {
     }
 
     const normalizedValue = `${currentOrigin() ?? ''}${appBasePath}/list/${nextListId}/edit`;
-    if (backendStatus.state !== 'connected') {
+    if (!canUseBackend) {
       return { state: 'unavailable' };
     }
 
@@ -578,22 +633,28 @@ export default function App() {
       const localRecordWithIdentity = {
         ...localRecord,
         listId: nextListId,
-        serverBacked: localRecord.serverBacked === true || Boolean(listId),
+        serverBacked: !debugSettings.forceLocalStorage && (localRecord.serverBacked === true || Boolean(listId)),
       };
       let selectedRecord = localRecordWithIdentity;
       let nextStorageMode: StorageMode = 'local';
       let nextServerBacked = localRecordWithIdentity.serverBacked === true;
 
+      const initialHeartbeatStartedAt = performance.now();
       const initialBackendStatus = await checkBackendStatus();
       if (!cancelled) {
         setBackendStatus(initialBackendStatus);
+        recordBackendHeartbeat(initialBackendStatus, initialHeartbeatStartedAt);
       }
 
-      if (initialBackendStatus.state !== 'connected' && nextServerBacked) {
+      if (initialBackendStatus.state !== 'connected' && nextServerBacked && !debugSettings.forceLocalStorage) {
         setShareError('offlineBackup');
       }
 
-      if (initialBackendStatus.state === 'connected') {
+      if (
+        initialBackendStatus.state === 'connected' &&
+        !debugSettings.forceLocalStorage &&
+        !debugSettings.disableAutoBackendReconnect
+      ) {
         try {
           const remotePayload = await loadSharedShoppingList(nextListId);
           selectedRecord = {
@@ -636,9 +697,11 @@ export default function App() {
       setStorageMode(nextStorageMode);
       setActiveListId(nextListId);
       setIsServerBackedList(nextServerBacked);
+      const currentLocationDebugTab = readRouteFromLocation().debugTab;
       setRoute((current) => ({
         page: current.page,
         listId: nextServerBacked ? nextListId : undefined,
+        debugTab: current.debugTab ?? currentLocationDebugTab,
       }));
       setCountryCode(selectedRecord.countryCode);
       setListName(selectedRecord.listName ?? '');
@@ -656,10 +719,15 @@ export default function App() {
     return () => {
       cancelled = true;
     };
-  }, [listId]);
+  }, [
+    debugSettings.disableAutoBackendReconnect,
+    debugSettings.forceLocalStorage,
+    listId,
+    recordBackendHeartbeat,
+  ]);
 
   useEffect(() => {
-    if (!isLoaded) { return; }
+    if (!isLoaded || debugSettings.pauseBackendHeartbeat) { return; }
 
     let cancelled = false;
     let inFlight = false;
@@ -687,10 +755,17 @@ export default function App() {
       inFlight = true;
 
       try {
+        const heartbeatStartedAt = performance.now();
         const nextBackendStatus = await checkBackendStatus();
         if (cancelled) { return; }
 
         setBackendStatus(nextBackendStatus);
+        const sample = recordBackendHeartbeat(nextBackendStatus, heartbeatStartedAt);
+        verboseDebugLog('backend heartbeat', {
+          state: nextBackendStatus.state,
+          adapter: nextBackendStatus.database.adapter,
+          latencyMs: sample.latencyMs,
+        });
         scheduleHeartbeat(
           nextBackendStatus.state === 'connected' ? BACKEND_HEARTBEAT_CONNECTED_MS : BACKEND_HEARTBEAT_RETRY_MS,
         );
@@ -730,10 +805,16 @@ export default function App() {
       window.removeEventListener('offline', requestImmediateHeartbeat);
       document.removeEventListener('visibilitychange', requestVisibleHeartbeat);
     };
-  }, [isLoaded]);
+  }, [debugSettings.pauseBackendHeartbeat, isLoaded, recordBackendHeartbeat, verboseDebugLog]);
 
   useEffect(() => {
-    if (!isLoaded || storageMode === 'backend' || backendStatus.state !== 'connected') { return; }
+    if (
+      !isLoaded ||
+      storageMode === 'backend' ||
+      backendStatus.state !== 'connected' ||
+      debugSettings.forceLocalStorage ||
+      debugSettings.disableAutoBackendReconnect
+    ) { return; }
 
     const connectBackend = async () => {
       try {
@@ -764,9 +845,11 @@ export default function App() {
         suppressNextAutosaveStatus();
         setStorageMode('backend');
         setIsServerBackedList(true);
+        const currentLocationDebugTab = readRouteFromLocation().debugTab;
         setRoute((current) => ({
           page: current.page,
           listId: activeListId,
+          debugTab: current.debugTab ?? currentLocationDebugTab,
         }));
         setCountryCode(selectedRecord.countryCode);
         setListName(selectedRecord.listName ?? '');
@@ -786,13 +869,31 @@ export default function App() {
     };
 
     void connectBackend();
-  }, [activeListId, backendStatus.state, isLoaded, storageMode]);
+  }, [
+    activeListId,
+    backendStatus.state,
+    debugSettings.disableAutoBackendReconnect,
+    debugSettings.forceLocalStorage,
+    isLoaded,
+    storageMode,
+  ]);
+
+  useEffect(() => {
+    if (!isLoaded || !debugSettings.forceLocalStorage || storageMode === 'local') { return; }
+
+    verboseDebugLog('forcing local storage mode', { activeListId });
+    setStorageMode('local');
+    setIsServerBackedList(false);
+    setRoute((current) => ({ page: current.page, debugTab: current.debugTab, listId: current.listId }));
+  }, [activeListId, debugSettings.forceLocalStorage, isLoaded, storageMode, verboseDebugLog]);
 
   useEffect(() => {
     const handleLocationChange = () => {
       setRoute((current) => {
         const next = readRouteFromLocation();
-        return current.page === next.page && current.listId === next.listId ? current : next;
+        return current.page === next.page && current.listId === next.listId && current.debugTab === next.debugTab
+          ? current
+          : next;
       });
     };
 
@@ -836,6 +937,21 @@ export default function App() {
   }, [measurementDisplayMode]);
 
   useEffect(() => {
+    if (!debugSettings.showPwaInstallPrompts || typeof window === 'undefined') { return; }
+
+    window.localStorage.removeItem(PWA_INSTALL_NUDGE_DISMISSED_KEY);
+    setIsPwaInstallNudgeVisible(true);
+  }, [debugSettings.showPwaInstallPrompts]);
+
+  useEffect(() => {
+    verboseDebugLog('route changed', { page, listId });
+  }, [listId, page, verboseDebugLog]);
+
+  useEffect(() => {
+    verboseDebugLog('storage mode changed', { storageMode, isServerBackedList, activeListId });
+  }, [activeListId, isServerBackedList, storageMode, verboseDebugLog]);
+
+  useEffect(() => {
     if (!isLoaded) { return; }
     const saveRequestId = saveRequestIdRef.current + 1;
     saveRequestIdRef.current = saveRequestId;
@@ -866,7 +982,7 @@ export default function App() {
       });
     }
 
-    if (storageMode === 'backend' && backendStatus.state === 'connected') {
+    if (storageMode === 'backend' && canUseBackend) {
       const backendRecord = { ...record, serverBacked: true };
       void saveSharedShoppingList(activeListId, backendRecord)
         .then(() => {
@@ -886,7 +1002,7 @@ export default function App() {
     if (shouldReportSaveStatus) {
       setSaveStatus('saved');
     }
-  }, [activeListId, backendStatus.state, countryCode, input, isLoaded, isServerBackedList, items, listName, storageMode]);
+  }, [activeListId, canUseBackend, countryCode, input, isLoaded, isServerBackedList, items, listName, storageMode]);
 
   useEffect(() => {
     syncRouteToUrl(route);
@@ -1107,8 +1223,9 @@ export default function App() {
   };
 
   const handleCreateSharedLink = async () => {
-    if (backendStatus.state !== 'connected') {
+    if (!canUseBackend) {
       setShareError('connectBackendFirst');
+      verboseDebugLog('shared link create blocked', { forceLocalStorage: debugSettings.forceLocalStorage });
       return;
     }
 
@@ -1129,6 +1246,7 @@ export default function App() {
       setStorageMode('backend');
       setIsServerBackedList(true);
       setRoute({ page: 'edit', listId: activeListId });
+      verboseDebugLog('shared link created', { listId: activeListId });
     } catch (error) {
       console.warn('Unable to create shared link.', error);
       setShareError('createFailed');
@@ -1139,8 +1257,9 @@ export default function App() {
 
   const handleRefreshSharedList = async () => {
     if (!isServerBackedList) { return; }
-    if (backendStatus.state !== 'connected') {
+    if (!canUseBackend) {
       setShareError('connectBackendFirst');
+      verboseDebugLog('shared list refresh blocked', { listId: activeListId, forceLocalStorage: debugSettings.forceLocalStorage });
       return;
     }
 
@@ -1216,32 +1335,37 @@ export default function App() {
     dismissPwaInstallNudge();
   };
   const canPromptInstall = Boolean(beforeInstallPromptEvent);
-  const canShowManualInstallGuidance = hasInstallPromptCheckSettled && isLikelyMobileForInstall;
+  const canShowManualInstallGuidance =
+    debugSettings.showPwaInstallPrompts || (hasInstallPromptCheckSettled && isLikelyMobileForInstall);
   const isFloatingPwaInstallVisible =
     isLoaded &&
-    isPwaInstallNudgeVisible &&
+    (isPwaInstallNudgeVisible || debugSettings.showPwaInstallPrompts) &&
     !isPwaInstalled &&
     (canPromptInstall || canShowManualInstallGuidance);
 
   return (
     <I18nProvider value={{ locale, messages, setLocale }}>
-      <PwaSplashScreen />
+      <PwaSplashScreen disabled={debugSettings.disablePwaSplash} />
       <div className={'shopping-app'}>
         <div className={'shopping-shell'}>
           <a className={'skip-link'} href={'#main-content'}>
             {messages.actions.skipToMainContent}
           </a>
           <AppHeader
-            page={page}
+            page={visiblePage}
             hasItems={items.length > 0}
             backendStatus={backendStatus}
             resolvedTheme={resolvedTheme}
             onChangePage={changePage}
-            onRevealEasterEgg={() => setIsSecretAisleEasterEggVisible(true)}
+            onRevealEasterEgg={() => {
+              if (!debugSettings.disableEasterEggs) {
+                setIsSecretAisleEasterEggVisible(true);
+              }
+            }}
           />
 
           <main id={'main-content'} className={'main-content'} tabIndex={-1}>
-            {page === 'edit' ? (
+            {visiblePage === 'edit' ? (
               <EditPage
                 input={input}
                 listName={listName}
@@ -1277,7 +1401,7 @@ export default function App() {
               />
             ) : null}
 
-            {page === 'route' ? (
+            {visiblePage === 'route' ? (
               <RoutePage
                 listName={listName}
                 query={query}
@@ -1298,7 +1422,7 @@ export default function App() {
               />
             ) : null}
 
-            {page === 'settings' ? (
+            {visiblePage === 'settings' ? (
               <SettingsPage
                 routeViewMode={routeViewMode}
                 themeMode={themeMode}
@@ -1312,9 +1436,9 @@ export default function App() {
               />
             ) : null}
 
-            {page === 'sections' ? <SectionsPage config={config} /> : null}
+            {visiblePage === 'sections' ? <SectionsPage config={config} /> : null}
 
-            {page === 'about' ? (
+            {visiblePage === 'about' ? (
               <AboutPage
                 isDebugMode={isDebugMode}
                 onEnableDebugMode={enableDebugMode}
@@ -1322,9 +1446,11 @@ export default function App() {
               />
             ) : null}
 
-            {page === 'debug' ? (
+            {visiblePage === 'debug' ? (
               <DebugPage
                 backendStatus={backendStatus}
+                heartbeatSamples={backendHeartbeatSamples}
+                storageMode={storageMode}
                 items={items}
                 config={config}
                 matcherTests={matcherTests}
@@ -1336,6 +1462,8 @@ export default function App() {
                 storageTests={storageTests}
                 stateTests={stateTests}
                 isDebugMode={isDebugMode}
+                activeTab={activeDebugTab}
+                debugSettings={debugSettings}
                 matcherHasFailures={matcherTests.some((test) => !test.passed)}
                 configHasFailures={configTests.some((test) => !test.passed)}
                 countQuantityHasFailures={countQuantityTests.some((test) => !test.passed)}
@@ -1348,14 +1476,16 @@ export default function App() {
                 onToggleItem={toggleItem}
                 onDeleteItem={handleDeleteItem}
                 onDebugModeChange={handleDebugModeChange}
+                onDebugSettingChange={handleDebugSettingChange}
+                onDebugTabChange={changeDebugTab}
                 onBackToEdit={() => changePage('edit')}
                 onBackToSettings={() => changePage('settings')}
               />
             ) : null}
 
-            {page === 'not-found' || page === 'server-error' ? (
+            {visiblePage === 'not-found' || visiblePage === 'server-error' ? (
               <ErrorPage
-                variant={page}
+                variant={visiblePage}
                 isDebugMode={isDebugMode}
                 onBackToEdit={() => changePage('edit')}
                 onOpenDebug={() => changePage('debug')}
@@ -1370,10 +1500,10 @@ export default function App() {
           onInstall={promptPwaInstall}
         />
         <SecretAisleEasterEgg
-          isVisible={isSecretAisleEasterEggVisible}
+          isVisible={isSecretAisleEasterEggVisible && !debugSettings.disableEasterEggs}
           onDismiss={() => setIsSecretAisleEasterEggVisible(false)}
         />
-        {predatorEasterEggRun > 0 ? (
+        {predatorEasterEggRun > 0 && !debugSettings.disableEasterEggs ? (
           <PredatorEasterEgg
             key={predatorEasterEggRun}
             onComplete={() => setPredatorEasterEggRun(0)}

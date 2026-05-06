@@ -153,6 +153,7 @@ export const ro: Messages = {
     about: {
       tagline: 'Un planificator gratuit al traseului de cumpărături, atent la confidențialitate.',
       versionLabel: 'Versiune',
+      hostLabel: 'Gazdă',
       authorLabel: 'Creat de',
       authorValue: 'Rob',
       costLabel: 'Cost',
@@ -205,6 +206,7 @@ export const ro: Messages = {
       tabLayout: 'Layout',
       tabSections: 'Secțiuni',
       tabStorage: 'Stocare',
+      tabHost: 'Gazdă',
       tabSettings: 'Setări',
       backendTitle: 'Verificări backend',
       backendConnected: 'API-ul backend și baza de date sunt disponibile.',
@@ -213,10 +215,24 @@ export const ro: Messages = {
         'Backendul a răspuns, dar una sau mai multe verificări au eșuat.',
       backendOffline:
         'Backendul este offline; aplicația folosește doar stocare frontend.',
+      heartbeatTitle: 'Heartbeat backend',
+      heartbeatSubtitle: 'Ultimele verificări backend, cu ritmul recent afișat ca sparkline.',
+      heartbeatLastChecked: 'Ultima verificare',
+      heartbeatLatency: 'Latență',
+      heartbeatSamples: 'Mostre',
+      heartbeatPaused: 'Pauzat',
+      heartbeatWaiting: 'Se așteaptă primul heartbeat',
       backendHealthTitle: 'Sănătate backend',
       backendHealthExpected: 'GET /api/health returnează OK',
       databaseTitle: 'Bază de date',
       databaseExpected: 'GET /api/database/status poate citi stocarea backend',
+      databaseTypeTitle: 'Tipul curent de bază de date',
+      databaseTypeExpected: 'JSON DB, PostgreSQL sau LocalStorage',
+      databaseTypeLocalStorage: 'LocalStorage',
+      databaseTypeJson: 'JSON DB',
+      databaseTypePostgres: 'PostgreSQL',
+      appStorageModeLabel: 'Mod stocare aplicație',
+      backendAdapterLabel: 'Adaptor backend',
       configTitle: 'Autoverificări profil de țară',
       configSubtitle:
         'Validează structura profilului, acoperirea cuvintelor cheie și secțiunile lor proprietare.',
@@ -247,6 +263,35 @@ export const ro: Messages = {
       debugModeLabel: 'Mod depanare',
       debugModeHint:
         'Dezactivează pentru a ascunde din nou linkul către uneltele de depanare.',
+      forceLocalStorageLabel: 'Forțează modul LocalStorage',
+      forceLocalStorageHint:
+        'Păstrează acest dispozitiv în stocarea browserului chiar și cu backend sănătos.',
+      pauseBackendHeartbeatLabel: 'Pauzează heartbeat-ul backend',
+      pauseBackendHeartbeatHint:
+        'Oprește verificările recurente de backend până este dezactivat.',
+      disableAutoBackendReconnectLabel: 'Dezactivează reconectarea automată',
+      disableAutoBackendReconnectHint:
+        'Păstrează verificările manuale, dar oprește reconectările automate.',
+      showPwaInstallPromptsLabel: 'Arată invitațiile de instalare PWA',
+      showPwaInstallPromptsHint:
+        'Ignoră starea invitației închise în timpul testelor de instalare.',
+      disablePwaSplashLabel: 'Dezactivează ecranul PWA de pornire',
+      disablePwaSplashHint:
+        'Sari peste overlay-ul de pornire al PWA instalate.',
+      disableEasterEggsLabel: 'Dezactivează easter egg-urile',
+      disableEasterEggsHint:
+        'Previne interacțiunile ascunse de tastatură, touch și logo.',
+      verboseConsoleDiagnosticsLabel: 'Diagnostic detaliat în consolă',
+      verboseConsoleDiagnosticsHint:
+        'Loghează ruta, stocarea, heartbeat-ul backend și acțiunile de partajare.',
+      runtimeTitle: 'Locație de rulare',
+      runtimeSubtitle:
+        'De unde este servită acum această aplicație instalată sau sesiune de browser.',
+      runtimeHostnameLabel: 'Nume gazdă',
+      runtimeHostLabel: 'Gazdă',
+      runtimeOriginLabel: 'Origine',
+      runtimeProtocolLabel: 'Protocol',
+      runtimeBasePathLabel: 'Cale de bază',
       stateTitle: 'Autoverificări de stare',
       stateSubtitle:
         'Validează lista curentă cu parserul, potrivirea, variantele, progresul și identitatea listei.',

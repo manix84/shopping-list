@@ -980,6 +980,204 @@ select {
   }
 }
 
+.heartbeat-card {
+  background:
+    linear-gradient(135deg, color-mix(in srgb, $panel-alt 94%, $primary 6%), $panel),
+    $panel;
+  border: 1px solid $border;
+  border-radius: 8px;
+  display: grid;
+  gap: 16px;
+  overflow: hidden;
+  padding: 16px;
+}
+
+.heartbeat-summary {
+  align-items: center;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.heartbeat-pulse {
+  align-items: center;
+  border-radius: 999px;
+  display: inline-flex;
+  height: 44px;
+  justify-content: center;
+  position: relative;
+  width: 44px;
+
+  &::before,
+  &::after {
+    animation: heartbeat-ring 1.15s ease-out both;
+    border: 2px solid currentColor;
+    border-radius: inherit;
+    content: "";
+    inset: 0;
+    opacity: 0;
+    position: absolute;
+  }
+
+  &::after {
+    animation-delay: 0.18s;
+  }
+
+  span {
+    background: currentColor;
+    border-radius: 999px;
+    box-shadow: 0 0 24px currentColor;
+    height: 16px;
+    width: 16px;
+  }
+}
+
+.heartbeat-pulse-connected,
+.heartbeat-card-connected .heartbeat-graph-line {
+  color: $success-text;
+}
+
+.heartbeat-pulse-checking,
+.heartbeat-card-checking .heartbeat-graph-line {
+  color: $primary;
+}
+
+.heartbeat-pulse-error,
+.heartbeat-card-error .heartbeat-graph-line {
+  color: $danger-text;
+}
+
+.heartbeat-pulse-offline,
+.heartbeat-card-offline .heartbeat-graph-line {
+  color: $muted;
+}
+
+.heartbeat-metrics {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+
+  div {
+    background: color-mix(in srgb, $panel-alt 72%, transparent);
+    border: 1px solid $border;
+    border-radius: 6px;
+    min-width: 0;
+    padding: 10px 12px;
+  }
+
+  span,
+  strong {
+    display: block;
+  }
+
+  span {
+    color: $muted;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+  }
+
+  strong {
+    color: $text;
+    font-size: 0.95rem;
+    margin-top: 4px;
+    overflow-wrap: anywhere;
+  }
+}
+
+.heartbeat-graph {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, $panel-alt 84%, transparent), transparent),
+    color-mix(in srgb, $panel-alt 58%, transparent);
+  border: 1px solid $border;
+  border-radius: 6px;
+  height: 150px;
+  overflow: hidden;
+  position: relative;
+
+  svg {
+    display: block;
+    height: 100%;
+    inset: 0;
+    position: absolute;
+    width: 100%;
+  }
+}
+
+.heartbeat-graph-grid {
+  fill: none;
+  stroke: color-mix(in srgb, $muted 22%, transparent);
+  stroke-width: 0.7;
+  vector-effect: non-scaling-stroke;
+}
+
+.heartbeat-graph-line {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.6;
+  vector-effect: non-scaling-stroke;
+}
+
+.heartbeat-graph-line-good {
+  stroke: $success-text;
+}
+
+.heartbeat-graph-line-okay {
+  stroke: #d9a20b;
+}
+
+.heartbeat-graph-line-poor {
+  stroke: #e46f28;
+}
+
+.heartbeat-graph-line-offline {
+  stroke: $danger-text;
+}
+
+.heartbeat-graph-point {
+  fill: $panel;
+  background: currentColor;
+  border: 1px solid $panel;
+  border-radius: 999px;
+  box-shadow: 0 0 0 1px currentColor;
+  height: 5px;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 5px;
+}
+
+.heartbeat-graph-point-good {
+  color: $success-text;
+}
+
+.heartbeat-graph-point-okay {
+  color: #d9a20b;
+}
+
+.heartbeat-graph-point-poor {
+  color: #e46f28;
+}
+
+.heartbeat-graph-point-offline {
+  color: $danger-text;
+}
+
+@keyframes heartbeat-ring {
+  0% {
+    opacity: 0.42;
+    transform: scale(0.55);
+  }
+
+  70% {
+    opacity: 0.16;
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.42);
+  }
+}
+
 .route-filter-input {
   max-width: 250px;
   min-width: 0;

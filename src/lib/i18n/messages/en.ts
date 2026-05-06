@@ -147,6 +147,7 @@ export const en: Messages = {
     about: {
       tagline: 'A free, privacy-minded grocery route planner.',
       versionLabel: 'Version',
+      hostLabel: 'Host',
       authorLabel: 'Built by',
       authorValue: 'Rob',
       costLabel: 'Cost',
@@ -199,6 +200,7 @@ export const en: Messages = {
       tabLayout: 'Layout',
       tabSections: 'Sections',
       tabStorage: 'Storage',
+      tabHost: 'Host',
       tabSettings: 'Settings',
       backendTitle: 'Backend checks',
       backendConnected: 'Backend API and database are available.',
@@ -206,10 +208,24 @@ export const en: Messages = {
       backendError: 'Backend responded, but one or more checks failed.',
       backendOffline:
         'Backend is offline; the app is using frontend-only storage.',
+      heartbeatTitle: 'Backend heartbeat',
+      heartbeatSubtitle: 'Latest backend status checks, with the recent rhythm shown as a sparkline.',
+      heartbeatLastChecked: 'Last checked',
+      heartbeatLatency: 'Latency',
+      heartbeatSamples: 'Samples',
+      heartbeatPaused: 'Paused',
+      heartbeatWaiting: 'Waiting for first heartbeat',
       backendHealthTitle: 'Backend health',
       backendHealthExpected: 'GET /api/health returns OK',
       databaseTitle: 'Database',
       databaseExpected: 'GET /api/database/status can read the backend store',
+      databaseTypeTitle: 'Current database type',
+      databaseTypeExpected: 'JSON DB, PostgreSQL, or LocalStorage',
+      databaseTypeLocalStorage: 'LocalStorage',
+      databaseTypeJson: 'JSON DB',
+      databaseTypePostgres: 'PostgreSQL',
+      appStorageModeLabel: 'App storage mode',
+      backendAdapterLabel: 'Backend adapter',
       configTitle: 'Country config self-checks',
       configSubtitle:
         'Validate the selected country profile shape, keyword coverage, and matcher ownership.',
@@ -240,6 +256,35 @@ export const en: Messages = {
       debugModeLabel: 'Debug mode',
       debugModeHint:
         'Turn this off to hide the debug tools link again.',
+      forceLocalStorageLabel: 'Force LocalStorage mode',
+      forceLocalStorageHint:
+        'Keep this device in browser storage even when the backend is healthy.',
+      pauseBackendHeartbeatLabel: 'Pause backend heartbeat',
+      pauseBackendHeartbeatHint:
+        'Stop the recurring backend health checks until this is turned off.',
+      disableAutoBackendReconnectLabel: 'Disable auto backend reconnect',
+      disableAutoBackendReconnectHint:
+        'Keep manual backend checks available, but stop automatic local-to-backend reconnects.',
+      showPwaInstallPromptsLabel: 'Show PWA install prompts',
+      showPwaInstallPromptsHint:
+        'Ignore the dismissed install nudge state while testing install UI.',
+      disablePwaSplashLabel: 'Disable PWA splash screen',
+      disablePwaSplashHint:
+        'Skip the standalone PWA splash overlay on startup.',
+      disableEasterEggsLabel: 'Disable easter eggs',
+      disableEasterEggsHint:
+        'Prevent hidden keyboard, touch, and logo-triggered interactions.',
+      verboseConsoleDiagnosticsLabel: 'Verbose console diagnostics',
+      verboseConsoleDiagnosticsHint:
+        'Log route, storage, backend heartbeat, and sharing diagnostics to the console.',
+      runtimeTitle: 'Runtime location',
+      runtimeSubtitle:
+        'Where this installed or browser session is currently being served from.',
+      runtimeHostnameLabel: 'Hostname',
+      runtimeHostLabel: 'Host',
+      runtimeOriginLabel: 'Origin',
+      runtimeProtocolLabel: 'Protocol',
+      runtimeBasePathLabel: 'Base path',
       stateTitle: 'State self-checks',
       stateSubtitle:
         'Validate the current list state against the parser, matcher, variants, progress counters, and list identity.',

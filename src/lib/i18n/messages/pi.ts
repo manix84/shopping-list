@@ -152,6 +152,7 @@ export const pi: Messages = {
     about: {
       tagline: 'A free, privacy-minded grocery route planner fer yer market run.',
       versionLabel: 'Version',
+      hostLabel: 'Host',
       authorLabel: 'Built by',
       authorValue: 'Rob',
       costLabel: 'Cost',
@@ -204,6 +205,7 @@ export const pi: Messages = {
       tabLayout: 'Deck plan',
       tabSections: 'Decks',
       tabStorage: 'Stowage',
+      tabHost: 'Host',
       tabSettings: 'Rigging',
       backendTitle: 'Backend checks',
       backendConnected: 'Backend API and hold be available.',
@@ -212,10 +214,24 @@ export const pi: Messages = {
         'Backend answered, but one or more checks went to Davy Jones.',
       backendOffline:
         'Backend be offline; the app be using frontend stowage only.',
+      heartbeatTitle: 'Backend heartbeat',
+      heartbeatSubtitle: 'Latest backend checks, with the recent rhythm shown as a sparkline.',
+      heartbeatLastChecked: 'Last checked',
+      heartbeatLatency: 'Latency',
+      heartbeatSamples: 'Samples',
+      heartbeatPaused: 'Paused',
+      heartbeatWaiting: 'Waitin’ fer first heartbeat',
       backendHealthTitle: 'Backend health',
       backendHealthExpected: 'GET /api/health returns OK',
       databaseTitle: 'Hold',
       databaseExpected: 'GET /api/database/status can read the backend hold',
+      databaseTypeTitle: 'Current hold type',
+      databaseTypeExpected: 'JSON DB, PostgreSQL, or LocalStorage',
+      databaseTypeLocalStorage: 'LocalStorage',
+      databaseTypeJson: 'JSON DB',
+      databaseTypePostgres: 'PostgreSQL',
+      appStorageModeLabel: 'App stowage mode',
+      backendAdapterLabel: 'Backend adapter',
       configTitle: 'Waters profile self-checks',
       configSubtitle:
         'Check profile shape, keyword coverage, and matcher ownership.',
@@ -246,6 +262,35 @@ export const pi: Messages = {
       debugModeLabel: 'Bilge mode',
       debugModeHint:
         'Turn this off to hide the bilge tools link again.',
+      forceLocalStorageLabel: 'Force LocalStorage mode',
+      forceLocalStorageHint:
+        'Keep this device in browser stowage even when the backend be healthy.',
+      pauseBackendHeartbeatLabel: 'Pause backend heartbeat',
+      pauseBackendHeartbeatHint:
+        'Stop the recurring backend checks until this be turned off.',
+      disableAutoBackendReconnectLabel: 'Disable auto backend reconnect',
+      disableAutoBackendReconnectHint:
+        'Keep manual backend checks, but stop automatic reconnects.',
+      showPwaInstallPromptsLabel: 'Show PWA install prompts',
+      showPwaInstallPromptsHint:
+        'Ignore the dismissed install nudge while testing install UI.',
+      disablePwaSplashLabel: 'Disable PWA splash screen',
+      disablePwaSplashHint:
+        'Skip the installed PWA splash overlay on startup.',
+      disableEasterEggsLabel: 'Disable easter eggs',
+      disableEasterEggsHint:
+        'Prevent hidden keyboard, touch, and logo-triggered tricks.',
+      verboseConsoleDiagnosticsLabel: 'Verbose console diagnostics',
+      verboseConsoleDiagnosticsHint:
+        'Log route, stowage, backend heartbeat, and sharing diagnostics.',
+      runtimeTitle: 'Runtime berth',
+      runtimeSubtitle:
+        'Where this installed app or browser session be served from right now.',
+      runtimeHostnameLabel: 'Hostname',
+      runtimeHostLabel: 'Host',
+      runtimeOriginLabel: 'Origin',
+      runtimeProtocolLabel: 'Protocol',
+      runtimeBasePathLabel: 'Base path',
       stateTitle: 'State self-checks',
       stateSubtitle:
         'Check the current ledger against parser, matcher, variants, progress, and list mark.',

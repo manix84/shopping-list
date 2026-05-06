@@ -35,6 +35,7 @@ describe('apiRepository', () => {
           new Response(
             JSON.stringify({
               ok: true,
+              adapter: 'postgres',
               settingsExists: true,
               settingsCountryCode: 'fr',
               settingsUpdatedAt: '2026-04-22T00:00:00.000Z',
@@ -52,6 +53,7 @@ describe('apiRepository', () => {
       health: { ok: true, mode: 'backend' },
       database: {
         ok: true,
+        adapter: 'postgres',
         settingsExists: true,
         settingsCountryCode: 'fr',
         settingsUpdatedAt: '2026-04-22T00:00:00.000Z',
@@ -70,6 +72,37 @@ describe('apiRepository', () => {
       state: 'error',
       health: { ok: false },
       database: { ok: false },
+    });
+  });
+
+  it('infers JSON backend status from legacy database path metadata', async () => {
+    stubBrowserApi();
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockResolvedValueOnce(new Response(JSON.stringify({ ok: true, mode: 'backend' }), { status: 200 }))
+        .mockResolvedValueOnce(
+          new Response(
+            JSON.stringify({
+              ok: true,
+              path: '/redacted/shopping-list-db.json',
+              settingsExists: true,
+              settingsCountryCode: 'uk',
+              shoppingListExists: true,
+              sharedListCount: 1,
+            }),
+            { status: 200 },
+          ),
+        ),
+    );
+
+    await expect(checkBackendStatus()).resolves.toMatchObject({
+      state: 'connected',
+      database: {
+        ok: true,
+        adapter: 'json',
+      },
     });
   });
 

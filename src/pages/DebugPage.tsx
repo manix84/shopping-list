@@ -1,9 +1,12 @@
-import { useState, type KeyboardEvent } from 'react';
+import { type KeyboardEvent } from 'react';
 import type {
   BackendStatus,
+  BackendHeartbeatSample,
   ConfigTestResult,
   CountQuantityTestResult,
   CountryConfig,
+  DebugTabKey,
+  DebugSettings,
   Item,
   MatcherTestResult,
   MeasurementTestResult,
@@ -21,6 +24,8 @@ import type { Messages } from '../lib/i18n';
 
 type DebugPageProps = {
   backendStatus: BackendStatus;
+  heartbeatSamples: BackendHeartbeatSample[];
+  storageMode: 'local' | 'backend';
   items: Item[];
   config: CountryConfig;
   matcherTests: MatcherTestResult[];
@@ -32,6 +37,8 @@ type DebugPageProps = {
   storageTests: StorageTestResult[];
   stateTests: StateTestResult[];
   isDebugMode: boolean;
+  activeTab: DebugTabKey;
+  debugSettings: DebugSettings;
   matcherHasFailures: boolean;
   configHasFailures: boolean;
   countQuantityHasFailures: boolean;
@@ -44,6 +51,8 @@ type DebugPageProps = {
   onToggleItem: (itemId: string) => void;
   onDeleteItem: (itemId: string) => void;
   onDebugModeChange: (enabled: boolean) => void;
+  onDebugSettingChange: (key: keyof DebugSettings, enabled: boolean) => void;
+  onDebugTabChange: (tab: DebugTabKey) => void;
   onBackToEdit: () => void;
   onBackToSettings: () => void;
 };
@@ -66,23 +75,89 @@ const backendStateLabel = (status: BackendStatus, messages: Messages) => {
 
 const checkLabel = (passed: boolean, messages: Messages) => (passed ? messages.pages.debug.pass : messages.pages.debug.fail);
 
-type DebugTabKey =
-  | 'parsed'
-  | 'state'
-  | 'backend'
-  | 'config'
-  | 'matcher'
-  | 'quantity'
-  | 'measurements'
-  | 'weights'
-  | 'variants'
-  | 'layout'
-  | 'sections'
-  | 'storage'
-  | 'settings';
+const databaseAdapterLabel = (status: BackendStatus, messages: Messages) => {
+  if (status.database.adapter === 'postgres') { return messages.pages.debug.databaseTypePostgres; }
+  if (status.database.adapter === 'json') { return messages.pages.debug.databaseTypeJson; }
+  return messages.labels.unknown;
+};
+
+const currentDatabaseTypeLabel = (status: BackendStatus, storageMode: 'local' | 'backend', messages: Messages) => {
+  if (storageMode === 'local') { return messages.pages.debug.databaseTypeLocalStorage; }
+  return databaseAdapterLabel(status, messages);
+};
+
+const heartbeatLatencyScore = (sample: BackendHeartbeatSample) => {
+  if (sample.state !== 'connected' || !sample.healthOk || !sample.databaseOk) { return 0; }
+  const clampedLatency = Math.min(sample.latencyMs, 1_500);
+  return 100 - (clampedLatency / 1_500) * 84;
+};
+
+const heartbeatPolyline = (samples: BackendHeartbeatSample[]) => {
+  if (samples.length === 0) { return ''; }
+  if (samples.length === 1) {
+    const y = 100 - heartbeatLatencyScore(samples[0]);
+    return `0,${y} 100,${y}`;
+  }
+
+  return samples.map((sample, index) => {
+    const x = (index / (samples.length - 1)) * 100;
+    const y = 100 - heartbeatLatencyScore(sample);
+    return `${x.toFixed(2)},${y.toFixed(2)}`;
+  }).join(' ');
+};
+
+const heartbeatPoint = (sample: BackendHeartbeatSample, index: number, total: number) => {
+  const x = total === 1 ? 100 : (index / (total - 1)) * 100;
+  const y = 100 - heartbeatLatencyScore(sample);
+  return { x, y };
+};
+
+const heartbeatLatencyTone = (sample: BackendHeartbeatSample) => {
+  if (sample.state !== 'connected' || !sample.healthOk || !sample.databaseOk) { return 'offline'; }
+  if (sample.latencyMs <= 150) { return 'good'; }
+  if (sample.latencyMs <= 500) { return 'okay'; }
+  return 'poor';
+};
+
+const formatHeartbeatTime = (checkedAt: string) =>
+  new Intl.DateTimeFormat(undefined, {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }).format(new Date(checkedAt));
+
+function DebugSettingSwitch({
+  label,
+  hint,
+  checked,
+  onChange,
+}: {
+  label: string;
+  hint: string;
+  checked: boolean;
+  onChange: (enabled: boolean) => void;
+}) {
+  return (
+    <label className={'debug-setting-switch'}>
+      <span>
+        <span className={'debug-setting-label'}>{label}</span>
+        <span className={'small-text'}>{hint}</span>
+      </span>
+      <input
+        className={'debug-setting-switch-input'}
+        type={'checkbox'}
+        role={'switch'}
+        checked={checked}
+        onChange={(event) => onChange(event.target.checked)}
+      />
+    </label>
+  );
+}
 
 export function DebugPage({
   backendStatus,
+  heartbeatSamples,
+  storageMode,
   items,
   config,
   matcherTests,
@@ -94,6 +169,8 @@ export function DebugPage({
   storageTests,
   stateTests,
   isDebugMode,
+  activeTab,
+  debugSettings,
   matcherHasFailures,
   configHasFailures,
   countQuantityHasFailures,
@@ -106,11 +183,22 @@ export function DebugPage({
   onToggleItem,
   onDeleteItem,
   onDebugModeChange,
+  onDebugSettingChange,
+  onDebugTabChange,
   onBackToEdit,
   onBackToSettings,
 }: DebugPageProps) {
   const { messages } = useI18n();
-  const [activeTab, setActiveTab] = useState<DebugTabKey>('parsed');
+  const runtimeLocation =
+    typeof window === 'undefined'
+      ? null
+      : {
+          basePath: import.meta.env.BASE_URL,
+          host: window.location.host,
+          hostname: window.location.hostname,
+          origin: window.location.origin,
+          protocol: window.location.protocol,
+        };
   const debugTabs: Array<{ key: DebugTabKey; label: string }> = [
     { key: 'parsed', label: messages.pages.debug.tabParsed },
     { key: 'state', label: messages.pages.debug.tabState },
@@ -124,6 +212,7 @@ export function DebugPage({
     { key: 'layout', label: messages.pages.debug.tabLayout },
     { key: 'sections', label: messages.pages.debug.tabSections },
     { key: 'storage', label: messages.pages.debug.tabStorage },
+    { key: 'host', label: messages.pages.debug.tabHost },
     { key: 'settings', label: messages.pages.debug.tabSettings },
   ];
   const layoutRows = config.groups.flatMap((group) =>
@@ -139,6 +228,9 @@ export function DebugPage({
     imperial: messages.labels.measurementModeImperial,
     cooking: messages.labels.measurementModeCooking,
   };
+  const latestHeartbeat = heartbeatSamples.at(-1);
+  const heartbeatPath = heartbeatPolyline(heartbeatSamples);
+  const heartbeatTone = latestHeartbeat?.state ?? backendStatus.state;
   const handleTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
     const lastIndex = debugTabs.length - 1;
     const nextIndex =
@@ -160,7 +252,7 @@ export function DebugPage({
 
     event.preventDefault();
     const nextTab = debugTabs[nextIndex];
-    setActiveTab(nextTab.key);
+    onDebugTabChange(nextTab.key);
     document.getElementById(`debug-tab-${nextTab.key}`)?.focus();
   };
 
@@ -195,7 +287,7 @@ export function DebugPage({
             aria-controls={activeTab === tab.key ? `debug-panel-${tab.key}` : undefined}
             tabIndex={activeTab === tab.key ? 0 : -1}
             className={`button ${activeTab === tab.key ? 'button-active' : ''}`}
-            onClick={() => setActiveTab(tab.key)}
+            onClick={() => onDebugTabChange(tab.key)}
             onKeyDown={(event) => handleTabKeyDown(event, index)}
           >
             {tab.label}
@@ -273,6 +365,91 @@ export function DebugPage({
           }
           bodyClassName={'stack'}
         >
+          <div className={`heartbeat-card heartbeat-card-${heartbeatTone}`}>
+            <div className={'heartbeat-summary'}>
+              <div
+                key={latestHeartbeat?.checkedAt ?? 'waiting'}
+                className={`heartbeat-pulse heartbeat-pulse-${heartbeatTone}`}
+                aria-hidden={'true'}
+              >
+                <span />
+              </div>
+              <div>
+                <h3 className={'title title-xs'}>{messages.pages.debug.heartbeatTitle}</h3>
+                <p className={'small-text'}>{messages.pages.debug.heartbeatSubtitle}</p>
+              </div>
+            </div>
+            <div className={'heartbeat-metrics'} aria-label={messages.pages.debug.heartbeatTitle}>
+              <div>
+                <span>{messages.pages.debug.heartbeatLastChecked}</span>
+                <strong>
+                  {latestHeartbeat ? formatHeartbeatTime(latestHeartbeat.checkedAt) : messages.pages.debug.heartbeatWaiting}
+                </strong>
+              </div>
+              <div>
+                <span>{messages.pages.debug.heartbeatLatency}</span>
+                <strong>{latestHeartbeat ? `${latestHeartbeat.latencyMs}ms` : messages.pages.debug.unavailable}</strong>
+              </div>
+              <div>
+                <span>{messages.labels.state}</span>
+                <strong>{backendStateLabel(backendStatus, messages)}</strong>
+              </div>
+              <div>
+                <span>{messages.pages.debug.heartbeatSamples}</span>
+                <strong>{heartbeatSamples.length}</strong>
+              </div>
+              {debugSettings.pauseBackendHeartbeat ? (
+                <div>
+                  <span>{messages.labels.mode}</span>
+                  <strong>{messages.pages.debug.heartbeatPaused}</strong>
+                </div>
+              ) : null}
+            </div>
+            <div className={'heartbeat-graph'} aria-hidden={'true'}>
+              <svg viewBox={'0 0 100 100'} preserveAspectRatio={'none'}>
+                <path className={'heartbeat-graph-grid'} d={'M0 25 H100 M0 50 H100 M0 75 H100'} />
+                {heartbeatPath && heartbeatSamples.length === 1 ? (
+                  <polyline
+                    className={`heartbeat-graph-line heartbeat-graph-line-${heartbeatLatencyTone(heartbeatSamples[0])}`}
+                    points={heartbeatPath}
+                  />
+                ) : null}
+                {heartbeatSamples.slice(1).map((sample, index) => {
+                  const previousPoint = heartbeatPoint(heartbeatSamples[index], index, heartbeatSamples.length);
+                  const nextPoint = heartbeatPoint(sample, index + 1, heartbeatSamples.length);
+                  return (
+                    <line
+                      key={`${sample.checkedAt}-${index}`}
+                      className={`heartbeat-graph-line heartbeat-graph-line-${heartbeatLatencyTone(sample)}`}
+                      x1={previousPoint.x}
+                      y1={previousPoint.y}
+                      x2={nextPoint.x}
+                      y2={nextPoint.y}
+                    />
+                  );
+                })}
+              </svg>
+              {heartbeatSamples.map((sample, index) => {
+                const { x, y } = heartbeatPoint(sample, index, heartbeatSamples.length);
+                const tone = heartbeatLatencyTone(sample);
+                return (
+                  <span
+                    key={`${sample.checkedAt}-${index}`}
+                    className={`heartbeat-graph-point heartbeat-graph-point-${tone}`}
+                    style={{ left: `${x}%`, top: `${y}%` }}
+                  />
+                );
+              })}
+            </div>
+          </div>
+          <TestResultCard
+            title={messages.pages.debug.databaseTypeTitle}
+            expected={messages.pages.debug.databaseTypeExpected}
+            actual={currentDatabaseTypeLabel(backendStatus, storageMode, messages)}
+            passed={storageMode === 'local' || Boolean(backendStatus.database.adapter)}
+            tone={'muted'}
+            label={storageMode === 'local' ? messages.pages.debug.databaseTypeLocalStorage : databaseAdapterLabel(backendStatus, messages)}
+          />
           <TestResultCard
             title={messages.pages.debug.backendHealthTitle}
             expected={messages.pages.debug.backendHealthExpected}
@@ -305,6 +482,42 @@ export function DebugPage({
             tone={checkTone(backendStatus.database.ok)}
             label={checkLabel(backendStatus.database.ok, messages)}
           />
+          <div className={'table-wrap'}>
+            <table className={'debug-table'}>
+              <tbody>
+                <tr>
+                  <th scope={'row'}>{messages.pages.debug.appStorageModeLabel}</th>
+                  <td>{currentDatabaseTypeLabel(backendStatus, storageMode, messages)}</td>
+                </tr>
+                <tr>
+                  <th scope={'row'}>{messages.pages.debug.backendAdapterLabel}</th>
+                  <td>
+                    {backendStatus.database.adapter
+                      ? databaseAdapterLabel(backendStatus, messages)
+                      : messages.pages.debug.unavailable}
+                  </td>
+                </tr>
+                <tr>
+                  <th scope={'row'}>{messages.labels.defaultList}</th>
+                  <td>
+                    {typeof backendStatus.database.shoppingListExists === 'boolean'
+                      ? backendStatus.database.shoppingListExists
+                        ? messages.labels.exists
+                        : messages.labels.empty
+                      : messages.pages.debug.unavailable}
+                  </td>
+                </tr>
+                <tr>
+                  <th scope={'row'}>{messages.labels.sharedLists}</th>
+                  <td>{backendStatus.database.sharedListCount ?? messages.pages.debug.unavailable}</td>
+                </tr>
+                <tr>
+                  <th scope={'row'}>{messages.labels.updated}</th>
+                  <td>{backendStatus.database.updatedAt ?? messages.pages.debug.unavailable}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </Card>
       ) : null}
 
@@ -628,19 +841,97 @@ export function DebugPage({
           }
           bodyClassName={'stack'}
         >
-          <label className={'debug-setting-switch'}>
-            <span>
-              <span className={'debug-setting-label'}>{messages.pages.debug.debugModeLabel}</span>
-              <span className={'small-text'}>{messages.pages.debug.debugModeHint}</span>
-            </span>
-            <input
-              className={'debug-setting-switch-input'}
-              type={'checkbox'}
-              role={'switch'}
-              checked={isDebugMode}
-              onChange={(event) => onDebugModeChange(event.target.checked)}
-            />
-          </label>
+          <DebugSettingSwitch
+            label={messages.pages.debug.debugModeLabel}
+            hint={messages.pages.debug.debugModeHint}
+            checked={isDebugMode}
+            onChange={onDebugModeChange}
+          />
+          <DebugSettingSwitch
+            label={messages.pages.debug.forceLocalStorageLabel}
+            hint={messages.pages.debug.forceLocalStorageHint}
+            checked={debugSettings.forceLocalStorage}
+            onChange={(enabled) => onDebugSettingChange('forceLocalStorage', enabled)}
+          />
+          <DebugSettingSwitch
+            label={messages.pages.debug.pauseBackendHeartbeatLabel}
+            hint={messages.pages.debug.pauseBackendHeartbeatHint}
+            checked={debugSettings.pauseBackendHeartbeat}
+            onChange={(enabled) => onDebugSettingChange('pauseBackendHeartbeat', enabled)}
+          />
+          <DebugSettingSwitch
+            label={messages.pages.debug.disableAutoBackendReconnectLabel}
+            hint={messages.pages.debug.disableAutoBackendReconnectHint}
+            checked={debugSettings.disableAutoBackendReconnect}
+            onChange={(enabled) => onDebugSettingChange('disableAutoBackendReconnect', enabled)}
+          />
+          <DebugSettingSwitch
+            label={messages.pages.debug.showPwaInstallPromptsLabel}
+            hint={messages.pages.debug.showPwaInstallPromptsHint}
+            checked={debugSettings.showPwaInstallPrompts}
+            onChange={(enabled) => onDebugSettingChange('showPwaInstallPrompts', enabled)}
+          />
+          <DebugSettingSwitch
+            label={messages.pages.debug.disablePwaSplashLabel}
+            hint={messages.pages.debug.disablePwaSplashHint}
+            checked={debugSettings.disablePwaSplash}
+            onChange={(enabled) => onDebugSettingChange('disablePwaSplash', enabled)}
+          />
+          <DebugSettingSwitch
+            label={messages.pages.debug.disableEasterEggsLabel}
+            hint={messages.pages.debug.disableEasterEggsHint}
+            checked={debugSettings.disableEasterEggs}
+            onChange={(enabled) => onDebugSettingChange('disableEasterEggs', enabled)}
+          />
+          <DebugSettingSwitch
+            label={messages.pages.debug.verboseConsoleDiagnosticsLabel}
+            hint={messages.pages.debug.verboseConsoleDiagnosticsHint}
+            checked={debugSettings.verboseConsoleDiagnostics}
+            onChange={(enabled) => onDebugSettingChange('verboseConsoleDiagnostics', enabled)}
+          />
+        </Card>
+      ) : null}
+
+      {activeTab === 'host' ? (
+        <Card
+          id={'debug-panel-host'}
+          role={'tabpanel'}
+          aria-labelledby={'debug-tab-host'}
+          header={
+            <>
+              <h2 className={'title title-sm'}>{messages.pages.debug.runtimeTitle}</h2>
+              <p className={'subtitle'}>{messages.pages.debug.runtimeSubtitle}</p>
+            </>
+          }
+        >
+          <div className={'stack'}>
+            <div className={'table-wrap'}>
+              <table className={'debug-table'}>
+                <tbody>
+                  <tr>
+                    <th scope={'row'}>{messages.pages.debug.runtimeHostnameLabel}</th>
+                    <td>{runtimeLocation?.hostname || messages.pages.debug.unavailable}</td>
+                  </tr>
+                  <tr>
+                    <th scope={'row'}>{messages.pages.debug.runtimeHostLabel}</th>
+                    <td>{runtimeLocation?.host || messages.pages.debug.unavailable}</td>
+                  </tr>
+                  <tr>
+                    <th scope={'row'}>{messages.pages.debug.runtimeOriginLabel}</th>
+                    <td>{runtimeLocation?.origin || messages.pages.debug.unavailable}</td>
+                  </tr>
+                  <tr>
+                    <th scope={'row'}>{messages.pages.debug.runtimeProtocolLabel}</th>
+                    <td>{runtimeLocation?.protocol || messages.pages.debug.unavailable}</td>
+                  </tr>
+                  <tr>
+                    <th scope={'row'}>{messages.pages.debug.runtimeBasePathLabel}</th>
+                    <td>{runtimeLocation?.basePath || messages.pages.debug.unavailable}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </Card>
       ) : null}
     </Card>

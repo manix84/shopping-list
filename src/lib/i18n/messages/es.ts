@@ -149,6 +149,7 @@ export const es: Messages = {
     about: {
       tagline: 'Un planificador gratuito de rutas de compra que respeta tu privacidad.',
       versionLabel: 'Versión',
+      hostLabel: 'Host',
       authorLabel: 'Creado por',
       authorValue: 'Rob',
       costLabel: 'Coste',
@@ -201,6 +202,7 @@ export const es: Messages = {
       tabLayout: 'Diseño',
       tabSections: 'Secciones',
       tabStorage: 'Almacenamiento',
+      tabHost: 'Host',
       tabSettings: 'Ajustes',
       backendTitle: 'Comprobaciones del backend',
       backendConnected:
@@ -210,11 +212,25 @@ export const es: Messages = {
         'El backend respondió, pero una o más comprobaciones fallaron.',
       backendOffline:
         'El backend está sin conexión; la aplicación usa almacenamiento solo de frontend.',
+      heartbeatTitle: 'Latido del backend',
+      heartbeatSubtitle: 'Últimas comprobaciones del backend, con el ritmo reciente como sparkline.',
+      heartbeatLastChecked: 'Última comprobación',
+      heartbeatLatency: 'Latencia',
+      heartbeatSamples: 'Muestras',
+      heartbeatPaused: 'Pausado',
+      heartbeatWaiting: 'Esperando el primer latido',
       backendHealthTitle: 'Estado del backend',
       backendHealthExpected: 'GET /api/health devuelve OK',
       databaseTitle: 'Base de datos',
       databaseExpected:
         'GET /api/database/status puede leer el almacenamiento del backend',
+      databaseTypeTitle: 'Tipo de base de datos actual',
+      databaseTypeExpected: 'JSON DB, PostgreSQL o LocalStorage',
+      databaseTypeLocalStorage: 'LocalStorage',
+      databaseTypeJson: 'JSON DB',
+      databaseTypePostgres: 'PostgreSQL',
+      appStorageModeLabel: 'Modo de almacenamiento de la app',
+      backendAdapterLabel: 'Adaptador backend',
       configTitle: 'Comprobaciones de configuración de país',
       configSubtitle:
         'Valida la estructura del perfil, la cobertura de palabras clave y su sección propietaria.',
@@ -245,6 +261,35 @@ export const es: Messages = {
       debugModeLabel: 'Modo de depuración',
       debugModeHint:
         'Desactívalo para volver a ocultar el enlace a las herramientas de depuración.',
+      forceLocalStorageLabel: 'Forzar modo LocalStorage',
+      forceLocalStorageHint:
+        'Mantén este dispositivo en almacenamiento del navegador aunque el backend funcione.',
+      pauseBackendHeartbeatLabel: 'Pausar latido del backend',
+      pauseBackendHeartbeatHint:
+        'Detén las comprobaciones periódicas del backend hasta desactivarlo.',
+      disableAutoBackendReconnectLabel: 'Desactivar reconexión automática',
+      disableAutoBackendReconnectHint:
+        'Permite comprobaciones manuales, pero evita reconexiones automáticas al backend.',
+      showPwaInstallPromptsLabel: 'Mostrar avisos de instalación PWA',
+      showPwaInstallPromptsHint:
+        'Ignora el estado de aviso descartado al probar la instalación.',
+      disablePwaSplashLabel: 'Desactivar pantalla inicial PWA',
+      disablePwaSplashHint:
+        'Omite la pantalla inicial de la PWA instalada.',
+      disableEasterEggsLabel: 'Desactivar easter eggs',
+      disableEasterEggsHint:
+        'Evita interacciones ocultas de teclado, toque y logo.',
+      verboseConsoleDiagnosticsLabel: 'Diagnósticos detallados en consola',
+      verboseConsoleDiagnosticsHint:
+        'Registra ruta, almacenamiento, latido del backend y acciones de compartir.',
+      runtimeTitle: 'Ubicación de ejecución',
+      runtimeSubtitle:
+        'Desde dónde se está sirviendo esta app instalada o sesión del navegador.',
+      runtimeHostnameLabel: 'Nombre de host',
+      runtimeHostLabel: 'Host',
+      runtimeOriginLabel: 'Origen',
+      runtimeProtocolLabel: 'Protocolo',
+      runtimeBasePathLabel: 'Ruta base',
       stateTitle: 'Comprobaciones de estado',
       stateSubtitle:
         'Valida la lista actual contra el parser, el clasificador, las variantes, el progreso y la identidad.',

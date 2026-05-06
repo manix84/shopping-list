@@ -154,6 +154,7 @@ export const nl: Messages = {
     about: {
       tagline: 'Een gratis, privacybewuste planner voor je boodschappenroute.',
       versionLabel: 'Versie',
+      hostLabel: 'Host',
       authorLabel: 'Gebouwd door',
       authorValue: 'Rob',
       costLabel: 'Kosten',
@@ -206,6 +207,7 @@ export const nl: Messages = {
       tabLayout: 'Indeling',
       tabSections: 'Secties',
       tabStorage: 'Opslag',
+      tabHost: 'Host',
       tabSettings: 'Instellingen',
       backendTitle: 'Backendcontroles',
       backendConnected: 'Backend-API en database zijn beschikbaar.',
@@ -214,10 +216,24 @@ export const nl: Messages = {
         'Backend antwoordde, maar een of meer controles zijn mislukt.',
       backendOffline:
         'Backend is offline; de app gebruikt alleen frontend-opslag.',
+      heartbeatTitle: 'Backend-heartbeat',
+      heartbeatSubtitle: 'Laatste backendstatuscontroles, met het recente ritme als sparkline.',
+      heartbeatLastChecked: 'Laatst gecontroleerd',
+      heartbeatLatency: 'Latentie',
+      heartbeatSamples: 'Samples',
+      heartbeatPaused: 'Gepauzeerd',
+      heartbeatWaiting: 'Wachten op eerste heartbeat',
       backendHealthTitle: 'Backendstatus',
       backendHealthExpected: 'GET /api/health geeft OK terug',
       databaseTitle: 'Database',
       databaseExpected: 'GET /api/database/status kan de backend-opslag lezen',
+      databaseTypeTitle: 'Huidig databasetype',
+      databaseTypeExpected: 'JSON DB, PostgreSQL of LocalStorage',
+      databaseTypeLocalStorage: 'LocalStorage',
+      databaseTypeJson: 'JSON DB',
+      databaseTypePostgres: 'PostgreSQL',
+      appStorageModeLabel: 'App-opslagmodus',
+      backendAdapterLabel: 'Backendadapter',
       configTitle: 'Landprofiel-zelftests',
       configSubtitle:
         'Controleer profielstructuur, trefwoorddekking en de bijbehorende matcher-secties.',
@@ -248,6 +264,35 @@ export const nl: Messages = {
       debugModeLabel: 'Debugmodus',
       debugModeHint:
         'Zet dit uit om de link naar de debughulpmiddelen weer te verbergen.',
+      forceLocalStorageLabel: 'LocalStorage-modus afdwingen',
+      forceLocalStorageHint:
+        'Houd dit apparaat in browseropslag, ook als de backend gezond is.',
+      pauseBackendHeartbeatLabel: 'Backend-heartbeat pauzeren',
+      pauseBackendHeartbeatHint:
+        'Stop terugkerende backendcontroles tot dit uit staat.',
+      disableAutoBackendReconnectLabel: 'Automatisch backendherstel uitzetten',
+      disableAutoBackendReconnectHint:
+        'Laat handmatige controles toe, maar stop automatische herverbindingen.',
+      showPwaInstallPromptsLabel: 'PWA-installatiemeldingen tonen',
+      showPwaInstallPromptsHint:
+        'Negeer de weggeklikte installatiemelding tijdens testen.',
+      disablePwaSplashLabel: 'PWA-splashscreen uitzetten',
+      disablePwaSplashHint:
+        'Sla de splash-overlay van de geïnstalleerde PWA over.',
+      disableEasterEggsLabel: 'Easter eggs uitzetten',
+      disableEasterEggsHint:
+        'Voorkom verborgen toetsenbord-, touch- en logo-interacties.',
+      verboseConsoleDiagnosticsLabel: 'Uitgebreide consolediagnose',
+      verboseConsoleDiagnosticsHint:
+        'Log route, opslag, backend-heartbeat en delen-acties naar de console.',
+      runtimeTitle: 'Runtime-locatie',
+      runtimeSubtitle:
+        'Waar deze geïnstalleerde app of browsersessie nu vandaan wordt geserveerd.',
+      runtimeHostnameLabel: 'Hostnaam',
+      runtimeHostLabel: 'Host',
+      runtimeOriginLabel: 'Origin',
+      runtimeProtocolLabel: 'Protocol',
+      runtimeBasePathLabel: 'Basispad',
       stateTitle: 'Status-zelftests',
       stateSubtitle:
         'Controleer de huidige lijst tegen parser, matcher, varianten, voortgang en lijstidentiteit.',

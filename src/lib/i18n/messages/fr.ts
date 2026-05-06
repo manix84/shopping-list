@@ -155,6 +155,7 @@ export const fr: Messages = {
     about: {
       tagline: 'Un planificateur de parcours de courses gratuit et respectueux de la vie privée.',
       versionLabel: 'Version',
+      hostLabel: 'Hôte',
       authorLabel: 'Créé par',
       authorValue: 'Rob',
       costLabel: 'Coût',
@@ -207,6 +208,7 @@ export const fr: Messages = {
       tabLayout: 'Agencement',
       tabSections: 'Sections',
       tabStorage: 'Stockage',
+      tabHost: 'Hôte',
       tabSettings: 'Paramètres',
       backendTitle: 'Vérifications backend',
       backendConnected: 'L’API backend et la base de données sont disponibles.',
@@ -215,11 +217,25 @@ export const fr: Messages = {
         'Le backend a répondu, mais une ou plusieurs vérifications ont échoué.',
       backendOffline:
         'Le backend est hors ligne ; l’application utilise uniquement le stockage frontend.',
+      heartbeatTitle: 'Heartbeat backend',
+      heartbeatSubtitle: 'Dernières vérifications backend, avec le rythme récent en sparkline.',
+      heartbeatLastChecked: 'Dernière vérification',
+      heartbeatLatency: 'Latence',
+      heartbeatSamples: 'Échantillons',
+      heartbeatPaused: 'Suspendu',
+      heartbeatWaiting: 'En attente du premier heartbeat',
       backendHealthTitle: 'Santé du backend',
       backendHealthExpected: 'GET /api/health renvoie OK',
       databaseTitle: 'Base de données',
       databaseExpected:
         'GET /api/database/status peut lire le stockage backend',
+      databaseTypeTitle: 'Type de base actuel',
+      databaseTypeExpected: 'JSON DB, PostgreSQL ou LocalStorage',
+      databaseTypeLocalStorage: 'LocalStorage',
+      databaseTypeJson: 'JSON DB',
+      databaseTypePostgres: 'PostgreSQL',
+      appStorageModeLabel: 'Mode de stockage de l’app',
+      backendAdapterLabel: 'Adaptateur backend',
       configTitle: 'Auto-vérifications du profil pays',
       configSubtitle:
         'Validez la structure du profil, la couverture des mots-clés et leur section propriétaire.',
@@ -250,6 +266,35 @@ export const fr: Messages = {
       debugModeLabel: 'Mode débogage',
       debugModeHint:
         'Désactivez-le pour masquer à nouveau le lien vers les outils de débogage.',
+      forceLocalStorageLabel: 'Forcer le mode LocalStorage',
+      forceLocalStorageHint:
+        'Garder cet appareil en stockage navigateur même si le backend est disponible.',
+      pauseBackendHeartbeatLabel: 'Suspendre le heartbeat backend',
+      pauseBackendHeartbeatHint:
+        'Arrêter les vérifications backend récurrentes jusqu’à désactivation.',
+      disableAutoBackendReconnectLabel: 'Désactiver la reconnexion backend automatique',
+      disableAutoBackendReconnectHint:
+        'Garder les vérifications manuelles, mais bloquer les reconnexions automatiques.',
+      showPwaInstallPromptsLabel: 'Afficher les invites d’installation PWA',
+      showPwaInstallPromptsHint:
+        'Ignorer l’état d’invite masquée pendant les tests d’installation.',
+      disablePwaSplashLabel: 'Désactiver l’écran de démarrage PWA',
+      disablePwaSplashHint:
+        'Ignorer le splash de la PWA installée au démarrage.',
+      disableEasterEggsLabel: 'Désactiver les easter eggs',
+      disableEasterEggsHint:
+        'Empêcher les interactions cachées clavier, tactiles et logo.',
+      verboseConsoleDiagnosticsLabel: 'Diagnostics console détaillés',
+      verboseConsoleDiagnosticsHint:
+        'Journaliser route, stockage, heartbeat backend et partage dans la console.',
+      runtimeTitle: 'Emplacement d’exécution',
+      runtimeSubtitle:
+        'Adresse depuis laquelle cette app installée ou session du navigateur est servie.',
+      runtimeHostnameLabel: 'Nom d’hôte',
+      runtimeHostLabel: 'Hôte',
+      runtimeOriginLabel: 'Origine',
+      runtimeProtocolLabel: 'Protocole',
+      runtimeBasePathLabel: 'Chemin de base',
       stateTitle: 'Auto-vérifications de l’état',
       stateSubtitle:
         'Validez la liste actuelle avec le parseur, la correspondance, les variantes, la progression et l’identité.',

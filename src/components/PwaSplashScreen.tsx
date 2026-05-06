@@ -11,11 +11,20 @@ const isStandalonePwa = (): boolean => {
   return window.matchMedia('(display-mode: standalone)').matches || navigatorWithStandalone.standalone === true;
 };
 
-export function PwaSplashScreen() {
+type PwaSplashScreenProps = {
+  disabled?: boolean;
+};
+
+export function PwaSplashScreen({ disabled = false }: PwaSplashScreenProps) {
   const { messages } = useI18n();
-  const [visible, setVisible] = useState(() => isStandalonePwa());
+  const [visible, setVisible] = useState(() => !disabled && isStandalonePwa());
 
   useEffect(() => {
+    if (disabled) {
+      setVisible(false);
+      return;
+    }
+
     if (!visible) { return; }
 
     const timeoutId = window.setTimeout(() => {
@@ -23,7 +32,7 @@ export function PwaSplashScreen() {
     }, SPLASH_DURATION_MS);
 
     return () => window.clearTimeout(timeoutId);
-  }, [visible]);
+  }, [disabled, visible]);
 
   if (!visible) { return null; }
 

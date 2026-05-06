@@ -155,6 +155,7 @@ export const de: Messages = {
     about: {
       tagline: 'Ein kostenloser, datenschutzbewusster Einkaufsroutenplaner.',
       versionLabel: 'Version',
+      hostLabel: 'Host',
       authorLabel: 'Erstellt von',
       authorValue: 'Rob',
       costLabel: 'Kosten',
@@ -207,6 +208,7 @@ export const de: Messages = {
       tabLayout: 'Layout',
       tabSections: 'Bereiche',
       tabStorage: 'Speicher',
+      tabHost: 'Host',
       tabSettings: 'Einstellungen',
       backendTitle: 'Backend-Prüfungen',
       backendConnected: 'Backend-API und Datenbank sind verfügbar.',
@@ -215,11 +217,25 @@ export const de: Messages = {
         'Das Backend hat geantwortet, aber eine oder mehrere Prüfungen sind fehlgeschlagen.',
       backendOffline:
         'Das Backend ist offline; die App nutzt nur Frontend-Speicher.',
+      heartbeatTitle: 'Backend-Heartbeat',
+      heartbeatSubtitle: 'Letzte Backend-Statusprüfungen, mit dem Verlauf als Sparkline.',
+      heartbeatLastChecked: 'Zuletzt geprüft',
+      heartbeatLatency: 'Latenz',
+      heartbeatSamples: 'Samples',
+      heartbeatPaused: 'Pausiert',
+      heartbeatWaiting: 'Warte auf den ersten Heartbeat',
       backendHealthTitle: 'Backend-Status',
       backendHealthExpected: 'GET /api/health liefert OK',
       databaseTitle: 'Datenbank',
       databaseExpected:
         'GET /api/database/status kann den Backend-Speicher lesen',
+      databaseTypeTitle: 'Aktueller Datenbanktyp',
+      databaseTypeExpected: 'JSON DB, PostgreSQL oder LocalStorage',
+      databaseTypeLocalStorage: 'LocalStorage',
+      databaseTypeJson: 'JSON DB',
+      databaseTypePostgres: 'PostgreSQL',
+      appStorageModeLabel: 'App-Speichermodus',
+      backendAdapterLabel: 'Backend-Adapter',
       configTitle: 'Länderprofil-Selbsttests',
       configSubtitle:
         'Prüft Profilstruktur, Keyword-Abdeckung und die zugehörigen Matcher-Bereiche.',
@@ -250,6 +266,35 @@ export const de: Messages = {
       debugModeLabel: 'Debug-Modus',
       debugModeHint:
         'Deaktiviere dies, um den Link zu den Debug-Werkzeugen wieder auszublenden.',
+      forceLocalStorageLabel: 'LocalStorage-Modus erzwingen',
+      forceLocalStorageHint:
+        'Dieses Gerät im Browser-Speicher halten, auch wenn das Backend verfügbar ist.',
+      pauseBackendHeartbeatLabel: 'Backend-Heartbeat pausieren',
+      pauseBackendHeartbeatHint:
+        'Wiederkehrende Backend-Prüfungen stoppen, bis dies deaktiviert wird.',
+      disableAutoBackendReconnectLabel: 'Automatische Backend-Verbindung deaktivieren',
+      disableAutoBackendReconnectHint:
+        'Manuelle Backend-Prüfungen erlauben, aber automatische Reconnects verhindern.',
+      showPwaInstallPromptsLabel: 'PWA-Installationshinweise anzeigen',
+      showPwaInstallPromptsHint:
+        'Ausgeblendete Installationshinweise beim Testen ignorieren.',
+      disablePwaSplashLabel: 'PWA-Startbild deaktivieren',
+      disablePwaSplashHint:
+        'Das Start-Overlay der installierten PWA überspringen.',
+      disableEasterEggsLabel: 'Easter Eggs deaktivieren',
+      disableEasterEggsHint:
+        'Versteckte Tastatur-, Touch- und Logo-Interaktionen verhindern.',
+      verboseConsoleDiagnosticsLabel: 'Ausführliche Konsolendiagnose',
+      verboseConsoleDiagnosticsHint:
+        'Route, Speicher, Backend-Heartbeat und Teilen-Aktionen in der Konsole protokollieren.',
+      runtimeTitle: 'Laufzeit-Adresse',
+      runtimeSubtitle:
+        'Von wo diese installierte App oder Browser-Sitzung gerade bereitgestellt wird.',
+      runtimeHostnameLabel: 'Hostname',
+      runtimeHostLabel: 'Host',
+      runtimeOriginLabel: 'Origin',
+      runtimeProtocolLabel: 'Protokoll',
+      runtimeBasePathLabel: 'Basispfad',
       stateTitle: 'Status-Selbsttests',
       stateSubtitle:
         'Prüft die aktuelle Liste gegen Parser, Matcher, Varianten, Fortschritt und Listenidentität.',

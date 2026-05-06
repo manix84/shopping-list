@@ -499,7 +499,6 @@ export const getDatabaseStatus = async () => {
     return {
       ok: true,
       adapter: 'json',
-      path: databasePath,
       settingsExists: database.settings.exists,
       settingsCountryCode: database.settings.record.countryCode,
       settingsUpdatedAt: database.settings.record.updatedAt,

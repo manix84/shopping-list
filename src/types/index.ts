@@ -1,7 +1,23 @@
 export type PageKey = 'edit' | 'route' | 'sections' | 'settings' | 'about' | 'debug' | 'not-found' | 'server-error';
+export type DebugTabKey =
+  | 'parsed'
+  | 'state'
+  | 'backend'
+  | 'config'
+  | 'matcher'
+  | 'quantity'
+  | 'measurements'
+  | 'weights'
+  | 'variants'
+  | 'layout'
+  | 'sections'
+  | 'storage'
+  | 'host'
+  | 'settings';
 export type AppRoute = {
   page: PageKey;
   listId?: string;
+  debugTab?: DebugTabKey;
 };
 export type CountryCode = 'uk' | 'us' | 'ca' | 'fr' | 'de' | 'it' | 'be' | 'es' | 'ro' | 'mx' | 'nl';
 export type ThemeMode = 'system' | 'light' | 'dark';
@@ -210,8 +226,28 @@ export type StateTestResult = {
 };
 
 export type BackendConnectionState = 'checking' | 'connected' | 'offline' | 'error';
+export type BackendDatabaseAdapter = 'json' | 'postgres';
+
+export type BackendHeartbeatSample = {
+  checkedAt: string;
+  state: BackendConnectionState;
+  healthOk: boolean;
+  databaseOk: boolean;
+  adapter?: BackendDatabaseAdapter;
+  latencyMs: number;
+};
 
 export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
+
+export type DebugSettings = {
+  forceLocalStorage: boolean;
+  pauseBackendHeartbeat: boolean;
+  disableAutoBackendReconnect: boolean;
+  showPwaInstallPrompts: boolean;
+  disablePwaSplash: boolean;
+  disableEasterEggs: boolean;
+  verboseConsoleDiagnostics: boolean;
+};
 
 export type BackendStatus = {
   state: BackendConnectionState;
@@ -221,6 +257,7 @@ export type BackendStatus = {
   };
   database: {
     ok: boolean;
+    adapter?: BackendDatabaseAdapter;
     settingsExists?: boolean;
     settingsCountryCode?: CountryCode;
     settingsUpdatedAt?: string;
