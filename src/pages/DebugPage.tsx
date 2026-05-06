@@ -1,9 +1,10 @@
-import { useState, type KeyboardEvent } from 'react';
+import { type KeyboardEvent } from 'react';
 import type {
   BackendStatus,
   ConfigTestResult,
   CountQuantityTestResult,
   CountryConfig,
+  DebugTabKey,
   DebugSettings,
   Item,
   MatcherTestResult,
@@ -34,6 +35,7 @@ type DebugPageProps = {
   storageTests: StorageTestResult[];
   stateTests: StateTestResult[];
   isDebugMode: boolean;
+  activeTab: DebugTabKey;
   debugSettings: DebugSettings;
   matcherHasFailures: boolean;
   configHasFailures: boolean;
@@ -48,6 +50,7 @@ type DebugPageProps = {
   onDeleteItem: (itemId: string) => void;
   onDebugModeChange: (enabled: boolean) => void;
   onDebugSettingChange: (key: keyof DebugSettings, enabled: boolean) => void;
+  onDebugTabChange: (tab: DebugTabKey) => void;
   onBackToEdit: () => void;
   onBackToSettings: () => void;
 };
@@ -109,22 +112,6 @@ function DebugSettingSwitch({
   );
 }
 
-type DebugTabKey =
-  | 'parsed'
-  | 'state'
-  | 'backend'
-  | 'config'
-  | 'matcher'
-  | 'quantity'
-  | 'measurements'
-  | 'weights'
-  | 'variants'
-  | 'layout'
-  | 'sections'
-  | 'storage'
-  | 'host'
-  | 'settings';
-
 export function DebugPage({
   backendStatus,
   storageMode,
@@ -139,6 +126,7 @@ export function DebugPage({
   storageTests,
   stateTests,
   isDebugMode,
+  activeTab,
   debugSettings,
   matcherHasFailures,
   configHasFailures,
@@ -153,11 +141,11 @@ export function DebugPage({
   onDeleteItem,
   onDebugModeChange,
   onDebugSettingChange,
+  onDebugTabChange,
   onBackToEdit,
   onBackToSettings,
 }: DebugPageProps) {
   const { messages } = useI18n();
-  const [activeTab, setActiveTab] = useState<DebugTabKey>('parsed');
   const runtimeLocation =
     typeof window === 'undefined'
       ? null
@@ -218,7 +206,7 @@ export function DebugPage({
 
     event.preventDefault();
     const nextTab = debugTabs[nextIndex];
-    setActiveTab(nextTab.key);
+    onDebugTabChange(nextTab.key);
     document.getElementById(`debug-tab-${nextTab.key}`)?.focus();
   };
 
@@ -253,7 +241,7 @@ export function DebugPage({
             aria-controls={activeTab === tab.key ? `debug-panel-${tab.key}` : undefined}
             tabIndex={activeTab === tab.key ? 0 : -1}
             className={`button ${activeTab === tab.key ? 'button-active' : ''}`}
-            onClick={() => setActiveTab(tab.key)}
+            onClick={() => onDebugTabChange(tab.key)}
             onKeyDown={(event) => handleTabKeyDown(event, index)}
           >
             {tab.label}

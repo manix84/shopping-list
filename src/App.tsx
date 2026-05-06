@@ -58,7 +58,7 @@ import { ErrorPage } from './pages/ErrorPage';
 import { RoutePage } from './pages/RoutePage';
 import { SectionsPage } from './pages/SectionsPage';
 import { SettingsPage } from './pages/SettingsPage';
-import type { AppRoute, BackendStatus, CountryCode, DebugSettings, GroupedSectionView, Item, MeasurementDisplayMode, PageKey, RouteViewMode, SaveStatus, SectionKey, SharedListHistoryEntry, ShoppingListRecord, ThemeMode } from './types';
+import type { AppRoute, BackendStatus, CountryCode, DebugSettings, DebugTabKey, GroupedSectionView, Item, MeasurementDisplayMode, PageKey, RouteViewMode, SaveStatus, SectionKey, SharedListHistoryEntry, ShoppingListRecord, ThemeMode } from './types';
 
 const DEFAULT_PAGE: PageKey = 'edit';
 const BACKEND_HEARTBEAT_CONNECTED_MS = 5_000;
@@ -259,6 +259,7 @@ export default function App() {
   );
   const messages = useMemo(() => createMessages(locale), [locale]);
   const { page, listId } = route;
+  const activeDebugTab: DebugTabKey = page === 'debug' ? route.debugTab ?? 'parsed' : 'parsed';
   const canUseBackend = backendStatus.state === 'connected' && !debugSettings.forceLocalStorage;
   const canCreateSharedLink = items.length > 0 || cleanLine(input).length > 0;
   const shareLink =
@@ -268,7 +269,15 @@ export default function App() {
   const shareErrorMessage = shareError ? messages.sharing[shareError] : undefined;
 
   const changePage = (nextPage: PageKey) => {
-    setRoute((current) => ({ ...current, page: nextPage }));
+    setRoute((current) => ({
+      ...current,
+      page: nextPage,
+      debugTab: nextPage === 'debug' ? current.debugTab ?? 'parsed' : undefined,
+    }));
+  };
+
+  const changeDebugTab = (debugTab: DebugTabKey) => {
+    setRoute((current) => ({ ...current, page: 'debug', debugTab }));
   };
 
   const enableDebugMode = () => {
@@ -672,6 +681,7 @@ export default function App() {
       setRoute((current) => ({
         page: current.page,
         listId: nextServerBacked ? nextListId : undefined,
+        debugTab: current.debugTab,
       }));
       setCountryCode(selectedRecord.countryCode);
       setListName(selectedRecord.listName ?? '');
@@ -807,6 +817,7 @@ export default function App() {
         setRoute((current) => ({
           page: current.page,
           listId: activeListId,
+          debugTab: current.debugTab,
         }));
         setCountryCode(selectedRecord.countryCode);
         setListName(selectedRecord.listName ?? '');
@@ -841,14 +852,16 @@ export default function App() {
     verboseDebugLog('forcing local storage mode', { activeListId });
     setStorageMode('local');
     setIsServerBackedList(false);
-    setRoute((current) => ({ page: current.page }));
+    setRoute((current) => ({ page: current.page, debugTab: current.debugTab }));
   }, [activeListId, debugSettings.forceLocalStorage, isLoaded, storageMode, verboseDebugLog]);
 
   useEffect(() => {
     const handleLocationChange = () => {
       setRoute((current) => {
         const next = readRouteFromLocation();
-        return current.page === next.page && current.listId === next.listId ? current : next;
+        return current.page === next.page && current.listId === next.listId && current.debugTab === next.debugTab
+          ? current
+          : next;
       });
     };
 
@@ -1416,6 +1429,7 @@ export default function App() {
                 storageTests={storageTests}
                 stateTests={stateTests}
                 isDebugMode={isDebugMode}
+                activeTab={activeDebugTab}
                 debugSettings={debugSettings}
                 matcherHasFailures={matcherTests.some((test) => !test.passed)}
                 configHasFailures={configTests.some((test) => !test.passed)}
@@ -1430,6 +1444,7 @@ export default function App() {
                 onDeleteItem={handleDeleteItem}
                 onDebugModeChange={handleDebugModeChange}
                 onDebugSettingChange={handleDebugSettingChange}
+                onDebugTabChange={changeDebugTab}
                 onBackToEdit={() => changePage('edit')}
                 onBackToSettings={() => changePage('settings')}
               />

@@ -1,7 +1,23 @@
 export type PageKey = 'edit' | 'route' | 'sections' | 'settings' | 'about' | 'debug' | 'not-found' | 'server-error';
+export type DebugTabKey =
+  | 'parsed'
+  | 'state'
+  | 'backend'
+  | 'config'
+  | 'matcher'
+  | 'quantity'
+  | 'measurements'
+  | 'weights'
+  | 'variants'
+  | 'layout'
+  | 'sections'
+  | 'storage'
+  | 'host'
+  | 'settings';
 export type AppRoute = {
   page: PageKey;
   listId?: string;
+  debugTab?: DebugTabKey;
 };
 export type CountryCode = 'uk' | 'us' | 'ca' | 'fr' | 'de' | 'it' | 'be' | 'es' | 'ro' | 'mx' | 'nl';
 export type ThemeMode = 'system' | 'light' | 'dark';
