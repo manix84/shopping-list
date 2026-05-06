@@ -3,7 +3,6 @@ import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { COUNTRY_CONFIGS } from '../config/countries';
 import type { CountryCode, RouteViewMode, SaveStatus, ThemeMode } from '../types';
 import { Card } from '../components/Card';
-import { DebugLink } from '../components/DebugLink';
 import { SaveStatusIndicator } from '../components/SaveStatusIndicator';
 import {
   AUTO_DETECT_COUNTRY,
@@ -27,7 +26,6 @@ type SettingsPageProps = {
   themeMode: ThemeMode;
   onRouteViewModeChange: (mode: RouteViewMode) => void;
   onThemeChange: (themeMode: ThemeMode) => void;
-  onOpenDebug: () => void;
   canPromptInstall: boolean;
   canShowManualInstallGuidance: boolean;
   isInstalled: boolean;
@@ -162,7 +160,6 @@ export function SettingsPage({
   themeMode,
   onRouteViewModeChange,
   onThemeChange,
-  onOpenDebug,
   canPromptInstall,
   canShowManualInstallGuidance,
   isInstalled,
@@ -341,7 +338,6 @@ export function SettingsPage({
           />
         </div>
 
-        <DebugLink onOpen={onOpenDebug} />
         <div className={'settings-footnote small-text'}>{messages.labels.storedLocally}</div>
       </Card>
       {installSetting}

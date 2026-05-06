@@ -1,13 +1,50 @@
+import { useEffect, useRef } from 'react';
 import { Card } from '../components/Card';
+import { DebugLink } from '../components/DebugLink';
 import { useI18n } from '../lib/i18n';
 import { appVersion } from '../version';
 
 const logoHref = `${import.meta.env.BASE_URL}logo-animated-loop.svg`;
 const avatarHref = `${import.meta.env.BASE_URL}rob-avatar.png`;
+const DEBUG_MODE_TAP_COUNT = 7;
+const DEBUG_MODE_TAP_RESET_MS = 2_000;
 
-export function AboutPage() {
+type AboutPageProps = {
+  isDebugMode: boolean;
+  onEnableDebugMode: () => void;
+  onOpenDebug: () => void;
+};
+
+export function AboutPage({ isDebugMode, onEnableDebugMode, onOpenDebug }: AboutPageProps) {
   const { messages } = useI18n();
   const about = messages.pages.about;
+  const versionTapCountRef = useRef(0);
+  const versionTapResetTimerRef = useRef<number>();
+
+  const handleVersionTap = () => {
+    if (isDebugMode) { return; }
+
+    if (versionTapResetTimerRef.current) {
+      window.clearTimeout(versionTapResetTimerRef.current);
+    }
+
+    versionTapCountRef.current += 1;
+    if (versionTapCountRef.current >= DEBUG_MODE_TAP_COUNT) {
+      versionTapCountRef.current = 0;
+      onEnableDebugMode();
+      return;
+    }
+
+    versionTapResetTimerRef.current = window.setTimeout(() => {
+      versionTapCountRef.current = 0;
+    }, DEBUG_MODE_TAP_RESET_MS);
+  };
+
+  useEffect(() => () => {
+    if (versionTapResetTimerRef.current) {
+      window.clearTimeout(versionTapResetTimerRef.current);
+    }
+  }, []);
 
   return (
     <div className={'about-page'}>
@@ -35,7 +72,11 @@ export function AboutPage() {
         <dl className={'about-spec-list'}>
           <div>
             <dt>{about.versionLabel}</dt>
-            <dd>{appVersion}</dd>
+            <dd>
+              <span onPointerUp={handleVersionTap}>
+                {appVersion}
+              </span>
+            </dd>
           </div>
           <div>
             <dt>{about.authorLabel}</dt>
@@ -69,6 +110,8 @@ export function AboutPage() {
             {about.sponsorAction}
           </a>
         </div>
+
+        {isDebugMode ? <DebugLink onOpen={onOpenDebug} /> : null}
 
         <p className={'about-footnote'}>{about.sponsorFootnote}</p>
       </Card>

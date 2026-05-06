@@ -15,6 +15,7 @@ import {
   runUnitQuantityTests,
   runVariantTests,
 } from './lib/debugTests';
+import { loadDebugMode, saveDebugMode } from './lib/debugModePreference';
 import {
   applyDocumentLocale,
   createMessages,
@@ -230,6 +231,7 @@ export default function App() {
   const [routeViewMode, setRouteViewMode] = useState<RouteViewMode>(() => loadRouteViewMode());
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>(() => getResolvedTheme(loadThemeMode()));
   const [locale, setLocale] = useState(() => loadLocale());
+  const [isDebugMode, setIsDebugMode] = useState(() => loadDebugMode());
   const [isCreatingShareLink, setIsCreatingShareLink] = useState(false);
   const [isRefreshingSharedList, setIsRefreshingSharedList] = useState(false);
   const [isLoadingSharedList, setIsLoadingSharedList] = useState(false);
@@ -266,6 +268,15 @@ export default function App() {
 
   const changePage = (nextPage: PageKey) => {
     setRoute((current) => ({ ...current, page: nextPage }));
+  };
+
+  const enableDebugMode = () => {
+    setIsDebugMode(true);
+    try {
+      saveDebugMode(true);
+    } catch (error) {
+      console.warn('Unable to save debug mode preference.', error);
+    }
   };
 
   const applyTheme = (mode: ThemeMode) => {
@@ -1284,7 +1295,6 @@ export default function App() {
                 themeMode={themeMode}
                 onRouteViewModeChange={setRouteViewMode}
                 onThemeChange={setThemeMode}
-                onOpenDebug={() => changePage('debug')}
                 canPromptInstall={canPromptInstall}
                 canShowManualInstallGuidance={canShowManualInstallGuidance}
                 isInstalled={isPwaInstalled}
@@ -1295,7 +1305,13 @@ export default function App() {
 
             {page === 'sections' ? <SectionsPage config={config} /> : null}
 
-            {page === 'about' ? <AboutPage /> : null}
+            {page === 'about' ? (
+              <AboutPage
+                isDebugMode={isDebugMode}
+                onEnableDebugMode={enableDebugMode}
+                onOpenDebug={() => changePage('debug')}
+              />
+            ) : null}
 
             {page === 'debug' ? (
               <DebugPage
@@ -1329,6 +1345,7 @@ export default function App() {
             {page === 'not-found' || page === 'server-error' ? (
               <ErrorPage
                 variant={page}
+                isDebugMode={isDebugMode}
                 onBackToEdit={() => changePage('edit')}
                 onOpenDebug={() => changePage('debug')}
               />

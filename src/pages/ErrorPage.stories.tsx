@@ -11,6 +11,7 @@ const meta = {
     layout: 'fullscreen',
   },
   args: {
+    isDebugMode: true,
     onBackToEdit: fn(),
     onOpenDebug: fn(),
   },
