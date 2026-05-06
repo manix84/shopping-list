@@ -257,6 +257,27 @@ export const nl: Messages = {
       debugModeLabel: 'Debugmodus',
       debugModeHint:
         'Zet dit uit om de link naar de debughulpmiddelen weer te verbergen.',
+      forceLocalStorageLabel: 'LocalStorage-modus afdwingen',
+      forceLocalStorageHint:
+        'Houd dit apparaat in browseropslag, ook als de backend gezond is.',
+      pauseBackendHeartbeatLabel: 'Backend-heartbeat pauzeren',
+      pauseBackendHeartbeatHint:
+        'Stop terugkerende backendcontroles tot dit uit staat.',
+      disableAutoBackendReconnectLabel: 'Automatisch backendherstel uitzetten',
+      disableAutoBackendReconnectHint:
+        'Laat handmatige controles toe, maar stop automatische herverbindingen.',
+      showPwaInstallPromptsLabel: 'PWA-installatiemeldingen tonen',
+      showPwaInstallPromptsHint:
+        'Negeer de weggeklikte installatiemelding tijdens testen.',
+      disablePwaSplashLabel: 'PWA-splashscreen uitzetten',
+      disablePwaSplashHint:
+        'Sla de splash-overlay van de geïnstalleerde PWA over.',
+      disableEasterEggsLabel: 'Easter eggs uitzetten',
+      disableEasterEggsHint:
+        'Voorkom verborgen toetsenbord-, touch- en logo-interacties.',
+      verboseConsoleDiagnosticsLabel: 'Uitgebreide consolediagnose',
+      verboseConsoleDiagnosticsHint:
+        'Log route, opslag, backend-heartbeat en delen-acties naar de console.',
       runtimeTitle: 'Runtime-locatie',
       runtimeSubtitle:
         'Waar deze geïnstalleerde app of browsersessie nu vandaan wordt geserveerd.',

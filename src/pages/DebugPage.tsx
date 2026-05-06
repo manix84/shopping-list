@@ -4,6 +4,7 @@ import type {
   ConfigTestResult,
   CountQuantityTestResult,
   CountryConfig,
+  DebugSettings,
   Item,
   MatcherTestResult,
   MeasurementTestResult,
@@ -33,6 +34,7 @@ type DebugPageProps = {
   storageTests: StorageTestResult[];
   stateTests: StateTestResult[];
   isDebugMode: boolean;
+  debugSettings: DebugSettings;
   matcherHasFailures: boolean;
   configHasFailures: boolean;
   countQuantityHasFailures: boolean;
@@ -45,6 +47,7 @@ type DebugPageProps = {
   onToggleItem: (itemId: string) => void;
   onDeleteItem: (itemId: string) => void;
   onDebugModeChange: (enabled: boolean) => void;
+  onDebugSettingChange: (key: keyof DebugSettings, enabled: boolean) => void;
   onBackToEdit: () => void;
   onBackToSettings: () => void;
 };
@@ -78,6 +81,34 @@ const currentDatabaseTypeLabel = (status: BackendStatus, storageMode: 'local' | 
   return databaseAdapterLabel(status, messages);
 };
 
+function DebugSettingSwitch({
+  label,
+  hint,
+  checked,
+  onChange,
+}: {
+  label: string;
+  hint: string;
+  checked: boolean;
+  onChange: (enabled: boolean) => void;
+}) {
+  return (
+    <label className={'debug-setting-switch'}>
+      <span>
+        <span className={'debug-setting-label'}>{label}</span>
+        <span className={'small-text'}>{hint}</span>
+      </span>
+      <input
+        className={'debug-setting-switch-input'}
+        type={'checkbox'}
+        role={'switch'}
+        checked={checked}
+        onChange={(event) => onChange(event.target.checked)}
+      />
+    </label>
+  );
+}
+
 type DebugTabKey =
   | 'parsed'
   | 'state'
@@ -108,6 +139,7 @@ export function DebugPage({
   storageTests,
   stateTests,
   isDebugMode,
+  debugSettings,
   matcherHasFailures,
   configHasFailures,
   countQuantityHasFailures,
@@ -120,6 +152,7 @@ export function DebugPage({
   onToggleItem,
   onDeleteItem,
   onDebugModeChange,
+  onDebugSettingChange,
   onBackToEdit,
   onBackToSettings,
 }: DebugPageProps) {
@@ -697,19 +730,54 @@ export function DebugPage({
           }
           bodyClassName={'stack'}
         >
-          <label className={'debug-setting-switch'}>
-            <span>
-              <span className={'debug-setting-label'}>{messages.pages.debug.debugModeLabel}</span>
-              <span className={'small-text'}>{messages.pages.debug.debugModeHint}</span>
-            </span>
-            <input
-              className={'debug-setting-switch-input'}
-              type={'checkbox'}
-              role={'switch'}
-              checked={isDebugMode}
-              onChange={(event) => onDebugModeChange(event.target.checked)}
-            />
-          </label>
+          <DebugSettingSwitch
+            label={messages.pages.debug.debugModeLabel}
+            hint={messages.pages.debug.debugModeHint}
+            checked={isDebugMode}
+            onChange={onDebugModeChange}
+          />
+          <DebugSettingSwitch
+            label={messages.pages.debug.forceLocalStorageLabel}
+            hint={messages.pages.debug.forceLocalStorageHint}
+            checked={debugSettings.forceLocalStorage}
+            onChange={(enabled) => onDebugSettingChange('forceLocalStorage', enabled)}
+          />
+          <DebugSettingSwitch
+            label={messages.pages.debug.pauseBackendHeartbeatLabel}
+            hint={messages.pages.debug.pauseBackendHeartbeatHint}
+            checked={debugSettings.pauseBackendHeartbeat}
+            onChange={(enabled) => onDebugSettingChange('pauseBackendHeartbeat', enabled)}
+          />
+          <DebugSettingSwitch
+            label={messages.pages.debug.disableAutoBackendReconnectLabel}
+            hint={messages.pages.debug.disableAutoBackendReconnectHint}
+            checked={debugSettings.disableAutoBackendReconnect}
+            onChange={(enabled) => onDebugSettingChange('disableAutoBackendReconnect', enabled)}
+          />
+          <DebugSettingSwitch
+            label={messages.pages.debug.showPwaInstallPromptsLabel}
+            hint={messages.pages.debug.showPwaInstallPromptsHint}
+            checked={debugSettings.showPwaInstallPrompts}
+            onChange={(enabled) => onDebugSettingChange('showPwaInstallPrompts', enabled)}
+          />
+          <DebugSettingSwitch
+            label={messages.pages.debug.disablePwaSplashLabel}
+            hint={messages.pages.debug.disablePwaSplashHint}
+            checked={debugSettings.disablePwaSplash}
+            onChange={(enabled) => onDebugSettingChange('disablePwaSplash', enabled)}
+          />
+          <DebugSettingSwitch
+            label={messages.pages.debug.disableEasterEggsLabel}
+            hint={messages.pages.debug.disableEasterEggsHint}
+            checked={debugSettings.disableEasterEggs}
+            onChange={(enabled) => onDebugSettingChange('disableEasterEggs', enabled)}
+          />
+          <DebugSettingSwitch
+            label={messages.pages.debug.verboseConsoleDiagnosticsLabel}
+            hint={messages.pages.debug.verboseConsoleDiagnosticsHint}
+            checked={debugSettings.verboseConsoleDiagnostics}
+            onChange={(enabled) => onDebugSettingChange('verboseConsoleDiagnostics', enabled)}
+          />
         </Card>
       ) : null}
 

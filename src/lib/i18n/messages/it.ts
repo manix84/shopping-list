@@ -257,6 +257,27 @@ export const it: Messages = {
       debugModeLabel: 'Modalità debug',
       debugModeHint:
         'Disattivala per nascondere di nuovo il link agli strumenti di debug.',
+      forceLocalStorageLabel: 'Forza modalità LocalStorage',
+      forceLocalStorageHint:
+        'Mantieni questo dispositivo nello storage del browser anche con backend sano.',
+      pauseBackendHeartbeatLabel: 'Metti in pausa heartbeat backend',
+      pauseBackendHeartbeatHint:
+        'Ferma i controlli backend ricorrenti finché non viene disattivato.',
+      disableAutoBackendReconnectLabel: 'Disattiva riconnessione backend automatica',
+      disableAutoBackendReconnectHint:
+        'Mantieni i controlli manuali, ma blocca le riconnessioni automatiche.',
+      showPwaInstallPromptsLabel: 'Mostra prompt installazione PWA',
+      showPwaInstallPromptsHint:
+        'Ignora lo stato di prompt chiuso durante i test di installazione.',
+      disablePwaSplashLabel: 'Disattiva schermata iniziale PWA',
+      disablePwaSplashHint:
+        'Salta lo splash della PWA installata all’avvio.',
+      disableEasterEggsLabel: 'Disattiva easter egg',
+      disableEasterEggsHint:
+        'Impedisci interazioni nascoste da tastiera, touch e logo.',
+      verboseConsoleDiagnosticsLabel: 'Diagnostica console dettagliata',
+      verboseConsoleDiagnosticsHint:
+        'Registra route, storage, heartbeat backend e condivisione in console.',
       runtimeTitle: 'Posizione di esecuzione',
       runtimeSubtitle:
         'Da dove questa app installata o sessione del browser viene servita ora.',

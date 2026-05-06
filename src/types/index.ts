@@ -214,6 +214,16 @@ export type BackendDatabaseAdapter = 'json' | 'postgres';
 
 export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 
+export type DebugSettings = {
+  forceLocalStorage: boolean;
+  pauseBackendHeartbeat: boolean;
+  disableAutoBackendReconnect: boolean;
+  showPwaInstallPrompts: boolean;
+  disablePwaSplash: boolean;
+  disableEasterEggs: boolean;
+  verboseConsoleDiagnostics: boolean;
+};
+
 export type BackendStatus = {
   state: BackendConnectionState;
   health: {

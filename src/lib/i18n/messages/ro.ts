@@ -256,6 +256,27 @@ export const ro: Messages = {
       debugModeLabel: 'Mod depanare',
       debugModeHint:
         'Dezactivează pentru a ascunde din nou linkul către uneltele de depanare.',
+      forceLocalStorageLabel: 'Forțează modul LocalStorage',
+      forceLocalStorageHint:
+        'Păstrează acest dispozitiv în stocarea browserului chiar și cu backend sănătos.',
+      pauseBackendHeartbeatLabel: 'Pauzează heartbeat-ul backend',
+      pauseBackendHeartbeatHint:
+        'Oprește verificările recurente de backend până este dezactivat.',
+      disableAutoBackendReconnectLabel: 'Dezactivează reconectarea automată',
+      disableAutoBackendReconnectHint:
+        'Păstrează verificările manuale, dar oprește reconectările automate.',
+      showPwaInstallPromptsLabel: 'Arată invitațiile de instalare PWA',
+      showPwaInstallPromptsHint:
+        'Ignoră starea invitației închise în timpul testelor de instalare.',
+      disablePwaSplashLabel: 'Dezactivează ecranul PWA de pornire',
+      disablePwaSplashHint:
+        'Sari peste overlay-ul de pornire al PWA instalate.',
+      disableEasterEggsLabel: 'Dezactivează easter egg-urile',
+      disableEasterEggsHint:
+        'Previne interacțiunile ascunse de tastatură, touch și logo.',
+      verboseConsoleDiagnosticsLabel: 'Diagnostic detaliat în consolă',
+      verboseConsoleDiagnosticsHint:
+        'Loghează ruta, stocarea, heartbeat-ul backend și acțiunile de partajare.',
       runtimeTitle: 'Locație de rulare',
       runtimeSubtitle:
         'De unde este servită acum această aplicație instalată sau sesiune de browser.',

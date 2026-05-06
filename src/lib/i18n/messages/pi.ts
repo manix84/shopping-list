@@ -255,6 +255,27 @@ export const pi: Messages = {
       debugModeLabel: 'Bilge mode',
       debugModeHint:
         'Turn this off to hide the bilge tools link again.',
+      forceLocalStorageLabel: 'Force LocalStorage mode',
+      forceLocalStorageHint:
+        'Keep this device in browser stowage even when the backend be healthy.',
+      pauseBackendHeartbeatLabel: 'Pause backend heartbeat',
+      pauseBackendHeartbeatHint:
+        'Stop the recurring backend checks until this be turned off.',
+      disableAutoBackendReconnectLabel: 'Disable auto backend reconnect',
+      disableAutoBackendReconnectHint:
+        'Keep manual backend checks, but stop automatic reconnects.',
+      showPwaInstallPromptsLabel: 'Show PWA install prompts',
+      showPwaInstallPromptsHint:
+        'Ignore the dismissed install nudge while testing install UI.',
+      disablePwaSplashLabel: 'Disable PWA splash screen',
+      disablePwaSplashHint:
+        'Skip the installed PWA splash overlay on startup.',
+      disableEasterEggsLabel: 'Disable easter eggs',
+      disableEasterEggsHint:
+        'Prevent hidden keyboard, touch, and logo-triggered tricks.',
+      verboseConsoleDiagnosticsLabel: 'Verbose console diagnostics',
+      verboseConsoleDiagnosticsHint:
+        'Log route, stowage, backend heartbeat, and sharing diagnostics.',
       runtimeTitle: 'Runtime berth',
       runtimeSubtitle:
         'Where this installed app or browser session be served from right now.',

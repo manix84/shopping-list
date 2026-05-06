@@ -259,6 +259,27 @@ export const de: Messages = {
       debugModeLabel: 'Debug-Modus',
       debugModeHint:
         'Deaktiviere dies, um den Link zu den Debug-Werkzeugen wieder auszublenden.',
+      forceLocalStorageLabel: 'LocalStorage-Modus erzwingen',
+      forceLocalStorageHint:
+        'Dieses Gerät im Browser-Speicher halten, auch wenn das Backend verfügbar ist.',
+      pauseBackendHeartbeatLabel: 'Backend-Heartbeat pausieren',
+      pauseBackendHeartbeatHint:
+        'Wiederkehrende Backend-Prüfungen stoppen, bis dies deaktiviert wird.',
+      disableAutoBackendReconnectLabel: 'Automatische Backend-Verbindung deaktivieren',
+      disableAutoBackendReconnectHint:
+        'Manuelle Backend-Prüfungen erlauben, aber automatische Reconnects verhindern.',
+      showPwaInstallPromptsLabel: 'PWA-Installationshinweise anzeigen',
+      showPwaInstallPromptsHint:
+        'Ausgeblendete Installationshinweise beim Testen ignorieren.',
+      disablePwaSplashLabel: 'PWA-Startbild deaktivieren',
+      disablePwaSplashHint:
+        'Das Start-Overlay der installierten PWA überspringen.',
+      disableEasterEggsLabel: 'Easter Eggs deaktivieren',
+      disableEasterEggsHint:
+        'Versteckte Tastatur-, Touch- und Logo-Interaktionen verhindern.',
+      verboseConsoleDiagnosticsLabel: 'Ausführliche Konsolendiagnose',
+      verboseConsoleDiagnosticsHint:
+        'Route, Speicher, Backend-Heartbeat und Teilen-Aktionen in der Konsole protokollieren.',
       runtimeTitle: 'Laufzeit-Adresse',
       runtimeSubtitle:
         'Von wo diese installierte App oder Browser-Sitzung gerade bereitgestellt wird.',
