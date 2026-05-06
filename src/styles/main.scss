@@ -1092,10 +1092,13 @@ select {
   border-radius: 6px;
   height: 150px;
   overflow: hidden;
+  position: relative;
 
   svg {
     display: block;
     height: 100%;
+    inset: 0;
+    position: absolute;
     width: 100%;
   }
 }
@@ -1109,33 +1112,54 @@ select {
 
 .heartbeat-graph-line {
   fill: none;
-  stroke: currentColor;
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 2.6;
   vector-effect: non-scaling-stroke;
 }
 
-.heartbeat-graph-point {
-  fill: $panel;
-  stroke-width: 1.2;
-  vector-effect: non-scaling-stroke;
-}
-
-.heartbeat-graph-point-good {
+.heartbeat-graph-line-good {
   stroke: $success-text;
 }
 
-.heartbeat-graph-point-okay {
+.heartbeat-graph-line-okay {
   stroke: #d9a20b;
 }
 
-.heartbeat-graph-point-poor {
+.heartbeat-graph-line-poor {
   stroke: #e46f28;
 }
 
-.heartbeat-graph-point-offline {
+.heartbeat-graph-line-offline {
   stroke: $danger-text;
+}
+
+.heartbeat-graph-point {
+  fill: $panel;
+  background: currentColor;
+  border: 1px solid $panel;
+  border-radius: 999px;
+  box-shadow: 0 0 0 1px currentColor;
+  height: 5px;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 5px;
+}
+
+.heartbeat-graph-point-good {
+  color: $success-text;
+}
+
+.heartbeat-graph-point-okay {
+  color: #d9a20b;
+}
+
+.heartbeat-graph-point-poor {
+  color: #e46f28;
+}
+
+.heartbeat-graph-point-offline {
+  color: $danger-text;
 }
 
 @keyframes heartbeat-ring {

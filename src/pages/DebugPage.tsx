@@ -106,6 +106,12 @@ const heartbeatPolyline = (samples: BackendHeartbeatSample[]) => {
   }).join(' ');
 };
 
+const heartbeatPoint = (sample: BackendHeartbeatSample, index: number, total: number) => {
+  const x = total === 1 ? 100 : (index / (total - 1)) * 100;
+  const y = 100 - heartbeatLatencyScore(sample);
+  return { x, y };
+};
+
 const heartbeatLatencyTone = (sample: BackendHeartbeatSample) => {
   if (sample.state !== 'connected' || !sample.healthOk || !sample.databaseOk) { return 'offline'; }
   if (sample.latencyMs <= 150) { return 'good'; }
@@ -402,23 +408,38 @@ export function DebugPage({
             <div className={'heartbeat-graph'} aria-hidden={'true'}>
               <svg viewBox={'0 0 100 100'} preserveAspectRatio={'none'}>
                 <path className={'heartbeat-graph-grid'} d={'M0 25 H100 M0 50 H100 M0 75 H100'} />
-                {heartbeatPath ? <polyline className={'heartbeat-graph-line'} points={heartbeatPath} /> : null}
-                {heartbeatSamples.map((sample, index) => {
-                  const x = heartbeatSamples.length === 1 ? 100 : (index / (heartbeatSamples.length - 1)) * 100;
-                  const y = 100 - heartbeatLatencyScore(sample);
-                  const tone = heartbeatLatencyTone(sample);
+                {heartbeatPath && heartbeatSamples.length === 1 ? (
+                  <polyline
+                    className={`heartbeat-graph-line heartbeat-graph-line-${heartbeatLatencyTone(heartbeatSamples[0])}`}
+                    points={heartbeatPath}
+                  />
+                ) : null}
+                {heartbeatSamples.slice(1).map((sample, index) => {
+                  const previousPoint = heartbeatPoint(heartbeatSamples[index], index, heartbeatSamples.length);
+                  const nextPoint = heartbeatPoint(sample, index + 1, heartbeatSamples.length);
                   return (
-                    <ellipse
+                    <line
                       key={`${sample.checkedAt}-${index}`}
-                      className={`heartbeat-graph-point heartbeat-graph-point-${tone}`}
-                      cx={x}
-                      cy={y}
-                      rx={'1.7'}
-                      ry={'3.5'}
+                      className={`heartbeat-graph-line heartbeat-graph-line-${heartbeatLatencyTone(sample)}`}
+                      x1={previousPoint.x}
+                      y1={previousPoint.y}
+                      x2={nextPoint.x}
+                      y2={nextPoint.y}
                     />
                   );
                 })}
               </svg>
+              {heartbeatSamples.map((sample, index) => {
+                const { x, y } = heartbeatPoint(sample, index, heartbeatSamples.length);
+                const tone = heartbeatLatencyTone(sample);
+                return (
+                  <span
+                    key={`${sample.checkedAt}-${index}`}
+                    className={`heartbeat-graph-point heartbeat-graph-point-${tone}`}
+                    style={{ left: `${x}%`, top: `${y}%` }}
+                  />
+                );
+              })}
             </div>
           </div>
           <TestResultCard
