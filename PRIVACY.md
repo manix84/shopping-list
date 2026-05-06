@@ -48,7 +48,9 @@ Smart Shopping List does not:
 
 You can clear local browser data using the app's reset flow or your browser's site data controls.
 
-If you run the backend, the database is stored in `data/shopping-list-db.json` by default. Whoever runs the backend controls that file and can back it up, delete it, or move it using `SHOPPING_LIST_DB_PATH`.
+If you run the backend with `DATABASE_URL` configured, the database is stored in that PostgreSQL database. Whoever runs the backend controls that database and can back it up, delete it, or rotate credentials using their hosting provider’s tools.
+
+If `DATABASE_URL` is not configured, the backend falls back to `data/shopping-list-db.json`. That file fallback is intended for quick local experiments and should not be treated as durable production storage.
 
 ## Open source
 
