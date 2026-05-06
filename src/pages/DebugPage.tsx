@@ -86,25 +86,31 @@ const currentDatabaseTypeLabel = (status: BackendStatus, storageMode: 'local' | 
   return databaseAdapterLabel(status, messages);
 };
 
-const heartbeatScore = (sample: BackendHeartbeatSample) => {
-  if (sample.state === 'connected' && sample.healthOk && sample.databaseOk) { return 92; }
-  if (sample.state === 'checking') { return 66; }
-  if (sample.state === 'error') { return 42; }
-  return 18;
+const heartbeatLatencyScore = (sample: BackendHeartbeatSample) => {
+  if (sample.state !== 'connected' || !sample.healthOk || !sample.databaseOk) { return 0; }
+  const clampedLatency = Math.min(sample.latencyMs, 1_500);
+  return 100 - (clampedLatency / 1_500) * 84;
 };
 
 const heartbeatPolyline = (samples: BackendHeartbeatSample[]) => {
   if (samples.length === 0) { return ''; }
   if (samples.length === 1) {
-    const y = 100 - heartbeatScore(samples[0]);
+    const y = 100 - heartbeatLatencyScore(samples[0]);
     return `0,${y} 100,${y}`;
   }
 
   return samples.map((sample, index) => {
     const x = (index / (samples.length - 1)) * 100;
-    const y = 100 - heartbeatScore(sample);
+    const y = 100 - heartbeatLatencyScore(sample);
     return `${x.toFixed(2)},${y.toFixed(2)}`;
   }).join(' ');
+};
+
+const heartbeatLatencyTone = (sample: BackendHeartbeatSample) => {
+  if (sample.state !== 'connected' || !sample.healthOk || !sample.databaseOk) { return 'offline'; }
+  if (sample.latencyMs <= 150) { return 'good'; }
+  if (sample.latencyMs <= 500) { return 'okay'; }
+  return 'poor';
 };
 
 const formatHeartbeatTime = (checkedAt: string) =>
@@ -399,14 +405,16 @@ export function DebugPage({
                 {heartbeatPath ? <polyline className={'heartbeat-graph-line'} points={heartbeatPath} /> : null}
                 {heartbeatSamples.map((sample, index) => {
                   const x = heartbeatSamples.length === 1 ? 100 : (index / (heartbeatSamples.length - 1)) * 100;
-                  const y = 100 - heartbeatScore(sample);
+                  const y = 100 - heartbeatLatencyScore(sample);
+                  const tone = heartbeatLatencyTone(sample);
                   return (
-                    <circle
+                    <ellipse
                       key={`${sample.checkedAt}-${index}`}
-                      className={`heartbeat-graph-point heartbeat-graph-point-${sample.state}`}
+                      className={`heartbeat-graph-point heartbeat-graph-point-${tone}`}
                       cx={x}
                       cy={y}
-                      r={'1.7'}
+                      rx={'1.7'}
+                      ry={'3.5'}
                     />
                   );
                 })}

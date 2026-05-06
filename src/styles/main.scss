@@ -1122,20 +1122,20 @@ select {
   vector-effect: non-scaling-stroke;
 }
 
-.heartbeat-graph-point-connected {
+.heartbeat-graph-point-good {
   stroke: $success-text;
 }
 
-.heartbeat-graph-point-checking {
-  stroke: $primary;
+.heartbeat-graph-point-okay {
+  stroke: #d9a20b;
 }
 
-.heartbeat-graph-point-error {
-  stroke: $danger-text;
+.heartbeat-graph-point-poor {
+  stroke: #e46f28;
 }
 
 .heartbeat-graph-point-offline {
-  stroke: $muted;
+  stroke: $danger-text;
 }
 
 @keyframes heartbeat-ring {
