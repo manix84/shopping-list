@@ -201,6 +201,13 @@ export type Messages = {
       backendChecking: string;
       backendError: string;
       backendOffline: string;
+      heartbeatTitle: string;
+      heartbeatSubtitle: string;
+      heartbeatLastChecked: string;
+      heartbeatLatency: string;
+      heartbeatSamples: string;
+      heartbeatPaused: string;
+      heartbeatWaiting: string;
       backendHealthTitle: string;
       backendHealthExpected: string;
       databaseTitle: string;

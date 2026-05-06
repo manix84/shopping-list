@@ -208,6 +208,13 @@ export const en: Messages = {
       backendError: 'Backend responded, but one or more checks failed.',
       backendOffline:
         'Backend is offline; the app is using frontend-only storage.',
+      heartbeatTitle: 'Backend heartbeat',
+      heartbeatSubtitle: 'Latest backend status checks, with the recent rhythm shown as a sparkline.',
+      heartbeatLastChecked: 'Last checked',
+      heartbeatLatency: 'Latency',
+      heartbeatSamples: 'Samples',
+      heartbeatPaused: 'Paused',
+      heartbeatWaiting: 'Waiting for first heartbeat',
       backendHealthTitle: 'Backend health',
       backendHealthExpected: 'GET /api/health returns OK',
       databaseTitle: 'Database',

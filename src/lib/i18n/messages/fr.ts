@@ -217,6 +217,13 @@ export const fr: Messages = {
         'Le backend a répondu, mais une ou plusieurs vérifications ont échoué.',
       backendOffline:
         'Le backend est hors ligne ; l’application utilise uniquement le stockage frontend.',
+      heartbeatTitle: 'Heartbeat backend',
+      heartbeatSubtitle: 'Dernières vérifications backend, avec le rythme récent en sparkline.',
+      heartbeatLastChecked: 'Dernière vérification',
+      heartbeatLatency: 'Latence',
+      heartbeatSamples: 'Échantillons',
+      heartbeatPaused: 'Suspendu',
+      heartbeatWaiting: 'En attente du premier heartbeat',
       backendHealthTitle: 'Santé du backend',
       backendHealthExpected: 'GET /api/health renvoie OK',
       databaseTitle: 'Base de données',

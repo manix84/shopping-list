@@ -58,11 +58,12 @@ import { ErrorPage } from './pages/ErrorPage';
 import { RoutePage } from './pages/RoutePage';
 import { SectionsPage } from './pages/SectionsPage';
 import { SettingsPage } from './pages/SettingsPage';
-import type { AppRoute, BackendStatus, CountryCode, DebugSettings, DebugTabKey, GroupedSectionView, Item, MeasurementDisplayMode, PageKey, RouteViewMode, SaveStatus, SectionKey, SharedListHistoryEntry, ShoppingListRecord, ThemeMode } from './types';
+import type { AppRoute, BackendHeartbeatSample, BackendStatus, CountryCode, DebugSettings, DebugTabKey, GroupedSectionView, Item, MeasurementDisplayMode, PageKey, RouteViewMode, SaveStatus, SectionKey, SharedListHistoryEntry, ShoppingListRecord, ThemeMode } from './types';
 
 const DEFAULT_PAGE: PageKey = 'edit';
 const BACKEND_HEARTBEAT_CONNECTED_MS = 5_000;
 const BACKEND_HEARTBEAT_RETRY_MS = 1_500;
+const BACKEND_HEARTBEAT_HISTORY_LIMIT = 36;
 const PWA_INSTALL_NUDGE_DISMISSED_KEY = 'smart-shopping-list-pwa-install-nudge-dismissed-v1';
 const PWA_INSTALL_PROMPT_SETTLE_MS = 1_200;
 const KONAMI_SEQUENCE = ['up', 'up', 'down', 'down', 'left', 'right', 'left', 'right', 'b', 'a'] as const;
@@ -167,10 +168,10 @@ const readRouteFromLocation = (): AppRoute => {
   });
 };
 
-const syncRouteToUrl = ({ page, listId }: AppRoute): void => {
+const syncRouteToUrl = ({ page, listId, debugTab }: AppRoute): void => {
   if (typeof window === 'undefined') { return; }
 
-  const nextUrl = routeToUrl({ page, listId }, appBasePath);
+  const nextUrl = routeToUrl({ page, listId, debugTab }, appBasePath);
   const currentUrl = window.location.pathname;
   if (currentUrl !== nextUrl) {
     window.history.replaceState(null, '', nextUrl);
@@ -221,6 +222,7 @@ export default function App() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [storageMode, setStorageMode] = useState<StorageMode>('local');
   const [backendStatus, setBackendStatus] = useState<BackendStatus>(() => defaultBackendStatus());
+  const [backendHeartbeatSamples, setBackendHeartbeatSamples] = useState<BackendHeartbeatSample[]>([]);
   const [activeListId, setActiveListId] = useState<string>(() => readRouteFromLocation().listId ?? createUuidV7());
   const [isServerBackedList, setIsServerBackedList] = useState(false);
   const [countryCode, setCountryCode] = useState<CountryCode>('uk');
@@ -302,6 +304,20 @@ export default function App() {
     if (!debugSettings.verboseConsoleDiagnostics) { return; }
     console.info(`[debug] ${message}`, context ?? {});
   }, [debugSettings.verboseConsoleDiagnostics]);
+
+  const recordBackendHeartbeat = useCallback((status: BackendStatus, startedAt: number) => {
+    const sample: BackendHeartbeatSample = {
+      checkedAt: new Date().toISOString(),
+      state: status.state,
+      healthOk: status.health.ok,
+      databaseOk: status.database.ok,
+      adapter: status.database.adapter,
+      latencyMs: Math.max(0, Math.round(performance.now() - startedAt)),
+    };
+
+    setBackendHeartbeatSamples((current) => [...current, sample].slice(-BACKEND_HEARTBEAT_HISTORY_LIMIT));
+    return sample;
+  }, []);
 
   const handleDebugSettingChange = (key: keyof DebugSettings, enabled: boolean) => {
     setDebugSettings((current) => {
@@ -622,9 +638,11 @@ export default function App() {
       let nextStorageMode: StorageMode = 'local';
       let nextServerBacked = localRecordWithIdentity.serverBacked === true;
 
+      const initialHeartbeatStartedAt = performance.now();
       const initialBackendStatus = await checkBackendStatus();
       if (!cancelled) {
         setBackendStatus(initialBackendStatus);
+        recordBackendHeartbeat(initialBackendStatus, initialHeartbeatStartedAt);
       }
 
       if (initialBackendStatus.state !== 'connected' && nextServerBacked && !debugSettings.forceLocalStorage) {
@@ -678,10 +696,11 @@ export default function App() {
       setStorageMode(nextStorageMode);
       setActiveListId(nextListId);
       setIsServerBackedList(nextServerBacked);
+      const currentLocationDebugTab = readRouteFromLocation().debugTab;
       setRoute((current) => ({
         page: current.page,
         listId: nextServerBacked ? nextListId : undefined,
-        debugTab: current.debugTab,
+        debugTab: current.debugTab ?? currentLocationDebugTab,
       }));
       setCountryCode(selectedRecord.countryCode);
       setListName(selectedRecord.listName ?? '');
@@ -699,7 +718,12 @@ export default function App() {
     return () => {
       cancelled = true;
     };
-  }, [debugSettings.disableAutoBackendReconnect, debugSettings.forceLocalStorage, listId]);
+  }, [
+    debugSettings.disableAutoBackendReconnect,
+    debugSettings.forceLocalStorage,
+    listId,
+    recordBackendHeartbeat,
+  ]);
 
   useEffect(() => {
     if (!isLoaded || debugSettings.pauseBackendHeartbeat) { return; }
@@ -730,11 +754,17 @@ export default function App() {
       inFlight = true;
 
       try {
+        const heartbeatStartedAt = performance.now();
         const nextBackendStatus = await checkBackendStatus();
         if (cancelled) { return; }
 
         setBackendStatus(nextBackendStatus);
-        verboseDebugLog('backend heartbeat', { state: nextBackendStatus.state, adapter: nextBackendStatus.database.adapter });
+        const sample = recordBackendHeartbeat(nextBackendStatus, heartbeatStartedAt);
+        verboseDebugLog('backend heartbeat', {
+          state: nextBackendStatus.state,
+          adapter: nextBackendStatus.database.adapter,
+          latencyMs: sample.latencyMs,
+        });
         scheduleHeartbeat(
           nextBackendStatus.state === 'connected' ? BACKEND_HEARTBEAT_CONNECTED_MS : BACKEND_HEARTBEAT_RETRY_MS,
         );
@@ -774,7 +804,7 @@ export default function App() {
       window.removeEventListener('offline', requestImmediateHeartbeat);
       document.removeEventListener('visibilitychange', requestVisibleHeartbeat);
     };
-  }, [debugSettings.pauseBackendHeartbeat, isLoaded, verboseDebugLog]);
+  }, [debugSettings.pauseBackendHeartbeat, isLoaded, recordBackendHeartbeat, verboseDebugLog]);
 
   useEffect(() => {
     if (
@@ -814,10 +844,11 @@ export default function App() {
         suppressNextAutosaveStatus();
         setStorageMode('backend');
         setIsServerBackedList(true);
+        const currentLocationDebugTab = readRouteFromLocation().debugTab;
         setRoute((current) => ({
           page: current.page,
           listId: activeListId,
-          debugTab: current.debugTab,
+          debugTab: current.debugTab ?? currentLocationDebugTab,
         }));
         setCountryCode(selectedRecord.countryCode);
         setListName(selectedRecord.listName ?? '');
@@ -1417,6 +1448,7 @@ export default function App() {
             {page === 'debug' ? (
               <DebugPage
                 backendStatus={backendStatus}
+                heartbeatSamples={backendHeartbeatSamples}
                 storageMode={storageMode}
                 items={items}
                 config={config}

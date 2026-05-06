@@ -214,6 +214,13 @@ export const pi: Messages = {
         'Backend answered, but one or more checks went to Davy Jones.',
       backendOffline:
         'Backend be offline; the app be using frontend stowage only.',
+      heartbeatTitle: 'Backend heartbeat',
+      heartbeatSubtitle: 'Latest backend checks, with the recent rhythm shown as a sparkline.',
+      heartbeatLastChecked: 'Last checked',
+      heartbeatLatency: 'Latency',
+      heartbeatSamples: 'Samples',
+      heartbeatPaused: 'Paused',
+      heartbeatWaiting: 'Waitin’ fer first heartbeat',
       backendHealthTitle: 'Backend health',
       backendHealthExpected: 'GET /api/health returns OK',
       databaseTitle: 'Hold',

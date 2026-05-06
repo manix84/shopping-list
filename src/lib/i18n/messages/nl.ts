@@ -216,6 +216,13 @@ export const nl: Messages = {
         'Backend antwoordde, maar een of meer controles zijn mislukt.',
       backendOffline:
         'Backend is offline; de app gebruikt alleen frontend-opslag.',
+      heartbeatTitle: 'Backend-heartbeat',
+      heartbeatSubtitle: 'Laatste backendstatuscontroles, met het recente ritme als sparkline.',
+      heartbeatLastChecked: 'Laatst gecontroleerd',
+      heartbeatLatency: 'Latentie',
+      heartbeatSamples: 'Samples',
+      heartbeatPaused: 'Gepauzeerd',
+      heartbeatWaiting: 'Wachten op eerste heartbeat',
       backendHealthTitle: 'Backendstatus',
       backendHealthExpected: 'GET /api/health geeft OK terug',
       databaseTitle: 'Database',

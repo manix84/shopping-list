@@ -215,6 +215,13 @@ export const ro: Messages = {
         'Backendul a răspuns, dar una sau mai multe verificări au eșuat.',
       backendOffline:
         'Backendul este offline; aplicația folosește doar stocare frontend.',
+      heartbeatTitle: 'Heartbeat backend',
+      heartbeatSubtitle: 'Ultimele verificări backend, cu ritmul recent afișat ca sparkline.',
+      heartbeatLastChecked: 'Ultima verificare',
+      heartbeatLatency: 'Latență',
+      heartbeatSamples: 'Mostre',
+      heartbeatPaused: 'Pauzat',
+      heartbeatWaiting: 'Se așteaptă primul heartbeat',
       backendHealthTitle: 'Sănătate backend',
       backendHealthExpected: 'GET /api/health returnează OK',
       databaseTitle: 'Bază de date',

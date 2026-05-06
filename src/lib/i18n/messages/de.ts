@@ -217,6 +217,13 @@ export const de: Messages = {
         'Das Backend hat geantwortet, aber eine oder mehrere Prüfungen sind fehlgeschlagen.',
       backendOffline:
         'Das Backend ist offline; die App nutzt nur Frontend-Speicher.',
+      heartbeatTitle: 'Backend-Heartbeat',
+      heartbeatSubtitle: 'Letzte Backend-Statusprüfungen, mit dem Verlauf als Sparkline.',
+      heartbeatLastChecked: 'Zuletzt geprüft',
+      heartbeatLatency: 'Latenz',
+      heartbeatSamples: 'Samples',
+      heartbeatPaused: 'Pausiert',
+      heartbeatWaiting: 'Warte auf den ersten Heartbeat',
       backendHealthTitle: 'Backend-Status',
       backendHealthExpected: 'GET /api/health liefert OK',
       databaseTitle: 'Datenbank',

@@ -215,6 +215,13 @@ export const it: Messages = {
         'Il backend ha risposto, ma uno o più controlli sono falliti.',
       backendOffline:
         'Il backend è offline; l’app usa solo archiviazione frontend.',
+      heartbeatTitle: 'Heartbeat backend',
+      heartbeatSubtitle: 'Ultimi controlli backend, con il ritmo recente come sparkline.',
+      heartbeatLastChecked: 'Ultimo controllo',
+      heartbeatLatency: 'Latenza',
+      heartbeatSamples: 'Campioni',
+      heartbeatPaused: 'In pausa',
+      heartbeatWaiting: 'In attesa del primo heartbeat',
       backendHealthTitle: 'Salute backend',
       backendHealthExpected: 'GET /api/health restituisce OK',
       databaseTitle: 'Database',

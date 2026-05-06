@@ -212,6 +212,13 @@ export const es: Messages = {
         'El backend respondió, pero una o más comprobaciones fallaron.',
       backendOffline:
         'El backend está sin conexión; la aplicación usa almacenamiento solo de frontend.',
+      heartbeatTitle: 'Latido del backend',
+      heartbeatSubtitle: 'Últimas comprobaciones del backend, con el ritmo reciente como sparkline.',
+      heartbeatLastChecked: 'Última comprobación',
+      heartbeatLatency: 'Latencia',
+      heartbeatSamples: 'Muestras',
+      heartbeatPaused: 'Pausado',
+      heartbeatWaiting: 'Esperando el primer latido',
       backendHealthTitle: 'Estado del backend',
       backendHealthExpected: 'GET /api/health devuelve OK',
       databaseTitle: 'Base de datos',

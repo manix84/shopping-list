@@ -1,6 +1,7 @@
 import { type KeyboardEvent } from 'react';
 import type {
   BackendStatus,
+  BackendHeartbeatSample,
   ConfigTestResult,
   CountQuantityTestResult,
   CountryConfig,
@@ -23,6 +24,7 @@ import type { Messages } from '../lib/i18n';
 
 type DebugPageProps = {
   backendStatus: BackendStatus;
+  heartbeatSamples: BackendHeartbeatSample[];
   storageMode: 'local' | 'backend';
   items: Item[];
   config: CountryConfig;
@@ -84,6 +86,34 @@ const currentDatabaseTypeLabel = (status: BackendStatus, storageMode: 'local' | 
   return databaseAdapterLabel(status, messages);
 };
 
+const heartbeatScore = (sample: BackendHeartbeatSample) => {
+  if (sample.state === 'connected' && sample.healthOk && sample.databaseOk) { return 92; }
+  if (sample.state === 'checking') { return 66; }
+  if (sample.state === 'error') { return 42; }
+  return 18;
+};
+
+const heartbeatPolyline = (samples: BackendHeartbeatSample[]) => {
+  if (samples.length === 0) { return ''; }
+  if (samples.length === 1) {
+    const y = 100 - heartbeatScore(samples[0]);
+    return `0,${y} 100,${y}`;
+  }
+
+  return samples.map((sample, index) => {
+    const x = (index / (samples.length - 1)) * 100;
+    const y = 100 - heartbeatScore(sample);
+    return `${x.toFixed(2)},${y.toFixed(2)}`;
+  }).join(' ');
+};
+
+const formatHeartbeatTime = (checkedAt: string) =>
+  new Intl.DateTimeFormat(undefined, {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }).format(new Date(checkedAt));
+
 function DebugSettingSwitch({
   label,
   hint,
@@ -114,6 +144,7 @@ function DebugSettingSwitch({
 
 export function DebugPage({
   backendStatus,
+  heartbeatSamples,
   storageMode,
   items,
   config,
@@ -185,6 +216,9 @@ export function DebugPage({
     imperial: messages.labels.measurementModeImperial,
     cooking: messages.labels.measurementModeCooking,
   };
+  const latestHeartbeat = heartbeatSamples.at(-1);
+  const heartbeatPath = heartbeatPolyline(heartbeatSamples);
+  const heartbeatTone = latestHeartbeat?.state ?? backendStatus.state;
   const handleTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
     const lastIndex = debugTabs.length - 1;
     const nextIndex =
@@ -319,6 +353,66 @@ export function DebugPage({
           }
           bodyClassName={'stack'}
         >
+          <div className={`heartbeat-card heartbeat-card-${heartbeatTone}`}>
+            <div className={'heartbeat-summary'}>
+              <div
+                key={latestHeartbeat?.checkedAt ?? 'waiting'}
+                className={`heartbeat-pulse heartbeat-pulse-${heartbeatTone}`}
+                aria-hidden={'true'}
+              >
+                <span />
+              </div>
+              <div>
+                <h3 className={'title title-xs'}>{messages.pages.debug.heartbeatTitle}</h3>
+                <p className={'small-text'}>{messages.pages.debug.heartbeatSubtitle}</p>
+              </div>
+            </div>
+            <div className={'heartbeat-metrics'} aria-label={messages.pages.debug.heartbeatTitle}>
+              <div>
+                <span>{messages.pages.debug.heartbeatLastChecked}</span>
+                <strong>
+                  {latestHeartbeat ? formatHeartbeatTime(latestHeartbeat.checkedAt) : messages.pages.debug.heartbeatWaiting}
+                </strong>
+              </div>
+              <div>
+                <span>{messages.pages.debug.heartbeatLatency}</span>
+                <strong>{latestHeartbeat ? `${latestHeartbeat.latencyMs}ms` : messages.pages.debug.unavailable}</strong>
+              </div>
+              <div>
+                <span>{messages.labels.state}</span>
+                <strong>{backendStateLabel(backendStatus, messages)}</strong>
+              </div>
+              <div>
+                <span>{messages.pages.debug.heartbeatSamples}</span>
+                <strong>{heartbeatSamples.length}</strong>
+              </div>
+              {debugSettings.pauseBackendHeartbeat ? (
+                <div>
+                  <span>{messages.labels.mode}</span>
+                  <strong>{messages.pages.debug.heartbeatPaused}</strong>
+                </div>
+              ) : null}
+            </div>
+            <div className={'heartbeat-graph'} aria-hidden={'true'}>
+              <svg viewBox={'0 0 100 100'} preserveAspectRatio={'none'}>
+                <path className={'heartbeat-graph-grid'} d={'M0 25 H100 M0 50 H100 M0 75 H100'} />
+                {heartbeatPath ? <polyline className={'heartbeat-graph-line'} points={heartbeatPath} /> : null}
+                {heartbeatSamples.map((sample, index) => {
+                  const x = heartbeatSamples.length === 1 ? 100 : (index / (heartbeatSamples.length - 1)) * 100;
+                  const y = 100 - heartbeatScore(sample);
+                  return (
+                    <circle
+                      key={`${sample.checkedAt}-${index}`}
+                      className={`heartbeat-graph-point heartbeat-graph-point-${sample.state}`}
+                      cx={x}
+                      cy={y}
+                      r={'1.7'}
+                    />
+                  );
+                })}
+              </svg>
+            </div>
+          </div>
           <TestResultCard
             title={messages.pages.debug.databaseTypeTitle}
             expected={messages.pages.debug.databaseTypeExpected}
