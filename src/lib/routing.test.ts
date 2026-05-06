@@ -34,6 +34,10 @@ describe('routing', () => {
       page: 'debug',
       debugTab: 'settings',
     });
+    expect(readRouteFromLocationParts({ pathname: '/debug/events' })).toEqual({
+      page: 'debug',
+      debugTab: 'events',
+    });
     expect(readRouteFromLocationParts({ pathname: `/list/${LIST_ID}/debug/backend` })).toEqual({
       page: 'debug',
       listId: LIST_ID,
@@ -91,6 +95,7 @@ describe('routing', () => {
 
   it('renders debug tab URLs', () => {
     expect(routeToUrl({ page: 'debug', debugTab: 'settings' })).toBe('/debug/settings');
+    expect(routeToUrl({ page: 'debug', debugTab: 'events' })).toBe('/debug/events');
     expect(routeToUrl({ page: 'debug', listId: LIST_ID, debugTab: 'backend' })).toBe('/debug/backend');
   });
 

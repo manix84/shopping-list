@@ -29,6 +29,7 @@ const DEBUG_TAB_KEYS: DebugTabKey[] = [
   'sections',
   'storage',
   'host',
+  'events',
   'settings',
 ];
 

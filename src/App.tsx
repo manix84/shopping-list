@@ -63,7 +63,7 @@ import { ErrorPage } from './pages/ErrorPage';
 import { RoutePage } from './pages/RoutePage';
 import { SectionsPage } from './pages/SectionsPage';
 import { SettingsPage } from './pages/SettingsPage';
-import type { AppRoute, BackendHeartbeatSample, BackendStatus, CountryCode, DebugSettings, DebugTabKey, GroupedSectionView, Item, MeasurementDisplayMode, PageKey, RouteViewMode, SaveStatus, SectionKey, SharedListHistoryEntry, ShoppingListRecord, ThemeMode } from './types';
+import type { AppRoute, BackendHeartbeatSample, BackendStatus, CountryCode, DebugEventTestKey, DebugNotificationTestKey, DebugSettings, DebugTabKey, GroupedSectionView, Item, MeasurementDisplayMode, PageKey, RouteViewMode, SaveStatus, SectionKey, SharedListHistoryEntry, ShoppingListRecord, ThemeMode } from './types';
 
 const DEFAULT_PAGE: PageKey = 'edit';
 const BACKEND_HEARTBEAT_CONNECTED_MS = 5_000;
@@ -72,6 +72,7 @@ const BACKEND_HEARTBEAT_HISTORY_LIMIT = 36;
 const SHARED_LIST_NOTIFICATION_POLL_MS = 30_000;
 const SHARED_LIST_NOTIFICATION_GROUP_MS = 2 * 60_000;
 const SHARED_LIST_NOTIFICATION_PREVIEW_LIMIT = 3;
+const DEBUG_NOTIFICATION_LIST_ID = 'debug-notifications';
 const PWA_INSTALL_NUDGE_DISMISSED_KEY = 'smart-shopping-list-pwa-install-nudge-dismissed-v1';
 const PWA_INSTALL_PROMPT_SETTLE_MS = 1_200;
 const KONAMI_SEQUENCE = ['up', 'up', 'down', 'down', 'left', 'right', 'left', 'right', 'b', 'a'] as const;
@@ -357,20 +358,11 @@ export default function App() {
     });
   };
 
-  const handleNotificationsChange = async (enabled: boolean) => {
+  const ensureNotificationPermission = useCallback(async () => {
     const currentPermission = browserNotificationPermission();
-    if (!enabled) {
-      saveNotificationsEnabled(false);
-      setNotificationsEnabled(false);
-      setNotificationPermission(currentPermission);
-      return;
-    }
-
     if (currentPermission === 'unsupported' || currentPermission === 'denied') {
-      saveNotificationsEnabled(false);
-      setNotificationsEnabled(false);
       setNotificationPermission(currentPermission);
-      return;
+      return false;
     }
 
     const nextPermission =
@@ -378,14 +370,40 @@ export default function App() {
         ? await window.Notification.requestPermission()
         : currentPermission;
 
-    const granted = nextPermission === 'granted';
+    setNotificationPermission(nextPermission);
+    return nextPermission === 'granted';
+  }, []);
+
+  const handleNotificationsChange = async (enabled: boolean) => {
+    if (!enabled) {
+      saveNotificationsEnabled(false);
+      setNotificationsEnabled(false);
+      setNotificationPermission(browserNotificationPermission());
+      return;
+    }
+
+    const granted = await ensureNotificationPermission();
     saveNotificationsEnabled(granted);
     setNotificationsEnabled(granted);
-    setNotificationPermission(nextPermission);
   };
 
-  const notifySharedListAdditions = useCallback(async (listId: string, addedItems: Item[]) => {
-    if (!notificationsEnabled || browserNotificationPermission() !== 'granted' || addedItems.length === 0) { return; }
+  const showBrowserNotification = useCallback(async (title: string, options: NotificationOptions) => {
+    if (browserNotificationPermission() !== 'granted') { return; }
+    if (typeof window === 'undefined') { return; }
+
+    if ('serviceWorker' in navigator) {
+      const registration = await navigator.serviceWorker.ready.catch(() => undefined);
+      if (registration?.showNotification) {
+        await registration.showNotification(title, options);
+        return;
+      }
+    }
+
+    new window.Notification(title, options);
+  }, []);
+
+  const notifySharedListAdditions = useCallback(async (listId: string, addedItems: Item[], force = false) => {
+    if ((!force && !notificationsEnabled) || addedItems.length === 0) { return; }
     if (typeof window === 'undefined') { return; }
 
     const now = Date.now();
@@ -424,16 +442,45 @@ export default function App() {
       tag: `smart-shopping-list-${listId}-additions`,
     };
 
-    if ('serviceWorker' in navigator) {
-      const registration = await navigator.serviceWorker.ready.catch(() => undefined);
-      if (registration?.showNotification) {
-        await registration.showNotification(title, options);
-        return;
-      }
-    }
+    await showBrowserNotification(title, options);
+  }, [messages.notifications, notificationsEnabled, showBrowserNotification]);
 
-    new window.Notification(title, options);
-  }, [messages.notifications, notificationsEnabled]);
+  const debugNotificationItems = useCallback((kind: DebugNotificationTestKey): Item[] => {
+    const namesByKind: Record<DebugNotificationTestKey, string[]> = {
+      'single-item': ['Milk'],
+      'few-items': ['Milk', 'Eggs', 'Bananas'],
+      'large-batch': ['Milk', 'Eggs', 'Bananas', 'Bread', 'Apples', 'Pasta', 'Tomatoes', 'Coffee', 'Rice', 'Yoghurt'],
+      'silent-follow-up': ['Cheese', 'Butter'],
+    };
+
+    return namesByKind[kind].map((raw, index) => ({
+      id: `debug-${kind}-${Date.now()}-${index}`,
+      raw,
+      normalized: raw.toLowerCase(),
+      cleaned: raw.toLowerCase(),
+      checked: false,
+      matchedSection: 'other',
+    }));
+  }, []);
+
+  const handleDebugNotificationTest = useCallback(async (kind: DebugNotificationTestKey) => {
+    const granted = await ensureNotificationPermission();
+    if (!granted) { return; }
+
+    await notifySharedListAdditions(DEBUG_NOTIFICATION_LIST_ID, debugNotificationItems(kind), true);
+  }, [debugNotificationItems, ensureNotificationPermission, notifySharedListAdditions]);
+
+  const handleDebugEventTest = useCallback((kind: DebugEventTestKey) => {
+    if (kind === 'pwa-install-nudge') {
+      setIsPwaInstallNudgeVisible(true);
+      return;
+    }
+    if (kind === 'secret-aisle') {
+      setIsSecretAisleEasterEggVisible(true);
+      return;
+    }
+    setPredatorEasterEggRun((current) => current + 1);
+  }, []);
 
   const applyTheme = (mode: ThemeMode) => {
     if (typeof document === 'undefined') { return; }
@@ -1618,6 +1665,8 @@ export default function App() {
                 backendStatus={backendStatus}
                 heartbeatSamples={backendHeartbeatSamples}
                 storageMode={storageMode}
+                notificationsEnabled={notificationsEnabled}
+                notificationPermission={notificationPermission}
                 items={items}
                 config={config}
                 matcherTests={matcherTests}
@@ -1644,6 +1693,8 @@ export default function App() {
                 onDeleteItem={handleDeleteItem}
                 onDebugModeChange={handleDebugModeChange}
                 onDebugSettingChange={handleDebugSettingChange}
+                onDebugNotificationTest={handleDebugNotificationTest}
+                onDebugEventTest={handleDebugEventTest}
                 onDebugTabChange={changeDebugTab}
                 onBackToEdit={() => changePage('edit')}
                 onBackToSettings={() => changePage('settings')}

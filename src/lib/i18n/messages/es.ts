@@ -210,6 +210,7 @@ export const es: Messages = {
       tabSections: 'Secciones',
       tabStorage: 'Almacenamiento',
       tabHost: 'Host',
+      tabEvents: 'Eventos',
       tabSettings: 'Ajustes',
       backendTitle: 'Comprobaciones del backend',
       backendConnected:
@@ -297,6 +298,33 @@ export const es: Messages = {
       runtimeOriginLabel: 'Origen',
       runtimeProtocolLabel: 'Protocolo',
       runtimeBasePathLabel: 'Ruta base',
+      eventsTitle: 'Pruebas de eventos',
+      eventsSubtitle:
+        'Activa manualmente notificaciones y eventos de ejecución difíciles de reproducir bajo demanda.',
+      eventsNotificationGroupTitle: 'Notificaciones',
+      eventsNotificationGroupSubtitle:
+        'Ejemplos de notificaciones que el usuario puede ver para artículos añadidos a listas compartidas.',
+      eventsOtherGroupTitle: 'Otros eventos',
+      eventsOtherGroupSubtitle:
+        'Comportamientos que normalmente dependen del navegador, gestos ocultos o tiempos del ciclo de vida de la app.',
+      eventNotificationSingleLabel: 'Un artículo añadido',
+      eventNotificationSingleHint: 'Muestra la notificación de lista compartida para un artículo.',
+      eventNotificationFewLabel: 'Varios artículos añadidos',
+      eventNotificationFewHint: 'Muestra una notificación agrupada para unos pocos artículos nuevos.',
+      eventNotificationLargeLabel: 'Lote grande añadido',
+      eventNotificationLargeHint: 'Muestra el texto agrupado usado cuando llegan muchos artículos juntos.',
+      eventNotificationSilentFollowUpLabel: 'Actualización agrupada silenciosa',
+      eventNotificationSilentFollowUpHint:
+        'Actualiza la notificación agrupada actual con más artículos y pide al navegador que no avise.',
+      eventPwaInstallNudgeLabel: 'Aviso de instalación PWA',
+      eventPwaInstallNudgeHint: 'Muestra el aviso flotante de instalación sin esperar al navegador.',
+      eventSecretAisleLabel: 'Superposición de pasillo secreto',
+      eventSecretAisleHint: 'Abre la superposición oculta usada por la interacción del encabezado.',
+      eventPredatorLabel: 'Efecto visual de inicio',
+      eventPredatorHint: 'Ejecuta el efecto animado normalmente activado por la secuencia oculta de teclas.',
+      eventTriggerAction: 'Activar',
+      eventNotificationPermissionLabel: 'Permiso de notificaciones',
+      eventNotificationPreferenceLabel: 'Ajuste de notificaciones',
       stateTitle: 'Comprobaciones de estado',
       stateSubtitle:
         'Valida la lista actual contra el parser, el clasificador, las variantes, el progreso y la identidad.',
