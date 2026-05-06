@@ -275,13 +275,12 @@ export default function App() {
     setRoute((current) => ({
       ...current,
       page: nextPage,
-      listId: nextPage === 'debug' ? undefined : current.listId,
       debugTab: nextPage === 'debug' ? current.debugTab ?? 'parsed' : undefined,
     }));
   };
 
   const changeDebugTab = (debugTab: DebugTabKey) => {
-    setRoute((current) => ({ ...current, page: 'debug', listId: undefined, debugTab }));
+    setRoute((current) => ({ ...current, page: 'debug', debugTab }));
   };
 
   const enableDebugMode = () => {
@@ -701,7 +700,7 @@ export default function App() {
       const currentLocationDebugTab = readRouteFromLocation().debugTab;
       setRoute((current) => ({
         page: current.page,
-        listId: current.page === 'debug' ? undefined : nextServerBacked ? nextListId : undefined,
+        listId: nextServerBacked ? nextListId : undefined,
         debugTab: current.debugTab ?? currentLocationDebugTab,
       }));
       setCountryCode(selectedRecord.countryCode);
@@ -849,7 +848,7 @@ export default function App() {
         const currentLocationDebugTab = readRouteFromLocation().debugTab;
         setRoute((current) => ({
           page: current.page,
-          listId: current.page === 'debug' ? undefined : activeListId,
+          listId: activeListId,
           debugTab: current.debugTab ?? currentLocationDebugTab,
         }));
         setCountryCode(selectedRecord.countryCode);
@@ -885,7 +884,7 @@ export default function App() {
     verboseDebugLog('forcing local storage mode', { activeListId });
     setStorageMode('local');
     setIsServerBackedList(false);
-    setRoute((current) => ({ page: current.page, debugTab: current.debugTab }));
+    setRoute((current) => ({ page: current.page, debugTab: current.debugTab, listId: current.listId }));
   }, [activeListId, debugSettings.forceLocalStorage, isLoaded, storageMode, verboseDebugLog]);
 
   useEffect(() => {

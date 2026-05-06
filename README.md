@@ -61,7 +61,7 @@ Backend-backed shared lists use path routes:
 - `/list/<uuidv7>/edit` - shared list editor
 - `/list/<uuidv7>/route` - shared list route view
 
-Debug tools are app-level routes and are not nested under `/list/<uuidv7>`, because they inspect the current browser/app runtime rather than a specific shared list.
+Debug tools are generated and normalized as app-level routes because they inspect the current browser/app runtime rather than a specific shared list. Older list-nested debug URLs such as `/list/<uuidv7>/debug/backend` may still be accepted for compatibility, but the canonical URL is `/debug/backend`.
 
 If a page needs data that is not available yet, it shows a warning and points you to the page that can populate it.
 
