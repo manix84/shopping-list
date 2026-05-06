@@ -274,12 +274,13 @@ export default function App() {
     setRoute((current) => ({
       ...current,
       page: nextPage,
+      listId: nextPage === 'debug' ? undefined : current.listId,
       debugTab: nextPage === 'debug' ? current.debugTab ?? 'parsed' : undefined,
     }));
   };
 
   const changeDebugTab = (debugTab: DebugTabKey) => {
-    setRoute((current) => ({ ...current, page: 'debug', debugTab }));
+    setRoute((current) => ({ ...current, page: 'debug', listId: undefined, debugTab }));
   };
 
   const enableDebugMode = () => {
@@ -699,7 +700,7 @@ export default function App() {
       const currentLocationDebugTab = readRouteFromLocation().debugTab;
       setRoute((current) => ({
         page: current.page,
-        listId: nextServerBacked ? nextListId : undefined,
+        listId: current.page === 'debug' ? undefined : nextServerBacked ? nextListId : undefined,
         debugTab: current.debugTab ?? currentLocationDebugTab,
       }));
       setCountryCode(selectedRecord.countryCode);
@@ -847,7 +848,7 @@ export default function App() {
         const currentLocationDebugTab = readRouteFromLocation().debugTab;
         setRoute((current) => ({
           page: current.page,
-          listId: activeListId,
+          listId: current.page === 'debug' ? undefined : activeListId,
           debugTab: current.debugTab ?? currentLocationDebugTab,
         }));
         setCountryCode(selectedRecord.countryCode);

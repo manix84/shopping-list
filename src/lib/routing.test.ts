@@ -77,10 +77,11 @@ describe('routing', () => {
     expect(readRouteFromLocationParts({ pathname: '/settings' })).toEqual({ page: 'settings' });
   });
 
-  it('keeps settings, sections, and about app-level when rendering URLs', () => {
+  it('keeps settings, sections, about, and debug app-level when rendering URLs', () => {
     expect(routeToUrl({ page: 'settings', listId: LIST_ID })).toBe('/settings');
     expect(routeToUrl({ page: 'sections', listId: LIST_ID })).toBe('/sections');
     expect(routeToUrl({ page: 'about', listId: LIST_ID })).toBe('/about');
+    expect(routeToUrl({ page: 'debug', listId: LIST_ID })).toBe('/debug');
   });
 
   it('renders list-specific edit and route URLs', () => {
@@ -90,9 +91,7 @@ describe('routing', () => {
 
   it('renders debug tab URLs', () => {
     expect(routeToUrl({ page: 'debug', debugTab: 'settings' })).toBe('/debug/settings');
-    expect(routeToUrl({ page: 'debug', listId: LIST_ID, debugTab: 'backend' })).toBe(
-      `/list/${LIST_ID}/debug/backend`,
-    );
+    expect(routeToUrl({ page: 'debug', listId: LIST_ID, debugTab: 'backend' })).toBe('/debug/backend');
   });
 
   it('uses path routes when there is no visible shared list id', () => {
