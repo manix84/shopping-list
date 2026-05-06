@@ -146,6 +146,13 @@ export const de: Messages = {
       routeDensityLabel: 'Routendichte',
       routeDensitySubtitle:
         'Legt fest, wie dicht die Einkaufsroute auf diesem Gerät dargestellt wird.',
+      notificationsLabel: 'Benachrichtigungen für freigegebene Listen',
+      notificationsSubtitle:
+        'Warnt nur, wenn ein anderes Gerät Artikel hinzufügt, während diese App nicht im Fokus ist.',
+      notificationsEnable: 'Benachrichtigungen aktivieren',
+      notificationsDisable: 'Benachrichtigungen deaktivieren',
+      notificationsBlocked: 'Benachrichtigungen sind in diesem Browser blockiert.',
+      notificationsUnsupported: 'Benachrichtigungen werden in diesem Browser nicht unterstützt.',
     },
     sections: {
       title: 'Bereiche',
@@ -209,6 +216,7 @@ export const de: Messages = {
       tabSections: 'Bereiche',
       tabStorage: 'Speicher',
       tabHost: 'Host',
+      tabEvents: 'Events',
       tabSettings: 'Einstellungen',
       backendTitle: 'Backend-Prüfungen',
       backendConnected: 'Backend-API und Datenbank sind verfügbar.',
@@ -295,6 +303,33 @@ export const de: Messages = {
       runtimeOriginLabel: 'Origin',
       runtimeProtocolLabel: 'Protokoll',
       runtimeBasePathLabel: 'Basispfad',
+      eventsTitle: 'Event-Tests',
+      eventsSubtitle:
+        'Benachrichtigungen und Laufzeit-Events manuell auslösen, die schwer gezielt zu reproduzieren sind.',
+      eventsNotificationGroupTitle: 'Benachrichtigungen',
+      eventsNotificationGroupSubtitle:
+        'Benutzerseitige Benachrichtigungsbeispiele für hinzugefügte Artikel in freigegebenen Listen.',
+      eventsOtherGroupTitle: 'Andere Events',
+      eventsOtherGroupSubtitle:
+        'Laufzeitverhalten, das normalerweise Browserstatus, versteckte Gesten oder App-Lifecycle-Timing braucht.',
+      eventNotificationSingleLabel: 'Ein Artikel hinzugefügt',
+      eventNotificationSingleHint: 'Zeigt die Benachrichtigung für einen Artikel in einer freigegebenen Liste.',
+      eventNotificationFewLabel: 'Mehrere Artikel hinzugefügt',
+      eventNotificationFewHint: 'Zeigt eine gruppierte Benachrichtigung für wenige neue Artikel.',
+      eventNotificationLargeLabel: 'Großer Stapel hinzugefügt',
+      eventNotificationLargeHint: 'Zeigt den gruppierten Text, wenn viele Artikel gleichzeitig eintreffen.',
+      eventNotificationSilentFollowUpLabel: 'Stilles gruppiertes Update',
+      eventNotificationSilentFollowUpHint:
+        'Aktualisiert die aktuelle gruppierte Benachrichtigung mit weiteren Artikeln und bittet den Browser, ruhig zu bleiben.',
+      eventPwaInstallNudgeLabel: 'PWA-Installationshinweis',
+      eventPwaInstallNudgeHint: 'Zeigt den schwebenden Installationshinweis ohne Browser-Timing.',
+      eventSecretAisleLabel: 'Geheimer-Gang-Overlay',
+      eventSecretAisleHint: 'Öffnet das versteckte Overlay der App-Header-Interaktion.',
+      eventPredatorLabel: 'Start-Animationseffekt',
+      eventPredatorHint: 'Startet den animierten Effekt der versteckten Tastensequenz.',
+      eventTriggerAction: 'Auslösen',
+      eventNotificationPermissionLabel: 'Benachrichtigungsberechtigung',
+      eventNotificationPreferenceLabel: 'Benachrichtigungseinstellung',
       stateTitle: 'Status-Selbsttests',
       stateSubtitle:
         'Prüft die aktuelle Liste gegen Parser, Matcher, Varianten, Fortschritt und Listenidentität.',
@@ -365,6 +400,12 @@ export const de: Messages = {
     unavailableTitle: 'Über das Browsermenü installieren',
     unavailableDescription:
       'Nutze die Teilen-Funktion oder das Browsermenü und wähle Zum Startbildschirm hinzufügen oder App installieren.',
+  },
+  notifications: {
+    sharedItemsAddedTitle: 'Einkaufsliste aktualisiert',
+    sharedItemAddedBody: '{item} wurde hinzugefügt.',
+    sharedItemsAddedBody: '{count} Artikel wurden hinzugefügt.',
+    sharedItemsAddedPreview: '{items}',
   },
   backendStatus: {
     connected: 'Online',

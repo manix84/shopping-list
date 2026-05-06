@@ -146,6 +146,13 @@ export const fr: Messages = {
       routeDensityLabel: 'Densité du parcours',
       routeDensitySubtitle:
         'Définit l’espacement du parcours sur cet appareil.',
+      notificationsLabel: 'Notifications des listes partagées',
+      notificationsSubtitle:
+        'Alerte seulement quand un autre appareil ajoute des articles pendant que l’app n’est pas active.',
+      notificationsEnable: 'Activer les notifications',
+      notificationsDisable: 'Désactiver les notifications',
+      notificationsBlocked: 'Les notifications sont bloquées dans ce navigateur.',
+      notificationsUnsupported: 'Ce navigateur ne prend pas en charge les notifications.',
     },
     sections: {
       title: 'Sections',
@@ -209,6 +216,7 @@ export const fr: Messages = {
       tabSections: 'Sections',
       tabStorage: 'Stockage',
       tabHost: 'Hôte',
+      tabEvents: 'Événements',
       tabSettings: 'Paramètres',
       backendTitle: 'Vérifications backend',
       backendConnected: 'L’API backend et la base de données sont disponibles.',
@@ -295,6 +303,33 @@ export const fr: Messages = {
       runtimeOriginLabel: 'Origine',
       runtimeProtocolLabel: 'Protocole',
       runtimeBasePathLabel: 'Chemin de base',
+      eventsTitle: 'Test des événements',
+      eventsSubtitle:
+        'Déclenchez manuellement les notifications et événements difficiles à reproduire à la demande.',
+      eventsNotificationGroupTitle: 'Notifications',
+      eventsNotificationGroupSubtitle:
+        'Exemples de notifications utilisateur pour les ajouts d’articles dans les listes partagées.',
+      eventsOtherGroupTitle: 'Autres événements',
+      eventsOtherGroupSubtitle:
+        'Comportements qui dépendent normalement de l’état du navigateur, de gestes cachés ou du cycle de vie de l’app.',
+      eventNotificationSingleLabel: 'Un article ajouté',
+      eventNotificationSingleHint: 'Affiche la notification de liste partagée pour un article.',
+      eventNotificationFewLabel: 'Plusieurs articles ajoutés',
+      eventNotificationFewHint: 'Affiche une notification groupée pour quelques ajouts.',
+      eventNotificationLargeLabel: 'Grand lot ajouté',
+      eventNotificationLargeHint: 'Affiche le libellé groupé utilisé quand beaucoup d’articles arrivent ensemble.',
+      eventNotificationSilentFollowUpLabel: 'Suivi groupé silencieux',
+      eventNotificationSilentFollowUpHint:
+        'Met à jour la notification groupée actuelle avec plus d’articles et demande au navigateur de rester discret.',
+      eventPwaInstallNudgeLabel: 'Invite d’installation PWA',
+      eventPwaInstallNudgeHint: 'Affiche l’invite flottante d’installation sans attendre le navigateur.',
+      eventSecretAisleLabel: 'Superposition allée secrète',
+      eventSecretAisleHint: 'Ouvre la superposition cachée utilisée par l’interaction de l’en-tête.',
+      eventPredatorLabel: 'Effet visuel de démarrage',
+      eventPredatorHint: 'Lance l’effet animé normalement déclenché par la séquence de touches cachée.',
+      eventTriggerAction: 'Déclencher',
+      eventNotificationPermissionLabel: 'Autorisation des notifications',
+      eventNotificationPreferenceLabel: 'Réglage des notifications',
       stateTitle: 'Auto-vérifications de l’état',
       stateSubtitle:
         'Validez la liste actuelle avec le parseur, la correspondance, les variantes, la progression et l’identité.',
@@ -368,6 +403,12 @@ export const fr: Messages = {
     unavailableTitle: 'Installer depuis le menu du navigateur',
     unavailableDescription:
       'Utilisez le bouton de partage ou le menu du navigateur, puis choisissez Ajouter à l’écran d’accueil ou Installer l’application.',
+  },
+  notifications: {
+    sharedItemsAddedTitle: 'Liste de courses mise à jour',
+    sharedItemAddedBody: '{item} a été ajouté.',
+    sharedItemsAddedBody: '{count} articles ont été ajoutés.',
+    sharedItemsAddedPreview: '{items}',
   },
   backendStatus: {
     connected: 'En ligne',

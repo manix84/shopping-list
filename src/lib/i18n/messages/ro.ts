@@ -144,6 +144,13 @@ export const ro: Messages = {
       routeDensityLabel: 'Densitatea traseului',
       routeDensitySubtitle:
         'Controlează spațierea traseului pe acest dispozitiv.',
+      notificationsLabel: 'Notificări pentru liste partajate',
+      notificationsSubtitle:
+        'Avertizează doar când alt dispozitiv adaugă articole cât timp aplicația nu este focalizată.',
+      notificationsEnable: 'Activează notificările',
+      notificationsDisable: 'Dezactivează notificările',
+      notificationsBlocked: 'Notificările sunt blocate în acest browser.',
+      notificationsUnsupported: 'Notificările nu sunt acceptate în acest browser.',
     },
     sections: {
       title: 'Secțiuni',
@@ -207,6 +214,7 @@ export const ro: Messages = {
       tabSections: 'Secțiuni',
       tabStorage: 'Stocare',
       tabHost: 'Gazdă',
+      tabEvents: 'Evenimente',
       tabSettings: 'Setări',
       backendTitle: 'Verificări backend',
       backendConnected: 'API-ul backend și baza de date sunt disponibile.',
@@ -292,6 +300,33 @@ export const ro: Messages = {
       runtimeOriginLabel: 'Origine',
       runtimeProtocolLabel: 'Protocol',
       runtimeBasePathLabel: 'Cale de bază',
+      eventsTitle: 'Testare evenimente',
+      eventsSubtitle:
+        'Declanșează manual notificări și evenimente de runtime care sunt greu de reprodus la cerere.',
+      eventsNotificationGroupTitle: 'Notificări',
+      eventsNotificationGroupSubtitle:
+        'Exemple de notificări pentru utilizator când sunt adăugate articole în liste partajate.',
+      eventsOtherGroupTitle: 'Alte evenimente',
+      eventsOtherGroupSubtitle:
+        'Comportamente care în mod normal depind de starea browserului, gesturi ascunse sau ciclul de viață al aplicației.',
+      eventNotificationSingleLabel: 'Un articol adăugat',
+      eventNotificationSingleHint: 'Afișează notificarea pentru un articol din lista partajată.',
+      eventNotificationFewLabel: 'Mai multe articole adăugate',
+      eventNotificationFewHint: 'Afișează o notificare grupată pentru câteva articole noi.',
+      eventNotificationLargeLabel: 'Lot mare adăugat',
+      eventNotificationLargeHint: 'Afișează textul grupat folosit când sosesc multe articole împreună.',
+      eventNotificationSilentFollowUpLabel: 'Actualizare grupată silențioasă',
+      eventNotificationSilentFollowUpHint:
+        'Actualizează notificarea grupată curentă cu mai multe articole și cere browserului să rămână silențios.',
+      eventPwaInstallNudgeLabel: 'Invitație instalare PWA',
+      eventPwaInstallNudgeHint: 'Afișează invitația flotantă de instalare fără a aștepta browserul.',
+      eventSecretAisleLabel: 'Suprapunere culoar secret',
+      eventSecretAisleHint: 'Deschide suprapunerea ascunsă folosită de interacțiunea antetului.',
+      eventPredatorLabel: 'Efect vizual de pornire',
+      eventPredatorHint: 'Rulează efectul animat declanșat normal de secvența ascunsă de taste.',
+      eventTriggerAction: 'Declanșează',
+      eventNotificationPermissionLabel: 'Permisiune notificări',
+      eventNotificationPreferenceLabel: 'Setare notificări',
       stateTitle: 'Autoverificări de stare',
       stateSubtitle:
         'Validează lista curentă cu parserul, potrivirea, variantele, progresul și identitatea listei.',
@@ -362,6 +397,12 @@ export const ro: Messages = {
     unavailableTitle: 'Instalează din meniul browserului',
     unavailableDescription:
       'Folosește butonul de partajare sau meniul browserului, apoi alege Adaugă pe ecranul de pornire sau Instalează aplicația.',
+  },
+  notifications: {
+    sharedItemsAddedTitle: 'Lista de cumpărături a fost actualizată',
+    sharedItemAddedBody: '{item} a fost adăugat.',
+    sharedItemsAddedBody: '{count} articole au fost adăugate.',
+    sharedItemsAddedPreview: '{items}',
   },
   backendStatus: {
     connected: 'Online',

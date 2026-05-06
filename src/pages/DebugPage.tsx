@@ -5,6 +5,8 @@ import type {
   ConfigTestResult,
   CountQuantityTestResult,
   CountryConfig,
+  DebugEventTestKey,
+  DebugNotificationTestKey,
   DebugTabKey,
   DebugSettings,
   Item,
@@ -26,6 +28,8 @@ type DebugPageProps = {
   backendStatus: BackendStatus;
   heartbeatSamples: BackendHeartbeatSample[];
   storageMode: 'local' | 'backend';
+  notificationsEnabled: boolean;
+  notificationPermission: NotificationPermission | 'unsupported';
   items: Item[];
   config: CountryConfig;
   matcherTests: MatcherTestResult[];
@@ -52,6 +56,8 @@ type DebugPageProps = {
   onDeleteItem: (itemId: string) => void;
   onDebugModeChange: (enabled: boolean) => void;
   onDebugSettingChange: (key: keyof DebugSettings, enabled: boolean) => void;
+  onDebugNotificationTest: (key: DebugNotificationTestKey) => void;
+  onDebugEventTest: (key: DebugEventTestKey) => void;
   onDebugTabChange: (tab: DebugTabKey) => void;
   onBackToEdit: () => void;
   onBackToSettings: () => void;
@@ -154,10 +160,36 @@ function DebugSettingSwitch({
   );
 }
 
+function DebugEventButton({
+  label,
+  hint,
+  onClick,
+}: {
+  label: string;
+  hint: string;
+  onClick: () => void;
+}) {
+  const { messages } = useI18n();
+
+  return (
+    <div className={'debug-setting-switch'}>
+      <span>
+        <span className={'debug-setting-label'}>{label}</span>
+        <span className={'small-text'}>{hint}</span>
+      </span>
+      <button type={'button'} className={'button button-secondary'} onClick={onClick}>
+        {messages.pages.debug.eventTriggerAction}
+      </button>
+    </div>
+  );
+}
+
 export function DebugPage({
   backendStatus,
   heartbeatSamples,
   storageMode,
+  notificationsEnabled,
+  notificationPermission,
   items,
   config,
   matcherTests,
@@ -184,6 +216,8 @@ export function DebugPage({
   onDeleteItem,
   onDebugModeChange,
   onDebugSettingChange,
+  onDebugNotificationTest,
+  onDebugEventTest,
   onDebugTabChange,
   onBackToEdit,
   onBackToSettings,
@@ -213,6 +247,7 @@ export function DebugPage({
     { key: 'sections', label: messages.pages.debug.tabSections },
     { key: 'storage', label: messages.pages.debug.tabStorage },
     { key: 'host', label: messages.pages.debug.tabHost },
+    { key: 'events', label: messages.pages.debug.tabEvents },
     { key: 'settings', label: messages.pages.debug.tabSettings },
   ];
   const layoutRows = config.groups.flatMap((group) =>
@@ -826,6 +861,83 @@ export function DebugPage({
         <div id={'debug-panel-sections'} role={'tabpanel'} aria-labelledby={'debug-tab-sections'}>
           <SectionsPage config={config} />
         </div>
+      ) : null}
+
+      {activeTab === 'events' ? (
+        <Card
+          id={'debug-panel-events'}
+          role={'tabpanel'}
+          aria-labelledby={'debug-tab-events'}
+          header={
+            <>
+              <h2 className={'title title-sm'}>{messages.pages.debug.eventsTitle}</h2>
+              <p className={'subtitle'}>{messages.pages.debug.eventsSubtitle}</p>
+            </>
+          }
+          bodyClassName={'stack'}
+        >
+          <div className={'table-wrap'}>
+            <table className={'debug-table'}>
+              <tbody>
+                <tr>
+                  <th scope={'row'}>{messages.pages.debug.eventNotificationPermissionLabel}</th>
+                  <td>{notificationPermission}</td>
+                </tr>
+                <tr>
+                  <th scope={'row'}>{messages.pages.debug.eventNotificationPreferenceLabel}</th>
+                  <td>{String(notificationsEnabled)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <section className={'debug-event-group stack'}>
+            <div>
+              <h3 className={'title title-xs'}>{messages.pages.debug.eventsNotificationGroupTitle}</h3>
+              <p className={'subtitle'}>{messages.pages.debug.eventsNotificationGroupSubtitle}</p>
+            </div>
+            <DebugEventButton
+              label={messages.pages.debug.eventNotificationSingleLabel}
+              hint={messages.pages.debug.eventNotificationSingleHint}
+              onClick={() => onDebugNotificationTest('single-item')}
+            />
+            <DebugEventButton
+              label={messages.pages.debug.eventNotificationFewLabel}
+              hint={messages.pages.debug.eventNotificationFewHint}
+              onClick={() => onDebugNotificationTest('few-items')}
+            />
+            <DebugEventButton
+              label={messages.pages.debug.eventNotificationLargeLabel}
+              hint={messages.pages.debug.eventNotificationLargeHint}
+              onClick={() => onDebugNotificationTest('large-batch')}
+            />
+            <DebugEventButton
+              label={messages.pages.debug.eventNotificationSilentFollowUpLabel}
+              hint={messages.pages.debug.eventNotificationSilentFollowUpHint}
+              onClick={() => onDebugNotificationTest('silent-follow-up')}
+            />
+          </section>
+          <section className={'debug-event-group stack'}>
+            <div>
+              <h3 className={'title title-xs'}>{messages.pages.debug.eventsOtherGroupTitle}</h3>
+              <p className={'subtitle'}>{messages.pages.debug.eventsOtherGroupSubtitle}</p>
+            </div>
+            <DebugEventButton
+              label={messages.pages.debug.eventPwaInstallNudgeLabel}
+              hint={messages.pages.debug.eventPwaInstallNudgeHint}
+              onClick={() => onDebugEventTest('pwa-install-nudge')}
+            />
+            <DebugEventButton
+              label={messages.pages.debug.eventSecretAisleLabel}
+              hint={messages.pages.debug.eventSecretAisleHint}
+              onClick={() => onDebugEventTest('secret-aisle')}
+            />
+            <DebugEventButton
+              label={messages.pages.debug.eventPredatorLabel}
+              hint={messages.pages.debug.eventPredatorHint}
+              onClick={() => onDebugEventTest('predator')}
+            />
+          </section>
+        </Card>
       ) : null}
 
       {activeTab === 'settings' ? (

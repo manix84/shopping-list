@@ -138,6 +138,12 @@ export const en: Messages = {
       localeSubtitle: 'Choose the language you prefer for app text.',
       routeDensityLabel: 'Route density',
       routeDensitySubtitle: 'How the shopping route is spaced on this device.',
+      notificationsLabel: 'Shared-list notifications',
+      notificationsSubtitle: 'Only alert when another device adds items while this app is not focused.',
+      notificationsEnable: 'Enable notifications',
+      notificationsDisable: 'Disable notifications',
+      notificationsBlocked: 'Notifications are blocked in this browser.',
+      notificationsUnsupported: 'Notifications are not supported in this browser.',
     },
     sections: {
       title: 'Sections',
@@ -201,6 +207,7 @@ export const en: Messages = {
       tabSections: 'Sections',
       tabStorage: 'Storage',
       tabHost: 'Host',
+      tabEvents: 'Events',
       tabSettings: 'Settings',
       backendTitle: 'Backend checks',
       backendConnected: 'Backend API and database are available.',
@@ -285,6 +292,33 @@ export const en: Messages = {
       runtimeOriginLabel: 'Origin',
       runtimeProtocolLabel: 'Protocol',
       runtimeBasePathLabel: 'Base path',
+      eventsTitle: 'Event testing',
+      eventsSubtitle:
+        'Manually trigger notifications and runtime events that are hard to reproduce on demand.',
+      eventsNotificationGroupTitle: 'Notifications',
+      eventsNotificationGroupSubtitle:
+        'User-facing notification examples for shared-list item additions.',
+      eventsOtherGroupTitle: 'Other events',
+      eventsOtherGroupSubtitle:
+        'Runtime behaviours that normally need browser state, hidden gestures, or app lifecycle timing.',
+      eventNotificationSingleLabel: 'Single item added',
+      eventNotificationSingleHint: 'Shows the one-item shared-list notification.',
+      eventNotificationFewLabel: 'Several items added',
+      eventNotificationFewHint: 'Shows a grouped notification for a small set of additions.',
+      eventNotificationLargeLabel: 'Large batch added',
+      eventNotificationLargeHint: 'Shows the grouped wording used when many items arrive together.',
+      eventNotificationSilentFollowUpLabel: 'Silent grouped follow-up',
+      eventNotificationSilentFollowUpHint:
+        'Updates the current grouped notification with more items and asks the browser to keep it quiet.',
+      eventPwaInstallNudgeLabel: 'PWA install nudge',
+      eventPwaInstallNudgeHint: 'Shows the floating install prompt without waiting for browser timing.',
+      eventSecretAisleLabel: 'Secret aisle overlay',
+      eventSecretAisleHint: 'Opens the hidden overlay used by the app header interaction.',
+      eventPredatorLabel: 'Startup visual effect',
+      eventPredatorHint: 'Runs the animated effect normally triggered by the hidden key sequence.',
+      eventTriggerAction: 'Trigger',
+      eventNotificationPermissionLabel: 'Notification permission',
+      eventNotificationPreferenceLabel: 'Notification setting',
       stateTitle: 'State self-checks',
       stateSubtitle:
         'Validate the current list state against the parser, matcher, variants, progress counters, and list identity.',
@@ -355,6 +389,12 @@ export const en: Messages = {
     unavailableTitle: 'Install from your browser menu',
     unavailableDescription:
       'Use your browser share or menu button, then choose Add to Home Screen or Install app.',
+  },
+  notifications: {
+    sharedItemsAddedTitle: 'Shopping list updated',
+    sharedItemAddedBody: '{item} was added.',
+    sharedItemsAddedBody: '{count} items were added.',
+    sharedItemsAddedPreview: '{items}',
   },
   backendStatus: {
     connected: 'Online',

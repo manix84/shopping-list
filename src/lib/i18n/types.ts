@@ -142,6 +142,12 @@ export type Messages = {
       localeSubtitle: string;
       routeDensityLabel: string;
       routeDensitySubtitle: string;
+      notificationsLabel: string;
+      notificationsSubtitle: string;
+      notificationsEnable: string;
+      notificationsDisable: string;
+      notificationsBlocked: string;
+      notificationsUnsupported: string;
     };
     sections: {
       title: string;
@@ -195,6 +201,7 @@ export type Messages = {
       tabSections: string;
       tabStorage: string;
       tabHost: string;
+      tabEvents: string;
       tabSettings: string;
       backendTitle: string;
       backendConnected: string;
@@ -260,6 +267,29 @@ export type Messages = {
       runtimeOriginLabel: string;
       runtimeProtocolLabel: string;
       runtimeBasePathLabel: string;
+      eventsTitle: string;
+      eventsSubtitle: string;
+      eventsNotificationGroupTitle: string;
+      eventsNotificationGroupSubtitle: string;
+      eventsOtherGroupTitle: string;
+      eventsOtherGroupSubtitle: string;
+      eventNotificationSingleLabel: string;
+      eventNotificationSingleHint: string;
+      eventNotificationFewLabel: string;
+      eventNotificationFewHint: string;
+      eventNotificationLargeLabel: string;
+      eventNotificationLargeHint: string;
+      eventNotificationSilentFollowUpLabel: string;
+      eventNotificationSilentFollowUpHint: string;
+      eventPwaInstallNudgeLabel: string;
+      eventPwaInstallNudgeHint: string;
+      eventSecretAisleLabel: string;
+      eventSecretAisleHint: string;
+      eventPredatorLabel: string;
+      eventPredatorHint: string;
+      eventTriggerAction: string;
+      eventNotificationPermissionLabel: string;
+      eventNotificationPreferenceLabel: string;
       stateTitle: string;
       stateSubtitle: string;
       allMatcherPass: string;
@@ -306,6 +336,12 @@ export type Messages = {
     settingsDescription: string;
     unavailableTitle: string;
     unavailableDescription: string;
+  };
+  notifications: {
+    sharedItemsAddedTitle: string;
+    sharedItemAddedBody: string;
+    sharedItemsAddedBody: string;
+    sharedItemsAddedPreview: string;
   };
   backendStatus: {
     connected: string;

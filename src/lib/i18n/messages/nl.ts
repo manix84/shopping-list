@@ -145,6 +145,13 @@ export const nl: Messages = {
       routeDensityLabel: 'Routedichtheid',
       routeDensitySubtitle:
         'Bepaalt de spacing van de winkelroute op dit apparaat.',
+      notificationsLabel: 'Meldingen voor gedeelde lijsten',
+      notificationsSubtitle:
+        'Waarschuwt alleen wanneer een ander apparaat items toevoegt terwijl de app niet actief is.',
+      notificationsEnable: 'Meldingen inschakelen',
+      notificationsDisable: 'Meldingen uitschakelen',
+      notificationsBlocked: 'Meldingen zijn geblokkeerd in deze browser.',
+      notificationsUnsupported: 'Meldingen worden niet ondersteund in deze browser.',
     },
     sections: {
       title: 'Secties',
@@ -208,6 +215,7 @@ export const nl: Messages = {
       tabSections: 'Secties',
       tabStorage: 'Opslag',
       tabHost: 'Host',
+      tabEvents: 'Gebeurtenissen',
       tabSettings: 'Instellingen',
       backendTitle: 'Backendcontroles',
       backendConnected: 'Backend-API en database zijn beschikbaar.',
@@ -293,6 +301,33 @@ export const nl: Messages = {
       runtimeOriginLabel: 'Origin',
       runtimeProtocolLabel: 'Protocol',
       runtimeBasePathLabel: 'Basispad',
+      eventsTitle: 'Gebeurtenissen testen',
+      eventsSubtitle:
+        'Activeer handmatig meldingen en runtime-gebeurtenissen die lastig op aanvraag te reproduceren zijn.',
+      eventsNotificationGroupTitle: 'Meldingen',
+      eventsNotificationGroupSubtitle:
+        'Voorbeelden van meldingen die gebruikers kunnen zien bij toegevoegde items in gedeelde lijsten.',
+      eventsOtherGroupTitle: 'Andere gebeurtenissen',
+      eventsOtherGroupSubtitle:
+        'Gedrag dat normaal browserstatus, verborgen gebaren of app-lifecycle timing nodig heeft.',
+      eventNotificationSingleLabel: 'Een item toegevoegd',
+      eventNotificationSingleHint: 'Toont de gedeelde-lijstmelding voor een item.',
+      eventNotificationFewLabel: 'Meerdere items toegevoegd',
+      eventNotificationFewHint: 'Toont een gegroepeerde melding voor een kleine set toevoegingen.',
+      eventNotificationLargeLabel: 'Grote batch toegevoegd',
+      eventNotificationLargeHint: 'Toont de gegroepeerde tekst voor veel items tegelijk.',
+      eventNotificationSilentFollowUpLabel: 'Stille gegroepeerde update',
+      eventNotificationSilentFollowUpHint:
+        'Werkt de huidige gegroepeerde melding bij met meer items en vraagt de browser stil te blijven.',
+      eventPwaInstallNudgeLabel: 'PWA-installatiemelding',
+      eventPwaInstallNudgeHint: 'Toont de zwevende installatieprompt zonder op browser-timing te wachten.',
+      eventSecretAisleLabel: 'Geheime-gang overlay',
+      eventSecretAisleHint: 'Opent de verborgen overlay van de app-headerinteractie.',
+      eventPredatorLabel: 'Visueel starteffect',
+      eventPredatorHint: 'Start het geanimeerde effect van de verborgen toetsreeks.',
+      eventTriggerAction: 'Activeren',
+      eventNotificationPermissionLabel: 'Meldingstoestemming',
+      eventNotificationPreferenceLabel: 'Meldingsinstelling',
       stateTitle: 'Status-zelftests',
       stateSubtitle:
         'Controleer de huidige lijst tegen parser, matcher, varianten, voortgang en lijstidentiteit.',
@@ -363,6 +398,12 @@ export const nl: Messages = {
     unavailableTitle: 'Installeren via het browsermenu',
     unavailableDescription:
       'Gebruik de deelknop of het browsermenu en kies Toevoegen aan startscherm of App installeren.',
+  },
+  notifications: {
+    sharedItemsAddedTitle: 'Boodschappenlijst bijgewerkt',
+    sharedItemAddedBody: '{item} is toegevoegd.',
+    sharedItemsAddedBody: '{count} items zijn toegevoegd.',
+    sharedItemsAddedPreview: '{items}',
   },
   backendStatus: {
     connected: 'Online',
