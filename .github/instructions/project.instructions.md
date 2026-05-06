@@ -4,13 +4,13 @@ applyTo: "**/*.{ts,tsx,mjs,scss}"
 
 # Shopping List Implementation Notes
 
-These path-specific notes supplement `.github/copilot-instructions.md` for code and style files. Keep review comments concrete and tied to the changed lines.
+These notes supplement `.github/copilot-instructions.md` for code and style files. Keep review comments concrete and tied to changed lines.
 
 ## Frontend
 
-- Use existing patterns in `src/pages`, `src/components`, and `src/lib` before adding new abstractions.
+- Use existing patterns in `src/pages`, `src/components`, and `src/lib`.
 - Keep app state and persistence behaviour compatible with both frontend-only mode and backend mode.
-- Do not introduce layout shifts around page titles, route toolbars, save-status indicators, dialogs, or mobile controls.
+- Avoid layout shifts around page titles, route toolbars, save-status indicators, dialogs, and mobile controls.
 - Use Material Design Icons from `@mdi/js` where existing icon buttons use them.
 - Add stories for new reusable components and meaningful component states.
 
@@ -30,7 +30,7 @@ These path-specific notes supplement `.github/copilot-instructions.md` for code 
 - Record encoding/decoding: `src/lib/repository/recordCodec.ts`
 - Record merge behaviour: `src/lib/repository/recordMerge.ts`
 
-When backend mode is available, the newest record by `updatedAt` wins and is written back to both browser storage and backend storage.
+In backend mode, the newest record by `updatedAt` wins and is written back to browser and backend storage.
 
 ## Styling
 
@@ -42,7 +42,7 @@ When backend mode is available, the newest record by `updatedAt` wins and is wri
 
 ## I18n
 
-All user-visible strings need entries in `src/lib/i18n/types.ts` and every file in `src/lib/i18n/messages`.
+All user-visible strings need entries in `src/lib/i18n/types.ts` and every locale file.
 
 After i18n changes, run:
 
@@ -62,7 +62,7 @@ Automation scripts live in `scripts/`. They run directly with Node and do not ne
 
 ## Local Setup
 
-`npm run setup` requires Docker Desktop to be installed and running. It starts local Postgres, writes `.env.local`, and creates schema. Local defaults are only for development:
+`npm run setup` requires Docker Desktop running. It starts local Postgres, writes `.env.local`, and creates schema. Local defaults are development-only:
 
 ```text
 localhost:54321
