@@ -31,6 +31,7 @@ type DebugPageProps = {
   variantTests: VariantTestResult[];
   storageTests: StorageTestResult[];
   stateTests: StateTestResult[];
+  isDebugMode: boolean;
   matcherHasFailures: boolean;
   configHasFailures: boolean;
   countQuantityHasFailures: boolean;
@@ -42,6 +43,7 @@ type DebugPageProps = {
   onRenameItem: (itemId: string, nextRaw: string) => void;
   onToggleItem: (itemId: string) => void;
   onDeleteItem: (itemId: string) => void;
+  onDebugModeChange: (enabled: boolean) => void;
   onBackToEdit: () => void;
   onBackToSettings: () => void;
 };
@@ -76,7 +78,8 @@ type DebugTabKey =
   | 'variants'
   | 'layout'
   | 'sections'
-  | 'storage';
+  | 'storage'
+  | 'settings';
 
 export function DebugPage({
   backendStatus,
@@ -90,6 +93,7 @@ export function DebugPage({
   variantTests,
   storageTests,
   stateTests,
+  isDebugMode,
   matcherHasFailures,
   configHasFailures,
   countQuantityHasFailures,
@@ -101,6 +105,7 @@ export function DebugPage({
   onRenameItem,
   onToggleItem,
   onDeleteItem,
+  onDebugModeChange,
   onBackToEdit,
   onBackToSettings,
 }: DebugPageProps) {
@@ -119,6 +124,7 @@ export function DebugPage({
     { key: 'layout', label: messages.pages.debug.tabLayout },
     { key: 'sections', label: messages.pages.debug.tabSections },
     { key: 'storage', label: messages.pages.debug.tabStorage },
+    { key: 'settings', label: messages.pages.debug.tabSettings },
   ];
   const layoutRows = config.groups.flatMap((group) =>
     group.sections.map((section) => ({
@@ -607,6 +613,35 @@ export function DebugPage({
         <div id={'debug-panel-sections'} role={'tabpanel'} aria-labelledby={'debug-tab-sections'}>
           <SectionsPage config={config} />
         </div>
+      ) : null}
+
+      {activeTab === 'settings' ? (
+        <Card
+          id={'debug-panel-settings'}
+          role={'tabpanel'}
+          aria-labelledby={'debug-tab-settings'}
+          header={
+            <>
+              <h2 className={'title title-sm'}>{messages.pages.debug.settingsTitle}</h2>
+              <p className={'subtitle'}>{messages.pages.debug.settingsSubtitle}</p>
+            </>
+          }
+          bodyClassName={'stack'}
+        >
+          <label className={'debug-setting-switch'}>
+            <span>
+              <span className={'debug-setting-label'}>{messages.pages.debug.debugModeLabel}</span>
+              <span className={'small-text'}>{messages.pages.debug.debugModeHint}</span>
+            </span>
+            <input
+              className={'debug-setting-switch-input'}
+              type={'checkbox'}
+              role={'switch'}
+              checked={isDebugMode}
+              onChange={(event) => onDebugModeChange(event.target.checked)}
+            />
+          </label>
+        </Card>
       ) : null}
     </Card>
   );

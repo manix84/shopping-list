@@ -279,6 +279,15 @@ export default function App() {
     }
   };
 
+  const handleDebugModeChange = (enabled: boolean) => {
+    setIsDebugMode(enabled);
+    try {
+      saveDebugMode(enabled);
+    } catch (error) {
+      console.warn('Unable to save debug mode preference.', error);
+    }
+  };
+
   const applyTheme = (mode: ThemeMode) => {
     if (typeof document === 'undefined') { return; }
 
@@ -1326,6 +1335,7 @@ export default function App() {
                 variantTests={variantTests}
                 storageTests={storageTests}
                 stateTests={stateTests}
+                isDebugMode={isDebugMode}
                 matcherHasFailures={matcherTests.some((test) => !test.passed)}
                 configHasFailures={configTests.some((test) => !test.passed)}
                 countQuantityHasFailures={countQuantityTests.some((test) => !test.passed)}
@@ -1337,6 +1347,7 @@ export default function App() {
                 onRenameItem={handleRenameItem}
                 onToggleItem={toggleItem}
                 onDeleteItem={handleDeleteItem}
+                onDebugModeChange={handleDebugModeChange}
                 onBackToEdit={() => changePage('edit')}
                 onBackToSettings={() => changePage('settings')}
               />

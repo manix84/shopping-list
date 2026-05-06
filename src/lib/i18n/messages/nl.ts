@@ -206,6 +206,7 @@ export const nl: Messages = {
       tabLayout: 'Indeling',
       tabSections: 'Secties',
       tabStorage: 'Opslag',
+      tabSettings: 'Instellingen',
       backendTitle: 'Backendcontroles',
       backendConnected: 'Backend-API en database zijn beschikbaar.',
       backendChecking: 'Backendstatus wordt gecontroleerd.',
@@ -241,6 +242,12 @@ export const nl: Messages = {
       storageTitle: 'Opslag-zelftests',
       storageSubtitle:
         'Gegevens moeten netjes heen en weer gaan door lokale opslag en latere databases.',
+      settingsTitle: 'Debuginstellingen',
+      settingsSubtitle:
+        'Bediening voor ontwikkelfuncties die buiten de hoofdflow moeten blijven.',
+      debugModeLabel: 'Debugmodus',
+      debugModeHint:
+        'Zet dit uit om de link naar de debughulpmiddelen weer te verbergen.',
       stateTitle: 'Status-zelftests',
       stateSubtitle:
         'Controleer de huidige lijst tegen parser, matcher, varianten, voortgang en lijstidentiteit.',

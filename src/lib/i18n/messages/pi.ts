@@ -204,6 +204,7 @@ export const pi: Messages = {
       tabLayout: 'Deck plan',
       tabSections: 'Decks',
       tabStorage: 'Stowage',
+      tabSettings: 'Rigging',
       backendTitle: 'Backend checks',
       backendConnected: 'Backend API and hold be available.',
       backendChecking: 'Backend status be gettin’ checked.',
@@ -239,6 +240,12 @@ export const pi: Messages = {
       storageTitle: 'Stowage self-checks',
       storageSubtitle:
         'Record data should round-trip clean through local stowage and any future hold.',
+      settingsTitle: 'Bilge tool rigging',
+      settingsSubtitle:
+        'Controls for build-only tricks that should stay out o’ the main voyage.',
+      debugModeLabel: 'Bilge mode',
+      debugModeHint:
+        'Turn this off to hide the bilge tools link again.',
       stateTitle: 'State self-checks',
       stateSubtitle:
         'Check the current ledger against parser, matcher, variants, progress, and list mark.',

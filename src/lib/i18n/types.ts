@@ -193,6 +193,7 @@ export type Messages = {
       tabLayout: string;
       tabSections: string;
       tabStorage: string;
+      tabSettings: string;
       backendTitle: string;
       backendConnected: string;
       backendChecking: string;
@@ -218,6 +219,10 @@ export type Messages = {
       layoutSubtitle: string;
       storageTitle: string;
       storageSubtitle: string;
+      settingsTitle: string;
+      settingsSubtitle: string;
+      debugModeLabel: string;
+      debugModeHint: string;
       stateTitle: string;
       stateSubtitle: string;
       allMatcherPass: string;

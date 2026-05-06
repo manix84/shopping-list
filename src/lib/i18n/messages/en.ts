@@ -199,6 +199,7 @@ export const en: Messages = {
       tabLayout: 'Layout',
       tabSections: 'Sections',
       tabStorage: 'Storage',
+      tabSettings: 'Settings',
       backendTitle: 'Backend checks',
       backendConnected: 'Backend API and database are available.',
       backendChecking: 'Backend status is being checked.',
@@ -233,6 +234,12 @@ export const en: Messages = {
       storageTitle: 'Storage self-checks',
       storageSubtitle:
         'Record data should round-trip cleanly through local storage and any future database store.',
+      settingsTitle: 'Debug settings',
+      settingsSubtitle:
+        'Controls for development-only features that should stay out of the main app flow.',
+      debugModeLabel: 'Debug mode',
+      debugModeHint:
+        'Turn this off to hide the debug tools link again.',
       stateTitle: 'State self-checks',
       stateSubtitle:
         'Validate the current list state against the parser, matcher, variants, progress counters, and list identity.',

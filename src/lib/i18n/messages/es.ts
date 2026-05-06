@@ -201,6 +201,7 @@ export const es: Messages = {
       tabLayout: 'Diseño',
       tabSections: 'Secciones',
       tabStorage: 'Almacenamiento',
+      tabSettings: 'Ajustes',
       backendTitle: 'Comprobaciones del backend',
       backendConnected:
         'La API del backend y la base de datos están disponibles.',
@@ -238,6 +239,12 @@ export const es: Messages = {
       storageTitle: 'Comprobaciones de almacenamiento',
       storageSubtitle:
         'Los datos deben redondearse limpiamente a través del almacenamiento local y cualquier futura base de datos.',
+      settingsTitle: 'Ajustes de depuración',
+      settingsSubtitle:
+        'Controles para funciones solo de desarrollo que no deben estar en el flujo principal.',
+      debugModeLabel: 'Modo de depuración',
+      debugModeHint:
+        'Desactívalo para volver a ocultar el enlace a las herramientas de depuración.',
       stateTitle: 'Comprobaciones de estado',
       stateSubtitle:
         'Valida la lista actual contra el parser, el clasificador, las variantes, el progreso y la identidad.',

@@ -205,6 +205,7 @@ export const ro: Messages = {
       tabLayout: 'Layout',
       tabSections: 'Secțiuni',
       tabStorage: 'Stocare',
+      tabSettings: 'Setări',
       backendTitle: 'Verificări backend',
       backendConnected: 'API-ul backend și baza de date sunt disponibile.',
       backendChecking: 'Starea backendului este verificată.',
@@ -240,6 +241,12 @@ export const ro: Messages = {
       storageTitle: 'Autoverificări de stocare',
       storageSubtitle:
         'Datele trebuie să treacă curat prin stocarea locală și orice bază viitoare.',
+      settingsTitle: 'Setări de depanare',
+      settingsSubtitle:
+        'Controale pentru funcții doar de dezvoltare care trebuie să stea în afara fluxului principal.',
+      debugModeLabel: 'Mod depanare',
+      debugModeHint:
+        'Dezactivează pentru a ascunde din nou linkul către uneltele de depanare.',
       stateTitle: 'Autoverificări de stare',
       stateSubtitle:
         'Validează lista curentă cu parserul, potrivirea, variantele, progresul și identitatea listei.',
