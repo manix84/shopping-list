@@ -142,6 +142,12 @@ export type Messages = {
       localeSubtitle: string;
       routeDensityLabel: string;
       routeDensitySubtitle: string;
+      notificationsLabel: string;
+      notificationsSubtitle: string;
+      notificationsEnable: string;
+      notificationsDisable: string;
+      notificationsBlocked: string;
+      notificationsUnsupported: string;
     };
     sections: {
       title: string;
@@ -306,6 +312,12 @@ export type Messages = {
     settingsDescription: string;
     unavailableTitle: string;
     unavailableDescription: string;
+  };
+  notifications: {
+    sharedItemsAddedTitle: string;
+    sharedItemAddedBody: string;
+    sharedItemsAddedBody: string;
+    sharedItemsAddedPreview: string;
   };
   backendStatus: {
     connected: string;

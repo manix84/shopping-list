@@ -144,6 +144,13 @@ export const pi: Messages = {
       routeDensityLabel: 'Route density',
       routeDensitySubtitle:
         'How tight the shopping route be spaced on this device.',
+      notificationsLabel: 'Shared-list bells',
+      notificationsSubtitle:
+        'Only rings when another device adds booty while this app is not in focus.',
+      notificationsEnable: 'Enable bells',
+      notificationsDisable: 'Disable bells',
+      notificationsBlocked: 'Notifications be blocked in this browser.',
+      notificationsUnsupported: 'Notifications be not supported in this browser.',
     },
     sections: {
       title: 'Decks',
@@ -361,6 +368,12 @@ export const pi: Messages = {
     unavailableTitle: 'Install from yer browser menu',
     unavailableDescription:
       'Use yer browser share or menu button, then choose Add to Home Screen or Install app.',
+  },
+  notifications: {
+    sharedItemsAddedTitle: 'Shopping list updated',
+    sharedItemAddedBody: '{item} was added.',
+    sharedItemsAddedBody: '{count} items were added.',
+    sharedItemsAddedPreview: '{items}',
   },
   backendStatus: {
     connected: 'Ahoy',

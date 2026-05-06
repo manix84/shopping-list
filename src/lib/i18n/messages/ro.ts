@@ -144,6 +144,13 @@ export const ro: Messages = {
       routeDensityLabel: 'Densitatea traseului',
       routeDensitySubtitle:
         'Controlează spațierea traseului pe acest dispozitiv.',
+      notificationsLabel: 'Notificări pentru liste partajate',
+      notificationsSubtitle:
+        'Avertizează doar când alt dispozitiv adaugă articole cât timp aplicația nu este focalizată.',
+      notificationsEnable: 'Activează notificările',
+      notificationsDisable: 'Dezactivează notificările',
+      notificationsBlocked: 'Notificările sunt blocate în acest browser.',
+      notificationsUnsupported: 'Notificările nu sunt acceptate în acest browser.',
     },
     sections: {
       title: 'Secțiuni',
@@ -362,6 +369,12 @@ export const ro: Messages = {
     unavailableTitle: 'Instalează din meniul browserului',
     unavailableDescription:
       'Folosește butonul de partajare sau meniul browserului, apoi alege Adaugă pe ecranul de pornire sau Instalează aplicația.',
+  },
+  notifications: {
+    sharedItemsAddedTitle: 'Lista de cumpărături a fost actualizată',
+    sharedItemAddedBody: '{item} a fost adăugat.',
+    sharedItemsAddedBody: '{count} articole au fost adăugate.',
+    sharedItemsAddedPreview: '{items}',
   },
   backendStatus: {
     connected: 'Online',

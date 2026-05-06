@@ -138,6 +138,12 @@ export const en: Messages = {
       localeSubtitle: 'Choose the language you prefer for app text.',
       routeDensityLabel: 'Route density',
       routeDensitySubtitle: 'How the shopping route is spaced on this device.',
+      notificationsLabel: 'Shared-list notifications',
+      notificationsSubtitle: 'Only alert when another device adds items while this app is not focused.',
+      notificationsEnable: 'Enable notifications',
+      notificationsDisable: 'Disable notifications',
+      notificationsBlocked: 'Notifications are blocked in this browser.',
+      notificationsUnsupported: 'Notifications are not supported in this browser.',
     },
     sections: {
       title: 'Sections',
@@ -355,6 +361,12 @@ export const en: Messages = {
     unavailableTitle: 'Install from your browser menu',
     unavailableDescription:
       'Use your browser share or menu button, then choose Add to Home Screen or Install app.',
+  },
+  notifications: {
+    sharedItemsAddedTitle: 'Shopping list updated',
+    sharedItemAddedBody: '{item} was added.',
+    sharedItemsAddedBody: '{count} items were added.',
+    sharedItemsAddedPreview: '{items}',
   },
   backendStatus: {
     connected: 'Online',

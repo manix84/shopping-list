@@ -28,6 +28,11 @@ import {
   saveMeasurementDisplayMode,
   withMeasurementDisplayMode,
 } from './lib/ingredientMode';
+import {
+  browserNotificationPermission,
+  loadNotificationsEnabled,
+  saveNotificationsEnabled,
+} from './lib/notificationPreference';
 import { getDisplayValue, getStoredValue, parseItems } from './lib/parser';
 import {
   checkBackendStatus,
@@ -64,6 +69,9 @@ const DEFAULT_PAGE: PageKey = 'edit';
 const BACKEND_HEARTBEAT_CONNECTED_MS = 5_000;
 const BACKEND_HEARTBEAT_RETRY_MS = 1_500;
 const BACKEND_HEARTBEAT_HISTORY_LIMIT = 36;
+const SHARED_LIST_NOTIFICATION_POLL_MS = 30_000;
+const SHARED_LIST_NOTIFICATION_GROUP_MS = 2 * 60_000;
+const SHARED_LIST_NOTIFICATION_PREVIEW_LIMIT = 3;
 const PWA_INSTALL_NUDGE_DISMISSED_KEY = 'smart-shopping-list-pwa-install-nudge-dismissed-v1';
 const PWA_INSTALL_PROMPT_SETTLE_MS = 1_200;
 const KONAMI_SEQUENCE = ['up', 'up', 'down', 'down', 'left', 'right', 'left', 'right', 'b', 'a'] as const;
@@ -95,6 +103,12 @@ type SharedInputValidation =
   | { state: 'invalid' }
   | { state: 'missing'; listId: string; normalizedValue: string }
   | { state: 'unavailable' };
+type SharedListNotificationGroup = {
+  listId: string;
+  itemIds: Set<string>;
+  itemNames: string[];
+  lastShownAt: number;
+};
 
 const defaultBackendStatus = (): BackendStatus => ({
   state: 'checking',
@@ -233,6 +247,10 @@ export default function App() {
   const [routeViewMode, setRouteViewMode] = useState<RouteViewMode>(() => loadRouteViewMode());
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>(() => getResolvedTheme(loadThemeMode()));
   const [locale, setLocale] = useState(() => loadLocale());
+  const [notificationsEnabled, setNotificationsEnabled] = useState(() => loadNotificationsEnabled());
+  const [notificationPermission, setNotificationPermission] = useState<NotificationPermission | 'unsupported'>(
+    () => browserNotificationPermission(),
+  );
   const [isDebugMode, setIsDebugMode] = useState(() => loadDebugMode());
   const [debugSettings, setDebugSettings] = useState<DebugSettings>(() => loadDebugSettings());
   const [isCreatingShareLink, setIsCreatingShareLink] = useState(false);
@@ -248,6 +266,9 @@ export default function App() {
   const [isLikelyMobileForInstall, setIsLikelyMobileForInstall] = useState(() => isMobileOrTabletDevice());
   const [isSecretAisleEasterEggVisible, setIsSecretAisleEasterEggVisible] = useState(false);
   const [predatorEasterEggRun, setPredatorEasterEggRun] = useState(0);
+  const currentItemsRef = useRef<Item[]>([]);
+  const sharedListNotificationSeenUpdatedAtRef = useRef<Record<string, string>>({});
+  const sharedListNotificationGroupRef = useRef<SharedListNotificationGroup>();
   const saveRequestIdRef = useRef(0);
   const suppressNextAutosaveStatusRef = useRef(true);
   const suppressNextAutosaveStatus = () => {
@@ -270,6 +291,10 @@ export default function App() {
       ? undefined
       : `${window.location.origin}${appBasePath}/list/${activeListId}/edit`;
   const shareErrorMessage = shareError ? messages.sharing[shareError] : undefined;
+
+  useEffect(() => {
+    currentItemsRef.current = items;
+  }, [items]);
 
   const changePage = (nextPage: PageKey) => {
     setRoute((current) => ({
@@ -331,6 +356,84 @@ export default function App() {
       return next;
     });
   };
+
+  const handleNotificationsChange = async (enabled: boolean) => {
+    const currentPermission = browserNotificationPermission();
+    if (!enabled) {
+      saveNotificationsEnabled(false);
+      setNotificationsEnabled(false);
+      setNotificationPermission(currentPermission);
+      return;
+    }
+
+    if (currentPermission === 'unsupported' || currentPermission === 'denied') {
+      saveNotificationsEnabled(false);
+      setNotificationsEnabled(false);
+      setNotificationPermission(currentPermission);
+      return;
+    }
+
+    const nextPermission =
+      currentPermission === 'default' && typeof window !== 'undefined' && 'Notification' in window
+        ? await window.Notification.requestPermission()
+        : currentPermission;
+
+    const granted = nextPermission === 'granted';
+    saveNotificationsEnabled(granted);
+    setNotificationsEnabled(granted);
+    setNotificationPermission(nextPermission);
+  };
+
+  const notifySharedListAdditions = useCallback(async (listId: string, addedItems: Item[]) => {
+    if (!notificationsEnabled || browserNotificationPermission() !== 'granted' || addedItems.length === 0) { return; }
+    if (typeof window === 'undefined') { return; }
+
+    const now = Date.now();
+    const currentGroup = sharedListNotificationGroupRef.current;
+    const shouldContinueGroup =
+      currentGroup?.listId === listId && now - currentGroup.lastShownAt <= SHARED_LIST_NOTIFICATION_GROUP_MS;
+    const nextGroup: SharedListNotificationGroup = shouldContinueGroup && currentGroup
+      ? currentGroup
+      : { listId, itemIds: new Set<string>(), itemNames: [], lastShownAt: now };
+
+    addedItems.forEach((item) => {
+      if (nextGroup.itemIds.has(item.id)) { return; }
+      nextGroup.itemIds.add(item.id);
+      nextGroup.itemNames.push(item.raw);
+    });
+    nextGroup.lastShownAt = now;
+    sharedListNotificationGroupRef.current = nextGroup;
+
+    const count = nextGroup.itemIds.size;
+    if (count === 0) { return; }
+
+    const title = messages.notifications.sharedItemsAddedTitle;
+    const preview = messages.notifications.sharedItemsAddedPreview.replace(
+      '{items}',
+      nextGroup.itemNames.slice(0, SHARED_LIST_NOTIFICATION_PREVIEW_LIMIT).join(', '),
+    );
+    const body = count === 1
+      ? messages.notifications.sharedItemAddedBody.replace('{item}', nextGroup.itemNames[0] ?? '')
+      : `${messages.notifications.sharedItemsAddedBody.replace('{count}', String(count))} ${preview}`;
+    const url = `${window.location.origin}${appBasePath}/list/${listId}/edit`;
+    const options: NotificationOptions = {
+      body,
+      data: { url },
+      icon: `${appBasePath}/icon-192.png`,
+      silent: shouldContinueGroup,
+      tag: `smart-shopping-list-${listId}-additions`,
+    };
+
+    if ('serviceWorker' in navigator) {
+      const registration = await navigator.serviceWorker.ready.catch(() => undefined);
+      if (registration?.showNotification) {
+        await registration.showNotification(title, options);
+        return;
+      }
+    }
+
+    new window.Notification(title, options);
+  }, [messages.notifications, notificationsEnabled]);
 
   const applyTheme = (mode: ThemeMode) => {
     if (typeof document === 'undefined') { return; }
@@ -1005,6 +1108,67 @@ export default function App() {
   }, [activeListId, canUseBackend, countryCode, input, isLoaded, isServerBackedList, items, listName, storageMode]);
 
   useEffect(() => {
+    if (
+      !isLoaded ||
+      !notificationsEnabled ||
+      notificationPermission !== 'granted' ||
+      !isServerBackedList ||
+      storageMode !== 'backend' ||
+      !canUseBackend
+    ) { return; }
+
+    let cancelled = false;
+    const checkForRemoteAdditions = async () => {
+      try {
+        const remotePayload = await loadSharedShoppingList(activeListId);
+        if (cancelled || !remotePayload.exists) { return; }
+
+        const remoteUpdatedAt = remotePayload.updatedAt ?? remotePayload.record.updatedAt;
+        const lastSeenUpdatedAt = sharedListNotificationSeenUpdatedAtRef.current[activeListId];
+        sharedListNotificationSeenUpdatedAtRef.current[activeListId] = remoteUpdatedAt;
+        if (!lastSeenUpdatedAt || remoteUpdatedAt === lastSeenUpdatedAt) { return; }
+
+        const currentItemIds = new Set(currentItemsRef.current.map((item) => item.id));
+        const addedItems = remotePayload.record.items.filter((item) => !currentItemIds.has(item.id));
+        if (addedItems.length === 0) { return; }
+        if (document.visibilityState === 'visible' && document.hasFocus()) { return; }
+
+        await notifySharedListAdditions(activeListId, addedItems);
+      } catch (error) {
+        verboseDebugLog('shared list notification check failed', { listId: activeListId, error });
+      }
+    };
+
+    const intervalId = window.setInterval(() => {
+      void checkForRemoteAdditions();
+    }, SHARED_LIST_NOTIFICATION_POLL_MS);
+    const handleVisibilityChange = () => {
+      if (document.visibilityState !== 'visible') {
+        void checkForRemoteAdditions();
+      }
+    };
+
+    void checkForRemoteAdditions();
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(intervalId);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [
+    activeListId,
+    canUseBackend,
+    isLoaded,
+    isServerBackedList,
+    notificationPermission,
+    notificationsEnabled,
+    notifySharedListAdditions,
+    storageMode,
+    verboseDebugLog,
+  ]);
+
+  useEffect(() => {
     syncRouteToUrl(route);
   }, [route]);
 
@@ -1433,6 +1597,9 @@ export default function App() {
                 isInstalled={isPwaInstalled}
                 isFloatingInstallVisible={isFloatingPwaInstallVisible}
                 onInstall={promptPwaInstall}
+                notificationsEnabled={notificationsEnabled}
+                notificationPermission={notificationPermission}
+                onNotificationsChange={handleNotificationsChange}
               />
             ) : null}
 

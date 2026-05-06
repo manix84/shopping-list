@@ -140,6 +140,13 @@ export const es: Messages = {
       routeDensityLabel: 'Densidad de la ruta',
       routeDensitySubtitle:
         'Cómo se espacia la ruta de compra en este dispositivo.',
+      notificationsLabel: 'Notificaciones de listas compartidas',
+      notificationsSubtitle:
+        'Solo avisa cuando otro dispositivo añade artículos mientras la app no está enfocada.',
+      notificationsEnable: 'Activar notificaciones',
+      notificationsDisable: 'Desactivar notificaciones',
+      notificationsBlocked: 'Las notificaciones están bloqueadas en este navegador.',
+      notificationsUnsupported: 'Este navegador no admite notificaciones.',
     },
     sections: {
       title: 'Secciones',
@@ -360,6 +367,12 @@ export const es: Messages = {
     unavailableTitle: 'Instalar desde el menú del navegador',
     unavailableDescription:
       'Usa el botón de compartir o el menú del navegador y elige Añadir a pantalla de inicio o Instalar app.',
+  },
+  notifications: {
+    sharedItemsAddedTitle: 'Lista de compra actualizada',
+    sharedItemAddedBody: 'Se añadió {item}.',
+    sharedItemsAddedBody: 'Se añadieron {count} artículos.',
+    sharedItemsAddedPreview: '{items}',
   },
   backendStatus: {
     connected: 'En línea',

@@ -146,6 +146,13 @@ export const fr: Messages = {
       routeDensityLabel: 'Densité du parcours',
       routeDensitySubtitle:
         'Définit l’espacement du parcours sur cet appareil.',
+      notificationsLabel: 'Notifications des listes partagées',
+      notificationsSubtitle:
+        'Alerte seulement quand un autre appareil ajoute des articles pendant que l’app n’est pas active.',
+      notificationsEnable: 'Activer les notifications',
+      notificationsDisable: 'Désactiver les notifications',
+      notificationsBlocked: 'Les notifications sont bloquées dans ce navigateur.',
+      notificationsUnsupported: 'Ce navigateur ne prend pas en charge les notifications.',
     },
     sections: {
       title: 'Sections',
@@ -368,6 +375,12 @@ export const fr: Messages = {
     unavailableTitle: 'Installer depuis le menu du navigateur',
     unavailableDescription:
       'Utilisez le bouton de partage ou le menu du navigateur, puis choisissez Ajouter à l’écran d’accueil ou Installer l’application.',
+  },
+  notifications: {
+    sharedItemsAddedTitle: 'Liste de courses mise à jour',
+    sharedItemAddedBody: '{item} a été ajouté.',
+    sharedItemsAddedBody: '{count} articles ont été ajoutés.',
+    sharedItemsAddedPreview: '{items}',
   },
   backendStatus: {
     connected: 'En ligne',

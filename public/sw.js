@@ -1,4 +1,4 @@
-const CACHE_NAME = 'smart-shopping-list-pwa-v6';
+const CACHE_NAME = 'smart-shopping-list-pwa-v7';
 
 const staticAssetUrls = () => [
   new URL('index.html', self.registration.scope).href,
@@ -94,6 +94,22 @@ self.addEventListener('fetch', (event) => {
           const cache = await caches.open(CACHE_NAME);
           return cache.match(event.request) ?? new Response('', { status: 504, statusText: 'Offline' });
         });
+    }),
+  );
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const targetUrl = event.notification.data?.url ?? self.registration.scope;
+
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
+      const matchingClient = clients.find((client) => client.url === targetUrl || client.url.startsWith(targetUrl));
+      if (matchingClient) {
+        return matchingClient.focus();
+      }
+
+      return self.clients.openWindow(targetUrl);
     }),
   );
 });

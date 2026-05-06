@@ -145,6 +145,13 @@ export const nl: Messages = {
       routeDensityLabel: 'Routedichtheid',
       routeDensitySubtitle:
         'Bepaalt de spacing van de winkelroute op dit apparaat.',
+      notificationsLabel: 'Meldingen voor gedeelde lijsten',
+      notificationsSubtitle:
+        'Waarschuwt alleen wanneer een ander apparaat items toevoegt terwijl de app niet actief is.',
+      notificationsEnable: 'Meldingen inschakelen',
+      notificationsDisable: 'Meldingen uitschakelen',
+      notificationsBlocked: 'Meldingen zijn geblokkeerd in deze browser.',
+      notificationsUnsupported: 'Meldingen worden niet ondersteund in deze browser.',
     },
     sections: {
       title: 'Secties',
@@ -363,6 +370,12 @@ export const nl: Messages = {
     unavailableTitle: 'Installeren via het browsermenu',
     unavailableDescription:
       'Gebruik de deelknop of het browsermenu en kies Toevoegen aan startscherm of App installeren.',
+  },
+  notifications: {
+    sharedItemsAddedTitle: 'Boodschappenlijst bijgewerkt',
+    sharedItemAddedBody: '{item} is toegevoegd.',
+    sharedItemsAddedBody: '{count} items zijn toegevoegd.',
+    sharedItemsAddedPreview: '{items}',
   },
   backendStatus: {
     connected: 'Online',

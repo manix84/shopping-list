@@ -144,6 +144,13 @@ export const it: Messages = {
       routeDensityLabel: 'Densità del percorso',
       routeDensitySubtitle:
         'Definisce la spaziatura del percorso su questo dispositivo.',
+      notificationsLabel: 'Notifiche delle liste condivise',
+      notificationsSubtitle:
+        'Avvisa solo quando un altro dispositivo aggiunge articoli mentre l’app non è in primo piano.',
+      notificationsEnable: 'Attiva notifiche',
+      notificationsDisable: 'Disattiva notifiche',
+      notificationsBlocked: 'Le notifiche sono bloccate in questo browser.',
+      notificationsUnsupported: 'Questo browser non supporta le notifiche.',
     },
     sections: {
       title: 'Sezioni',
@@ -363,6 +370,12 @@ export const it: Messages = {
     unavailableTitle: 'Installa dal menu del browser',
     unavailableDescription:
       'Usa il pulsante di condivisione o il menu del browser, poi scegli Aggiungi alla schermata Home o Installa app.',
+  },
+  notifications: {
+    sharedItemsAddedTitle: 'Lista della spesa aggiornata',
+    sharedItemAddedBody: '{item} è stato aggiunto.',
+    sharedItemsAddedBody: 'Sono stati aggiunti {count} articoli.',
+    sharedItemsAddedPreview: '{items}',
   },
   backendStatus: {
     connected: 'Online',

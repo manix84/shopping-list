@@ -31,6 +31,9 @@ type SettingsPageProps = {
   isInstalled: boolean;
   isFloatingInstallVisible: boolean;
   onInstall: () => void;
+  notificationsEnabled: boolean;
+  notificationPermission: NotificationPermission | 'unsupported';
+  onNotificationsChange: (enabled: boolean) => Promise<void>;
 };
 
 type ThemeIconProps = {
@@ -165,6 +168,9 @@ export function SettingsPage({
   isInstalled,
   isFloatingInstallVisible,
   onInstall,
+  notificationsEnabled,
+  notificationPermission,
+  onNotificationsChange,
 }: SettingsPageProps) {
   const { locale, setLocale, messages } = useI18n();
   const [settingsSaveStatus, setSettingsSaveStatus] = useState<SaveStatus>('idle');
@@ -218,6 +224,12 @@ export function SettingsPage({
   const installDescription = canPromptInstall
     ? messages.pwaInstall.settingsDescription
     : messages.pwaInstall.unavailableDescription;
+  const notificationsUnavailableMessage =
+    notificationPermission === 'unsupported'
+      ? messages.pages.settings.notificationsUnsupported
+      : notificationPermission === 'denied'
+        ? messages.pages.settings.notificationsBlocked
+        : undefined;
 
   const installSetting = shouldShowInstallSetting ? (
     <div className={'settings-install-row'}>
@@ -269,6 +281,23 @@ export function SettingsPage({
   };
   const handleRouteViewModeChange = (nextRouteViewMode: RouteViewMode) => {
     writeSetting(() => onRouteViewModeChange(nextRouteViewMode));
+  };
+  const handleNotificationsClick = async () => {
+    if (notificationsUnavailableMessage) { return; }
+    if (settingsSaveTimerRef.current) {
+      window.clearTimeout(settingsSaveTimerRef.current);
+    }
+
+    setSettingsSaveStatus('saving');
+    try {
+      await onNotificationsChange(!notificationsEnabled);
+      settingsSaveTimerRef.current = window.setTimeout(() => {
+        setSettingsSaveStatus('saved');
+      }, 120);
+    } catch (error) {
+      console.warn('Unable to save notification preference.', error);
+      setSettingsSaveStatus('error');
+    }
   };
 
   useEffect(() => () => {
@@ -336,6 +365,24 @@ export function SettingsPage({
             options={routeDensityOptions}
             onChange={handleRouteViewModeChange}
           />
+        </div>
+
+        <div className={'field field-compact'}>
+          <div>
+            <label htmlFor={'notifications-toggle'}>{messages.pages.settings.notificationsLabel}</label>
+            <div className={'small-text'}>
+              {notificationsUnavailableMessage ?? messages.pages.settings.notificationsSubtitle}
+            </div>
+          </div>
+          <button
+            id={'notifications-toggle'}
+            type={'button'}
+            className={'button button-secondary'}
+            disabled={Boolean(notificationsUnavailableMessage)}
+            onClick={handleNotificationsClick}
+          >
+            {notificationsEnabled ? messages.pages.settings.notificationsDisable : messages.pages.settings.notificationsEnable}
+          </button>
         </div>
 
         <div className={'settings-footnote small-text'}>{messages.labels.storedLocally}</div>

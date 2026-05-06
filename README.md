@@ -35,6 +35,7 @@ The generator uses Playwright Chromium. If the browser binary is missing after i
 - persists data locally so the app can be reopened without losing state
 - supports backend-backed shared list links that anyone with the link can edit
 - generates themed QR codes for shared lists and can scan shared-list QR codes when the browser supports camera scanning
+- can optionally show grouped, low-noise browser notifications when another device adds items to an open shared list while the app is not focused
 - remembers recently opened shared lists locally on the device for quick reopening
 - stores the country profile in the backend when available, with local fallback
 - supports English, Spanish, French, German, Dutch, Italian, Romanian, and Pirate UI text, defaulting from the browser language
@@ -280,6 +281,7 @@ The sharing panel also supports:
 - validating that scanned or pasted list ids exist in the backend
 - a device-local history of recently opened shared lists with quick reopen/delete actions
 - tapping a recent-history card to reopen that list, with drag protection so scroll gestures do not trigger accidental loads
+- opt-in grouped notifications for item additions from another device while the app is running, unfocused, and connected to the shared backend list
 
 Empty lists do not create new shared-list entries. The `New List` action also removes the current shared list instead of leaving behind an empty backend record. If a previously opened shared list is empty, the recent-history panel labels it as `Empty list`.
 
@@ -309,6 +311,7 @@ On supported browsers you can install the app with the browser's install action:
 - the app shell, core icons, and built JS/CSS are cached for offline navigation after the service worker has installed
 - the app works offline with local storage even without the backend
 - backend-backed shared lists still need network access to validate, refresh, or load remote list data
+- shared-list notifications are opt-in, only cover item additions while the app/PWA is running, and use grouped notification tags so later additions update the existing notification silently where the browser supports it
 - QR scanning depends on browser camera support and `BarcodeDetector`; if it is unavailable, the scanner action is hidden and you can paste the shared UUID or URL manually
 - if you change icons or manifest colours, some installed shells keep stale assets until the app is removed and installed again
 

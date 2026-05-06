@@ -146,6 +146,13 @@ export const de: Messages = {
       routeDensityLabel: 'Routendichte',
       routeDensitySubtitle:
         'Legt fest, wie dicht die Einkaufsroute auf diesem Gerät dargestellt wird.',
+      notificationsLabel: 'Benachrichtigungen für freigegebene Listen',
+      notificationsSubtitle:
+        'Warnt nur, wenn ein anderes Gerät Artikel hinzufügt, während diese App nicht im Fokus ist.',
+      notificationsEnable: 'Benachrichtigungen aktivieren',
+      notificationsDisable: 'Benachrichtigungen deaktivieren',
+      notificationsBlocked: 'Benachrichtigungen sind in diesem Browser blockiert.',
+      notificationsUnsupported: 'Benachrichtigungen werden in diesem Browser nicht unterstützt.',
     },
     sections: {
       title: 'Bereiche',
@@ -365,6 +372,12 @@ export const de: Messages = {
     unavailableTitle: 'Über das Browsermenü installieren',
     unavailableDescription:
       'Nutze die Teilen-Funktion oder das Browsermenü und wähle Zum Startbildschirm hinzufügen oder App installieren.',
+  },
+  notifications: {
+    sharedItemsAddedTitle: 'Einkaufsliste aktualisiert',
+    sharedItemAddedBody: '{item} wurde hinzugefügt.',
+    sharedItemsAddedBody: '{count} Artikel wurden hinzugefügt.',
+    sharedItemsAddedPreview: '{items}',
   },
   backendStatus: {
     connected: 'Online',
