@@ -39,7 +39,7 @@ The generator uses Playwright Chromium. If the browser binary is missing after i
 - stores the country profile in the backend when available, with local fallback
 - supports English, Spanish, French, German, Dutch, Italian, Romanian, and Pirate UI text, defaulting from the browser language
 - supports light, dark, and system themes, including PWA chrome theme colours
-- includes debug self-checks for backend health, database state, state consistency, quantity parsing, measurement conversion, variants, storage, section matching, and active shop layout
+- includes debug self-checks and diagnostics for backend health, heartbeat latency, database type, runtime host, state consistency, quantity parsing, measurement conversion, variants, storage, section matching, and active shop layout
 - deploys to GitHub Pages via GitHub Actions
 
 ## 🧭 Routes
@@ -51,7 +51,8 @@ The app uses normal path-based routing:
 - `/sections` - read-only section and route-order reference
 - `/settings` - language, country profile, and theme preferences
 - `/about` - app version, install status, and release information
-- `/debug` - parser, storage, backend, measurement, and layout self-checks
+- `/debug` - debug tools, defaulting to parsed item diagnostics
+- `/debug/<tab>` - direct debug tabs such as `/debug/backend`, `/debug/host`, and `/debug/settings`
 - `/404` - not-found page for unknown routes
 - `/500` - server-error page for backend failure states
 
@@ -59,6 +60,8 @@ Backend-backed shared lists use path routes:
 
 - `/list/<uuidv7>/edit` - shared list editor
 - `/list/<uuidv7>/route` - shared list route view
+
+Debug tools are app-level routes and are not nested under `/list/<uuidv7>`, because they inspect the current browser/app runtime rather than a specific shared list.
 
 If a page needs data that is not available yet, it shows a warning and points you to the page that can populate it.
 
@@ -210,6 +213,31 @@ Backend utility routes:
 - `PUT /api/settings`
 
 Backend records are validated before they are stored. Shopping-list timestamps must use canonical ISO format, country codes must match the supported country profiles, and persisted section keys must be known route sections.
+
+## 🛠️ Debug tools
+
+Debug tools are hidden from the normal app flow until debug mode is enabled. Tap the About page version seven times to reveal the Debug tools link, then open `/debug` or a direct tab route such as `/debug/backend`.
+
+Debug tabs include:
+
+- `Parsed` - inspect and edit the structured items generated from the current list
+- `State` - validate parser, matcher, progress, variants, and list identity state
+- `Backend` - inspect backend health, current storage type, database metadata, heartbeat history, and latency trend
+- `Host` - show the current hostname, host, origin, protocol, and Vite base path so installed PWAs can be checked against the domain they are running from
+- `Config`, `Matcher`, `Quantities`, `Measurements`, `Weights`, `Variants`, `Layout`, `Sections`, and `Storage` - self-checks and reference data for parser and route behaviour
+- `Settings` - debug-only switches that should stay out of the main user settings area
+
+The Backend tab reports whether the app is currently using `LocalStorage`, backend JSON DB fallback, or PostgreSQL. It only displays non-sensitive database details: adapter type, default-list state, shared-list count, country profile, and timestamps. The heartbeat panel records recent backend status checks, latest latency, and a latency-coloured sparkline: green for fast checks, yellow for okay latency, orange for slow latency, and red for disconnected/error states.
+
+Debug Settings currently include:
+
+- force LocalStorage mode
+- pause backend heartbeat
+- disable automatic backend reconnect
+- show PWA install prompts while testing install UI
+- disable the PWA splash screen
+- disable hidden easter-egg interactions
+- enable verbose console diagnostics for route, storage, backend heartbeat, and sharing events
 
 ### 🏠 Home Assistant
 
