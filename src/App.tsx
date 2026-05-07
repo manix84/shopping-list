@@ -153,13 +153,33 @@ const isRunningInstalledPwa = (): boolean => {
   return window.matchMedia('(display-mode: standalone)').matches || navigatorWithStandalone.standalone === true;
 };
 
+const absoluteManifestUrl = (value: unknown, manifestUrl: string): unknown =>
+  typeof value === 'string' ? new URL(value, manifestUrl).href : value;
+
+const absoluteManifestImageResources = (value: unknown, manifestUrl: string): unknown => {
+  if (!Array.isArray(value)) { return value; }
+
+  return value.map((entry) => {
+    if (!entry || typeof entry !== 'object') { return entry; }
+
+    return {
+      ...entry,
+      src: absoluteManifestUrl((entry as { src?: unknown }).src, manifestUrl),
+    };
+  });
+};
+
 const updateDevManifest = (appTitle: string): void => {
   if (!import.meta.env.DEV || typeof document === 'undefined') { return; }
 
   const manifestLink = document.querySelector<HTMLLinkElement>('link[rel="manifest"]');
   if (!manifestLink) { return; }
 
-  fetch(manifestLink.href, { cache: 'no-store' })
+  const sourceManifestUrl = manifestLink.href.startsWith('blob:')
+    ? new URL('manifest.webmanifest', window.location.href).href
+    : manifestLink.href;
+
+  fetch(sourceManifestUrl, { cache: 'no-store' })
     .then((response) => response.ok ? response.json() : undefined)
     .then((manifest: unknown) => {
       if (!manifest || typeof manifest !== 'object') { return; }
@@ -167,6 +187,10 @@ const updateDevManifest = (appTitle: string): void => {
       const devManifest = {
         ...manifest,
         id: DEV_MANIFEST_ID,
+        start_url: absoluteManifestUrl((manifest as { start_url?: unknown }).start_url, sourceManifestUrl),
+        scope: absoluteManifestUrl((manifest as { scope?: unknown }).scope, sourceManifestUrl),
+        icons: absoluteManifestImageResources((manifest as { icons?: unknown }).icons, sourceManifestUrl),
+        screenshots: absoluteManifestImageResources((manifest as { screenshots?: unknown }).screenshots, sourceManifestUrl),
         name: `${appTitle}${DEV_TITLE_SUFFIX}`,
         short_name: `Shopping List${DEV_TITLE_SUFFIX}`,
       };
