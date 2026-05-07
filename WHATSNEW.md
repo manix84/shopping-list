@@ -4,6 +4,7 @@ Keep this file updated when user-visible features, platform changes, major parse
 
 ## 0.16.x - Current - Backend Visibility, Notifications, and Sauce Routing
 
+- Added automatic PWA update checks so online app launches, resumes, and navigations refresh cached static assets, show a themed logo reload mask, and move onto the latest built revision.
 - Added backend operation status tracking so Debug tools can show when the app is loading, reconnecting, using backend storage, falling back to LocalStorage, or hitting a backend save failure.
 - Expanded the Backend debug tab with heartbeat history, status timeline bars, latency, health/database check results, adapter details, and recent operation details.
 - Fixed a live-site offline flicker caused by backend save validation rejecting the new `sauces` section.
