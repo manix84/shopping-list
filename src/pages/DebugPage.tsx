@@ -1,4 +1,4 @@
-import { type KeyboardEvent } from 'react';
+import { type CSSProperties, type KeyboardEvent } from 'react';
 import type {
   BackendStatus,
   BackendHeartbeatSample,
@@ -374,6 +374,9 @@ export function DebugPage({
     slot.sample !== undefined,
   );
   const firstHeartbeatSampleSlot = heartbeatSampleSlots[0];
+  const heartbeatSlotStyle = {
+    '--heartbeat-slot-count': HEARTBEAT_HISTORY_SLOT_COUNT,
+  } as CSSProperties;
   const recentHeartbeatSamples = heartbeatSamples.slice(-8).reverse();
   const handleTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
     const lastIndex = debugTabs.length - 1;
@@ -590,7 +593,11 @@ export function DebugPage({
                 );
               })}
             </div>
-            <div className={'heartbeat-status-strip'} aria-label={messages.pages.debug.heartbeatStatusHistory}>
+            <div
+              className={'heartbeat-status-strip'}
+              style={heartbeatSlotStyle}
+              aria-label={messages.pages.debug.heartbeatStatusHistory}
+            >
               {heartbeatSlots.map((slot) => (
                 <span
                   key={slot.sample ? `${slot.sample.checkedAt}-status-${slot.index}` : `heartbeat-status-ghost-${slot.index}`}
