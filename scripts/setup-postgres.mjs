@@ -2,7 +2,8 @@ import { createConnection } from 'node:net';
 import { readFile, writeFile } from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 
-const localDatabaseUrl = 'postgres://shopping_list:shopping_list@localhost:54321/shopping_list';
+const legacyLocalDatabaseUrl = 'postgres://shopping_list:shopping_list@localhost:54321/shopping_list';
+const localDatabaseUrl = 'postgres://shopping_list:shopping_list@127.0.0.1:54321/shopping_list';
 const envPath = '.env.local';
 
 if (process.argv.includes('--help') || process.argv.includes('-h')) {
@@ -72,6 +73,13 @@ const ensureEnvLocal = async () => {
     current = await readFile(envPath, 'utf8');
   } catch (error) {
     if (error?.code !== 'ENOENT') { throw error; }
+  }
+
+  if (current.includes(`DATABASE_URL=${legacyLocalDatabaseUrl}`)) {
+    const next = current.replace(`DATABASE_URL=${legacyLocalDatabaseUrl}`, `DATABASE_URL=${localDatabaseUrl}`);
+    await writeFile(envPath, next, 'utf8');
+    console.log(`Updated ${envPath} to use the IPv4 local Postgres host.`);
+    return;
   }
 
   if (/^DATABASE_URL=/m.test(current) || /^SHOPPING_LIST_DATABASE_URL=/m.test(current)) {

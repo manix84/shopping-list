@@ -75,6 +75,38 @@ describe('apiRepository', () => {
     });
   });
 
+  it('keeps database adapter and error metadata when the backend status probe fails', async () => {
+    stubBrowserApi();
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockResolvedValueOnce(new Response(JSON.stringify({ ok: true, mode: 'backend' }), { status: 200 }))
+        .mockResolvedValueOnce(
+          new Response(
+            JSON.stringify({
+              ok: false,
+              adapter: 'postgres',
+              error: 'connect ECONNREFUSED ::1:54321',
+              errorCode: 'ECONNREFUSED',
+            }),
+            { status: 200 },
+          ),
+        ),
+    );
+
+    await expect(checkBackendStatus()).resolves.toEqual({
+      state: 'error',
+      health: { ok: true, mode: 'backend' },
+      database: {
+        ok: false,
+        adapter: 'postgres',
+        error: 'connect ECONNREFUSED ::1:54321',
+        errorCode: 'ECONNREFUSED',
+      },
+    });
+  });
+
   it('infers JSON backend status from legacy database path metadata', async () => {
     stubBrowserApi();
     vi.stubGlobal(

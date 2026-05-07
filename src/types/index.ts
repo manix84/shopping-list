@@ -292,5 +292,7 @@ export type BackendStatus = {
     shoppingListExists?: boolean;
     updatedAt?: string;
     sharedListCount?: number;
+    error?: string;
+    errorCode?: string;
   };
 };

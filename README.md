@@ -146,7 +146,7 @@ If setup prints Docker success messages and then fails with `read ECONNRESET`, P
 To inspect the local database in DBeaver or another Postgres client, use:
 
 ```text
-Host: localhost
+Host: 127.0.0.1
 Port: 54321
 Database: shopping_list
 Username: shopping_list

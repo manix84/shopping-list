@@ -75,6 +75,8 @@ export const checkBackendStatus = async (): Promise<BackendStatus> => {
           shoppingListExists?: unknown;
           updatedAt?: unknown;
           sharedListCount?: unknown;
+          error?: unknown;
+          errorCode?: unknown;
         })
       : undefined;
 
@@ -93,6 +95,8 @@ export const checkBackendStatus = async (): Promise<BackendStatus> => {
         shoppingListExists: typeof database?.shoppingListExists === 'boolean' ? database.shoppingListExists : undefined,
         updatedAt: typeof database?.updatedAt === 'string' ? database.updatedAt : undefined,
         sharedListCount: typeof database?.sharedListCount === 'number' ? database.sharedListCount : undefined,
+        error: typeof database?.error === 'string' ? database.error : undefined,
+        errorCode: typeof database?.errorCode === 'string' ? database.errorCode : undefined,
       },
     };
   } catch {
