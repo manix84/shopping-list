@@ -1110,6 +1110,37 @@ export function DebugPage({
           </section>
           <section className={'debug-event-group stack'}>
             <div>
+              <h3 className={'title title-xs'}>{messages.pages.debug.eventsToastGroupTitle}</h3>
+              <p className={'subtitle'}>{messages.pages.debug.eventsToastGroupSubtitle}</p>
+            </div>
+            <DebugEventButton
+              label={messages.pages.debug.eventToastSuccessLabel}
+              hint={messages.pages.debug.eventToastSuccessHint}
+              onClick={() => onDebugEventTest('toast-success')}
+            />
+            <DebugEventButton
+              label={messages.pages.debug.eventToastInfoLabel}
+              hint={messages.pages.debug.eventToastInfoHint}
+              onClick={() => onDebugEventTest('toast-info')}
+            />
+            <DebugEventButton
+              label={messages.pages.debug.eventToastWarningLabel}
+              hint={messages.pages.debug.eventToastWarningHint}
+              onClick={() => onDebugEventTest('toast-warning')}
+            />
+            <DebugEventButton
+              label={messages.pages.debug.eventToastErrorLabel}
+              hint={messages.pages.debug.eventToastErrorHint}
+              onClick={() => onDebugEventTest('toast-error')}
+            />
+            <DebugEventButton
+              label={messages.pages.debug.eventToastPlainLabel}
+              hint={messages.pages.debug.eventToastPlainHint}
+              onClick={() => onDebugEventTest('toast-plain')}
+            />
+          </section>
+          <section className={'debug-event-group stack'}>
+            <div>
               <h3 className={'title title-xs'}>{messages.pages.debug.eventsOtherGroupTitle}</h3>
               <p className={'subtitle'}>{messages.pages.debug.eventsOtherGroupSubtitle}</p>
             </div>

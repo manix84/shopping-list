@@ -16,7 +16,15 @@ export type DebugTabKey =
   | 'events'
   | 'settings';
 export type DebugNotificationTestKey = 'minimal' | 'single-item' | 'few-items' | 'large-batch' | 'silent-follow-up';
-export type DebugEventTestKey = 'pwa-install-nudge' | 'secret-aisle' | 'predator';
+export type DebugEventTestKey =
+  | 'pwa-install-nudge'
+  | 'secret-aisle'
+  | 'predator'
+  | 'toast-success'
+  | 'toast-info'
+  | 'toast-warning'
+  | 'toast-error'
+  | 'toast-plain';
 export type DebugNotificationDeliveryPath = 'blocked' | 'service-worker' | 'page' | 'failed';
 export type DebugNotificationResult = {
   status: 'requesting' | 'blocked' | 'failed' | 'shown';

@@ -646,6 +646,51 @@ export default function App() {
   }, [debugNotificationItems, ensureNotificationPermission, messages.notifications, notifySharedListAdditions, showDirectPageNotification]);
 
   const handleDebugEventTest = useCallback((kind: DebugEventTestKey) => {
+    if (kind === 'toast-success') {
+      setDebugModeNotice({
+        id: Date.now(),
+        tone: 'success',
+        title: messages.pages.debug.eventToastSuccessTitle,
+        message: messages.pages.debug.eventToastSuccessMessage,
+      });
+      return;
+    }
+    if (kind === 'toast-info') {
+      setDebugModeNotice({
+        id: Date.now(),
+        tone: 'info',
+        title: messages.pages.debug.eventToastInfoTitle,
+        message: messages.pages.debug.eventToastInfoMessage,
+      });
+      return;
+    }
+    if (kind === 'toast-warning') {
+      setDebugModeNotice({
+        id: Date.now(),
+        tone: 'warning',
+        title: messages.pages.debug.eventToastWarningTitle,
+        message: messages.pages.debug.eventToastWarningMessage,
+      });
+      return;
+    }
+    if (kind === 'toast-error') {
+      setDebugModeNotice({
+        id: Date.now(),
+        tone: 'error',
+        title: messages.pages.debug.eventToastErrorTitle,
+        message: messages.pages.debug.eventToastErrorMessage,
+      });
+      return;
+    }
+    if (kind === 'toast-plain') {
+      setDebugModeNotice({
+        id: Date.now(),
+        tone: 'info',
+        message: messages.pages.debug.eventToastPlainMessage,
+        showIcon: false,
+      });
+      return;
+    }
     if (kind === 'pwa-install-nudge') {
       setIsPwaInstallNudgeVisible(true);
       return;
@@ -655,7 +700,7 @@ export default function App() {
       return;
     }
     setPredatorEasterEggRun((current) => current + 1);
-  }, []);
+  }, [messages.pages.debug]);
 
   const applyTheme = (mode: ThemeMode) => {
     if (typeof document === 'undefined') { return; }
