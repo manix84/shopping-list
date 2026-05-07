@@ -215,6 +215,18 @@ export type Messages = {
       heartbeatSamples: string;
       heartbeatPaused: string;
       heartbeatWaiting: string;
+      heartbeatStatusHistory: string;
+      heartbeatHealth: string;
+      heartbeatDatabase: string;
+      heartbeatAdapter: string;
+      backendOperationTitle: string;
+      backendOperationDetail: string;
+      backendOperationIdle: string;
+      backendOperationLoading: string;
+      backendOperationReconnecting: string;
+      backendOperationBackend: string;
+      backendOperationLocalFallback: string;
+      backendOperationSaveFailed: string;
       backendHealthTitle: string;
       backendHealthExpected: string;
       databaseTitle: string;

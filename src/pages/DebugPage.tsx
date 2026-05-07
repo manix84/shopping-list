@@ -2,6 +2,7 @@ import { type KeyboardEvent } from 'react';
 import type {
   BackendStatus,
   BackendHeartbeatSample,
+  BackendOperationStatus,
   ConfigTestResult,
   CountQuantityTestResult,
   CountryConfig,
@@ -28,6 +29,7 @@ import type { Messages } from '../lib/i18n';
 
 type DebugPageProps = {
   backendStatus: BackendStatus;
+  backendOperation: BackendOperationStatus;
   heartbeatSamples: BackendHeartbeatSample[];
   storageMode: 'local' | 'backend';
   notificationsEnabled: boolean;
@@ -178,6 +180,18 @@ const currentDatabaseTypeLabel = (status: BackendStatus, storageMode: 'local' | 
   return databaseAdapterLabel(status, messages);
 };
 
+const backendOperationLabel = (operation: BackendOperationStatus, messages: Messages): string => {
+  const labels: Record<BackendOperationStatus['state'], string> = {
+    idle: messages.pages.debug.backendOperationIdle,
+    loading: messages.pages.debug.backendOperationLoading,
+    reconnecting: messages.pages.debug.backendOperationReconnecting,
+    backend: messages.pages.debug.backendOperationBackend,
+    'local-fallback': messages.pages.debug.backendOperationLocalFallback,
+    'save-failed': messages.pages.debug.backendOperationSaveFailed,
+  };
+  return labels[operation.state];
+};
+
 const heartbeatLatencyScore = (sample: BackendHeartbeatSample) => {
   if (sample.state !== 'connected' || !sample.healthOk || !sample.databaseOk) { return 0; }
   const clampedLatency = Math.min(sample.latencyMs, 1_500);
@@ -272,6 +286,7 @@ function DebugEventButton({
 
 export function DebugPage({
   backendStatus,
+  backendOperation,
   heartbeatSamples,
   storageMode,
   notificationsEnabled,
@@ -353,6 +368,7 @@ export function DebugPage({
   const latestHeartbeat = heartbeatSamples.at(-1);
   const heartbeatPath = heartbeatPolyline(heartbeatSamples);
   const heartbeatTone = latestHeartbeat?.state ?? backendStatus.state;
+  const recentHeartbeatSamples = heartbeatSamples.slice(-8).reverse();
   const handleTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
     const lastIndex = debugTabs.length - 1;
     const nextIndex =
@@ -559,10 +575,85 @@ export function DebugPage({
                     key={`${sample.checkedAt}-${index}`}
                     className={`heartbeat-graph-point heartbeat-graph-point-${tone}`}
                     style={{ left: `${x}%`, top: `${y}%` }}
-                  />
-                );
-              })}
+                />
+              );
+            })}
             </div>
+            <div className={'heartbeat-status-strip'} aria-label={messages.pages.debug.heartbeatStatusHistory}>
+              {heartbeatSamples.length === 0 ? (
+                <span className={'heartbeat-status-empty'}>{messages.pages.debug.heartbeatWaiting}</span>
+              ) : (
+                heartbeatSamples.map((sample, index) => (
+                  <span
+                    key={`${sample.checkedAt}-status-${index}`}
+                    className={`heartbeat-status-bar heartbeat-status-bar-${sample.state}`}
+                    title={`${formatHeartbeatTime(sample.checkedAt)} ${backendStateLabel({ ...backendStatus, state: sample.state }, messages)}`}
+                  />
+                ))
+              )}
+            </div>
+          </div>
+          <div className={'table-wrap'}>
+            <table className={'debug-table debug-table-compact'}>
+              <caption>{messages.pages.debug.backendOperationTitle}</caption>
+              <tbody>
+                <tr>
+                  <th scope={'row'}>{messages.labels.state}</th>
+                  <td>{backendOperationLabel(backendOperation, messages)}</td>
+                </tr>
+                <tr>
+                  <th scope={'row'}>{messages.labels.updated}</th>
+                  <td>
+                    {backendOperation.updatedAt
+                      ? formatHeartbeatTime(backendOperation.updatedAt)
+                      : messages.pages.debug.unavailable}
+                  </td>
+                </tr>
+                {backendOperation.detail ? (
+                  <tr>
+                    <th scope={'row'}>{messages.pages.debug.backendOperationDetail}</th>
+                    <td>{backendOperation.detail}</td>
+                  </tr>
+                ) : null}
+              </tbody>
+            </table>
+          </div>
+          <div className={'table-wrap'}>
+            <table className={'debug-table debug-table-compact'}>
+              <caption>{messages.pages.debug.heartbeatStatusHistory}</caption>
+              <thead>
+                <tr>
+                  <th scope={'col'}>{messages.pages.debug.heartbeatLastChecked}</th>
+                  <th scope={'col'}>{messages.labels.state}</th>
+                  <th scope={'col'}>{messages.pages.debug.heartbeatHealth}</th>
+                  <th scope={'col'}>{messages.pages.debug.heartbeatDatabase}</th>
+                  <th scope={'col'}>{messages.pages.debug.heartbeatAdapter}</th>
+                  <th scope={'col'}>{messages.pages.debug.heartbeatLatency}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentHeartbeatSamples.length === 0 ? (
+                  <tr>
+                    <td colSpan={6}>{messages.pages.debug.heartbeatWaiting}</td>
+                  </tr>
+                ) : (
+                  recentHeartbeatSamples.map((sample, index) => (
+                    <tr key={`${sample.checkedAt}-row-${index}`}>
+                      <td>{formatHeartbeatTime(sample.checkedAt)}</td>
+                      <td>{backendStateLabel({ ...backendStatus, state: sample.state }, messages)}</td>
+                      <td>{checkLabel(sample.healthOk, messages)}</td>
+                      <td>{checkLabel(sample.databaseOk, messages)}</td>
+                      <td>
+                        {sample.adapter
+                          ? databaseAdapterLabel({ ...backendStatus, database: { ...backendStatus.database, adapter: sample.adapter } }, messages)
+                          : messages.pages.debug.unavailable}
+                      </td>
+                      <td>{sample.latencyMs}ms</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
           <TestResultCard
             title={messages.pages.debug.databaseTypeTitle}
