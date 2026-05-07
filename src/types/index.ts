@@ -45,6 +45,7 @@ export type SectionKey =
   | 'pasta'
   | 'cereal'
   | 'baby_food'
+  | 'sauces'
   | 'tinned_jarred'
   | 'home_baking'
   | 'cooking_ingredients'
