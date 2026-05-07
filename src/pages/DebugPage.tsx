@@ -596,7 +596,7 @@ export function DebugPage({
             <div
               className={'heartbeat-status-strip'}
               style={heartbeatSlotStyle}
-              aria-label={messages.pages.debug.heartbeatStatusHistory}
+              aria-hidden={'true'}
             >
               {heartbeatSlots.map((slot) => (
                 <span
