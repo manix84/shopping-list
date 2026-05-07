@@ -340,6 +340,7 @@ export const nl: Messages = {
       eventNotificationVisibilityLabel: 'Zichtbaarheid',
       eventNotificationRequesting: 'Meldingstoestemming aanvragen...',
       eventNotificationNotShown: 'Browsermelding is niet getoond.',
+      eventNotificationFailed: 'Browsermelding kon niet worden bezorgd.',
       eventNotificationShown: 'Browsermeldingstest voltooid.',
       eventNotificationDeliveryBlocked: 'Geblokkeerd',
       eventNotificationDeliveryServiceWorker: 'Service worker',

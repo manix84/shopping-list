@@ -342,6 +342,7 @@ export const de: Messages = {
       eventNotificationVisibilityLabel: 'Sichtbarkeit',
       eventNotificationRequesting: 'Benachrichtigungsberechtigung wird angefordert...',
       eventNotificationNotShown: 'Browser-Benachrichtigung wurde nicht angezeigt.',
+      eventNotificationFailed: 'Browser-Benachrichtigung konnte nicht zugestellt werden.',
       eventNotificationShown: 'Browser-Benachrichtigungstest abgeschlossen.',
       eventNotificationDeliveryBlocked: 'Blockiert',
       eventNotificationDeliveryServiceWorker: 'Service Worker',

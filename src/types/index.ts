@@ -19,7 +19,7 @@ export type DebugNotificationTestKey = 'minimal' | 'single-item' | 'few-items' |
 export type DebugEventTestKey = 'pwa-install-nudge' | 'secret-aisle' | 'predator';
 export type DebugNotificationDeliveryPath = 'blocked' | 'service-worker' | 'page' | 'failed';
 export type DebugNotificationResult = {
-  status: 'requesting' | 'blocked' | 'shown';
+  status: 'requesting' | 'blocked' | 'failed' | 'shown';
   kind?: DebugNotificationTestKey;
   deliveryPath?: DebugNotificationDeliveryPath;
   permission?: NotificationPermission | 'unsupported';

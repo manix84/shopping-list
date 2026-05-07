@@ -342,6 +342,7 @@ export const fr: Messages = {
       eventNotificationVisibilityLabel: 'Visibilité',
       eventNotificationRequesting: 'Demande d’autorisation des notifications...',
       eventNotificationNotShown: 'La notification du navigateur n’a pas été affichée.',
+      eventNotificationFailed: 'L’envoi de la notification du navigateur a échoué.',
       eventNotificationShown: 'Le test de notification du navigateur est terminé.',
       eventNotificationDeliveryBlocked: 'Bloqué',
       eventNotificationDeliveryServiceWorker: 'Service worker',

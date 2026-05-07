@@ -339,6 +339,7 @@ export const ro: Messages = {
       eventNotificationVisibilityLabel: 'Vizibilitate',
       eventNotificationRequesting: 'Se solicită permisiunea pentru notificări...',
       eventNotificationNotShown: 'Notificarea browserului nu a fost afișată.',
+      eventNotificationFailed: 'Livrarea notificării browserului a eșuat.',
       eventNotificationShown: 'Testul notificării browserului s-a încheiat.',
       eventNotificationDeliveryBlocked: 'Blocată',
       eventNotificationDeliveryServiceWorker: 'Service worker',

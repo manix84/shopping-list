@@ -331,6 +331,7 @@ export const en: Messages = {
       eventNotificationVisibilityLabel: 'Visibility',
       eventNotificationRequesting: 'Requesting notification permission...',
       eventNotificationNotShown: 'Browser notification was not shown.',
+      eventNotificationFailed: 'Browser notification delivery failed.',
       eventNotificationShown: 'Browser notification test completed.',
       eventNotificationDeliveryBlocked: 'Blocked',
       eventNotificationDeliveryServiceWorker: 'Service worker',

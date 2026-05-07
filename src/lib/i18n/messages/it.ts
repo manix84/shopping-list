@@ -340,6 +340,7 @@ export const it: Messages = {
       eventNotificationVisibilityLabel: 'Visibilità',
       eventNotificationRequesting: 'Richiesta autorizzazione notifiche...',
       eventNotificationNotShown: 'La notifica del browser non è stata mostrata.',
+      eventNotificationFailed: 'La consegna della notifica del browser non è riuscita.',
       eventNotificationShown: 'Test notifica browser completato.',
       eventNotificationDeliveryBlocked: 'Bloccata',
       eventNotificationDeliveryServiceWorker: 'Service worker',

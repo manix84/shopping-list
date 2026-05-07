@@ -97,6 +97,7 @@ const debugNotificationDeliveryLabel = (path: DebugNotificationDeliveryPath, mes
 const debugNotificationStatusLabel = (result: DebugNotificationResult, messages: Messages): string => {
   if (result.status === 'requesting') { return messages.pages.debug.eventNotificationRequesting; }
   if (result.status === 'blocked') { return messages.pages.debug.eventNotificationNotShown; }
+  if (result.status === 'failed') { return messages.pages.debug.eventNotificationFailed; }
   return messages.pages.debug.eventNotificationShown;
 };
 

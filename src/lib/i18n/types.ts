@@ -301,6 +301,7 @@ export type Messages = {
       eventNotificationVisibilityLabel: string;
       eventNotificationRequesting: string;
       eventNotificationNotShown: string;
+      eventNotificationFailed: string;
       eventNotificationShown: string;
       eventNotificationDeliveryBlocked: string;
       eventNotificationDeliveryServiceWorker: string;

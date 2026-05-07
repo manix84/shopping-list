@@ -75,6 +75,13 @@ const SHARED_LIST_NOTIFICATION_PREVIEW_LIMIT = 3;
 const NOTIFICATION_SERVICE_WORKER_READY_TIMEOUT_MS = 750;
 const DEBUG_NOTIFICATION_LIST_ID = 'debug-notifications';
 type NotificationDeliveryResult = DebugNotificationDeliveryPath;
+const debugNotificationStatusFromDelivery = (
+  result: NotificationDeliveryResult,
+): DebugNotificationResult['status'] => {
+  if (result === 'failed') { return 'failed'; }
+  if (result === 'blocked') { return 'blocked'; }
+  return 'shown';
+};
 const PWA_INSTALL_NUDGE_DISMISSED_KEY = 'smart-shopping-list-pwa-install-nudge-dismissed-v1';
 const PWA_INSTALL_PROMPT_SETTLE_MS = 1_200;
 const KONAMI_SEQUENCE = ['up', 'up', 'down', 'down', 'left', 'right', 'left', 'right', 'b', 'a'] as const;
@@ -549,7 +556,7 @@ export default function App() {
         messages.notifications.debugTestBody,
       );
       setDebugNotificationResult({
-        status: 'shown',
+        status: debugNotificationStatusFromDelivery(result),
         kind,
         deliveryPath: result,
         ...currentNotificationContext(),
@@ -565,7 +572,7 @@ export default function App() {
     const listId = debugNotificationListIdRef.current;
     const result = await notifySharedListAdditions(listId, debugNotificationItems(kind), true);
     setDebugNotificationResult({
-      status: 'shown',
+      status: debugNotificationStatusFromDelivery(result),
       kind,
       deliveryPath: result,
       ...currentNotificationContext(),
