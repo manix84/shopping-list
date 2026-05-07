@@ -275,6 +275,8 @@ export type Messages = {
       eventsOtherGroupSubtitle: string;
       eventNotificationSingleLabel: string;
       eventNotificationSingleHint: string;
+      eventNotificationMinimalLabel: string;
+      eventNotificationMinimalHint: string;
       eventNotificationFewLabel: string;
       eventNotificationFewHint: string;
       eventNotificationLargeLabel: string;
@@ -290,6 +292,21 @@ export type Messages = {
       eventTriggerAction: string;
       eventNotificationPermissionLabel: string;
       eventNotificationPreferenceLabel: string;
+      eventNotificationLastTestLabel: string;
+      eventNotificationStatusLabel: string;
+      eventNotificationKindLabel: string;
+      eventNotificationDeliveryPathLabel: string;
+      eventNotificationSecureContextLabel: string;
+      eventNotificationFocusLabel: string;
+      eventNotificationVisibilityLabel: string;
+      eventNotificationRequesting: string;
+      eventNotificationNotShown: string;
+      eventNotificationFailed: string;
+      eventNotificationShown: string;
+      eventNotificationDeliveryBlocked: string;
+      eventNotificationDeliveryServiceWorker: string;
+      eventNotificationDeliveryPage: string;
+      eventNotificationDeliveryFailed: string;
       stateTitle: string;
       stateSubtitle: string;
       allMatcherPass: string;
@@ -338,6 +355,8 @@ export type Messages = {
     unavailableDescription: string;
   };
   notifications: {
+    debugTestTitle: string;
+    debugTestBody: string;
     sharedItemsAddedTitle: string;
     sharedItemAddedBody: string;
     sharedItemsAddedBody: string;

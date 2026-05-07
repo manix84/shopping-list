@@ -63,7 +63,7 @@ import { ErrorPage } from './pages/ErrorPage';
 import { RoutePage } from './pages/RoutePage';
 import { SectionsPage } from './pages/SectionsPage';
 import { SettingsPage } from './pages/SettingsPage';
-import type { AppRoute, BackendHeartbeatSample, BackendStatus, CountryCode, DebugEventTestKey, DebugNotificationTestKey, DebugSettings, DebugTabKey, GroupedSectionView, Item, MeasurementDisplayMode, PageKey, RouteViewMode, SaveStatus, SectionKey, SharedListHistoryEntry, ShoppingListRecord, ThemeMode } from './types';
+import type { AppRoute, BackendHeartbeatSample, BackendStatus, CountryCode, DebugEventTestKey, DebugNotificationDeliveryPath, DebugNotificationResult, DebugNotificationTestKey, DebugSettings, DebugTabKey, GroupedSectionView, Item, MeasurementDisplayMode, PageKey, RouteViewMode, SaveStatus, SectionKey, SharedListHistoryEntry, ShoppingListRecord, ThemeMode } from './types';
 
 const DEFAULT_PAGE: PageKey = 'edit';
 const BACKEND_HEARTBEAT_CONNECTED_MS = 5_000;
@@ -72,7 +72,16 @@ const BACKEND_HEARTBEAT_HISTORY_LIMIT = 36;
 const SHARED_LIST_NOTIFICATION_POLL_MS = 30_000;
 const SHARED_LIST_NOTIFICATION_GROUP_MS = 2 * 60_000;
 const SHARED_LIST_NOTIFICATION_PREVIEW_LIMIT = 3;
+const NOTIFICATION_SERVICE_WORKER_READY_TIMEOUT_MS = 750;
 const DEBUG_NOTIFICATION_LIST_ID = 'debug-notifications';
+type NotificationDeliveryResult = DebugNotificationDeliveryPath;
+const debugNotificationStatusFromDelivery = (
+  result: NotificationDeliveryResult,
+): DebugNotificationResult['status'] => {
+  if (result === 'failed') { return 'failed'; }
+  if (result === 'blocked') { return 'blocked'; }
+  return 'shown';
+};
 const PWA_INSTALL_NUDGE_DISMISSED_KEY = 'smart-shopping-list-pwa-install-nudge-dismissed-v1';
 const PWA_INSTALL_PROMPT_SETTLE_MS = 1_200;
 const KONAMI_SEQUENCE = ['up', 'up', 'down', 'down', 'left', 'right', 'left', 'right', 'b', 'a'] as const;
@@ -162,6 +171,24 @@ const hasDismissedPwaInstallNudge = (): boolean => {
   if (typeof window === 'undefined') { return false; }
 
   return window.localStorage.getItem(PWA_INSTALL_NUDGE_DISMISSED_KEY) === 'true';
+};
+
+const serviceWorkerReadyWithTimeout = async (): Promise<ServiceWorkerRegistration | undefined> => {
+  if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) { return undefined; }
+
+  let timeoutId: number | undefined;
+  try {
+    return await Promise.race([
+      navigator.serviceWorker.ready,
+      new Promise<undefined>((resolve) => {
+        timeoutId = window.setTimeout(() => resolve(undefined), NOTIFICATION_SERVICE_WORKER_READY_TIMEOUT_MS);
+      }),
+    ]);
+  } finally {
+    if (timeoutId !== undefined) {
+      window.clearTimeout(timeoutId);
+    }
+  }
 };
 
 const updateBrowserIcon = (theme: 'light' | 'dark'): void => {
@@ -267,9 +294,11 @@ export default function App() {
   const [isLikelyMobileForInstall, setIsLikelyMobileForInstall] = useState(() => isMobileOrTabletDevice());
   const [isSecretAisleEasterEggVisible, setIsSecretAisleEasterEggVisible] = useState(false);
   const [predatorEasterEggRun, setPredatorEasterEggRun] = useState(0);
+  const [debugNotificationResult, setDebugNotificationResult] = useState<DebugNotificationResult>();
   const currentItemsRef = useRef<Item[]>([]);
   const sharedListNotificationSeenUpdatedAtRef = useRef<Record<string, string>>({});
   const sharedListNotificationGroupRef = useRef<SharedListNotificationGroup>();
+  const debugNotificationListIdRef = useRef(DEBUG_NOTIFICATION_LIST_ID);
   const saveRequestIdRef = useRef(0);
   const suppressNextAutosaveStatusRef = useRef(true);
   const suppressNextAutosaveStatus = () => {
@@ -387,24 +416,62 @@ export default function App() {
     setNotificationsEnabled(granted);
   };
 
-  const showBrowserNotification = useCallback(async (title: string, options: NotificationOptions) => {
-    if (browserNotificationPermission() !== 'granted') { return; }
-    if (typeof window === 'undefined') { return; }
+  const showBrowserNotification = useCallback(async (
+    title: string,
+    options: NotificationOptions,
+  ): Promise<NotificationDeliveryResult> => {
+    if (browserNotificationPermission() !== 'granted') { return 'blocked'; }
+    if (typeof window === 'undefined') { return 'failed'; }
 
-    if ('serviceWorker' in navigator) {
-      const registration = await navigator.serviceWorker.ready.catch(() => undefined);
-      if (registration?.showNotification) {
+    const registration = await serviceWorkerReadyWithTimeout().catch(() => undefined);
+    if (registration?.showNotification) {
+      try {
         await registration.showNotification(title, options);
-        return;
+        return 'service-worker';
+      } catch (error) {
+        console.warn('Unable to show service worker notification. Falling back to page notification.', error);
       }
     }
 
-    new window.Notification(title, options);
+    try {
+      new window.Notification(title, options);
+      return 'page';
+    } catch (error) {
+      console.warn('Unable to show page notification with full options. Retrying with minimal options.', error);
+    }
+
+    try {
+      new window.Notification(title, {
+        body: options.body,
+        icon: options.icon,
+      });
+      return 'page';
+    } catch (error) {
+      console.warn('Unable to show page notification.', error);
+      return 'failed';
+    }
   }, []);
 
-  const notifySharedListAdditions = useCallback(async (listId: string, addedItems: Item[], force = false) => {
-    if ((!force && !notificationsEnabled) || addedItems.length === 0) { return; }
-    if (typeof window === 'undefined') { return; }
+  const showDirectPageNotification = useCallback((title: string, body: string): NotificationDeliveryResult => {
+    if (browserNotificationPermission() !== 'granted') { return 'blocked'; }
+    if (typeof window === 'undefined' || !('Notification' in window)) { return 'failed'; }
+
+    try {
+      new window.Notification(title, { body });
+      return 'page';
+    } catch (error) {
+      console.warn('Unable to show minimal page notification.', error);
+      return 'failed';
+    }
+  }, []);
+
+  const notifySharedListAdditions = useCallback(async (
+    listId: string,
+    addedItems: Item[],
+    force = false,
+  ): Promise<NotificationDeliveryResult> => {
+    if ((!force && !notificationsEnabled) || addedItems.length === 0) { return 'blocked'; }
+    if (typeof window === 'undefined') { return 'failed'; }
 
     const now = Date.now();
     const currentGroup = sharedListNotificationGroupRef.current;
@@ -423,7 +490,7 @@ export default function App() {
     sharedListNotificationGroupRef.current = nextGroup;
 
     const count = nextGroup.itemIds.size;
-    if (count === 0) { return; }
+    if (count === 0) { return 'blocked'; }
 
     const title = messages.notifications.sharedItemsAddedTitle;
     const preview = messages.notifications.sharedItemsAddedPreview.replace(
@@ -442,11 +509,12 @@ export default function App() {
       tag: `smart-shopping-list-${listId}-additions`,
     };
 
-    await showBrowserNotification(title, options);
+    return showBrowserNotification(title, options);
   }, [messages.notifications, notificationsEnabled, showBrowserNotification]);
 
   const debugNotificationItems = useCallback((kind: DebugNotificationTestKey): Item[] => {
     const namesByKind: Record<DebugNotificationTestKey, string[]> = {
+      minimal: ['Milk'],
       'single-item': ['Milk'],
       'few-items': ['Milk', 'Eggs', 'Bananas'],
       'large-batch': ['Milk', 'Eggs', 'Bananas', 'Bread', 'Apples', 'Pasta', 'Tomatoes', 'Coffee', 'Rice', 'Yoghurt'],
@@ -464,11 +532,52 @@ export default function App() {
   }, []);
 
   const handleDebugNotificationTest = useCallback(async (kind: DebugNotificationTestKey) => {
+    setDebugNotificationResult({ status: 'requesting', kind });
     const granted = await ensureNotificationPermission();
-    if (!granted) { return; }
+    if (!granted) {
+      setDebugNotificationResult({
+        status: 'blocked',
+        kind,
+        permission: browserNotificationPermission(),
+      });
+      return;
+    }
 
-    await notifySharedListAdditions(DEBUG_NOTIFICATION_LIST_ID, debugNotificationItems(kind), true);
-  }, [debugNotificationItems, ensureNotificationPermission, notifySharedListAdditions]);
+    const currentNotificationContext = () => ({
+      permission: browserNotificationPermission(),
+      secureContext: window.isSecureContext,
+      focus: document.hasFocus(),
+      visibility: document.visibilityState,
+    });
+
+    if (kind === 'minimal') {
+      const result = showDirectPageNotification(
+        messages.notifications.debugTestTitle,
+        messages.notifications.debugTestBody,
+      );
+      setDebugNotificationResult({
+        status: debugNotificationStatusFromDelivery(result),
+        kind,
+        deliveryPath: result,
+        ...currentNotificationContext(),
+      });
+      return;
+    }
+
+    if (kind !== 'silent-follow-up') {
+      sharedListNotificationGroupRef.current = undefined;
+      debugNotificationListIdRef.current = `${DEBUG_NOTIFICATION_LIST_ID}-${Date.now()}`;
+    }
+
+    const listId = debugNotificationListIdRef.current;
+    const result = await notifySharedListAdditions(listId, debugNotificationItems(kind), true);
+    setDebugNotificationResult({
+      status: debugNotificationStatusFromDelivery(result),
+      kind,
+      deliveryPath: result,
+      ...currentNotificationContext(),
+    });
+  }, [debugNotificationItems, ensureNotificationPermission, messages.notifications, notifySharedListAdditions, showDirectPageNotification]);
 
   const handleDebugEventTest = useCallback((kind: DebugEventTestKey) => {
     if (kind === 'pwa-install-nudge') {
@@ -1667,6 +1776,7 @@ export default function App() {
                 storageMode={storageMode}
                 notificationsEnabled={notificationsEnabled}
                 notificationPermission={notificationPermission}
+                debugNotificationResult={debugNotificationResult}
                 items={items}
                 config={config}
                 matcherTests={matcherTests}
