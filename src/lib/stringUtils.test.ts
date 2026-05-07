@@ -43,6 +43,8 @@ describe('string utilities', () => {
     ['cookies and cream ice-cream', undefined, 'Cookies and Cream Ice-Cream'],
     ['bananas', 2, 'Bananas'],
     ['blue milk', undefined, 'Whole Milk'],
+    ['ketchup', undefined, 'Tomato Ketchup'],
+    ['real milk', undefined, 'Whole Milk'],
     ['small milk', 2, 'Small Milk'],
     ['bottle of water', 2, 'Bottle of Water'],
     ['', undefined, ''],

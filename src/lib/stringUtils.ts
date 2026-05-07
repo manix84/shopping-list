@@ -107,9 +107,10 @@ const pluralizeWord = (word: string): string => {
 
 const displayNameAliases = new Map<string, string>([
   ['blue milk', 'whole milk'],
-  ['gold milk', 'semi-skimmed milk'],
   ['green milk', 'semi-skimmed milk'],
+  ['ketchup', 'tomato ketchup'],
   ['milk', 'semi-skimmed milk'],
+  ['real milk', 'whole milk'],
   ['red milk', 'skimmed milk'],
 ]);
 
