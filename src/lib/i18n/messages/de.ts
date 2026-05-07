@@ -430,6 +430,7 @@ export const de: Messages = {
     unavailableTitle: 'Über das Browsermenü installieren',
     unavailableDescription:
       'Nutze die Teilen-Funktion oder das Browsermenü und wähle Zum Startbildschirm hinzufügen oder App installieren.',
+    updateReloadLabel: 'App wird aktualisiert',
   },
   notifications: {
     debugTestTitle: 'Smart Shopping List Benachrichtigungstest',

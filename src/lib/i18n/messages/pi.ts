@@ -426,6 +426,7 @@ export const pi: Messages = {
     unavailableTitle: 'Install from yer browser menu',
     unavailableDescription:
       'Use yer browser share or menu button, then choose Add to Home Screen or Install app.',
+    updateReloadLabel: 'Updatin the app, matey',
   },
   notifications: {
     debugTestTitle: 'Smart Shopping Ledger bell test',

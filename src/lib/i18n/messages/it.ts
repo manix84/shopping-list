@@ -428,6 +428,7 @@ export const it: Messages = {
     unavailableTitle: 'Installa dal menu del browser',
     unavailableDescription:
       'Usa il pulsante di condivisione o il menu del browser, poi scegli Aggiungi alla schermata Home o Installa app.',
+    updateReloadLabel: 'Aggiornamento dell’app',
   },
   notifications: {
     debugTestTitle: 'Test notifica Smart Shopping List',

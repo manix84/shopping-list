@@ -425,6 +425,7 @@ export const es: Messages = {
     unavailableTitle: 'Instalar desde el menú del navegador',
     unavailableDescription:
       'Usa el botón de compartir o el menú del navegador y elige Añadir a pantalla de inicio o Instalar app.',
+    updateReloadLabel: 'Actualizando la app',
   },
   notifications: {
     debugTestTitle: 'Prueba de notificación de Smart Shopping List',

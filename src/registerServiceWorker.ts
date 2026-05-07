@@ -1,3 +1,5 @@
+import { createMessages, loadLocale } from './lib/i18n';
+
 export const registerServiceWorker = (): void => {
   if (!import.meta.env.PROD || !('serviceWorker' in navigator)) { return; }
 
@@ -20,7 +22,7 @@ export const registerServiceWorker = (): void => {
     overlay.id = UPDATE_RELOAD_OVERLAY_ID;
     overlay.setAttribute('role', 'status');
     overlay.setAttribute('aria-live', 'polite');
-    overlay.setAttribute('aria-label', 'Updating app');
+    overlay.setAttribute('aria-label', createMessages(loadLocale()).pwaInstall.updateReloadLabel);
     overlay.innerHTML = `<img src="${logoUrl}" alt="" />`;
     overlay.style.cssText = [
       'align-items:center',
@@ -52,7 +54,7 @@ export const registerServiceWorker = (): void => {
   };
 
   const currentAssetUrls = (): Set<string> => new Set(
-    Array.from(document.querySelectorAll<HTMLLinkElement | HTMLScriptElement>('script[src], link[rel="stylesheet"][href]'))
+    Array.from(document.querySelectorAll<HTMLLinkElement | HTMLScriptElement>('script[src], link[href]'))
       .map((element) => {
         if (element instanceof HTMLScriptElement) { return element.src; }
         return element.href;

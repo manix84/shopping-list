@@ -427,6 +427,7 @@ export const ro: Messages = {
     unavailableTitle: 'Instalează din meniul browserului',
     unavailableDescription:
       'Folosește butonul de partajare sau meniul browserului, apoi alege Adaugă pe ecranul de pornire sau Instalează aplicația.',
+    updateReloadLabel: 'Aplicația se actualizează',
   },
   notifications: {
     debugTestTitle: 'Test notificare Smart Shopping List',

@@ -365,6 +365,7 @@ export type Messages = {
     settingsDescription: string;
     unavailableTitle: string;
     unavailableDescription: string;
+    updateReloadLabel: string;
   };
   notifications: {
     debugTestTitle: string;
