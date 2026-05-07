@@ -15,7 +15,7 @@ export type DebugTabKey =
   | 'host'
   | 'events'
   | 'settings';
-export type DebugNotificationTestKey = 'single-item' | 'few-items' | 'large-batch' | 'silent-follow-up';
+export type DebugNotificationTestKey = 'minimal' | 'single-item' | 'few-items' | 'large-batch' | 'silent-follow-up';
 export type DebugEventTestKey = 'pwa-install-nudge' | 'secret-aisle' | 'predator';
 export type AppRoute = {
   page: PageKey;

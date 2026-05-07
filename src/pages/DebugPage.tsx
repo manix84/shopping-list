@@ -30,6 +30,7 @@ type DebugPageProps = {
   storageMode: 'local' | 'backend';
   notificationsEnabled: boolean;
   notificationPermission: NotificationPermission | 'unsupported';
+  debugNotificationResult?: string;
   items: Item[];
   config: CountryConfig;
   matcherTests: MatcherTestResult[];
@@ -190,6 +191,7 @@ export function DebugPage({
   storageMode,
   notificationsEnabled,
   notificationPermission,
+  debugNotificationResult,
   items,
   config,
   matcherTests,
@@ -887,6 +889,10 @@ export function DebugPage({
                   <th scope={'row'}>{messages.pages.debug.eventNotificationPreferenceLabel}</th>
                   <td>{String(notificationsEnabled)}</td>
                 </tr>
+                <tr>
+                  <th scope={'row'}>Last notification test</th>
+                  <td>{debugNotificationResult ?? messages.pages.debug.unavailable}</td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -895,6 +901,11 @@ export function DebugPage({
               <h3 className={'title title-xs'}>{messages.pages.debug.eventsNotificationGroupTitle}</h3>
               <p className={'subtitle'}>{messages.pages.debug.eventsNotificationGroupSubtitle}</p>
             </div>
+            <DebugEventButton
+              label={'Minimal direct notification'}
+              hint={'Bypasses the service worker, tags, icons, and grouped notification options.'}
+              onClick={() => onDebugNotificationTest('minimal')}
+            />
             <DebugEventButton
               label={messages.pages.debug.eventNotificationSingleLabel}
               hint={messages.pages.debug.eventNotificationSingleHint}
