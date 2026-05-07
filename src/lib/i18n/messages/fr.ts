@@ -422,6 +422,8 @@ export const fr: Messages = {
       'Utilisez le bouton de partage ou le menu du navigateur, puis choisissez Ajouter à l’écran d’accueil ou Installer l’application.',
   },
   notifications: {
+    debugTestTitle: 'Test de notification Smart Shopping List',
+    debugTestBody: 'Test minimal de notification locale.',
     sharedItemsAddedTitle: 'Liste de courses mise à jour',
     sharedItemAddedBody: '{item} a été ajouté.',
     sharedItemsAddedBody: '{count} articles ont été ajoutés.',

@@ -408,6 +408,8 @@ export const en: Messages = {
       'Use your browser share or menu button, then choose Add to Home Screen or Install app.',
   },
   notifications: {
+    debugTestTitle: 'Smart Shopping List notification test',
+    debugTestBody: 'Minimal localhost notification test.',
     sharedItemsAddedTitle: 'Shopping list updated',
     sharedItemAddedBody: '{item} was added.',
     sharedItemsAddedBody: '{count} items were added.',

@@ -414,6 +414,8 @@ export const es: Messages = {
       'Usa el botón de compartir o el menú del navegador y elige Añadir a pantalla de inicio o Instalar app.',
   },
   notifications: {
+    debugTestTitle: 'Prueba de notificación de Smart Shopping List',
+    debugTestBody: 'Prueba mínima de notificación local.',
     sharedItemsAddedTitle: 'Lista de compra actualizada',
     sharedItemAddedBody: 'Se añadió {item}.',
     sharedItemsAddedBody: 'Se añadieron {count} artículos.',

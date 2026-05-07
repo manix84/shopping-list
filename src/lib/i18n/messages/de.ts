@@ -419,6 +419,8 @@ export const de: Messages = {
       'Nutze die Teilen-Funktion oder das Browsermenü und wähle Zum Startbildschirm hinzufügen oder App installieren.',
   },
   notifications: {
+    debugTestTitle: 'Smart Shopping List Benachrichtigungstest',
+    debugTestBody: 'Minimaler lokaler Benachrichtigungstest.',
     sharedItemsAddedTitle: 'Einkaufsliste aktualisiert',
     sharedItemAddedBody: '{item} wurde hinzugefügt.',
     sharedItemsAddedBody: '{count} Artikel wurden hinzugefügt.',

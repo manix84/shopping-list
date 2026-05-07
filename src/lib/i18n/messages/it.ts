@@ -417,6 +417,8 @@ export const it: Messages = {
       'Usa il pulsante di condivisione o il menu del browser, poi scegli Aggiungi alla schermata Home o Installa app.',
   },
   notifications: {
+    debugTestTitle: 'Test notifica Smart Shopping List',
+    debugTestBody: 'Test minimo di notifica locale.',
     sharedItemsAddedTitle: 'Lista della spesa aggiornata',
     sharedItemAddedBody: '{item} è stato aggiunto.',
     sharedItemsAddedBody: 'Sono stati aggiunti {count} articoli.',

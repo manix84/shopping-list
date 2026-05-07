@@ -417,6 +417,8 @@ export const nl: Messages = {
       'Gebruik de deelknop of het browsermenu en kies Toevoegen aan startscherm of App installeren.',
   },
   notifications: {
+    debugTestTitle: 'Smart Shopping List meldingstest',
+    debugTestBody: 'Minimale lokale meldingstest.',
     sharedItemsAddedTitle: 'Boodschappenlijst bijgewerkt',
     sharedItemAddedBody: '{item} is toegevoegd.',
     sharedItemsAddedBody: '{count} items zijn toegevoegd.',

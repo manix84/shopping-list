@@ -354,6 +354,8 @@ export type Messages = {
     unavailableDescription: string;
   };
   notifications: {
+    debugTestTitle: string;
+    debugTestBody: string;
     sharedItemsAddedTitle: string;
     sharedItemAddedBody: string;
     sharedItemsAddedBody: string;

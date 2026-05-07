@@ -415,6 +415,8 @@ export const pi: Messages = {
       'Use yer browser share or menu button, then choose Add to Home Screen or Install app.',
   },
   notifications: {
+    debugTestTitle: 'Smart Shopping Ledger bell test',
+    debugTestBody: 'Small local bell test.',
     sharedItemsAddedTitle: 'Shopping list updated',
     sharedItemAddedBody: '{item} was added.',
     sharedItemsAddedBody: '{count} items were added.',

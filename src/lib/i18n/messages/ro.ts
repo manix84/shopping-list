@@ -416,6 +416,8 @@ export const ro: Messages = {
       'Folosește butonul de partajare sau meniul browserului, apoi alege Adaugă pe ecranul de pornire sau Instalează aplicația.',
   },
   notifications: {
+    debugTestTitle: 'Test notificare Smart Shopping List',
+    debugTestBody: 'Test minim de notificare locală.',
     sharedItemsAddedTitle: 'Lista de cumpărături a fost actualizată',
     sharedItemAddedBody: '{item} a fost adăugat.',
     sharedItemsAddedBody: '{count} articole au fost adăugate.',

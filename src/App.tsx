@@ -544,7 +544,10 @@ export default function App() {
     });
 
     if (kind === 'minimal') {
-      const result = showDirectPageNotification('Smart Shopping List notification test', 'Minimal localhost notification test.');
+      const result = showDirectPageNotification(
+        messages.notifications.debugTestTitle,
+        messages.notifications.debugTestBody,
+      );
       setDebugNotificationResult({
         status: 'shown',
         kind,
@@ -567,7 +570,7 @@ export default function App() {
       deliveryPath: result,
       ...currentNotificationContext(),
     });
-  }, [debugNotificationItems, ensureNotificationPermission, notifySharedListAdditions, showDirectPageNotification]);
+  }, [debugNotificationItems, ensureNotificationPermission, messages.notifications, notifySharedListAdditions, showDirectPageNotification]);
 
   const handleDebugEventTest = useCallback((kind: DebugEventTestKey) => {
     if (kind === 'pwa-install-nudge') {
