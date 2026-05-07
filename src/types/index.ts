@@ -250,6 +250,12 @@ export type BackendHeartbeatSample = {
   adapter?: BackendDatabaseAdapter;
   latencyMs: number;
 };
+export type BackendOperationState = 'idle' | 'loading' | 'reconnecting' | 'backend' | 'local-fallback' | 'save-failed';
+export type BackendOperationStatus = {
+  state: BackendOperationState;
+  updatedAt?: string;
+  detail?: string;
+};
 
 export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 

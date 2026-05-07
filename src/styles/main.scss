@@ -361,6 +361,14 @@ select {
   min-width: 720px;
   width: 100%;
 
+  caption {
+    color: $text;
+    font-size: 0.9rem;
+    font-weight: 700;
+    padding: 0 0 8px;
+    text-align: left;
+  }
+
   th,
   td {
     border-bottom: 1px solid $border;
@@ -378,6 +386,15 @@ select {
 
   td {
     font-size: 0.88rem;
+  }
+}
+
+.debug-table-compact {
+  min-width: 560px;
+
+  th,
+  td {
+    padding: 8px 10px;
   }
 }
 
@@ -1186,6 +1203,40 @@ select {
 
 .heartbeat-graph-point-offline {
   color: $danger-text;
+}
+
+.heartbeat-status-strip {
+  align-items: stretch;
+  display: grid;
+  gap: 3px;
+  grid-template-columns: repeat(auto-fit, minmax(8px, 1fr));
+  min-height: 14px;
+}
+
+.heartbeat-status-empty {
+  color: $muted;
+  font-size: 0.78rem;
+}
+
+.heartbeat-status-bar {
+  border-radius: 999px;
+  min-height: 10px;
+}
+
+.heartbeat-status-bar-connected {
+  background: $success-text;
+}
+
+.heartbeat-status-bar-checking {
+  background: $primary;
+}
+
+.heartbeat-status-bar-error {
+  background: $danger-text;
+}
+
+.heartbeat-status-bar-offline {
+  background: $muted;
 }
 
 @keyframes heartbeat-ring {
