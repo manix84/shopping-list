@@ -4,7 +4,7 @@
 
 [![Deploy to GitHub Pages](https://github.com/manix84/shopping-list/actions/workflows/deploy-gh-pages.yml/badge.svg)](https://github.com/manix84/shopping-list/actions/workflows/deploy-gh-pages.yml)
 
-[![Version](https://img.shields.io/github/package-json/v/manix84/shopping-list?filename=package.json&label=version)](package.json)
+[![Version](https://img.shields.io/github/package-json/v/manix84/shopping-list?filename=package.json&label=version)](package.json) [![Compressed app shell size](https://img.badgesize.io/https://manix84.github.io/shopping-list/index.html?compression=gzip&label=compressed%20app%20shell&color=blue&size=dec)](https://manix84.github.io/shopping-list/)
 
 A React + TypeScript shopping list app that turns a rough grocery list into an ordered route through the store. It runs as a static frontend by default, can install as a PWA, and can use an optional backend for shared lists and durable settings.
 
