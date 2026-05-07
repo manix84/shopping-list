@@ -4,7 +4,11 @@
 
 [![Deploy to GitHub Pages](https://github.com/manix84/shopping-list/actions/workflows/deploy-gh-pages.yml/badge.svg)](https://github.com/manix84/shopping-list/actions/workflows/deploy-gh-pages.yml)
 
+[![Version](https://img.shields.io/github/package-json/v/manix84/shopping-list?filename=package.json&label=version)](package.json)
+
 A React + TypeScript shopping list app that turns a rough grocery list into an ordered route through the store. It runs as a static frontend by default, can install as a PWA, and can use an optional backend for shared lists and durable settings.
+
+See [What's New](WHATSNEW.md) for recent changes and major app milestones.
 
 ## 📸 App screens
 
@@ -16,12 +20,12 @@ node scripts/generate-readme-screenshots.mjs
 
 The generator uses Playwright Chromium. If the browser binary is missing after installing dependencies, run `npx playwright install chromium`.
 
-| Route view | Edit and share |
-| --- | --- |
+| Route view                                                                                                                                                         | Edit and share                                                                                                                                                                                                     |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | ![Annotated desktop route view showing toolbar controls, section grouping, quantity badges, and tickable items.](docs/screenshots/readme/readme-desktop-route.png) | ![Annotated desktop edit and share view showing store layout selection, pasted list input, save actions, shared link, QR preview, and recent shared lists.](docs/screenshots/readme/readme-desktop-edit-share.png) |
 
-| Mobile edit and share | Mobile settings |
-| --- | --- |
+| Mobile edit and share                                                                                                                                                    | Mobile settings                                                                                                                                                    |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | ![Annotated mobile edit and share view showing the stacked editor, list input, install prompt, and sharing panel.](docs/screenshots/readme/readme-mobile-edit-share.png) | ![Annotated mobile settings view showing localized selectors, detected country, and local preference storage.](docs/screenshots/readme/readme-mobile-settings.png) |
 
 ## ✨ What it does
