@@ -76,6 +76,7 @@ const NOTIFICATION_SERVICE_WORKER_READY_TIMEOUT_MS = 750;
 const DEBUG_NOTIFICATION_LIST_ID = 'debug-notifications';
 const DEBUG_MODE_NOTICE_DURATION_MS = 4_000;
 const DEV_TITLE_SUFFIX = ' [Dev]';
+const DEV_MANIFEST_ID = 'smart-shopping-list-dev';
 type NotificationDeliveryResult = DebugNotificationDeliveryPath;
 const debugNotificationStatusFromDelivery = (
   result: NotificationDeliveryResult,
@@ -149,6 +150,35 @@ const isRunningInstalledPwa = (): boolean => {
 
   const navigatorWithStandalone = window.navigator as Navigator & { standalone?: boolean };
   return window.matchMedia('(display-mode: standalone)').matches || navigatorWithStandalone.standalone === true;
+};
+
+const updateDevManifest = (appTitle: string): void => {
+  if (!import.meta.env.DEV || typeof document === 'undefined') { return; }
+
+  const manifestLink = document.querySelector<HTMLLinkElement>('link[rel="manifest"]');
+  if (!manifestLink) { return; }
+
+  fetch(manifestLink.href, { cache: 'no-store' })
+    .then((response) => response.ok ? response.json() : undefined)
+    .then((manifest: unknown) => {
+      if (!manifest || typeof manifest !== 'object') { return; }
+
+      const devManifest = {
+        ...manifest,
+        id: DEV_MANIFEST_ID,
+        name: `${appTitle}${DEV_TITLE_SUFFIX}`,
+        short_name: `Shopping List${DEV_TITLE_SUFFIX}`,
+      };
+      const manifestBlob = new Blob([JSON.stringify(devManifest)], { type: 'application/manifest+json' });
+      const previousHref = manifestLink.href.startsWith('blob:') ? manifestLink.href : undefined;
+      manifestLink.href = URL.createObjectURL(manifestBlob);
+      if (previousHref) {
+        URL.revokeObjectURL(previousHref);
+      }
+    })
+    .catch(() => {
+      // Non-fatal: the dev install prompt can fall back to the static manifest.
+    });
 };
 
 const isMobileOrTabletDevice = (): boolean => {
@@ -1211,6 +1241,7 @@ export default function App() {
     applyDocumentLocale(locale);
     if (typeof document !== 'undefined') {
       document.title = import.meta.env.DEV ? `${messages.app.title}${DEV_TITLE_SUFFIX}` : messages.app.title;
+      updateDevManifest(messages.app.title);
     }
   }, [locale, messages]);
 
