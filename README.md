@@ -6,6 +6,8 @@
 
 A React + TypeScript shopping list app that turns a rough grocery list into an ordered route through the store. It runs as a static frontend by default, can install as a PWA, and can use an optional backend for shared lists and durable settings.
 
+See [What's New](WHATSNEW.md) for recent changes and major app milestones.
+
 ## 📸 App screens
 
 These are real app screenshots with numbered callouts. The README versions are generated from `docs/screenshots/source` with:
