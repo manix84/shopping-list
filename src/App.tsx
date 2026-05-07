@@ -5,6 +5,7 @@ import { PredatorEasterEgg } from './components/PredatorEasterEgg';
 import { PwaInstallBadge } from './components/PwaInstallBadge';
 import { PwaSplashScreen } from './components/PwaSplashScreen';
 import { SecretAisleEasterEgg } from './components/SecretAisleEasterEgg';
+import { ToastPopup, type ToastPopupData } from './components/ToastPopup';
 import {
   runCountQuantityTests,
   runConfigTests,
@@ -341,7 +342,7 @@ export default function App() {
   const [isSecretAisleEasterEggVisible, setIsSecretAisleEasterEggVisible] = useState(false);
   const [predatorEasterEggRun, setPredatorEasterEggRun] = useState(0);
   const [debugNotificationResult, setDebugNotificationResult] = useState<DebugNotificationResult>();
-  const [debugModeNotice, setDebugModeNotice] = useState<{ id: number; message: string }>();
+  const [debugModeNotice, setDebugModeNotice] = useState<ToastPopupData>();
   const currentItemsRef = useRef<Item[]>([]);
   const sharedListNotificationSeenUpdatedAtRef = useRef<Record<string, string>>({});
   const sharedListNotificationGroupRef = useRef<SharedListNotificationGroup>();
@@ -389,7 +390,12 @@ export default function App() {
     const shouldNotifyEnabled = !isDebugMode;
     setIsDebugMode(true);
     if (shouldNotifyEnabled) {
-      setDebugModeNotice({ id: Date.now(), message: messages.pages.about.debugModeEnabledNotice });
+      setDebugModeNotice({
+        id: Date.now(),
+        tone: 'success',
+        title: messages.pages.about.debugModeEnabledNoticeTitle,
+        message: messages.pages.about.debugModeEnabledNotice,
+      });
     }
     try {
       saveDebugMode(true);
@@ -399,7 +405,12 @@ export default function App() {
   };
 
   const showAlreadyDebugModeNotice = () => {
-    setDebugModeNotice({ id: Date.now(), message: messages.pages.about.debugModeAlreadyEnabledNotice });
+    setDebugModeNotice({
+      id: Date.now(),
+      tone: 'info',
+      title: messages.pages.about.debugModeAlreadyEnabledNoticeTitle,
+      message: messages.pages.about.debugModeAlreadyEnabledNotice,
+    });
   };
 
   const handleDebugModeChange = (enabled: boolean) => {
@@ -1899,9 +1910,7 @@ export default function App() {
           onInstall={promptPwaInstall}
         />
         {debugModeNotice ? (
-          <aside key={debugModeNotice.id} className={'debug-mode-notice'} role={'status'} aria-live={'polite'}>
-            {debugModeNotice.message}
-          </aside>
+          <ToastPopup key={debugModeNotice.id} {...debugModeNotice} />
         ) : null}
         <SecretAisleEasterEgg
           isVisible={isSecretAisleEasterEggVisible && !debugSettings.disableEasterEggs}

@@ -177,7 +177,9 @@ export const es: Messages = {
       sponsorFootnote:
         'El patrocinio ayuda a mantener esta app independiente, mantenida y gratuita.',
       authorProfileLabel: 'Abrir el perfil de GitHub de Rob',
-      debugModeEnabledNotice: 'Modo de depuración activado. Las herramientas de depuración ya están disponibles en el menú principal.',
+      debugModeEnabledNoticeTitle: 'Modo de depuración activado',
+      debugModeEnabledNotice: 'Las herramientas de depuración ya están disponibles en el menú principal.',
+      debugModeAlreadyEnabledNoticeTitle: 'Ya está activado',
       debugModeAlreadyEnabledNotice: 'El modo de depuración ya está activado. No hace falta seguir tocando.',
     },
     error: {

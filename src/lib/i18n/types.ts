@@ -172,7 +172,9 @@ export type Messages = {
       sponsorAction: string;
       sponsorFootnote: string;
       authorProfileLabel: string;
+      debugModeEnabledNoticeTitle: string;
       debugModeEnabledNotice: string;
+      debugModeAlreadyEnabledNoticeTitle: string;
       debugModeAlreadyEnabledNotice: string;
     };
     error: {

@@ -2669,24 +2669,87 @@ select {
   z-index: 80;
 }
 
-.debug-mode-notice {
+.toast-popup {
   animation: connection-badge-fade-in 0.24s ease-out both;
   background: color-mix(in srgb, $panel 96%, transparent);
-  border: 1px solid color-mix(in srgb, $primary 34%, $border);
+  border: 1px solid color-mix(in srgb, var(--toast-color) 34%, $border);
   border-radius: 12px;
-  box-shadow: 0 16px 38px color-mix(in srgb, var(--shadow-color) 82%, transparent);
+  box-shadow:
+    0 18px 42px color-mix(in srgb, var(--shadow-color) 72%, transparent),
+    0 2px 8px color-mix(in srgb, var(--shadow-color) 34%, transparent);
   color: $text;
-  font-size: 14px;
-  font-weight: 700;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: auto minmax(0, 1fr);
   right: max(18px, env(safe-area-inset-right));
   line-height: 1.35;
   max-width: min(420px, calc(100vw - 32px));
   padding: 12px 14px;
   position: fixed;
-  text-align: center;
   top: max(18px, env(safe-area-inset-top));
   width: max-content;
   z-index: 90;
+}
+
+.toast-popup-success {
+  --toast-color: #{$success-text};
+}
+
+.toast-popup-info {
+  --toast-color: #{$primary};
+}
+
+.toast-popup-warning {
+  --toast-color: #b45309;
+}
+
+.toast-popup-error {
+  --toast-color: #{$danger-text};
+}
+
+.toast-popup-no-icon {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.toast-popup-icon {
+  align-items: center;
+  background: color-mix(in srgb, var(--toast-color) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--toast-color) 28%, transparent);
+  border-radius: 999px;
+  color: var(--toast-color);
+  display: inline-flex;
+  height: 34px;
+  justify-content: center;
+  width: 34px;
+
+  svg {
+    display: block;
+    height: 20px;
+    width: 20px;
+  }
+}
+
+.toast-popup-copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+
+  strong {
+    color: $text;
+    font-size: 14px;
+    line-height: 1.25;
+  }
+
+  span {
+    color: $muted;
+    font-size: 13px;
+  }
+}
+
+.toast-popup-no-title .toast-popup-copy span {
+  color: $text;
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .pwa-install-badge-copy {

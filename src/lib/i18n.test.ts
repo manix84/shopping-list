@@ -110,7 +110,9 @@ describe('i18n', () => {
       ['pwaInstall', 'unavailableTitle'],
       ['pwaInstall', 'unavailableDescription'],
       ['pwaInstall', 'updateReloadLabel'],
+      ['pages', 'about', 'debugModeEnabledNoticeTitle'],
       ['pages', 'about', 'debugModeEnabledNotice'],
+      ['pages', 'about', 'debugModeAlreadyEnabledNoticeTitle'],
       ['pages', 'about', 'debugModeAlreadyEnabledNotice'],
     ] as const;
 

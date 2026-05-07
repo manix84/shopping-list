@@ -182,7 +182,9 @@ export const nl: Messages = {
       sponsorFootnote:
         'Sponsoring helpt deze app onafhankelijk, onderhouden en gratis te houden.',
       authorProfileLabel: 'Robs GitHub-profiel openen',
-      debugModeEnabledNotice: 'Debugmodus ingeschakeld. Debughulpmiddelen staan nu in het hoofdmenu.',
+      debugModeEnabledNoticeTitle: 'Debugmodus ingeschakeld',
+      debugModeEnabledNotice: 'Debughulpmiddelen staan nu in het hoofdmenu.',
+      debugModeAlreadyEnabledNoticeTitle: 'Al ingeschakeld',
       debugModeAlreadyEnabledNotice: 'Debugmodus is al ingeschakeld. Je hoeft niet te blijven tikken.',
     },
     error: {

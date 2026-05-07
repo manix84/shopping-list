@@ -181,7 +181,9 @@ export const it: Messages = {
       sponsorFootnote:
         'La sponsorizzazione aiuta a mantenere questa app indipendente, curata e gratuita.',
       authorProfileLabel: 'Apri il profilo GitHub di Rob',
-      debugModeEnabledNotice: 'Modalità debug attivata. Gli strumenti di debug sono ora disponibili nel menu principale.',
+      debugModeEnabledNoticeTitle: 'Modalità debug attivata',
+      debugModeEnabledNotice: 'Gli strumenti di debug sono ora disponibili nel menu principale.',
+      debugModeAlreadyEnabledNoticeTitle: 'Già attiva',
       debugModeAlreadyEnabledNotice: 'La modalità debug è già attiva. Non serve continuare a toccare.',
     },
     error: {
