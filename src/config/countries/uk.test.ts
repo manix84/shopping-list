@@ -32,15 +32,15 @@ describe('UK config', () => {
     expect(snacks?.keywords).toContain('crisps');
     expect(snacks?.keywords).toContain('biscuits');
     expect(sauces?.label).toBe('Sauces');
+    expect(sauces?.keywords).toContain('ketchup');
+    expect(sauces?.keywords).toContain('dijon mustard');
+    expect(sauces?.keywords).toContain('mayonnaise');
     expect(sauces?.keywords).toContain('soya sauce');
     expect(sauces?.keywords).toContain('tomato ketchup');
     expect(sauces?.keywords).toContain('worcestershire sauce');
     expect(tinnedJarred?.label).toBe('Tinned & Jarred Goods');
     expect(tinnedJarred?.keywords).toContain('baked beans');
     expect(tinnedJarred?.keywords).toContain('tinned tomatoes');
-    expect(tinnedJarred?.keywords).toContain('ketchup');
-    expect(tinnedJarred?.keywords).toContain('dijon mustard');
-    expect(tinnedJarred?.keywords).toContain('mayonnaise');
     expect(tinnedJarred?.keywords).toContain('marmite');
     expect(homeBaking?.label).toBe('Home Baking');
     expect(homeBaking?.keywords).toContain('eggs');

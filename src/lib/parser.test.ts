@@ -99,11 +99,11 @@ describe('parser', () => {
     );
 
     expect(items.map((item) => item.matchedSection)).toEqual([
-      'tinned_jarred',
-      'tinned_jarred',
+      'sauces',
+      'sauces',
       'cooking_ingredients',
       'tinned_jarred',
-      'tinned_jarred',
+      'sauces',
     ]);
   });
 
@@ -128,10 +128,10 @@ describe('parser', () => {
     );
 
     expect(items.map((item) => [item.raw, item.variant, item.quantity, item.matchedSection])).toEqual([
-      ['mayonnaise', 'full fat', '650ml', 'tinned_jarred'],
+      ['mayonnaise', 'full fat', '650ml', 'sauces'],
       ['greek yogurt', 'full fat', '150ml', 'chilled_milk_juice_cream'],
-      ['ketchup', undefined, '120ml', 'tinned_jarred'],
-      ['dijon mustard', undefined, '25ml', 'tinned_jarred'],
+      ['ketchup', undefined, '120ml', 'sauces'],
+      ['dijon mustard', undefined, '25ml', 'sauces'],
       ['vinegar', 'white', '25ml', 'cooking_ingredients'],
       ['sugar', undefined, '20ml', 'home_baking'],
       ['onion powder', undefined, '12ml', 'cooking_ingredients'],
@@ -161,7 +161,7 @@ describe('parser', () => {
       variant: 'full fat',
       quantity: undefined,
       sizeValue: undefined,
-      matchedSection: 'tinned_jarred',
+      matchedSection: 'sauces',
     });
     expect(getVariantValue(items[0])).toBe('Full Fat');
     expect(getVariantPrefixedDisplayValue(items[0])).toBe('Full Fat Mayonnaise');
@@ -171,7 +171,7 @@ describe('parser', () => {
       variant: undefined,
       quantity: '25ml',
       sizeValue: undefined,
-      matchedSection: 'tinned_jarred',
+      matchedSection: 'sauces',
     });
     expect(getUnitQuantityDisplayValue(items[1])).toBe('25ml');
 
@@ -180,7 +180,7 @@ describe('parser', () => {
       variant: undefined,
       quantity: undefined,
       sizeValue: 'L',
-      matchedSection: 'tinned_jarred',
+      matchedSection: 'sauces',
     });
     expect(getSizeDisplayValue(items[2])).toBe('Size: L');
   });
