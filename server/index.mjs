@@ -90,7 +90,7 @@ const handleApi = async (request, response, path) => {
   }
 
   if (request.method === 'GET' && path === '/api/health') {
-    sendJson(response, 200, { ok: true, mode: 'backend' });
+    sendJson(response, 200, { ok: true, mode: 'backend', database: await getDatabaseStatus() });
     return;
   }
 

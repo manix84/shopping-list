@@ -248,7 +248,7 @@ export const pi: Messages = {
       backendHealthTitle: 'Backend health',
       backendHealthExpected: 'GET /api/health returns OK',
       databaseTitle: 'Hold',
-      databaseExpected: 'GET /api/database/status can read the backend hold',
+      databaseExpected: 'GET /api/health can read the backend hold',
       databaseTypeTitle: 'Current hold type',
       databaseTypeExpected: 'JSON DB, PostgreSQL, or LocalStorage',
       databaseTypeLocalStorage: 'LocalStorage',

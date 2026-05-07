@@ -250,7 +250,7 @@ export const nl: Messages = {
       backendHealthTitle: 'Backendstatus',
       backendHealthExpected: 'GET /api/health geeft OK terug',
       databaseTitle: 'Database',
-      databaseExpected: 'GET /api/database/status kan de backend-opslag lezen',
+      databaseExpected: 'GET /api/health kan de backend-opslag lezen',
       databaseTypeTitle: 'Huidig databasetype',
       databaseTypeExpected: 'JSON DB, PostgreSQL of LocalStorage',
       databaseTypeLocalStorage: 'LocalStorage',

@@ -43,6 +43,20 @@ const fetchWithTimeout = async (path: string, init: RequestInit = {}, timeoutMs 
   }
 };
 
+type ApiDatabaseStatusPayload = {
+  ok?: unknown;
+  adapter?: unknown;
+  path?: unknown;
+  settingsExists?: unknown;
+  settingsCountryCode?: unknown;
+  settingsUpdatedAt?: unknown;
+  shoppingListExists?: unknown;
+  updatedAt?: unknown;
+  sharedListCount?: unknown;
+  error?: unknown;
+  errorCode?: unknown;
+};
+
 export const checkBackendStatus = async (): Promise<BackendStatus> => {
   if (skipBackendChecks) {
     return {
@@ -62,32 +76,21 @@ export const checkBackendStatus = async (): Promise<BackendStatus> => {
       };
     }
 
-    const health = (await healthResponse.json()) as { ok?: unknown; mode?: unknown };
-    const databaseResponse = await fetchWithTimeout('/api/database/status');
-    const database = databaseResponse.ok
-      ? ((await databaseResponse.json()) as {
-          ok?: unknown;
-          adapter?: unknown;
-          path?: unknown;
-          settingsExists?: unknown;
-          settingsCountryCode?: unknown;
-          settingsUpdatedAt?: unknown;
-          shoppingListExists?: unknown;
-          updatedAt?: unknown;
-          sharedListCount?: unknown;
-          error?: unknown;
-          errorCode?: unknown;
-        })
-      : undefined;
+    const health = (await healthResponse.json()) as {
+      ok?: unknown;
+      mode?: unknown;
+      database?: ApiDatabaseStatusPayload;
+    };
+    const database = health.database;
 
     return {
-      state: databaseResponse.ok && database?.ok === true ? 'connected' : 'error',
+      state: health.ok === true && database?.ok === true ? 'connected' : 'error',
       health: {
         ok: health.ok === true,
         mode: typeof health.mode === 'string' ? health.mode : undefined,
       },
       database: {
-        ok: databaseResponse.ok && database?.ok === true,
+        ok: health.ok === true && database?.ok === true,
         adapter: backendDatabaseAdapter(database?.adapter, database?.path),
         settingsExists: typeof database?.settingsExists === 'boolean' ? database.settingsExists : undefined,
         settingsCountryCode: isCountryCode(database?.settingsCountryCode) ? database.settingsCountryCode : undefined,

@@ -252,7 +252,7 @@ export const de: Messages = {
       backendHealthExpected: 'GET /api/health liefert OK',
       databaseTitle: 'Datenbank',
       databaseExpected:
-        'GET /api/database/status kann den Backend-Speicher lesen',
+        'GET /api/health kann den Backend-Speicher lesen',
       databaseTypeTitle: 'Aktueller Datenbanktyp',
       databaseTypeExpected: 'JSON DB, PostgreSQL oder LocalStorage',
       databaseTypeLocalStorage: 'LocalStorage',

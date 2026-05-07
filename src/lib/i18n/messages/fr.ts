@@ -252,7 +252,7 @@ export const fr: Messages = {
       backendHealthExpected: 'GET /api/health renvoie OK',
       databaseTitle: 'Base de données',
       databaseExpected:
-        'GET /api/database/status peut lire le stockage backend',
+        'GET /api/health peut lire le stockage backend',
       databaseTypeTitle: 'Type de base actuel',
       databaseTypeExpected: 'JSON DB, PostgreSQL ou LocalStorage',
       databaseTypeLocalStorage: 'LocalStorage',

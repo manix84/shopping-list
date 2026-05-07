@@ -249,7 +249,7 @@ export const ro: Messages = {
       backendHealthTitle: 'Sănătate backend',
       backendHealthExpected: 'GET /api/health returnează OK',
       databaseTitle: 'Bază de date',
-      databaseExpected: 'GET /api/database/status poate citi stocarea backend',
+      databaseExpected: 'GET /api/health poate citi stocarea backend',
       databaseTypeTitle: 'Tipul curent de bază de date',
       databaseTypeExpected: 'JSON DB, PostgreSQL sau LocalStorage',
       databaseTypeLocalStorage: 'LocalStorage',

@@ -212,8 +212,8 @@ If `DATABASE_URL` is not configured, the backend falls back to the old JSON file
 
 Backend utility routes:
 
-- `GET /api/health`
-- `GET /api/database/status`
+- `GET /api/health` - includes backend health and database status
+- `GET /api/database/status` - compatibility route for database status only
 - `GET /api/settings`
 - `PUT /api/settings`
 

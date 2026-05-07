@@ -250,7 +250,7 @@ export const it: Messages = {
       backendHealthExpected: 'GET /api/health restituisce OK',
       databaseTitle: 'Database',
       databaseExpected:
-        'GET /api/database/status può leggere l’archiviazione backend',
+        'GET /api/health può leggere l’archiviazione backend',
       databaseTypeTitle: 'Tipo database corrente',
       databaseTypeExpected: 'JSON DB, PostgreSQL o LocalStorage',
       databaseTypeLocalStorage: 'LocalStorage',
