@@ -17,6 +17,16 @@ export type DebugTabKey =
   | 'settings';
 export type DebugNotificationTestKey = 'minimal' | 'single-item' | 'few-items' | 'large-batch' | 'silent-follow-up';
 export type DebugEventTestKey = 'pwa-install-nudge' | 'secret-aisle' | 'predator';
+export type DebugNotificationDeliveryPath = 'blocked' | 'service-worker' | 'page' | 'failed';
+export type DebugNotificationResult = {
+  status: 'requesting' | 'blocked' | 'shown';
+  kind?: DebugNotificationTestKey;
+  deliveryPath?: DebugNotificationDeliveryPath;
+  permission?: NotificationPermission | 'unsupported';
+  secureContext?: boolean;
+  focus?: boolean;
+  visibility?: DocumentVisibilityState;
+};
 export type AppRoute = {
   page: PageKey;
   listId?: string;

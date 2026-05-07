@@ -381,6 +381,27 @@ select {
   }
 }
 
+.debug-kv-list {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+
+  div {
+    display: grid;
+    gap: 8px;
+    grid-template-columns: minmax(120px, max-content) 1fr;
+  }
+
+  dt {
+    color: $muted;
+    font-weight: 700;
+  }
+
+  dd {
+    margin: 0;
+  }
+}
+
 .title-row,
 .item-row,
 .section-header {

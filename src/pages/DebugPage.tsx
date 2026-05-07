@@ -6,6 +6,8 @@ import type {
   CountQuantityTestResult,
   CountryConfig,
   DebugEventTestKey,
+  DebugNotificationDeliveryPath,
+  DebugNotificationResult,
   DebugNotificationTestKey,
   DebugTabKey,
   DebugSettings,
@@ -30,7 +32,7 @@ type DebugPageProps = {
   storageMode: 'local' | 'backend';
   notificationsEnabled: boolean;
   notificationPermission: NotificationPermission | 'unsupported';
-  debugNotificationResult?: string;
+  debugNotificationResult?: DebugNotificationResult;
   items: Item[];
   config: CountryConfig;
   matcherTests: MatcherTestResult[];
@@ -69,6 +71,88 @@ const backendSummary = (status: BackendStatus, messages: Messages): string => {
   if (status.state === 'checking') { return messages.pages.debug.backendChecking; }
   if (status.state === 'error') { return messages.pages.debug.backendError; }
   return messages.pages.debug.backendOffline;
+};
+
+const debugNotificationKindLabel = (kind: DebugNotificationTestKey, messages: Messages): string => {
+  const labels: Record<DebugNotificationTestKey, string> = {
+    minimal: messages.pages.debug.eventNotificationMinimalLabel,
+    'single-item': messages.pages.debug.eventNotificationSingleLabel,
+    'few-items': messages.pages.debug.eventNotificationFewLabel,
+    'large-batch': messages.pages.debug.eventNotificationLargeLabel,
+    'silent-follow-up': messages.pages.debug.eventNotificationSilentFollowUpLabel,
+  };
+  return labels[kind];
+};
+
+const debugNotificationDeliveryLabel = (path: DebugNotificationDeliveryPath, messages: Messages): string => {
+  const labels: Record<DebugNotificationDeliveryPath, string> = {
+    blocked: messages.pages.debug.eventNotificationDeliveryBlocked,
+    'service-worker': messages.pages.debug.eventNotificationDeliveryServiceWorker,
+    page: messages.pages.debug.eventNotificationDeliveryPage,
+    failed: messages.pages.debug.eventNotificationDeliveryFailed,
+  };
+  return labels[path];
+};
+
+const debugNotificationStatusLabel = (result: DebugNotificationResult, messages: Messages): string => {
+  if (result.status === 'requesting') { return messages.pages.debug.eventNotificationRequesting; }
+  if (result.status === 'blocked') { return messages.pages.debug.eventNotificationNotShown; }
+  return messages.pages.debug.eventNotificationShown;
+};
+
+const DebugNotificationResultView = ({
+  result,
+  messages,
+}: {
+  result: DebugNotificationResult | undefined;
+  messages: Messages;
+}) => {
+  if (!result) { return <>{messages.pages.debug.unavailable}</>; }
+
+  return (
+    <dl className={'debug-kv-list'}>
+      <div>
+        <dt>{messages.pages.debug.eventNotificationStatusLabel}</dt>
+        <dd>{debugNotificationStatusLabel(result, messages)}</dd>
+      </div>
+      {result.kind ? (
+        <div>
+          <dt>{messages.pages.debug.eventNotificationKindLabel}</dt>
+          <dd>{debugNotificationKindLabel(result.kind, messages)}</dd>
+        </div>
+      ) : null}
+      {result.deliveryPath ? (
+        <div>
+          <dt>{messages.pages.debug.eventNotificationDeliveryPathLabel}</dt>
+          <dd>{debugNotificationDeliveryLabel(result.deliveryPath, messages)}</dd>
+        </div>
+      ) : null}
+      {result.permission ? (
+        <div>
+          <dt>{messages.pages.debug.eventNotificationPermissionLabel}</dt>
+          <dd>{result.permission}</dd>
+        </div>
+      ) : null}
+      {typeof result.secureContext === 'boolean' ? (
+        <div>
+          <dt>{messages.pages.debug.eventNotificationSecureContextLabel}</dt>
+          <dd>{String(result.secureContext)}</dd>
+        </div>
+      ) : null}
+      {typeof result.focus === 'boolean' ? (
+        <div>
+          <dt>{messages.pages.debug.eventNotificationFocusLabel}</dt>
+          <dd>{String(result.focus)}</dd>
+        </div>
+      ) : null}
+      {result.visibility ? (
+        <div>
+          <dt>{messages.pages.debug.eventNotificationVisibilityLabel}</dt>
+          <dd>{result.visibility}</dd>
+        </div>
+      ) : null}
+    </dl>
+  );
 };
 
 const checkTone = (passed: boolean) => (passed ? ('success' as const) : ('danger' as const));
@@ -890,8 +974,13 @@ export function DebugPage({
                   <td>{String(notificationsEnabled)}</td>
                 </tr>
                 <tr>
-                  <th scope={'row'}>Last notification test</th>
-                  <td>{debugNotificationResult ?? messages.pages.debug.unavailable}</td>
+                  <th scope={'row'}>{messages.pages.debug.eventNotificationLastTestLabel}</th>
+                  <td>
+                    <DebugNotificationResultView
+                      result={debugNotificationResult}
+                      messages={messages}
+                    />
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -902,8 +991,8 @@ export function DebugPage({
               <p className={'subtitle'}>{messages.pages.debug.eventsNotificationGroupSubtitle}</p>
             </div>
             <DebugEventButton
-              label={'Minimal direct notification'}
-              hint={'Bypasses the service worker, tags, icons, and grouped notification options.'}
+              label={messages.pages.debug.eventNotificationMinimalLabel}
+              hint={messages.pages.debug.eventNotificationMinimalHint}
               onClick={() => onDebugNotificationTest('minimal')}
             />
             <DebugEventButton

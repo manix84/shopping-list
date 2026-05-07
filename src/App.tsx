@@ -63,7 +63,7 @@ import { ErrorPage } from './pages/ErrorPage';
 import { RoutePage } from './pages/RoutePage';
 import { SectionsPage } from './pages/SectionsPage';
 import { SettingsPage } from './pages/SettingsPage';
-import type { AppRoute, BackendHeartbeatSample, BackendStatus, CountryCode, DebugEventTestKey, DebugNotificationTestKey, DebugSettings, DebugTabKey, GroupedSectionView, Item, MeasurementDisplayMode, PageKey, RouteViewMode, SaveStatus, SectionKey, SharedListHistoryEntry, ShoppingListRecord, ThemeMode } from './types';
+import type { AppRoute, BackendHeartbeatSample, BackendStatus, CountryCode, DebugEventTestKey, DebugNotificationDeliveryPath, DebugNotificationResult, DebugNotificationTestKey, DebugSettings, DebugTabKey, GroupedSectionView, Item, MeasurementDisplayMode, PageKey, RouteViewMode, SaveStatus, SectionKey, SharedListHistoryEntry, ShoppingListRecord, ThemeMode } from './types';
 
 const DEFAULT_PAGE: PageKey = 'edit';
 const BACKEND_HEARTBEAT_CONNECTED_MS = 5_000;
@@ -74,7 +74,7 @@ const SHARED_LIST_NOTIFICATION_GROUP_MS = 2 * 60_000;
 const SHARED_LIST_NOTIFICATION_PREVIEW_LIMIT = 3;
 const NOTIFICATION_SERVICE_WORKER_READY_TIMEOUT_MS = 750;
 const DEBUG_NOTIFICATION_LIST_ID = 'debug-notifications';
-type NotificationDeliveryResult = 'blocked' | 'service-worker' | 'page' | 'failed';
+type NotificationDeliveryResult = DebugNotificationDeliveryPath;
 const PWA_INSTALL_NUDGE_DISMISSED_KEY = 'smart-shopping-list-pwa-install-nudge-dismissed-v1';
 const PWA_INSTALL_PROMPT_SETTLE_MS = 1_200;
 const KONAMI_SEQUENCE = ['up', 'up', 'down', 'down', 'left', 'right', 'left', 'right', 'b', 'a'] as const;
@@ -178,7 +178,7 @@ const serviceWorkerReadyWithTimeout = async (): Promise<ServiceWorkerRegistratio
       }),
     ]);
   } finally {
-    if (timeoutId) {
+    if (timeoutId !== undefined) {
       window.clearTimeout(timeoutId);
     }
   }
@@ -287,7 +287,7 @@ export default function App() {
   const [isLikelyMobileForInstall, setIsLikelyMobileForInstall] = useState(() => isMobileOrTabletDevice());
   const [isSecretAisleEasterEggVisible, setIsSecretAisleEasterEggVisible] = useState(false);
   const [predatorEasterEggRun, setPredatorEasterEggRun] = useState(0);
-  const [debugNotificationResult, setDebugNotificationResult] = useState<string>();
+  const [debugNotificationResult, setDebugNotificationResult] = useState<DebugNotificationResult>();
   const currentItemsRef = useRef<Item[]>([]);
   const sharedListNotificationSeenUpdatedAtRef = useRef<Record<string, string>>({});
   const sharedListNotificationGroupRef = useRef<SharedListNotificationGroup>();
@@ -525,19 +525,32 @@ export default function App() {
   }, []);
 
   const handleDebugNotificationTest = useCallback(async (kind: DebugNotificationTestKey) => {
-    setDebugNotificationResult('Requesting notification permission...');
+    setDebugNotificationResult({ status: 'requesting', kind });
     const granted = await ensureNotificationPermission();
     if (!granted) {
-      setDebugNotificationResult(`Permission is ${browserNotificationPermission()}. Browser notification was not shown.`);
+      setDebugNotificationResult({
+        status: 'blocked',
+        kind,
+        permission: browserNotificationPermission(),
+      });
       return;
     }
 
+    const currentNotificationContext = () => ({
+      permission: browserNotificationPermission(),
+      secureContext: window.isSecureContext,
+      focus: document.hasFocus(),
+      visibility: document.visibilityState,
+    });
+
     if (kind === 'minimal') {
       const result = showDirectPageNotification('Smart Shopping List notification test', 'Minimal localhost notification test.');
-      setDebugNotificationResult(
-        `Last test: minimal. Delivery path: ${result}. Permission: ${browserNotificationPermission()}. ` +
-        `Secure context: ${String(window.isSecureContext)}. Focused: ${String(document.hasFocus())}. Visibility: ${document.visibilityState}.`,
-      );
+      setDebugNotificationResult({
+        status: 'shown',
+        kind,
+        deliveryPath: result,
+        ...currentNotificationContext(),
+      });
       return;
     }
 
@@ -548,10 +561,12 @@ export default function App() {
 
     const listId = debugNotificationListIdRef.current;
     const result = await notifySharedListAdditions(listId, debugNotificationItems(kind), true);
-    setDebugNotificationResult(
-      `Last test: ${kind}. Delivery path: ${result}. Permission: ${browserNotificationPermission()}. ` +
-      `Secure context: ${String(window.isSecureContext)}. Focused: ${String(document.hasFocus())}. Visibility: ${document.visibilityState}.`,
-    );
+    setDebugNotificationResult({
+      status: 'shown',
+      kind,
+      deliveryPath: result,
+      ...currentNotificationContext(),
+    });
   }, [debugNotificationItems, ensureNotificationPermission, notifySharedListAdditions, showDirectPageNotification]);
 
   const handleDebugEventTest = useCallback((kind: DebugEventTestKey) => {
