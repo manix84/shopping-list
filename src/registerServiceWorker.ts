@@ -1,12 +1,55 @@
 export const registerServiceWorker = (): void => {
   if (!import.meta.env.PROD || !('serviceWorker' in navigator)) { return; }
 
+  const UPDATE_RELOAD_PAINT_DELAY_MS = 160;
+  const UPDATE_RELOAD_OVERLAY_ID = 'pwa-update-reload-overlay';
+
   let hasReloadedForUpdate = false;
   let updateTimeoutId: number | undefined;
 
   const assetReferencePattern = /(?:href|src)="([^"]*\.(?:js|css))"/g;
 
   const appBaseUrl = (): URL => new URL(import.meta.env.BASE_URL, window.location.origin);
+
+  const createUpdateReloadOverlay = (): void => {
+    if (document.getElementById(UPDATE_RELOAD_OVERLAY_ID)) { return; }
+
+    const resolvedTheme = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
+    const logoUrl = new URL(resolvedTheme === 'dark' ? 'logo-dark.png' : 'logo-light.png', appBaseUrl()).href;
+    const overlay = document.createElement('div');
+    overlay.id = UPDATE_RELOAD_OVERLAY_ID;
+    overlay.setAttribute('role', 'status');
+    overlay.setAttribute('aria-live', 'polite');
+    overlay.setAttribute('aria-label', 'Updating app');
+    overlay.innerHTML = `<img src="${logoUrl}" alt="" />`;
+    overlay.style.cssText = [
+      'align-items:center',
+      'background:var(--bg, #f6f7fb)',
+      'display:flex',
+      'inset:0',
+      'justify-content:center',
+      'opacity:0',
+      'padding:32px',
+      'position:fixed',
+      'transition:opacity 120ms ease',
+      'z-index:2147483647',
+    ].join(';');
+
+    const logo = overlay.querySelector('img');
+    if (logo) {
+      logo.style.cssText = [
+        'display:block',
+        'height:clamp(112px, 28vw, 172px)',
+        'object-fit:contain',
+        'width:clamp(112px, 28vw, 172px)',
+      ].join(';');
+    }
+
+    document.body.append(overlay);
+    window.requestAnimationFrame(() => {
+      overlay.style.opacity = '1';
+    });
+  };
 
   const currentAssetUrls = (): Set<string> => new Set(
     Array.from(document.querySelectorAll<HTMLLinkElement | HTMLScriptElement>('script[src], link[rel="stylesheet"][href]'))
@@ -24,7 +67,8 @@ export const registerServiceWorker = (): void => {
     if (hasReloadedForUpdate) { return; }
 
     hasReloadedForUpdate = true;
-    window.location.reload();
+    createUpdateReloadOverlay();
+    window.setTimeout(() => window.location.reload(), UPDATE_RELOAD_PAINT_DELAY_MS);
   };
 
   const reloadIfAppShellChanged = async (): Promise<void> => {

@@ -43,8 +43,15 @@ const cacheAssets = async () => {
   await cache.addAll(urls);
 };
 
+const isCacheableAppShellResponse = (response) => {
+  if (response.ok) return true;
+
+  const contentType = response.headers.get('content-type') ?? '';
+  return response.status === 404 && contentType.includes('text/html');
+};
+
 const refreshCachedAppShell = async (response, request) => {
-  if (!response.ok) { return; }
+  if (!isCacheableAppShellResponse(response)) { return; }
 
   const cache = await caches.open(CACHE_NAME);
   const html = await response.clone().text();

@@ -74,6 +74,7 @@ const SHARED_LIST_NOTIFICATION_GROUP_MS = 2 * 60_000;
 const SHARED_LIST_NOTIFICATION_PREVIEW_LIMIT = 3;
 const NOTIFICATION_SERVICE_WORKER_READY_TIMEOUT_MS = 750;
 const DEBUG_NOTIFICATION_LIST_ID = 'debug-notifications';
+const DEV_TITLE_SUFFIX = ' [Dev]';
 type NotificationDeliveryResult = DebugNotificationDeliveryPath;
 const debugNotificationStatusFromDelivery = (
   result: NotificationDeliveryResult,
@@ -1199,7 +1200,7 @@ export default function App() {
     saveLocale(locale);
     applyDocumentLocale(locale);
     if (typeof document !== 'undefined') {
-      document.title = messages.app.title;
+      document.title = import.meta.env.DEV ? `${messages.app.title}${DEV_TITLE_SUFFIX}` : messages.app.title;
     }
   }, [locale, messages]);
 
