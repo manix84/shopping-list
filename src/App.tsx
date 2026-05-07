@@ -942,12 +942,6 @@ export default function App() {
           nextServerBacked = true;
         } catch (error) {
           console.warn('Backend was detected but could not be loaded. Falling back to local storage.', error);
-          if (!cancelled) {
-            setBackendStatus({
-              ...initialBackendStatus,
-              state: 'error',
-            });
-          }
         }
       }
 
@@ -1120,10 +1114,6 @@ export default function App() {
         ));
       } catch (error) {
         console.warn('Backend reconnected but could not be merged. Staying in local storage mode.', error);
-        setBackendStatus((current) => ({
-          ...current,
-          state: 'error',
-        }));
       }
     };
 
