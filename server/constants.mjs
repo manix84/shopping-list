@@ -17,6 +17,7 @@ export const SECTION_KEYS = new Set([
   'pasta',
   'cereal',
   'baby_food',
+  'sauces',
   'tinned_jarred',
   'home_baking',
   'cooking_ingredients',

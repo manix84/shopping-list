@@ -47,6 +47,27 @@ describe('server validation', () => {
     expect(isShoppingListRecord(record)).toBe(false);
   });
 
+  it('accepts the sauces section used by the UK cupboard config', async () => {
+    const { isShoppingListRecord } = await loadValidation();
+    const record = {
+      input: 'tomato ketchup',
+      items: [
+        {
+          id: 'ketchup',
+          raw: 'tomato ketchup',
+          normalized: 'tomato ketchup',
+          cleaned: 'tomato ketchup',
+          checked: false,
+          matchedSection: 'sauces',
+        },
+      ],
+      updatedAt: '2026-04-22T00:00:00.000Z',
+      countryCode: 'uk',
+    };
+
+    expect(isShoppingListRecord(record)).toBe(true);
+  });
+
   it('allows optional shopping-list names but rejects malformed names', async () => {
     const { isShoppingListRecord } = await loadValidation();
     const record = {
