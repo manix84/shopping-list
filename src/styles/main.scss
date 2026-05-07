@@ -1153,6 +1153,13 @@ select {
   vector-effect: non-scaling-stroke;
 }
 
+.heartbeat-graph-ghost-line {
+  stroke: color-mix(in srgb, $muted 24%, transparent);
+  stroke-linecap: round;
+  stroke-width: 1.4;
+  vector-effect: non-scaling-stroke;
+}
+
 .heartbeat-graph-line {
   fill: none;
   stroke-linecap: round;
@@ -1205,38 +1212,49 @@ select {
   color: $danger-text;
 }
 
-.heartbeat-status-strip {
-  align-items: stretch;
-  display: grid;
-  gap: 3px;
-  grid-template-columns: repeat(auto-fit, minmax(8px, 1fr));
-  min-height: 14px;
-}
-
-.heartbeat-status-empty {
+.heartbeat-graph-point-ghost {
+  background: color-mix(in srgb, $muted 22%, transparent);
+  border-color: color-mix(in srgb, $muted 16%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, $muted 20%, transparent);
   color: $muted;
-  font-size: 0.78rem;
 }
 
-.heartbeat-status-bar {
+.heartbeat-status-strip {
+  align-items: center;
+  display: grid;
+  gap: 6px;
+  grid-template-columns: repeat(36, minmax(0, 1fr));
+  min-height: 18px;
+}
+
+.heartbeat-status-dot {
+  aspect-ratio: 1;
   border-radius: 999px;
-  min-height: 10px;
+  justify-self: center;
+  max-width: 10px;
+  min-width: 5px;
+  width: 100%;
 }
 
-.heartbeat-status-bar-connected {
+.heartbeat-status-dot-connected {
   background: $success-text;
 }
 
-.heartbeat-status-bar-checking {
+.heartbeat-status-dot-checking {
   background: $primary;
 }
 
-.heartbeat-status-bar-error {
+.heartbeat-status-dot-error {
   background: $danger-text;
 }
 
-.heartbeat-status-bar-offline {
+.heartbeat-status-dot-offline {
   background: $muted;
+}
+
+.heartbeat-status-dot-ghost {
+  background: color-mix(in srgb, $muted 24%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, $muted 18%, transparent);
 }
 
 @keyframes heartbeat-ring {
