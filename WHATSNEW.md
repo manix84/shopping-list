@@ -8,6 +8,8 @@ Keep this file updated when user-visible features, platform changes, major parse
 - Expanded the Backend debug tab with heartbeat history, status timeline bars, latency, health/database check results, adapter details, and recent operation details.
 - Fixed a live-site offline flicker caused by backend save validation rejecting the new `sauces` section.
 - Added a dedicated UK `Sauces` cupboard section, including ketchup, mayo, mustard, soya sauce, BBQ sauce, sriracha, dressings, and related condiments.
+- Expanded the France, Germany, Italy, Belgium, Spain, Romania, Mexico, and Netherlands item libraries with native-language food, frozen, sauces, pantry, household, baby, and personal-care terms.
+- Localized international store section labels so non-UK/US country profiles show their supermarket groups and aisles in the primary local language.
 - Added display aliases such as `Ketchup` -> `Tomato Ketchup` and `Real Milk` -> `Whole Milk`.
 - Improved notification debugging with structured, localized result details and clearer failure states.
 - Localized notification test text and debug event labels across all supported locale bundles.
