@@ -433,6 +433,7 @@ export const fr: Messages = {
     unavailableTitle: 'Installer depuis le menu du navigateur',
     unavailableDescription:
       'Utilisez le bouton de partage ou le menu du navigateur, puis choisissez Ajouter à l’écran d’accueil ou Installer l’application.',
+    updateReloadLabel: 'Mise à jour de l’application',
   },
   notifications: {
     debugTestTitle: 'Test de notification Smart Shopping List',

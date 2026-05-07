@@ -428,6 +428,7 @@ export const nl: Messages = {
     unavailableTitle: 'Installeren via het browsermenu',
     unavailableDescription:
       'Gebruik de deelknop of het browsermenu en kies Toevoegen aan startscherm of App installeren.',
+    updateReloadLabel: 'App wordt bijgewerkt',
   },
   notifications: {
     debugTestTitle: 'Smart Shopping List meldingstest',

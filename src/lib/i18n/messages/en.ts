@@ -419,6 +419,7 @@ export const en: Messages = {
     unavailableTitle: 'Install from your browser menu',
     unavailableDescription:
       'Use your browser share or menu button, then choose Add to Home Screen or Install app.',
+    updateReloadLabel: 'Updating app',
   },
   notifications: {
     debugTestTitle: 'Smart Shopping List notification test',

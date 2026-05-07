@@ -22,6 +22,11 @@ const staticAssetUrls = () => [
   new URL('apple-touch-icon.png', self.registration.scope).href,
 ];
 
+const buildAssetUrlsFromHtml = (html) => {
+  const assetPaths = [...html.matchAll(/(?:href|src)="([^"]*\.(?:js|css))"/g)].map((match) => match[1]);
+  return [...new Set(assetPaths)].map((path) => new URL(path, self.registration.scope).href);
+};
+
 const buildAssetUrls = async () => {
   const indexUrl = new URL('index.html', self.registration.scope).href;
   const response = await fetch(indexUrl, { cache: 'reload' });
@@ -29,15 +34,41 @@ const buildAssetUrls = async () => {
     return [];
   }
 
-  const html = await response.text();
-  const assetPaths = [...html.matchAll(/(?:href|src)="([^"]*\.(?:js|css))"/g)].map((match) => match[1]);
-  return [...new Set(assetPaths)].map((path) => new URL(path, self.registration.scope).href);
+  return buildAssetUrlsFromHtml(await response.text());
 };
 
 const cacheAssets = async () => {
   const cache = await caches.open(CACHE_NAME);
   const urls = [...staticAssetUrls(), ...(await buildAssetUrls())];
   await cache.addAll(urls);
+};
+
+const missingCachedUrls = async (cache, urls) => {
+  const cachedUrls = new Set((await cache.keys()).map((request) => request.url));
+  return urls.filter((url) => !cachedUrls.has(url));
+};
+
+const isCacheableAppShellResponse = (response) => {
+  if (response.ok) return true;
+
+  const contentType = response.headers.get('content-type') ?? '';
+  return response.status === 404 && contentType.includes('text/html');
+};
+
+const refreshCachedAppShell = async (response, request) => {
+  if (!isCacheableAppShellResponse(response)) { return; }
+
+  const cache = await caches.open(CACHE_NAME);
+  const html = await response.clone().text();
+  await Promise.all([
+    cache.put(request, response.clone()),
+    cache.put(new URL('index.html', self.registration.scope).href, response.clone()),
+  ]);
+
+  const missingAssetUrls = await missingCachedUrls(cache, buildAssetUrlsFromHtml(html));
+  if (missingAssetUrls.length > 0) {
+    await cache.addAll(missingAssetUrls);
+  }
 };
 
 self.addEventListener('install', (event) => {
@@ -50,6 +81,12 @@ self.addEventListener('activate', (event) => {
       self.clients.claim(),
     ),
   );
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data?.type === 'SKIP_WAITING') {
+    event.waitUntil(self.skipWaiting());
+  }
 });
 
 self.addEventListener('fetch', (event) => {
@@ -66,13 +103,32 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(event.request)
         .then((response) => {
-          const responseClone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
+          refreshCachedAppShell(response, event.request).catch(() => {
+            // Non-fatal: the network response still serves the latest app shell.
+          });
           return response;
         })
         .catch(async () => {
           const cache = await caches.open(CACHE_NAME);
           return (await cache.match(new URL('index.html', self.registration.scope).href)) ?? cache.match(new URL('.', self.registration.scope).href);
+        }),
+    );
+    return;
+  }
+
+  if (event.request.cache === 'reload') {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response.ok) {
+            const responseClone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
+          }
+          return response;
+        })
+        .catch(async () => {
+          const cache = await caches.open(CACHE_NAME);
+          return cache.match(event.request) ?? new Response('', { status: 504, statusText: 'Offline' });
         }),
     );
     return;
