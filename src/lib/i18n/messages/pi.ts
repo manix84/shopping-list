@@ -180,6 +180,8 @@ export const pi: Messages = {
       sponsorFootnote:
         'Sponsorship helps keep this app independent, maintained, and free to use.',
       authorProfileLabel: 'Open Rob’s GitHub profile',
+      debugModeEnabledNotice: 'Bilge mode enabled. Bilge tools now be in the main menu.',
+      debugModeAlreadyEnabledNotice: 'Bilge mode already be enabled. No need to keep tappin’.',
     },
     error: {
       notFoundCode: '404',

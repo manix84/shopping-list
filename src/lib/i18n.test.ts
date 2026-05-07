@@ -110,6 +110,8 @@ describe('i18n', () => {
       ['pwaInstall', 'unavailableTitle'],
       ['pwaInstall', 'unavailableDescription'],
       ['pwaInstall', 'updateReloadLabel'],
+      ['pages', 'about', 'debugModeEnabledNotice'],
+      ['pages', 'about', 'debugModeAlreadyEnabledNotice'],
     ] as const;
 
     const readMessage = (messages: Messages, keys: readonly string[]) =>

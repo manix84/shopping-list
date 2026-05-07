@@ -181,6 +181,8 @@ export const ro: Messages = {
       sponsorFootnote:
         'Sponsorizarea ajută această aplicație să rămână independentă, întreținută și gratuită.',
       authorProfileLabel: 'Deschide profilul GitHub al lui Rob',
+      debugModeEnabledNotice: 'Modul depanare a fost activat. Uneltele de depanare sunt acum în meniul principal.',
+      debugModeAlreadyEnabledNotice: 'Modul depanare este deja activat. Nu mai trebuie să continui să atingi.',
     },
     error: {
       notFoundCode: '404',

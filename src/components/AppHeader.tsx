@@ -18,6 +18,7 @@ type AppHeaderProps = {
   hasItems: boolean;
   backendStatus: BackendStatus;
   resolvedTheme: 'light' | 'dark';
+  isDebugMode?: boolean;
   onChangePage: (page: PageKey) => void;
   onRevealEasterEgg?: () => void;
 };
@@ -33,6 +34,7 @@ export function AppHeader({
   page,
   hasItems,
   backendStatus,
+  isDebugMode = false,
   onRevealEasterEgg,
   onChangePage,
 }: AppHeaderProps) {
@@ -166,7 +168,7 @@ export function AppHeader({
                   </div>
                 ) : null}
                 <div className={'desktop-menu-shell'}>
-                  <PageTabs page={page} hasItems={hasItems} onChange={handleChangePage} />
+                  <PageTabs page={page} hasItems={hasItems} showDebugTools={isDebugMode} onChange={handleChangePage} />
                 </div>
 
                 <div className={'mobile-menu-shell'}>
@@ -187,7 +189,7 @@ export function AppHeader({
 
                   {mobileMenuOpen ? (
                     <div id={'mobile-menu-panel'} className={'mobile-menu-panel'}>
-                      <PageTabs page={page} hasItems={hasItems} onChange={handleChangePage} />
+                      <PageTabs page={page} hasItems={hasItems} showDebugTools={isDebugMode} onChange={handleChangePage} />
                     </div>
                   ) : null}
                 </div>

@@ -182,6 +182,8 @@ export const nl: Messages = {
       sponsorFootnote:
         'Sponsoring helpt deze app onafhankelijk, onderhouden en gratis te houden.',
       authorProfileLabel: 'Robs GitHub-profiel openen',
+      debugModeEnabledNotice: 'Debugmodus ingeschakeld. Debughulpmiddelen staan nu in het hoofdmenu.',
+      debugModeAlreadyEnabledNotice: 'Debugmodus is al ingeschakeld. Je hoeft niet te blijven tikken.',
     },
     error: {
       notFoundCode: '404',

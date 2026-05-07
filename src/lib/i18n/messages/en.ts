@@ -174,6 +174,8 @@ export const en: Messages = {
       sponsorFootnote:
         'Sponsorship helps keep this app independent, maintained, and free to use.',
       authorProfileLabel: "Open Rob's GitHub profile",
+      debugModeEnabledNotice: 'Debug mode enabled. Debug tools are now available in the main menu.',
+      debugModeAlreadyEnabledNotice: 'Debug mode is already enabled. No need to keep tapping.',
     },
     error: {
       notFoundCode: '404',

@@ -74,6 +74,7 @@ const SHARED_LIST_NOTIFICATION_GROUP_MS = 2 * 60_000;
 const SHARED_LIST_NOTIFICATION_PREVIEW_LIMIT = 3;
 const NOTIFICATION_SERVICE_WORKER_READY_TIMEOUT_MS = 750;
 const DEBUG_NOTIFICATION_LIST_ID = 'debug-notifications';
+const DEBUG_MODE_NOTICE_DURATION_MS = 4_000;
 const DEV_TITLE_SUFFIX = ' [Dev]';
 type NotificationDeliveryResult = DebugNotificationDeliveryPath;
 const debugNotificationStatusFromDelivery = (
@@ -310,6 +311,7 @@ export default function App() {
   const [isSecretAisleEasterEggVisible, setIsSecretAisleEasterEggVisible] = useState(false);
   const [predatorEasterEggRun, setPredatorEasterEggRun] = useState(0);
   const [debugNotificationResult, setDebugNotificationResult] = useState<DebugNotificationResult>();
+  const [debugModeNotice, setDebugModeNotice] = useState<{ id: number; message: string }>();
   const currentItemsRef = useRef<Item[]>([]);
   const sharedListNotificationSeenUpdatedAtRef = useRef<Record<string, string>>({});
   const sharedListNotificationGroupRef = useRef<SharedListNotificationGroup>();
@@ -354,12 +356,20 @@ export default function App() {
   };
 
   const enableDebugMode = () => {
+    const shouldNotifyEnabled = !isDebugMode;
     setIsDebugMode(true);
+    if (shouldNotifyEnabled) {
+      setDebugModeNotice({ id: Date.now(), message: messages.pages.about.debugModeEnabledNotice });
+    }
     try {
       saveDebugMode(true);
     } catch (error) {
       console.warn('Unable to save debug mode preference.', error);
     }
+  };
+
+  const showAlreadyDebugModeNotice = () => {
+    setDebugModeNotice({ id: Date.now(), message: messages.pages.about.debugModeAlreadyEnabledNotice });
   };
 
   const handleDebugModeChange = (enabled: boolean) => {
@@ -1681,6 +1691,16 @@ export default function App() {
     !isPwaInstalled &&
     (canPromptInstall || canShowManualInstallGuidance);
 
+  useEffect(() => {
+    if (!debugModeNotice) { return undefined; }
+
+    const dismissTimer = window.setTimeout(() => {
+      setDebugModeNotice((current) => current?.id === debugModeNotice.id ? undefined : current);
+    }, DEBUG_MODE_NOTICE_DURATION_MS);
+
+    return () => window.clearTimeout(dismissTimer);
+  }, [debugModeNotice]);
+
   return (
     <I18nProvider value={{ locale, messages, setLocale }}>
       <PwaSplashScreen disabled={debugSettings.disablePwaSplash} />
@@ -1694,6 +1714,7 @@ export default function App() {
             hasItems={items.length > 0}
             backendStatus={backendStatus}
             resolvedTheme={resolvedTheme}
+            isDebugMode={isDebugMode}
             onChangePage={changePage}
             onRevealEasterEgg={() => {
               if (!debugSettings.disableEasterEggs) {
@@ -1783,7 +1804,7 @@ export default function App() {
               <AboutPage
                 isDebugMode={isDebugMode}
                 onEnableDebugMode={enableDebugMode}
-                onOpenDebug={() => changePage('debug')}
+                onAlreadyDebugMode={showAlreadyDebugModeNotice}
               />
             ) : null}
 
@@ -1846,6 +1867,11 @@ export default function App() {
           onDismiss={dismissPwaInstallNudge}
           onInstall={promptPwaInstall}
         />
+        {debugModeNotice ? (
+          <aside key={debugModeNotice.id} className={'debug-mode-notice'} role={'status'} aria-live={'polite'}>
+            {debugModeNotice.message}
+          </aside>
+        ) : null}
         <SecretAisleEasterEgg
           isVisible={isSecretAisleEasterEggVisible && !debugSettings.disableEasterEggs}
           onDismiss={() => setIsSecretAisleEasterEggVisible(false)}

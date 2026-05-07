@@ -172,6 +172,8 @@ export type Messages = {
       sponsorAction: string;
       sponsorFootnote: string;
       authorProfileLabel: string;
+      debugModeEnabledNotice: string;
+      debugModeAlreadyEnabledNotice: string;
     };
     error: {
       notFoundCode: string;

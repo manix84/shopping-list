@@ -183,6 +183,8 @@ export const fr: Messages = {
       sponsorFootnote:
         'Le sponsoring aide à garder cette application indépendante, maintenue et gratuite.',
       authorProfileLabel: 'Ouvrir le profil GitHub de Rob',
+      debugModeEnabledNotice: 'Mode débogage activé. Les outils de débogage sont maintenant dans le menu principal.',
+      debugModeAlreadyEnabledNotice: 'Le mode débogage est déjà activé. Inutile de continuer à appuyer.',
     },
     error: {
       notFoundCode: '404',

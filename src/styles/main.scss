@@ -2669,6 +2669,26 @@ select {
   z-index: 80;
 }
 
+.debug-mode-notice {
+  animation: connection-badge-fade-in 0.24s ease-out both;
+  background: color-mix(in srgb, $panel 96%, transparent);
+  border: 1px solid color-mix(in srgb, $primary 34%, $border);
+  border-radius: 12px;
+  box-shadow: 0 16px 38px color-mix(in srgb, var(--shadow-color) 82%, transparent);
+  color: $text;
+  font-size: 14px;
+  font-weight: 700;
+  right: max(18px, env(safe-area-inset-right));
+  line-height: 1.35;
+  max-width: min(420px, calc(100vw - 32px));
+  padding: 12px 14px;
+  position: fixed;
+  text-align: center;
+  top: max(18px, env(safe-area-inset-top));
+  width: max-content;
+  z-index: 90;
+}
+
 .pwa-install-badge-copy {
   min-width: 0;
 

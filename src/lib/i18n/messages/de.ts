@@ -183,6 +183,8 @@ export const de: Messages = {
       sponsorFootnote:
         'Sponsoring hilft, diese App unabhängig, gepflegt und kostenlos nutzbar zu halten.',
       authorProfileLabel: 'Robs GitHub-Profil öffnen',
+      debugModeEnabledNotice: 'Debug-Modus aktiviert. Die Debug-Werkzeuge sind jetzt im Hauptmenü verfügbar.',
+      debugModeAlreadyEnabledNotice: 'Der Debug-Modus ist bereits aktiviert. Du musst nicht weiter tippen.',
     },
     error: {
       notFoundCode: '404',
