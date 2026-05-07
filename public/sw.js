@@ -43,6 +43,11 @@ const cacheAssets = async () => {
   await cache.addAll(urls);
 };
 
+const missingCachedUrls = async (cache, urls) => {
+  const cachedUrls = new Set((await cache.keys()).map((request) => request.url));
+  return urls.filter((url) => !cachedUrls.has(url));
+};
+
 const isCacheableAppShellResponse = (response) => {
   if (response.ok) return true;
 
@@ -59,7 +64,11 @@ const refreshCachedAppShell = async (response, request) => {
     cache.put(request, response.clone()),
     cache.put(new URL('index.html', self.registration.scope).href, response.clone()),
   ]);
-  await cache.addAll(buildAssetUrlsFromHtml(html));
+
+  const missingAssetUrls = await missingCachedUrls(cache, buildAssetUrlsFromHtml(html));
+  if (missingAssetUrls.length > 0) {
+    await cache.addAll(missingAssetUrls);
+  }
 };
 
 self.addEventListener('install', (event) => {
