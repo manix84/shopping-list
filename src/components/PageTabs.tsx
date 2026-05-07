@@ -4,10 +4,11 @@ import { useI18n } from '../lib/i18n';
 type PageTabsProps = {
   page: PageKey;
   hasItems: boolean;
+  showDebugTools?: boolean;
   onChange: (page: PageKey) => void;
 };
 
-export function PageTabs({ page, hasItems, onChange }: PageTabsProps) {
+export function PageTabs({ page, hasItems, showDebugTools = false, onChange }: PageTabsProps) {
   const { messages } = useI18n();
 
   return (
@@ -45,6 +46,16 @@ export function PageTabs({ page, hasItems, onChange }: PageTabsProps) {
       >
         {messages.nav.about}
       </button>
+      {showDebugTools ? (
+        <button
+          type={'button'}
+          className={`button ${page === 'debug' ? 'button-active' : ''}`}
+          aria-current={page === 'debug' ? 'page' : undefined}
+          onClick={() => onChange('debug')}
+        >
+          {messages.nav.debugTools}
+        </button>
+      ) : null}
     </nav>
   );
 }

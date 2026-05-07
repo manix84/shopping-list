@@ -25,6 +25,28 @@ let databaseWriteQueue = Promise.resolve();
 let pool;
 let schemaReady;
 
+const databaseErrorCode = (error) => {
+  if (typeof error?.code === 'string' && error.code) { return error.code; }
+  if (Array.isArray(error?.errors)) {
+    for (const nestedError of error.errors) {
+      const nestedCode = databaseErrorCode(nestedError);
+      if (nestedCode) { return nestedCode; }
+    }
+  }
+  return undefined;
+};
+
+const databaseErrorMessage = (error) => {
+  if (typeof error?.message === 'string' && error.message) { return error.message; }
+  if (Array.isArray(error?.errors)) {
+    for (const nestedError of error.errors) {
+      const nestedMessage = databaseErrorMessage(nestedError);
+      if (nestedMessage) { return nestedMessage; }
+    }
+  }
+  return 'Unable to read database status';
+};
+
 const emptyDatabase = () => ({
   settings: {
     exists: false,
@@ -508,11 +530,23 @@ export const getDatabaseStatus = async () => {
     };
   }
 
-  const [settings, shoppingList, sharedListCount] = await Promise.all([
-    getSettings(),
-    getShoppingList(),
-    postgresQuery('SELECT COUNT(*)::integer AS count FROM shared_lists'),
-  ]);
+  let settings;
+  let shoppingList;
+  let sharedListCount;
+  try {
+    [settings, shoppingList, sharedListCount] = await Promise.all([
+      getSettings(),
+      getShoppingList(),
+      postgresQuery('SELECT COUNT(*)::integer AS count FROM shared_lists'),
+    ]);
+  } catch (error) {
+    return {
+      ok: false,
+      adapter: 'postgres',
+      error: databaseErrorMessage(error),
+      errorCode: databaseErrorCode(error),
+    };
+  }
 
   return {
     ok: true,

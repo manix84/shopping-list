@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react';
 import { Card } from '../components/Card';
-import { DebugLink } from '../components/DebugLink';
 import { useI18n } from '../lib/i18n';
 import { appVersion } from '../version';
 
@@ -12,10 +11,10 @@ const DEBUG_MODE_TAP_RESET_MS = 2_000;
 type AboutPageProps = {
   isDebugMode: boolean;
   onEnableDebugMode: () => void;
-  onOpenDebug: () => void;
+  onAlreadyDebugMode: () => void;
 };
 
-export function AboutPage({ isDebugMode, onEnableDebugMode, onOpenDebug }: AboutPageProps) {
+export function AboutPage({ isDebugMode, onEnableDebugMode, onAlreadyDebugMode }: AboutPageProps) {
   const { messages } = useI18n();
   const about = messages.pages.about;
   const runtimeHostname =
@@ -24,8 +23,6 @@ export function AboutPage({ isDebugMode, onEnableDebugMode, onOpenDebug }: About
   const versionTapResetTimerRef = useRef<number>();
 
   const handleVersionTap = () => {
-    if (isDebugMode) { return; }
-
     if (versionTapResetTimerRef.current) {
       window.clearTimeout(versionTapResetTimerRef.current);
     }
@@ -33,6 +30,10 @@ export function AboutPage({ isDebugMode, onEnableDebugMode, onOpenDebug }: About
     versionTapCountRef.current += 1;
     if (versionTapCountRef.current >= DEBUG_MODE_TAP_COUNT) {
       versionTapCountRef.current = 0;
+      if (isDebugMode) {
+        onAlreadyDebugMode();
+        return;
+      }
       onEnableDebugMode();
       return;
     }
@@ -116,8 +117,6 @@ export function AboutPage({ isDebugMode, onEnableDebugMode, onOpenDebug }: About
             {about.sponsorAction}
           </a>
         </div>
-
-        {isDebugMode ? <DebugLink onOpen={onOpenDebug} /> : null}
 
         <p className={'about-footnote'}>{about.sponsorFootnote}</p>
       </Card>

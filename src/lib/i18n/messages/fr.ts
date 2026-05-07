@@ -183,6 +183,10 @@ export const fr: Messages = {
       sponsorFootnote:
         'Le sponsoring aide à garder cette application indépendante, maintenue et gratuite.',
       authorProfileLabel: 'Ouvrir le profil GitHub de Rob',
+      debugModeEnabledNoticeTitle: 'Mode débogage activé',
+      debugModeEnabledNotice: 'Les outils de débogage sont maintenant dans le menu principal.',
+      debugModeAlreadyEnabledNoticeTitle: 'Déjà activé',
+      debugModeAlreadyEnabledNotice: 'Le mode débogage est déjà activé. Inutile de continuer à appuyer.',
     },
     error: {
       notFoundCode: '404',
@@ -248,7 +252,7 @@ export const fr: Messages = {
       backendHealthExpected: 'GET /api/health renvoie OK',
       databaseTitle: 'Base de données',
       databaseExpected:
-        'GET /api/database/status peut lire le stockage backend',
+        'GET /api/health peut lire le stockage backend',
       databaseTypeTitle: 'Type de base actuel',
       databaseTypeExpected: 'JSON DB, PostgreSQL ou LocalStorage',
       databaseTypeLocalStorage: 'LocalStorage',
@@ -321,6 +325,9 @@ export const fr: Messages = {
       eventsNotificationGroupTitle: 'Notifications',
       eventsNotificationGroupSubtitle:
         'Exemples de notifications utilisateur pour les ajouts d’articles dans les listes partagées.',
+      eventsToastGroupTitle: 'Popups toast',
+      eventsToastGroupSubtitle:
+        'Prévisualisez les variantes de popup de l’app sans provoquer un vrai échec.',
       eventsOtherGroupTitle: 'Autres événements',
       eventsOtherGroupSubtitle:
         'Comportements qui dépendent normalement de l’état du navigateur, de gestes cachés ou du cycle de vie de l’app.',
@@ -336,6 +343,25 @@ export const fr: Messages = {
       eventNotificationSilentFollowUpLabel: 'Suivi groupé silencieux',
       eventNotificationSilentFollowUpHint:
         'Met à jour la notification groupée actuelle avec plus d’articles et demande au navigateur de rester discret.',
+      eventToastSuccessLabel: 'Popup de réussite',
+      eventToastSuccessHint: 'Affiche le style de confirmation utilisé pour les actions terminées.',
+      eventToastSuccessTitle: 'Enregistré',
+      eventToastSuccessMessage: 'Le système de popup est prêt pour les messages de réussite.',
+      eventToastInfoLabel: 'Popup d’information',
+      eventToastInfoHint: 'Affiche le style neutre utilisé pour les messages contextuels.',
+      eventToastInfoTitle: 'À noter',
+      eventToastInfoMessage: 'Voici le style de popup d’information.',
+      eventToastWarningLabel: 'Popup d’avertissement',
+      eventToastWarningHint: 'Affiche le style de prudence quand un point demande attention.',
+      eventToastWarningTitle: 'À vérifier',
+      eventToastWarningMessage: 'Ce popup d’avertissement signale un problème récupérable.',
+      eventToastErrorLabel: 'Popup d’erreur',
+      eventToastErrorHint: 'Affiche le style assertif utilisé quand une action échoue.',
+      eventToastErrorTitle: 'Action échouée',
+      eventToastErrorMessage: 'Ce popup d’erreur est annoncé de façon assertive.',
+      eventToastPlainLabel: 'Popup simple',
+      eventToastPlainHint: 'Affiche un popup avec message seul, sans titre ni icône.',
+      eventToastPlainMessage: 'Ce popup n’a volontairement ni titre ni icône.',
       eventPwaInstallNudgeLabel: 'Invite d’installation PWA',
       eventPwaInstallNudgeHint: 'Affiche l’invite flottante d’installation sans attendre le navigateur.',
       eventSecretAisleLabel: 'Superposition allée secrète',

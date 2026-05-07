@@ -183,6 +183,10 @@ export const de: Messages = {
       sponsorFootnote:
         'Sponsoring hilft, diese App unabhängig, gepflegt und kostenlos nutzbar zu halten.',
       authorProfileLabel: 'Robs GitHub-Profil öffnen',
+      debugModeEnabledNoticeTitle: 'Debug-Modus aktiviert',
+      debugModeEnabledNotice: 'Die Debug-Werkzeuge sind jetzt im Hauptmenü verfügbar.',
+      debugModeAlreadyEnabledNoticeTitle: 'Bereits aktiviert',
+      debugModeAlreadyEnabledNotice: 'Der Debug-Modus ist bereits aktiviert. Du musst nicht weiter tippen.',
     },
     error: {
       notFoundCode: '404',
@@ -248,7 +252,7 @@ export const de: Messages = {
       backendHealthExpected: 'GET /api/health liefert OK',
       databaseTitle: 'Datenbank',
       databaseExpected:
-        'GET /api/database/status kann den Backend-Speicher lesen',
+        'GET /api/health kann den Backend-Speicher lesen',
       databaseTypeTitle: 'Aktueller Datenbanktyp',
       databaseTypeExpected: 'JSON DB, PostgreSQL oder LocalStorage',
       databaseTypeLocalStorage: 'LocalStorage',
@@ -321,6 +325,9 @@ export const de: Messages = {
       eventsNotificationGroupTitle: 'Benachrichtigungen',
       eventsNotificationGroupSubtitle:
         'Benutzerseitige Benachrichtigungsbeispiele für hinzugefügte Artikel in freigegebenen Listen.',
+      eventsToastGroupTitle: 'Toast-Popups',
+      eventsToastGroupSubtitle:
+        'Zeigt die Popup-Varianten der App ohne echten Workflow-Fehler.',
       eventsOtherGroupTitle: 'Andere Events',
       eventsOtherGroupSubtitle:
         'Laufzeitverhalten, das normalerweise Browserstatus, versteckte Gesten oder App-Lifecycle-Timing braucht.',
@@ -336,6 +343,25 @@ export const de: Messages = {
       eventNotificationSilentFollowUpLabel: 'Stilles gruppiertes Update',
       eventNotificationSilentFollowUpHint:
         'Aktualisiert die aktuelle gruppierte Benachrichtigung mit weiteren Artikeln und bittet den Browser, ruhig zu bleiben.',
+      eventToastSuccessLabel: 'Erfolgs-Popup',
+      eventToastSuccessHint: 'Zeigt den Bestätigungsstil für abgeschlossene Aktionen.',
+      eventToastSuccessTitle: 'Gespeichert',
+      eventToastSuccessMessage: 'Das Popup-System ist bereit für Erfolgsmeldungen.',
+      eventToastInfoLabel: 'Info-Popup',
+      eventToastInfoHint: 'Zeigt den neutralen Stil für Kontextmeldungen.',
+      eventToastInfoTitle: 'Hinweis',
+      eventToastInfoMessage: 'Dies ist der Stil für Info-Popups.',
+      eventToastWarningLabel: 'Warn-Popup',
+      eventToastWarningHint: 'Zeigt den Vorsichtsstil, wenn etwas Aufmerksamkeit braucht.',
+      eventToastWarningTitle: 'Bitte prüfen',
+      eventToastWarningMessage: 'Dieses Warn-Popup hebt ein behebbares Problem hervor.',
+      eventToastErrorLabel: 'Fehler-Popup',
+      eventToastErrorHint: 'Zeigt den assertiven Stil, wenn eine Aktion fehlschlägt.',
+      eventToastErrorTitle: 'Aktion fehlgeschlagen',
+      eventToastErrorMessage: 'Dieses Fehler-Popup wird assertiv angekündigt.',
+      eventToastPlainLabel: 'Einfaches Popup',
+      eventToastPlainHint: 'Zeigt nur eine Nachricht, ohne Titel oder Icon.',
+      eventToastPlainMessage: 'Dieses Popup hat absichtlich keinen Titel und kein Icon.',
       eventPwaInstallNudgeLabel: 'PWA-Installationshinweis',
       eventPwaInstallNudgeHint: 'Zeigt den schwebenden Installationshinweis ohne Browser-Timing.',
       eventSecretAisleLabel: 'Geheimer-Gang-Overlay',

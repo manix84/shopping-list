@@ -1,4 +1,4 @@
-import { type KeyboardEvent } from 'react';
+import { type CSSProperties, type KeyboardEvent } from 'react';
 import type {
   BackendStatus,
   BackendHeartbeatSample,
@@ -67,6 +67,8 @@ type DebugPageProps = {
   onBackToEdit: () => void;
   onBackToSettings: () => void;
 };
+
+const HEARTBEAT_HISTORY_SLOT_COUNT = 36;
 
 const backendSummary = (status: BackendStatus, messages: Messages): string => {
   if (status.state === 'connected') { return messages.pages.debug.backendConnected; }
@@ -198,23 +200,23 @@ const heartbeatLatencyScore = (sample: BackendHeartbeatSample) => {
   return 100 - (clampedLatency / 1_500) * 84;
 };
 
-const heartbeatPolyline = (samples: BackendHeartbeatSample[]) => {
-  if (samples.length === 0) { return ''; }
-  if (samples.length === 1) {
-    const y = 100 - heartbeatLatencyScore(samples[0]);
-    return `0,${y} 100,${y}`;
-  }
-
-  return samples.map((sample, index) => {
-    const x = (index / (samples.length - 1)) * 100;
-    const y = 100 - heartbeatLatencyScore(sample);
-    return `${x.toFixed(2)},${y.toFixed(2)}`;
-  }).join(' ');
+type HeartbeatHistorySlot = {
+  index: number;
+  sample?: BackendHeartbeatSample;
 };
 
-const heartbeatPoint = (sample: BackendHeartbeatSample, index: number, total: number) => {
-  const x = total === 1 ? 100 : (index / (total - 1)) * 100;
-  const y = 100 - heartbeatLatencyScore(sample);
+const heartbeatHistorySlots = (samples: BackendHeartbeatSample[]): HeartbeatHistorySlot[] => {
+  const visibleSamples = samples.slice(-HEARTBEAT_HISTORY_SLOT_COUNT);
+  const leadingSlotCount = HEARTBEAT_HISTORY_SLOT_COUNT - visibleSamples.length;
+  return Array.from({ length: HEARTBEAT_HISTORY_SLOT_COUNT }, (_, index) => ({
+    index,
+    sample: visibleSamples[index - leadingSlotCount],
+  }));
+};
+
+const heartbeatPoint = (slot: HeartbeatHistorySlot) => {
+  const x = (slot.index / (HEARTBEAT_HISTORY_SLOT_COUNT - 1)) * 100;
+  const y = slot.sample ? 100 - heartbeatLatencyScore(slot.sample) : 50;
   return { x, y };
 };
 
@@ -366,8 +368,15 @@ export function DebugPage({
     cooking: messages.labels.measurementModeCooking,
   };
   const latestHeartbeat = heartbeatSamples.at(-1);
-  const heartbeatPath = heartbeatPolyline(heartbeatSamples);
   const heartbeatTone = latestHeartbeat?.state ?? backendStatus.state;
+  const heartbeatSlots = heartbeatHistorySlots(heartbeatSamples);
+  const heartbeatSampleSlots = heartbeatSlots.filter((slot): slot is HeartbeatHistorySlot & { sample: BackendHeartbeatSample } =>
+    slot.sample !== undefined,
+  );
+  const firstHeartbeatSampleSlot = heartbeatSampleSlots[0];
+  const heartbeatSlotStyle = {
+    '--heartbeat-slot-count': HEARTBEAT_HISTORY_SLOT_COUNT,
+  } as CSSProperties;
   const recentHeartbeatSamples = heartbeatSamples.slice(-8).reverse();
   const handleTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
     const lastIndex = debugTabs.length - 1;
@@ -546,19 +555,24 @@ export function DebugPage({
             <div className={'heartbeat-graph'} aria-hidden={'true'}>
               <svg viewBox={'0 0 100 100'} preserveAspectRatio={'none'}>
                 <path className={'heartbeat-graph-grid'} d={'M0 25 H100 M0 50 H100 M0 75 H100'} />
-                {heartbeatPath && heartbeatSamples.length === 1 ? (
-                  <polyline
-                    className={`heartbeat-graph-line heartbeat-graph-line-${heartbeatLatencyTone(heartbeatSamples[0])}`}
-                    points={heartbeatPath}
+                <line className={'heartbeat-graph-ghost-line'} x1={'0'} y1={'50'} x2={'100'} y2={'50'} />
+                {firstHeartbeatSampleSlot && firstHeartbeatSampleSlot.index > 0 ? (
+                  <line
+                    className={'heartbeat-graph-ghost-line'}
+                    x1={heartbeatPoint({ index: firstHeartbeatSampleSlot.index - 1 }).x}
+                    y1={'50'}
+                    x2={heartbeatPoint(firstHeartbeatSampleSlot).x}
+                    y2={heartbeatPoint(firstHeartbeatSampleSlot).y}
                   />
                 ) : null}
-                {heartbeatSamples.slice(1).map((sample, index) => {
-                  const previousPoint = heartbeatPoint(heartbeatSamples[index], index, heartbeatSamples.length);
-                  const nextPoint = heartbeatPoint(sample, index + 1, heartbeatSamples.length);
+                {heartbeatSampleSlots.slice(1).map((slot, index) => {
+                  const previousSlot = heartbeatSampleSlots[index];
+                  const previousPoint = heartbeatPoint(previousSlot);
+                  const nextPoint = heartbeatPoint(slot);
                   return (
                     <line
-                      key={`${sample.checkedAt}-${index}`}
-                      className={`heartbeat-graph-line heartbeat-graph-line-${heartbeatLatencyTone(sample)}`}
+                      key={`${slot.sample.checkedAt}-${slot.index}`}
+                      className={`heartbeat-graph-line heartbeat-graph-line-${heartbeatLatencyTone(slot.sample)}`}
                       x1={previousPoint.x}
                       y1={previousPoint.y}
                       x2={nextPoint.x}
@@ -567,30 +581,34 @@ export function DebugPage({
                   );
                 })}
               </svg>
-              {heartbeatSamples.map((sample, index) => {
-                const { x, y } = heartbeatPoint(sample, index, heartbeatSamples.length);
-                const tone = heartbeatLatencyTone(sample);
+              {heartbeatSlots.map((slot) => {
+                const { x, y } = heartbeatPoint(slot);
+                const tone = slot.sample ? heartbeatLatencyTone(slot.sample) : 'ghost';
                 return (
                   <span
-                    key={`${sample.checkedAt}-${index}`}
+                    key={slot.sample ? `${slot.sample.checkedAt}-${slot.index}` : `heartbeat-ghost-${slot.index}`}
                     className={`heartbeat-graph-point heartbeat-graph-point-${tone}`}
                     style={{ left: `${x}%`, top: `${y}%` }}
-                />
-              );
-            })}
-            </div>
-            <div className={'heartbeat-status-strip'} aria-label={messages.pages.debug.heartbeatStatusHistory}>
-              {heartbeatSamples.length === 0 ? (
-                <span className={'heartbeat-status-empty'}>{messages.pages.debug.heartbeatWaiting}</span>
-              ) : (
-                heartbeatSamples.map((sample, index) => (
-                  <span
-                    key={`${sample.checkedAt}-status-${index}`}
-                    className={`heartbeat-status-bar heartbeat-status-bar-${sample.state}`}
-                    title={`${formatHeartbeatTime(sample.checkedAt)} ${backendStateLabel({ ...backendStatus, state: sample.state }, messages)}`}
                   />
-                ))
-              )}
+                );
+              })}
+            </div>
+            <div
+              className={'heartbeat-status-strip'}
+              style={heartbeatSlotStyle}
+              aria-hidden={'true'}
+            >
+              {heartbeatSlots.map((slot) => (
+                <span
+                  key={slot.sample ? `${slot.sample.checkedAt}-status-${slot.index}` : `heartbeat-status-ghost-${slot.index}`}
+                  className={`heartbeat-status-dot heartbeat-status-dot-${slot.sample?.state ?? 'ghost'}`}
+                  title={
+                    slot.sample
+                      ? `${formatHeartbeatTime(slot.sample.checkedAt)} ${backendStateLabel({ ...backendStatus, state: slot.sample.state }, messages)}`
+                      : messages.pages.debug.heartbeatWaiting
+                  }
+                />
+              ))}
             </div>
           </div>
           <div className={'table-wrap'}>
@@ -1106,6 +1124,37 @@ export function DebugPage({
               label={messages.pages.debug.eventNotificationSilentFollowUpLabel}
               hint={messages.pages.debug.eventNotificationSilentFollowUpHint}
               onClick={() => onDebugNotificationTest('silent-follow-up')}
+            />
+          </section>
+          <section className={'debug-event-group stack'}>
+            <div>
+              <h3 className={'title title-xs'}>{messages.pages.debug.eventsToastGroupTitle}</h3>
+              <p className={'subtitle'}>{messages.pages.debug.eventsToastGroupSubtitle}</p>
+            </div>
+            <DebugEventButton
+              label={messages.pages.debug.eventToastSuccessLabel}
+              hint={messages.pages.debug.eventToastSuccessHint}
+              onClick={() => onDebugEventTest('toast-success')}
+            />
+            <DebugEventButton
+              label={messages.pages.debug.eventToastInfoLabel}
+              hint={messages.pages.debug.eventToastInfoHint}
+              onClick={() => onDebugEventTest('toast-info')}
+            />
+            <DebugEventButton
+              label={messages.pages.debug.eventToastWarningLabel}
+              hint={messages.pages.debug.eventToastWarningHint}
+              onClick={() => onDebugEventTest('toast-warning')}
+            />
+            <DebugEventButton
+              label={messages.pages.debug.eventToastErrorLabel}
+              hint={messages.pages.debug.eventToastErrorHint}
+              onClick={() => onDebugEventTest('toast-error')}
+            />
+            <DebugEventButton
+              label={messages.pages.debug.eventToastPlainLabel}
+              hint={messages.pages.debug.eventToastPlainHint}
+              onClick={() => onDebugEventTest('toast-plain')}
             />
           </section>
           <section className={'debug-event-group stack'}>

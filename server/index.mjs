@@ -42,6 +42,18 @@ const sendJson = (response, statusCode, payload) => {
   response.end(JSON.stringify(payload));
 };
 
+const errorMessage = (error) => {
+  if (error instanceof Error && error.message) { return error.message; }
+  if (Array.isArray(error?.errors)) {
+    for (const nestedError of error.errors) {
+      const nestedMessage = errorMessage(nestedError);
+      if (nestedMessage) { return nestedMessage; }
+    }
+  }
+  if (typeof error?.code === 'string' && error.code) { return error.code; }
+  return 'Unexpected server error';
+};
+
 const readJsonBody = async (request) => {
   const chunks = [];
   for await (const chunk of request) {
@@ -67,7 +79,7 @@ const readJsonBody = async (request) => {
 const sendError = (response, error) => {
   const statusCode = error?.statusCode ?? 500;
   sendJson(response, statusCode, {
-    error: error instanceof Error ? error.message : 'Unexpected server error',
+    error: errorMessage(error),
   });
 };
 
@@ -78,7 +90,7 @@ const handleApi = async (request, response, path) => {
   }
 
   if (request.method === 'GET' && path === '/api/health') {
-    sendJson(response, 200, { ok: true, mode: 'backend' });
+    sendJson(response, 200, { ok: true, mode: 'backend', database: await getDatabaseStatus() });
     return;
   }
 

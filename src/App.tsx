@@ -5,6 +5,7 @@ import { PredatorEasterEgg } from './components/PredatorEasterEgg';
 import { PwaInstallBadge } from './components/PwaInstallBadge';
 import { PwaSplashScreen } from './components/PwaSplashScreen';
 import { SecretAisleEasterEgg } from './components/SecretAisleEasterEgg';
+import { ToastPopup, type ToastPopupData } from './components/ToastPopup';
 import {
   runCountQuantityTests,
   runConfigTests,
@@ -74,7 +75,9 @@ const SHARED_LIST_NOTIFICATION_GROUP_MS = 2 * 60_000;
 const SHARED_LIST_NOTIFICATION_PREVIEW_LIMIT = 3;
 const NOTIFICATION_SERVICE_WORKER_READY_TIMEOUT_MS = 750;
 const DEBUG_NOTIFICATION_LIST_ID = 'debug-notifications';
+const DEBUG_MODE_NOTICE_DURATION_MS = 4_000;
 const DEV_TITLE_SUFFIX = ' [Dev]';
+const DEV_MANIFEST_ID = 'smart-shopping-list-dev';
 type NotificationDeliveryResult = DebugNotificationDeliveryPath;
 const debugNotificationStatusFromDelivery = (
   result: NotificationDeliveryResult,
@@ -148,6 +151,59 @@ const isRunningInstalledPwa = (): boolean => {
 
   const navigatorWithStandalone = window.navigator as Navigator & { standalone?: boolean };
   return window.matchMedia('(display-mode: standalone)').matches || navigatorWithStandalone.standalone === true;
+};
+
+const absoluteManifestUrl = (value: unknown, manifestUrl: string): unknown =>
+  typeof value === 'string' ? new URL(value, manifestUrl).href : value;
+
+const absoluteManifestImageResources = (value: unknown, manifestUrl: string): unknown => {
+  if (!Array.isArray(value)) { return value; }
+
+  return value.map((entry) => {
+    if (!entry || typeof entry !== 'object') { return entry; }
+
+    return {
+      ...entry,
+      src: absoluteManifestUrl((entry as { src?: unknown }).src, manifestUrl),
+    };
+  });
+};
+
+const updateDevManifest = (appTitle: string): void => {
+  if (!import.meta.env.DEV || typeof document === 'undefined') { return; }
+
+  const manifestLink = document.querySelector<HTMLLinkElement>('link[rel="manifest"]');
+  if (!manifestLink) { return; }
+
+  const sourceManifestUrl = manifestLink.href.startsWith('blob:')
+    ? new URL('manifest.webmanifest', window.location.href).href
+    : manifestLink.href;
+
+  fetch(sourceManifestUrl, { cache: 'no-store' })
+    .then((response) => response.ok ? response.json() : undefined)
+    .then((manifest: unknown) => {
+      if (!manifest || typeof manifest !== 'object') { return; }
+
+      const devManifest = {
+        ...manifest,
+        id: DEV_MANIFEST_ID,
+        start_url: absoluteManifestUrl((manifest as { start_url?: unknown }).start_url, sourceManifestUrl),
+        scope: absoluteManifestUrl((manifest as { scope?: unknown }).scope, sourceManifestUrl),
+        icons: absoluteManifestImageResources((manifest as { icons?: unknown }).icons, sourceManifestUrl),
+        screenshots: absoluteManifestImageResources((manifest as { screenshots?: unknown }).screenshots, sourceManifestUrl),
+        name: `${appTitle}${DEV_TITLE_SUFFIX}`,
+        short_name: `Shopping List${DEV_TITLE_SUFFIX}`,
+      };
+      const manifestBlob = new Blob([JSON.stringify(devManifest)], { type: 'application/manifest+json' });
+      const previousHref = manifestLink.href.startsWith('blob:') ? manifestLink.href : undefined;
+      manifestLink.href = URL.createObjectURL(manifestBlob);
+      if (previousHref) {
+        URL.revokeObjectURL(previousHref);
+      }
+    })
+    .catch(() => {
+      // Non-fatal: the dev install prompt can fall back to the static manifest.
+    });
 };
 
 const isMobileOrTabletDevice = (): boolean => {
@@ -310,6 +366,7 @@ export default function App() {
   const [isSecretAisleEasterEggVisible, setIsSecretAisleEasterEggVisible] = useState(false);
   const [predatorEasterEggRun, setPredatorEasterEggRun] = useState(0);
   const [debugNotificationResult, setDebugNotificationResult] = useState<DebugNotificationResult>();
+  const [debugModeNotice, setDebugModeNotice] = useState<ToastPopupData>();
   const currentItemsRef = useRef<Item[]>([]);
   const sharedListNotificationSeenUpdatedAtRef = useRef<Record<string, string>>({});
   const sharedListNotificationGroupRef = useRef<SharedListNotificationGroup>();
@@ -354,12 +411,30 @@ export default function App() {
   };
 
   const enableDebugMode = () => {
+    const shouldNotifyEnabled = !isDebugMode;
     setIsDebugMode(true);
+    if (shouldNotifyEnabled) {
+      setDebugModeNotice({
+        id: Date.now(),
+        tone: 'success',
+        title: messages.pages.about.debugModeEnabledNoticeTitle,
+        message: messages.pages.about.debugModeEnabledNotice,
+      });
+    }
     try {
       saveDebugMode(true);
     } catch (error) {
       console.warn('Unable to save debug mode preference.', error);
     }
+  };
+
+  const showAlreadyDebugModeNotice = () => {
+    setDebugModeNotice({
+      id: Date.now(),
+      tone: 'info',
+      title: messages.pages.about.debugModeAlreadyEnabledNoticeTitle,
+      message: messages.pages.about.debugModeAlreadyEnabledNotice,
+    });
   };
 
   const handleDebugModeChange = (enabled: boolean) => {
@@ -595,6 +670,51 @@ export default function App() {
   }, [debugNotificationItems, ensureNotificationPermission, messages.notifications, notifySharedListAdditions, showDirectPageNotification]);
 
   const handleDebugEventTest = useCallback((kind: DebugEventTestKey) => {
+    if (kind === 'toast-success') {
+      setDebugModeNotice({
+        id: Date.now(),
+        tone: 'success',
+        title: messages.pages.debug.eventToastSuccessTitle,
+        message: messages.pages.debug.eventToastSuccessMessage,
+      });
+      return;
+    }
+    if (kind === 'toast-info') {
+      setDebugModeNotice({
+        id: Date.now(),
+        tone: 'info',
+        title: messages.pages.debug.eventToastInfoTitle,
+        message: messages.pages.debug.eventToastInfoMessage,
+      });
+      return;
+    }
+    if (kind === 'toast-warning') {
+      setDebugModeNotice({
+        id: Date.now(),
+        tone: 'warning',
+        title: messages.pages.debug.eventToastWarningTitle,
+        message: messages.pages.debug.eventToastWarningMessage,
+      });
+      return;
+    }
+    if (kind === 'toast-error') {
+      setDebugModeNotice({
+        id: Date.now(),
+        tone: 'error',
+        title: messages.pages.debug.eventToastErrorTitle,
+        message: messages.pages.debug.eventToastErrorMessage,
+      });
+      return;
+    }
+    if (kind === 'toast-plain') {
+      setDebugModeNotice({
+        id: Date.now(),
+        tone: 'info',
+        message: messages.pages.debug.eventToastPlainMessage,
+        showIcon: false,
+      });
+      return;
+    }
     if (kind === 'pwa-install-nudge') {
       setIsPwaInstallNudgeVisible(true);
       return;
@@ -604,7 +724,7 @@ export default function App() {
       return;
     }
     setPredatorEasterEggRun((current) => current + 1);
-  }, []);
+  }, [messages.pages.debug]);
 
   const applyTheme = (mode: ThemeMode) => {
     if (typeof document === 'undefined') { return; }
@@ -1201,6 +1321,7 @@ export default function App() {
     applyDocumentLocale(locale);
     if (typeof document !== 'undefined') {
       document.title = import.meta.env.DEV ? `${messages.app.title}${DEV_TITLE_SUFFIX}` : messages.app.title;
+      updateDevManifest(messages.app.title);
     }
   }, [locale, messages]);
 
@@ -1681,6 +1802,16 @@ export default function App() {
     !isPwaInstalled &&
     (canPromptInstall || canShowManualInstallGuidance);
 
+  useEffect(() => {
+    if (!debugModeNotice) { return undefined; }
+
+    const dismissTimer = window.setTimeout(() => {
+      setDebugModeNotice((current) => current?.id === debugModeNotice.id ? undefined : current);
+    }, DEBUG_MODE_NOTICE_DURATION_MS);
+
+    return () => window.clearTimeout(dismissTimer);
+  }, [debugModeNotice]);
+
   return (
     <I18nProvider value={{ locale, messages, setLocale }}>
       <PwaSplashScreen disabled={debugSettings.disablePwaSplash} />
@@ -1694,6 +1825,7 @@ export default function App() {
             hasItems={items.length > 0}
             backendStatus={backendStatus}
             resolvedTheme={resolvedTheme}
+            isDebugMode={isDebugMode}
             onChangePage={changePage}
             onRevealEasterEgg={() => {
               if (!debugSettings.disableEasterEggs) {
@@ -1783,7 +1915,7 @@ export default function App() {
               <AboutPage
                 isDebugMode={isDebugMode}
                 onEnableDebugMode={enableDebugMode}
-                onOpenDebug={() => changePage('debug')}
+                onAlreadyDebugMode={showAlreadyDebugModeNotice}
               />
             ) : null}
 
@@ -1846,6 +1978,9 @@ export default function App() {
           onDismiss={dismissPwaInstallNudge}
           onInstall={promptPwaInstall}
         />
+        {debugModeNotice ? (
+          <ToastPopup key={debugModeNotice.id} {...debugModeNotice} />
+        ) : null}
         <SecretAisleEasterEgg
           isVisible={isSecretAisleEasterEggVisible && !debugSettings.disableEasterEggs}
           onDismiss={() => setIsSecretAisleEasterEggVisible(false)}

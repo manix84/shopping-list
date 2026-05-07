@@ -146,7 +146,7 @@ If setup prints Docker success messages and then fails with `read ECONNRESET`, P
 To inspect the local database in DBeaver or another Postgres client, use:
 
 ```text
-Host: localhost
+Host: 127.0.0.1
 Port: 54321
 Database: shopping_list
 Username: shopping_list
@@ -212,8 +212,8 @@ If `DATABASE_URL` is not configured, the backend falls back to the old JSON file
 
 Backend utility routes:
 
-- `GET /api/health`
-- `GET /api/database/status`
+- `GET /api/health` - includes backend health and database status
+- `GET /api/database/status` - compatibility route for database status only
 - `GET /api/settings`
 - `PUT /api/settings`
 

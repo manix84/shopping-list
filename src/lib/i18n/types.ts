@@ -172,6 +172,10 @@ export type Messages = {
       sponsorAction: string;
       sponsorFootnote: string;
       authorProfileLabel: string;
+      debugModeEnabledNoticeTitle: string;
+      debugModeEnabledNotice: string;
+      debugModeAlreadyEnabledNoticeTitle: string;
+      debugModeAlreadyEnabledNotice: string;
     };
     error: {
       notFoundCode: string;
@@ -283,6 +287,8 @@ export type Messages = {
       eventsSubtitle: string;
       eventsNotificationGroupTitle: string;
       eventsNotificationGroupSubtitle: string;
+      eventsToastGroupTitle: string;
+      eventsToastGroupSubtitle: string;
       eventsOtherGroupTitle: string;
       eventsOtherGroupSubtitle: string;
       eventNotificationSingleLabel: string;
@@ -295,6 +301,25 @@ export type Messages = {
       eventNotificationLargeHint: string;
       eventNotificationSilentFollowUpLabel: string;
       eventNotificationSilentFollowUpHint: string;
+      eventToastSuccessLabel: string;
+      eventToastSuccessHint: string;
+      eventToastSuccessTitle: string;
+      eventToastSuccessMessage: string;
+      eventToastInfoLabel: string;
+      eventToastInfoHint: string;
+      eventToastInfoTitle: string;
+      eventToastInfoMessage: string;
+      eventToastWarningLabel: string;
+      eventToastWarningHint: string;
+      eventToastWarningTitle: string;
+      eventToastWarningMessage: string;
+      eventToastErrorLabel: string;
+      eventToastErrorHint: string;
+      eventToastErrorTitle: string;
+      eventToastErrorMessage: string;
+      eventToastPlainLabel: string;
+      eventToastPlainHint: string;
+      eventToastPlainMessage: string;
       eventPwaInstallNudgeLabel: string;
       eventPwaInstallNudgeHint: string;
       eventSecretAisleLabel: string;
