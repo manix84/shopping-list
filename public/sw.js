@@ -20,6 +20,8 @@ const staticAssetUrls = () => [
   new URL('icon-192-maskable.png', self.registration.scope).href,
   new URL('icon-512-maskable.png', self.registration.scope).href,
   new URL('apple-touch-icon.png', self.registration.scope).href,
+  new URL('screenshot-wide.png', self.registration.scope).href,
+  new URL('screenshot-mobile.png', self.registration.scope).href,
 ];
 
 const buildAssetUrlsFromHtml = (html) => {
