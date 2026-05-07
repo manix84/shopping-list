@@ -23,11 +23,6 @@ export function AboutPage({ isDebugMode, onEnableDebugMode, onAlreadyDebugMode }
   const versionTapResetTimerRef = useRef<number>();
 
   const handleVersionTap = () => {
-    if (isDebugMode) {
-      onAlreadyDebugMode();
-      return;
-    }
-
     if (versionTapResetTimerRef.current) {
       window.clearTimeout(versionTapResetTimerRef.current);
     }
@@ -35,6 +30,10 @@ export function AboutPage({ isDebugMode, onEnableDebugMode, onAlreadyDebugMode }
     versionTapCountRef.current += 1;
     if (versionTapCountRef.current >= DEBUG_MODE_TAP_COUNT) {
       versionTapCountRef.current = 0;
+      if (isDebugMode) {
+        onAlreadyDebugMode();
+        return;
+      }
       onEnableDebugMode();
       return;
     }
