@@ -1,7 +1,9 @@
-const CACHE_NAME = 'smart-shopping-list-pwa-v7';
+const CACHE_NAME = 'smart-shopping-list-pwa-v8';
+
+const appShellUrl = () => new URL('index.html', self.registration.scope).href;
+const scopeUrl = () => new URL('.', self.registration.scope).href;
 
 const staticAssetUrls = () => [
-  new URL('index.html', self.registration.scope).href,
   new URL('manifest.webmanifest', self.registration.scope).href,
   new URL('favicon-light.png', self.registration.scope).href,
   new URL('favicon-dark.png', self.registration.scope).href,
@@ -29,20 +31,41 @@ const buildAssetUrlsFromHtml = (html) => {
   return [...new Set(assetPaths)].map((path) => new URL(path, self.registration.scope).href);
 };
 
-const buildAssetUrls = async () => {
-  const indexUrl = new URL('index.html', self.registration.scope).href;
-  const response = await fetch(indexUrl, { cache: 'reload' });
+const buildAssetUrls = async (html) => buildAssetUrlsFromHtml(html);
+
+const cacheUrlIfAvailable = async (cache, url) => {
+  try {
+    const response = await fetch(url, { cache: 'reload' });
+    if (response.ok) {
+      await cache.put(url, response);
+    }
+  } catch {
+    // Optional assets should not prevent the cached app shell from working offline.
+  }
+};
+
+const cacheOptionalUrls = async (cache, urls) => {
+  await Promise.all([...new Set(urls)].map((url) => cacheUrlIfAvailable(cache, url)));
+};
+
+const cacheAppShell = async (cache) => {
+  const response = await fetch(appShellUrl(), { cache: 'reload' });
   if (!response.ok) {
-    return [];
+    throw new Error(`Unable to cache app shell: ${response.status}`);
   }
 
-  return buildAssetUrlsFromHtml(await response.text());
+  const html = await response.clone().text();
+  await Promise.all([
+    cache.put(appShellUrl(), response.clone()),
+    cache.put(scopeUrl(), response.clone()),
+  ]);
+  return html;
 };
 
 const cacheAssets = async () => {
   const cache = await caches.open(CACHE_NAME);
-  const urls = [...staticAssetUrls(), ...(await buildAssetUrls())];
-  await cache.addAll(urls);
+  const html = await cacheAppShell(cache);
+  await cacheOptionalUrls(cache, [...staticAssetUrls(), ...(await buildAssetUrls(html))]);
 };
 
 const missingCachedUrls = async (cache, urls) => {
@@ -65,12 +88,20 @@ const refreshCachedAppShell = async (response, request) => {
   await Promise.all([
     cache.put(request, response.clone()),
     cache.put(new URL('index.html', self.registration.scope).href, response.clone()),
+    cache.put(scopeUrl(), response.clone()),
   ]);
 
   const missingAssetUrls = await missingCachedUrls(cache, buildAssetUrlsFromHtml(html));
   if (missingAssetUrls.length > 0) {
-    await cache.addAll(missingAssetUrls);
+    await cacheOptionalUrls(cache, missingAssetUrls);
   }
+};
+
+const cachedAppShellResponse = async (request) => {
+  const cache = await caches.open(CACHE_NAME);
+  return (await cache.match(request)) ??
+    (await cache.match(appShellUrl())) ??
+    (await cache.match(scopeUrl()));
 };
 
 self.addEventListener('install', (event) => {
@@ -111,8 +142,7 @@ self.addEventListener('fetch', (event) => {
           return response;
         })
         .catch(async () => {
-          const cache = await caches.open(CACHE_NAME);
-          return (await cache.match(new URL('index.html', self.registration.scope).href)) ?? cache.match(new URL('.', self.registration.scope).href);
+          return (await cachedAppShellResponse(event.request)) ?? Response.error();
         }),
     );
     return;
