@@ -1083,10 +1083,18 @@ select {
   height: 44px;
   justify-content: center;
   position: relative;
+  transition: color 1s ease;
   width: 44px;
+}
 
-  &::before,
-  &::after {
+.heartbeat-pulse-ring {
+  border-radius: inherit;
+  inset: 0;
+  position: absolute;
+}
+
+.heartbeat-pulse-ring::before,
+.heartbeat-pulse-ring::after {
     animation: heartbeat-ring 1.15s ease-out both;
     border: 2px solid currentColor;
     border-radius: inherit;
@@ -1094,25 +1102,36 @@ select {
     inset: 0;
     opacity: 0;
     position: absolute;
-  }
+    transition: border-color 1s ease;
+}
 
-  &::after {
-    animation-delay: 0.18s;
-  }
+.heartbeat-pulse-ring::after {
+  animation-delay: 0.18s;
+}
 
-  span {
-    background: currentColor;
-    border-radius: 999px;
-    box-shadow: 0 0 24px currentColor;
-    height: 16px;
-    width: 16px;
-  }
+.heartbeat-pulse-core {
+  background: currentColor;
+  border-radius: 999px;
+  box-shadow: 0 0 24px currentColor;
+  height: 16px;
+  transition:
+    background-color 1s ease,
+    box-shadow 1s ease;
+  width: 16px;
 }
 
 .heartbeat-pulse-connected,
 .heartbeat-card-connected .heartbeat-graph-line {
   color: $success-text;
 }
+
+.heartbeat-pulse-excellent { color: #16a34a; }
+.heartbeat-pulse-healthy { color: #65a30d; }
+.heartbeat-pulse-steady { color: #ca8a04; }
+.heartbeat-pulse-elevated { color: #f59e0b; }
+.heartbeat-pulse-slow { color: #f97316; }
+.heartbeat-pulse-strained { color: #ea580c; }
+.heartbeat-pulse-critical { color: $danger-text; }
 
 .heartbeat-pulse-checking,
 .heartbeat-card-checking .heartbeat-graph-line {
@@ -1946,6 +1965,10 @@ select {
   }
 
   .button,
+  .heartbeat-pulse,
+  .heartbeat-pulse::before,
+  .heartbeat-pulse::after,
+  .heartbeat-pulse span,
   .heartbeat-graph-tooltip,
   .heartbeat-status-tooltip,
   .skip-link,

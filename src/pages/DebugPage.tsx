@@ -417,6 +417,7 @@ export function DebugPage({
   };
   const latestHeartbeat = heartbeatSamples.at(-1);
   const heartbeatTone = latestHeartbeat?.state ?? backendStatus.state;
+  const heartbeatPulseTone = latestHeartbeat ? heartbeatLatencyTone(latestHeartbeat) : backendStatus.state;
   const heartbeatSlots = heartbeatHistorySlots(heartbeatSamples);
   const heartbeatSampleSlots = heartbeatSlots.filter((slot): slot is HeartbeatHistorySlot & { sample: BackendHeartbeatSample } =>
     slot.sample !== undefined,
@@ -639,11 +640,11 @@ export function DebugPage({
           <div className={`heartbeat-card heartbeat-card-${heartbeatTone}`}>
             <div className={'heartbeat-summary'}>
               <div
-                key={latestHeartbeat?.checkedAt ?? 'waiting'}
-                className={`heartbeat-pulse heartbeat-pulse-${heartbeatTone}`}
+                className={`heartbeat-pulse heartbeat-pulse-${heartbeatPulseTone}`}
                 aria-hidden={'true'}
               >
-                <span />
+                <span key={latestHeartbeat?.checkedAt ?? 'waiting'} className={'heartbeat-pulse-ring'} />
+                <span className={'heartbeat-pulse-core'} />
               </div>
               <div>
                 <h3 className={'title title-xs'}>{messages.pages.debug.heartbeatTitle}</h3>
