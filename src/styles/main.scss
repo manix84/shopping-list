@@ -389,6 +389,16 @@ select {
   }
 }
 
+.debug-table-row-active {
+  background: color-mix(in srgb, $primary 9%, transparent);
+  box-shadow: inset 3px 0 0 $primary;
+
+  th,
+  td {
+    border-bottom-color: color-mix(in srgb, $primary 38%, $border);
+  }
+}
+
 .debug-table-compact {
   min-width: 560px;
 
@@ -1031,7 +1041,7 @@ select {
   border-radius: 8px;
   display: grid;
   gap: 16px;
-  overflow: hidden;
+  overflow: visible;
   padding: 16px;
 }
 
@@ -1134,7 +1144,7 @@ select {
   border: 1px solid $border;
   border-radius: 6px;
   height: 150px;
-  overflow: hidden;
+  overflow: visible;
   position: relative;
 
   svg {
@@ -1185,15 +1195,37 @@ select {
 }
 
 .heartbeat-graph-point {
-  fill: $panel;
-  background: currentColor;
-  border: 1px solid $panel;
+  background: transparent;
+  border: 0;
   border-radius: 999px;
-  box-shadow: 0 0 0 1px currentColor;
-  height: 5px;
+  box-shadow: none;
+  cursor: pointer;
+  height: 22px;
+  margin: 0;
+  padding: 0;
   position: absolute;
   transform: translate(-50%, -50%);
-  width: 5px;
+  width: 22px;
+  z-index: 2;
+
+  &::before {
+    background: currentColor;
+    border: 1px solid $panel;
+    border-radius: inherit;
+    box-shadow: 0 0 0 1px currentColor;
+    content: "";
+    height: 5px;
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 5px;
+  }
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+  }
 }
 
 .heartbeat-graph-point-good {
@@ -1213,10 +1245,105 @@ select {
 }
 
 .heartbeat-graph-point-ghost {
-  background: color-mix(in srgb, $muted 22%, transparent);
-  border-color: color-mix(in srgb, $muted 16%, transparent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, $muted 20%, transparent);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
   color: $muted;
+
+  &::before {
+    background: color-mix(in srgb, $muted 22%, transparent);
+    border-color: color-mix(in srgb, $muted 16%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in srgb, $muted 20%, transparent);
+  }
+}
+
+.heartbeat-graph-point-active::before,
+.heartbeat-graph-point:hover::before,
+.heartbeat-graph-point:focus-visible::before {
+  height: 8px;
+  width: 8px;
+}
+
+.heartbeat-graph-tooltip {
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  bottom: calc(100% + 8px);
+  box-shadow: $shadow;
+  color: $text;
+  display: grid;
+  gap: 2px;
+  left: 50%;
+  min-width: 74px;
+  opacity: 0;
+  padding: 7px 9px;
+  pointer-events: none;
+  position: absolute;
+  text-align: center;
+  transform: translate(-50%, 4px);
+  transition:
+    opacity 0.14s ease,
+    transform 0.14s ease;
+  visibility: hidden;
+  z-index: 4;
+
+  &::after {
+    background: inherit;
+    border-bottom: 1px solid currentColor;
+    border-right: 1px solid currentColor;
+    bottom: -5px;
+    content: "";
+    height: 8px;
+    left: 50%;
+    position: absolute;
+    transform: translateX(-50%) rotate(45deg);
+    width: 8px;
+  }
+
+  strong,
+  span {
+    position: relative;
+    z-index: 1;
+  }
+
+  strong {
+    color: inherit;
+    font-size: 0.8rem;
+    line-height: 1.1;
+  }
+
+  span {
+    color: color-mix(in srgb, currentColor 72%, $panel);
+    font-size: 0.68rem;
+    line-height: 1.1;
+  }
+}
+
+.heartbeat-graph-point-active .heartbeat-graph-tooltip,
+.heartbeat-graph-point:hover .heartbeat-graph-tooltip,
+.heartbeat-graph-point:focus-visible .heartbeat-graph-tooltip {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  visibility: visible;
+}
+
+.heartbeat-graph-tooltip-good {
+  background: color-mix(in srgb, $success-bg 86%, $panel);
+  color: $success-text;
+}
+
+.heartbeat-graph-tooltip-okay {
+  background: color-mix(in srgb, #fef3c7 88%, $panel);
+  color: #9a6a00;
+}
+
+.heartbeat-graph-tooltip-poor {
+  background: color-mix(in srgb, #ffedd5 88%, $panel);
+  color: #b45213;
+}
+
+.heartbeat-graph-tooltip-offline {
+  background: color-mix(in srgb, $danger-bg 88%, $panel);
+  color: $danger-text;
 }
 
 .heartbeat-status-strip {

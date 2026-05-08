@@ -1,4 +1,4 @@
-import { type CSSProperties, type KeyboardEvent } from 'react';
+import { useState, type CSSProperties, type KeyboardEvent } from 'react';
 import type {
   BackendStatus,
   BackendHeartbeatSample,
@@ -327,6 +327,7 @@ export function DebugPage({
   onBackToSettings,
 }: DebugPageProps) {
   const { messages } = useI18n();
+  const [activeHeartbeatSampleKey, setActiveHeartbeatSampleKey] = useState<string | null>(null);
   const runtimeLocation =
     typeof window === 'undefined'
       ? null
@@ -377,7 +378,13 @@ export function DebugPage({
   const heartbeatSlotStyle = {
     '--heartbeat-slot-count': HEARTBEAT_HISTORY_SLOT_COUNT,
   } as CSSProperties;
-  const recentHeartbeatSamples = heartbeatSamples.slice(-8).reverse();
+  const recentHeartbeatSamples = heartbeatSampleSlots.map((slot) => slot.sample).reverse();
+  const activateHeartbeatSample = (sample: BackendHeartbeatSample) => {
+    setActiveHeartbeatSampleKey(sample.checkedAt);
+  };
+  const clearActiveHeartbeatSample = () => {
+    setActiveHeartbeatSampleKey(null);
+  };
   const handleTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
     const lastIndex = debugTabs.length - 1;
     const nextIndex =
@@ -552,8 +559,8 @@ export function DebugPage({
                 </div>
               ) : null}
             </div>
-            <div className={'heartbeat-graph'} aria-hidden={'true'}>
-              <svg viewBox={'0 0 100 100'} preserveAspectRatio={'none'}>
+            <div className={'heartbeat-graph'}>
+              <svg viewBox={'0 0 100 100'} preserveAspectRatio={'none'} aria-hidden={'true'}>
                 <path className={'heartbeat-graph-grid'} d={'M0 25 H100 M0 50 H100 M0 75 H100'} />
                 <line className={'heartbeat-graph-ghost-line'} x1={'0'} y1={'50'} x2={'100'} y2={'50'} />
                 {firstHeartbeatSampleSlot && firstHeartbeatSampleSlot.index > 0 ? (
@@ -584,12 +591,36 @@ export function DebugPage({
               {heartbeatSlots.map((slot) => {
                 const { x, y } = heartbeatPoint(slot);
                 const tone = slot.sample ? heartbeatLatencyTone(slot.sample) : 'ghost';
+                const isActive = slot.sample?.checkedAt === activeHeartbeatSampleKey;
+                if (!slot.sample) {
+                  return (
+                    <span
+                      key={`heartbeat-ghost-${slot.index}`}
+                      className={'heartbeat-graph-point heartbeat-graph-point-ghost'}
+                      style={{ left: `${x}%`, top: `${y}%` }}
+                      aria-hidden={'true'}
+                    />
+                  );
+                }
+
+                const sample = slot.sample;
                 return (
-                  <span
-                    key={slot.sample ? `${slot.sample.checkedAt}-${slot.index}` : `heartbeat-ghost-${slot.index}`}
-                    className={`heartbeat-graph-point heartbeat-graph-point-${tone}`}
+                  <button
+                    key={`${sample.checkedAt}-${slot.index}`}
+                    type={'button'}
+                    className={`heartbeat-graph-point heartbeat-graph-point-${tone} ${isActive ? 'heartbeat-graph-point-active' : ''}`}
                     style={{ left: `${x}%`, top: `${y}%` }}
-                  />
+                    aria-label={`${messages.pages.debug.heartbeatLatency}: ${sample.latencyMs}ms, ${messages.pages.debug.heartbeatLastChecked}: ${formatHeartbeatTime(sample.checkedAt)}`}
+                    onMouseEnter={() => activateHeartbeatSample(sample)}
+                    onMouseLeave={clearActiveHeartbeatSample}
+                    onFocus={() => activateHeartbeatSample(sample)}
+                    onBlur={clearActiveHeartbeatSample}
+                  >
+                    <span className={`heartbeat-graph-tooltip heartbeat-graph-tooltip-${tone}`} role={'tooltip'}>
+                      <strong>{sample.latencyMs}ms</strong>
+                      <span>{formatHeartbeatTime(sample.checkedAt)}</span>
+                    </span>
+                  </button>
                 );
               })}
             </div>
@@ -656,7 +687,10 @@ export function DebugPage({
                   </tr>
                 ) : (
                   recentHeartbeatSamples.map((sample, index) => (
-                    <tr key={`${sample.checkedAt}-row-${index}`}>
+                    <tr
+                      key={`${sample.checkedAt}-row-${index}`}
+                      className={sample.checkedAt === activeHeartbeatSampleKey ? 'debug-table-row-active' : undefined}
+                    >
                       <td>{formatHeartbeatTime(sample.checkedAt)}</td>
                       <td>{backendStateLabel({ ...backendStatus, state: sample.state }, messages)}</td>
                       <td>{checkLabel(sample.healthOk, messages)}</td>
