@@ -43,9 +43,6 @@ const backendStatus: BackendStatus = {
   database: {
     ok: true,
     adapter: 'postgres',
-    settingsExists: true,
-    settingsCountryCode: 'uk',
-    shoppingListExists: true,
     sharedListCount: 2,
     updatedAt: new Date(now).toISOString(),
   },

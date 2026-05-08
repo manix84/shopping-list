@@ -109,11 +109,6 @@ export type ShoppingListRecord = {
   countryCode: CountryCode;
 };
 
-export type AppSettingsRecord = {
-  countryCode: CountryCode;
-  updatedAt: string;
-};
-
 export type SharedListHistoryEntry = {
   listId: string;
   listName?: string;
@@ -286,10 +281,6 @@ export type BackendStatus = {
   database: {
     ok: boolean;
     adapter?: BackendDatabaseAdapter;
-    settingsExists?: boolean;
-    settingsCountryCode?: CountryCode;
-    settingsUpdatedAt?: string;
-    shoppingListExists?: boolean;
     updatedAt?: string;
     sharedListCount?: number;
     error?: string;

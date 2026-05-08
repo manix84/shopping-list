@@ -4,9 +4,7 @@ import { parseItems } from '../parser';
 import {
   checkBackendStatus,
   clearSharedShoppingList,
-  loadAppSettings,
   loadSharedShoppingList,
-  saveAppSettings,
   saveSharedShoppingList,
 } from './apiRepository';
 
@@ -36,10 +34,6 @@ describe('apiRepository', () => {
             database: {
               ok: true,
               adapter: 'postgres',
-              settingsExists: true,
-              settingsCountryCode: 'fr',
-              settingsUpdatedAt: '2026-04-22T00:00:00.000Z',
-              shoppingListExists: true,
               updatedAt: '2026-04-22T01:00:00.000Z',
               sharedListCount: 3,
             },
@@ -55,10 +49,6 @@ describe('apiRepository', () => {
       database: {
         ok: true,
         adapter: 'postgres',
-        settingsExists: true,
-        settingsCountryCode: 'fr',
-        settingsUpdatedAt: '2026-04-22T00:00:00.000Z',
-        shoppingListExists: true,
         updatedAt: '2026-04-22T01:00:00.000Z',
         sharedListCount: 3,
       },
@@ -121,9 +111,6 @@ describe('apiRepository', () => {
             database: {
               ok: true,
               path: '/redacted/shopping-list-db.json',
-              settingsExists: true,
-              settingsCountryCode: 'uk',
-              shoppingListExists: true,
               sharedListCount: 1,
             },
           }),
@@ -150,59 +137,6 @@ describe('apiRepository', () => {
       health: { ok: false },
       database: { ok: false },
     });
-  });
-
-  it('loads app settings with country and timestamp fallbacks', async () => {
-    stubBrowserApi();
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue(
-        new Response(
-          JSON.stringify({
-            exists: true,
-            record: {
-              countryCode: 'not-supported',
-              updatedAt: 123,
-            },
-          }),
-          { status: 200 },
-        ),
-      ),
-    );
-
-    await expect(loadAppSettings()).resolves.toEqual({
-      exists: true,
-      record: {
-        countryCode: 'uk',
-        updatedAt: '1970-01-01T00:00:00.000Z',
-      },
-    });
-  });
-
-  it('throws when app settings cannot be loaded or saved', async () => {
-    stubBrowserApi();
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('{}', { status: 500 })));
-
-    await expect(loadAppSettings()).rejects.toThrow('Unable to load app settings: 500');
-    await expect(saveAppSettings({ countryCode: 'uk', updatedAt: '2026-04-22T00:00:00.000Z' })).rejects.toThrow(
-      'Unable to save app settings: 500',
-    );
-  });
-
-  it('saves app settings with a PUT request', async () => {
-    stubBrowserApi();
-    const fetchMock = vi.fn().mockResolvedValue(new Response('{}', { status: 200 }));
-    vi.stubGlobal('fetch', fetchMock);
-
-    await saveAppSettings({ countryCode: 'nl', updatedAt: '2026-04-22T00:00:00.000Z' });
-
-    expect(fetchMock).toHaveBeenCalledWith(
-      '/api/settings',
-      expect.objectContaining({
-        method: 'PUT',
-        body: JSON.stringify({ countryCode: 'nl', updatedAt: '2026-04-22T00:00:00.000Z' }),
-      }),
-    );
   });
 
   it('loads valid shared-list payloads from the backend', async () => {

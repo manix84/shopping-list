@@ -938,12 +938,8 @@ export function DebugPage({
             expected={messages.pages.debug.databaseExpected}
             actual={
               backendStatus.database.ok
-                ? `${messages.labels.available}, ${messages.labels.defaultList} ${
-                    backendStatus.database.shoppingListExists ? messages.labels.exists : messages.labels.empty
-                  }, ${messages.labels.sharedLists} ${
+                ? `${messages.labels.available}, ${messages.labels.sharedLists} ${
                     backendStatus.database.sharedListCount ?? 0
-                  }, ${messages.labels.countryProfile} ${
-                    backendStatus.database.settingsCountryCode ?? messages.labels.unknown
                   }, ${messages.labels.updated} ${backendStatus.database.updatedAt ?? messages.labels.unknown}`
                 : `${messages.labels.state} ${backendStateLabel(backendStatus, messages)}`
             }
@@ -963,16 +959,6 @@ export function DebugPage({
                   <td>
                     {backendStatus.database.adapter
                       ? databaseAdapterLabel(backendStatus, messages)
-                      : messages.pages.debug.unavailable}
-                  </td>
-                </tr>
-                <tr>
-                  <th scope={'row'}>{messages.labels.defaultList}</th>
-                  <td>
-                    {typeof backendStatus.database.shoppingListExists === 'boolean'
-                      ? backendStatus.database.shoppingListExists
-                        ? messages.labels.exists
-                        : messages.labels.empty
                       : messages.pages.debug.unavailable}
                   </td>
                 </tr>

@@ -4,19 +4,14 @@ import { createServer } from 'node:http';
 import { extname, join, resolve } from 'node:path';
 import {
   clearSharedList,
-  clearShoppingList,
   createSharedList,
   getDatabaseStatus,
-  getSettings,
   getSharedList,
-  getShoppingList,
   isSharedListId,
-  saveSettings,
   saveSharedList,
-  saveShoppingList,
 } from './database.mjs';
 import { callShoppingListService, getHomeAssistantStatus, pushRecordToHomeAssistant } from './homeAssistant.mjs';
-import { isSettingsRecord, isShoppingListRecord } from './validation.mjs';
+import { isShoppingListRecord } from './validation.mjs';
 
 const port = Number(process.env.PORT ?? 8787);
 const distDir = resolve('dist');
@@ -99,43 +94,6 @@ const handleApi = async (request, response, path) => {
     return;
   }
 
-  if (request.method === 'GET' && path === '/api/settings') {
-    sendJson(response, 200, await getSettings());
-    return;
-  }
-
-  if (request.method === 'PUT' && path === '/api/settings') {
-    const record = await readJsonBody(request);
-    if (!isSettingsRecord(record)) {
-      sendJson(response, 400, { error: 'Invalid settings record' });
-      return;
-    }
-
-    sendJson(response, 200, await saveSettings(record));
-    return;
-  }
-
-  if (request.method === 'GET' && path === '/api/shopping-list') {
-    sendJson(response, 200, await getShoppingList());
-    return;
-  }
-
-  if (request.method === 'PUT' && path === '/api/shopping-list') {
-    const record = await readJsonBody(request);
-    if (!isShoppingListRecord(record)) {
-      sendJson(response, 400, { error: 'Invalid shopping list record' });
-      return;
-    }
-
-    sendJson(response, 200, await saveShoppingList(record));
-    return;
-  }
-
-  if (request.method === 'DELETE' && path === '/api/shopping-list') {
-    sendJson(response, 200, await clearShoppingList());
-    return;
-  }
-
   if (request.method === 'POST' && path === '/api/shared-lists') {
     const body = await readJsonBody(request);
     if (!isShoppingListRecord(body.record)) {
@@ -190,7 +148,12 @@ const handleApi = async (request, response, path) => {
 
     if (request.method === 'POST' && path === '/api/home-assistant/sync') {
       const body = await readJsonBody(request);
-      const record = isShoppingListRecord(body.record) ? body.record : (await getShoppingList()).record;
+      if (!isShoppingListRecord(body.record)) {
+        sendJson(response, 400, { error: 'A valid record is required to sync Home Assistant' });
+        return;
+      }
+
+      const record = body.record;
       const actions = await pushRecordToHomeAssistant(record);
       sendJson(response, 200, { ok: true, actions });
       return;

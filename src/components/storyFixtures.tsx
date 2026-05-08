@@ -49,7 +49,7 @@ export const sampleSection: GroupedSectionView = {
 export const connectedBackend: BackendStatus = {
   state: 'connected',
   health: { ok: true },
-  database: { ok: true, settingsExists: true, settingsCountryCode: 'uk' },
+  database: { ok: true },
 };
 
 export const offlineBackend: BackendStatus = {
