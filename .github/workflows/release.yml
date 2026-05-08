@@ -1,0 +1,51 @@
+name: Release
+run-name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve release metadata
+        id: metadata
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          tag="v${version}"
+          if git rev-parse "${tag}" >/dev/null 2>&1; then
+            tag="${tag}-${GITHUB_SHA::7}"
+          fi
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          echo "tag=${tag}" >> "$GITHUB_OUTPUT"
+
+      - name: Create tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "${{ steps.metadata.outputs.tag }}" -m "Release ${{ steps.metadata.outputs.tag }}" "${GITHUB_SHA}"
+          git push origin "${{ steps.metadata.outputs.tag }}"
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ steps.metadata.outputs.tag }}" \
+            --title "Smart Shopping List ${{ steps.metadata.outputs.tag }}" \
+            --notes-file WHATSNEW.md \
+            --target "${GITHUB_SHA}"

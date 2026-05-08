@@ -8,6 +8,7 @@ Keep this file updated when user-visible features, platform changes, major parse
 - Added shared-list server-sent events so open backend-backed lists can apply remote changes automatically, with slower polling kept as a fallback.
 - Consolidated backend persistence around `shared_lists`, with each shared-list record carrying its own country profile and list metadata.
 - Added a Debug database-entry tab for the current backend-backed shared-list JSON and an Events trigger to preview the update reload overlay.
+- Added automatic git tags and GitHub Releases for every push to `main`.
 - Added a development-only `[Dev]` browser title suffix so local tabs are easier to distinguish from production.
 - Added backend operation status tracking so Debug tools can show when the app is loading, reconnecting, using backend storage, falling back to LocalStorage, or hitting a backend save failure.
 - Expanded the Backend debug tab with heartbeat history, status timeline bars, latency, health/database check results, adapter details, and recent operation details.

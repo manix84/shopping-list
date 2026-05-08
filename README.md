@@ -369,9 +369,11 @@ The app version shown on the About page comes from `package.json`. Use `npm run 
 
 The repo installs `.githooks/pre-commit` through `npm run prepare`. The pre-commit hook runs lint, applies the configured automatic version bump, and stages `package.json` plus `package-lock.json`. Set `VERSION_BUMP=major`, `VERSION_BUMP=minor`, or `VERSION_BUMP=patch` when you need to control the bump for a specific commit.
 
+Pushes to `main` automatically create an annotated git tag and GitHub Release. The release workflow uses `v<package.json version>` as the tag when it is available, and falls back to a SHA-suffixed tag if that version tag already exists so every `main` push still has a release point.
+
 ## 🚢 Deployment
 
-The repo includes a GitHub Actions workflow in `.github/workflows/deploy-gh-pages.yml` that builds on push to `main` and publishes `dist/` to GitHub Pages. The production build copies `dist/index.html` to `dist/404.html` so direct path-based SPA links work when opened or refreshed on GitHub Pages.
+The repo includes GitHub Actions workflows that build on push to `main`, publish `dist/` to GitHub Pages, and create a GitHub Release for the pushed commit. The production build copies `dist/index.html` to `dist/404.html` so direct path-based SPA links work when opened or refreshed on GitHub Pages.
 
 ## 🧱 Project structure
 
