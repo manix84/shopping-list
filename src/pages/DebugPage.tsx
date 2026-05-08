@@ -1,4 +1,4 @@
-import { useState, type CSSProperties, type KeyboardEvent } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
 import type {
   BackendStatus,
   BackendHeartbeatSample,
@@ -332,7 +332,10 @@ export function DebugPage({
   onBackToSettings,
 }: DebugPageProps) {
   const { messages } = useI18n();
-  const [activeHeartbeatSampleKey, setActiveHeartbeatSampleKey] = useState<string | null>(null);
+  const [hoveredHeartbeatSampleKey, setHoveredHeartbeatSampleKey] = useState<string | null>(null);
+  const [lockedHeartbeatSampleKey, setLockedHeartbeatSampleKey] = useState<string | null>(null);
+  const heartbeatHistoryWrapRef = useRef<HTMLDivElement | null>(null);
+  const heartbeatHistoryRowRefs = useRef(new Map<string, HTMLTableRowElement>());
   const runtimeLocation =
     typeof window === 'undefined'
       ? null
@@ -381,12 +384,46 @@ export function DebugPage({
   );
   const firstHeartbeatSampleSlot = heartbeatSampleSlots[0];
   const recentHeartbeatSamples = heartbeatSampleSlots.map((slot) => slot.sample).reverse();
+  const activeHeartbeatSampleKey = lockedHeartbeatSampleKey ?? hoveredHeartbeatSampleKey;
   const activateHeartbeatSample = (sample: BackendHeartbeatSample) => {
-    setActiveHeartbeatSampleKey(sample.checkedAt);
+    setHoveredHeartbeatSampleKey(sample.checkedAt);
   };
   const clearActiveHeartbeatSample = () => {
-    setActiveHeartbeatSampleKey(null);
+    setHoveredHeartbeatSampleKey(null);
   };
+  const lockHeartbeatSample = (sample: BackendHeartbeatSample) => {
+    setLockedHeartbeatSampleKey(sample.checkedAt);
+  };
+
+  useEffect(() => {
+    if (!activeHeartbeatSampleKey) { return; }
+
+    const wrap = heartbeatHistoryWrapRef.current;
+    const row = heartbeatHistoryRowRefs.current.get(activeHeartbeatSampleKey);
+    if (!wrap || !row) { return; }
+
+    const nextScrollTop = row.offsetTop - (wrap.clientHeight / 2) + (row.clientHeight / 2);
+    wrap.scrollTo({
+      top: Math.max(0, nextScrollTop),
+      behavior: 'smooth',
+    });
+  }, [activeHeartbeatSampleKey]);
+
+  useEffect(() => {
+    if (typeof document === 'undefined') { return undefined; }
+
+    const clearLockedHeartbeatSample = (event: PointerEvent) => {
+      const target = event.target;
+      if (target instanceof Element && target.closest('.heartbeat-graph-point')) { return; }
+
+      setHoveredHeartbeatSampleKey(null);
+      setLockedHeartbeatSampleKey(null);
+    };
+
+    document.addEventListener('pointerdown', clearLockedHeartbeatSample);
+    return () => document.removeEventListener('pointerdown', clearLockedHeartbeatSample);
+  }, []);
+
   const handleTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
     const lastIndex = debugTabs.length - 1;
     const nextIndex =
@@ -578,10 +615,13 @@ export function DebugPage({
                   const previousSlot = heartbeatSampleSlots[index];
                   const previousPoint = heartbeatPoint(previousSlot);
                   const nextPoint = heartbeatPoint(slot);
+                  const isLineActive =
+                    previousSlot.sample.checkedAt === activeHeartbeatSampleKey ||
+                    slot.sample.checkedAt === activeHeartbeatSampleKey;
                   return (
                     <line
                       key={`${slot.sample.checkedAt}-${slot.index}`}
-                      className={`heartbeat-graph-line heartbeat-graph-line-${heartbeatLatencyTone(slot.sample)}`}
+                      className={`heartbeat-graph-line heartbeat-graph-line-${heartbeatLatencyTone(slot.sample)} ${isLineActive ? 'heartbeat-graph-line-active' : ''}`}
                       x1={previousPoint.x}
                       y1={previousPoint.y}
                       x2={nextPoint.x}
@@ -613,10 +653,12 @@ export function DebugPage({
                     className={`heartbeat-graph-point heartbeat-graph-point-${tone} ${isActive ? 'heartbeat-graph-point-active' : ''}`}
                     style={{ left: `${x}%`, top: `${y}%` }}
                     aria-label={`${messages.pages.debug.heartbeatLatency}: ${sample.latencyMs}ms, ${messages.pages.debug.heartbeatLastChecked}: ${formatHeartbeatTime(sample.checkedAt)}`}
+                    aria-pressed={sample.checkedAt === lockedHeartbeatSampleKey}
                     onMouseEnter={() => activateHeartbeatSample(sample)}
                     onMouseLeave={clearActiveHeartbeatSample}
                     onFocus={() => activateHeartbeatSample(sample)}
                     onBlur={clearActiveHeartbeatSample}
+                    onClick={() => lockHeartbeatSample(sample)}
                   >
                     <span className={`heartbeat-graph-tooltip heartbeat-graph-tooltip-${tone}`} role={'tooltip'}>
                       <strong>{sample.latencyMs}ms</strong>
@@ -672,9 +714,12 @@ export function DebugPage({
               </tbody>
             </table>
           </div>
-          <div className={'table-wrap'}>
-            <table className={'debug-table debug-table-compact'}>
-              <caption>{messages.pages.debug.heartbeatStatusHistory}</caption>
+          <div className={'heartbeat-status-history'}>
+            <div className={'debug-table-title'} id={'heartbeat-status-history-title'}>
+              {messages.pages.debug.heartbeatStatusHistory}
+            </div>
+            <div className={'table-wrap heartbeat-status-history-wrap'} ref={heartbeatHistoryWrapRef}>
+              <table className={'debug-table debug-table-compact'} aria-labelledby={'heartbeat-status-history-title'}>
               <thead>
                 <tr>
                   <th scope={'col'}>{messages.pages.debug.heartbeatLastChecked}</th>
@@ -694,6 +739,13 @@ export function DebugPage({
                   recentHeartbeatSamples.map((sample, index) => (
                     <tr
                       key={`${sample.checkedAt}-row-${index}`}
+                      ref={(node) => {
+                        if (node) {
+                          heartbeatHistoryRowRefs.current.set(sample.checkedAt, node);
+                        } else {
+                          heartbeatHistoryRowRefs.current.delete(sample.checkedAt);
+                        }
+                      }}
                       className={sample.checkedAt === activeHeartbeatSampleKey ? 'debug-table-row-active' : undefined}
                     >
                       <td>{formatHeartbeatTime(sample.checkedAt)}</td>
@@ -710,7 +762,8 @@ export function DebugPage({
                   ))
                 )}
               </tbody>
-            </table>
+              </table>
+            </div>
           </div>
           <TestResultCard
             title={messages.pages.debug.databaseTypeTitle}

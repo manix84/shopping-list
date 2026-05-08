@@ -356,6 +356,19 @@ select {
   overflow-x: auto;
 }
 
+.heartbeat-status-history-wrap {
+  height: 350px;
+  overflow: auto;
+}
+
+.debug-table-title {
+  color: $text;
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 0 0 8px;
+  text-align: left;
+}
+
 .debug-table {
   border-collapse: collapse;
   min-width: 720px;
@@ -397,6 +410,13 @@ select {
   td {
     border-bottom-color: color-mix(in srgb, $primary 38%, $border);
   }
+}
+
+.heartbeat-status-history-wrap .debug-table thead th {
+  background: $panel;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 .debug-table-compact {
@@ -1176,6 +1196,11 @@ select {
   stroke-linejoin: round;
   stroke-width: 2.6;
   vector-effect: non-scaling-stroke;
+}
+
+.heartbeat-graph-line-active {
+  filter: drop-shadow(0 0 5px currentColor);
+  stroke-width: 4;
 }
 
 .heartbeat-graph-line-good {
