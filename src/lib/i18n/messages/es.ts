@@ -157,6 +157,7 @@ export const es: Messages = {
     about: {
       tagline: 'Un planificador gratuito de rutas de compra que respeta tu privacidad.',
       versionLabel: 'Versión',
+      updateAvailableAction: 'Actualización disponible',
       hostLabel: 'Host',
       authorLabel: 'Creado por',
       authorValue: 'Rob',

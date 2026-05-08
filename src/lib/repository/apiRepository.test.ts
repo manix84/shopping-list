@@ -31,6 +31,7 @@ describe('apiRepository', () => {
           JSON.stringify({
             ok: true,
             mode: 'backend',
+            version: '0.16.58',
             database: {
               ok: true,
               adapter: 'postgres',
@@ -45,7 +46,7 @@ describe('apiRepository', () => {
 
     await expect(checkBackendStatus()).resolves.toEqual({
       state: 'connected',
-      health: { ok: true, mode: 'backend' },
+      health: { ok: true, mode: 'backend', version: '0.16.58' },
       database: {
         ok: true,
         adapter: 'postgres',

@@ -279,6 +279,7 @@ export type BackendStatus = {
   health: {
     ok: boolean;
     mode?: string;
+    version?: string;
   };
   database: {
     ok: boolean;

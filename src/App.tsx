@@ -55,8 +55,9 @@ import { extractSharedListId } from './lib/sharedLinks';
 import { cleanLine, stripDisplaySizeLabel } from './lib/stringUtils';
 import { loadRouteViewMode, saveRouteViewMode } from './lib/routeViewPreference';
 import { getResolvedTheme, loadThemeMode, saveThemeMode } from './lib/themePreference';
-import { previewUpdateReloadOverlay } from './lib/updateReloadOverlay';
+import { previewUpdateReloadOverlay, showUpdateReloadOverlayForReload, UPDATE_RELOAD_FADE_MS } from './lib/updateReloadOverlay';
 import { createUuidV7 } from './lib/uuid';
+import { appVersion } from './version';
 import { formatCountQuantity } from './lib/quantity';
 import { extractVariant } from './lib/variant';
 import { AboutPage } from './pages/AboutPage';
@@ -84,6 +85,7 @@ const DEBUG_NOTIFICATION_LIST_ID = 'debug-notifications';
 const DEBUG_MODE_NOTICE_DURATION_MS = 4_000;
 const DEV_TITLE_SUFFIX = ' [Dev]';
 const DEV_MANIFEST_ID = 'smart-shopping-list-dev';
+const APP_VERSION_RELOAD_SESSION_KEY = 'smart-shopping-list-version-reload-v1';
 type NotificationDeliveryResult = DebugNotificationDeliveryPath;
 const debugNotificationStatusFromDelivery = (
   result: NotificationDeliveryResult,
@@ -448,6 +450,22 @@ const timestampValue = (value: string | undefined): number => {
   return Number.isFinite(parsed) ? parsed : 0;
 };
 
+const sessionValue = (key: string): string | undefined => {
+  try {
+    return window.sessionStorage.getItem(key) ?? undefined;
+  } catch {
+    return undefined;
+  }
+};
+
+const saveSessionValue = (key: string, value: string): void => {
+  try {
+    window.sessionStorage.setItem(key, value);
+  } catch {
+    // Non-fatal: callers should still complete their primary action without persistence.
+  }
+};
+
 function updateItemTextInInput(input: string, previousDisplay: string, nextDisplay: string): string {
   const lines = input.split('\n');
   const index = lines.findIndex((line) => cleanLine(line) === cleanLine(previousDisplay));
@@ -511,6 +529,8 @@ export default function App() {
   const lastBackendPersistedRecordRef = useRef<ShoppingListRecord>();
   const pendingBackendSaveRecordRef = useRef<ShoppingListRecord>();
   const currentShoppingListStateRef = useRef<CurrentShoppingListState>();
+  const appVersionReloadRequestedRef = useRef(false);
+  const pendingAppVersionReloadRef = useRef<string>();
   const skipNextAutosaveRef = useRef(false);
   const remoteSyncStatusTimerRef = useRef<number>();
   const suppressNextAutosaveStatusRef = useRef(true);
@@ -565,6 +585,52 @@ export default function App() {
     };
   }, [activeListId, canUseBackend, countryCode, input, isServerBackedList, items, listName, storageMode]);
   const shareErrorMessage = shareError ? messages.sharing[shareError] : undefined;
+
+  const canAutoReloadWithoutInterrupting = () =>
+    typeof document === 'undefined' ||
+    document.visibilityState !== 'visible' ||
+    (typeof document.hasFocus === 'function' && !document.hasFocus());
+
+  const requestAppVersionReload = useCallback((backendVersion: string | undefined, force = false) => {
+    if (
+      !backendVersion ||
+      backendVersion === appVersion ||
+      appVersionReloadRequestedRef.current ||
+      (!force && sessionValue(APP_VERSION_RELOAD_SESSION_KEY) === backendVersion)
+    ) { return; }
+
+    if (!force && !canAutoReloadWithoutInterrupting()) {
+      pendingAppVersionReloadRef.current = backendVersion;
+      return;
+    }
+
+    appVersionReloadRequestedRef.current = true;
+    pendingAppVersionReloadRef.current = undefined;
+    saveSessionValue(APP_VERSION_RELOAD_SESSION_KEY, backendVersion);
+    showUpdateReloadOverlayForReload();
+    window.setTimeout(() => window.location.reload(), UPDATE_RELOAD_FADE_MS);
+  }, []);
+
+  useEffect(() => {
+    const flushPendingAppVersionReload = () => {
+      if (canAutoReloadWithoutInterrupting()) {
+        requestAppVersionReload(pendingAppVersionReloadRef.current);
+      }
+    };
+    const handleVisibilityChange = () => {
+      if (document.visibilityState !== 'visible') {
+        flushPendingAppVersionReload();
+      }
+    };
+
+    window.addEventListener('blur', flushPendingAppVersionReload);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener('blur', flushPendingAppVersionReload);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [requestAppVersionReload]);
 
   useEffect(() => {
     currentItemsRef.current = items;
@@ -1237,6 +1303,7 @@ export default function App() {
       if (!cancelled) {
         setBackendStatus(initialBackendStatus);
         recordBackendHeartbeat(initialBackendStatus, initialHeartbeatStartedAt);
+        requestAppVersionReload(initialBackendStatus.health.version);
       }
 
       if (initialBackendStatus.state !== 'connected' && nextServerBacked && !debugSettings.forceLocalStorage) {
@@ -1326,6 +1393,7 @@ export default function App() {
     debugSettings.forceLocalStorage,
     listId,
     recordBackendHeartbeat,
+    requestAppVersionReload,
   ]);
 
   useEffect(() => {
@@ -1363,6 +1431,7 @@ export default function App() {
 
         setBackendStatus(nextBackendStatus);
         const sample = recordBackendHeartbeat(nextBackendStatus, heartbeatStartedAt);
+        requestAppVersionReload(nextBackendStatus.health.version);
         verboseDebugLog('backend heartbeat', {
           state: nextBackendStatus.state,
           adapter: nextBackendStatus.database.adapter,
@@ -1407,7 +1476,7 @@ export default function App() {
       window.removeEventListener('offline', requestImmediateHeartbeat);
       document.removeEventListener('visibilitychange', requestVisibleHeartbeat);
     };
-  }, [debugSettings.pauseBackendHeartbeat, isLoaded, recordBackendHeartbeat, verboseDebugLog]);
+  }, [debugSettings.pauseBackendHeartbeat, isLoaded, recordBackendHeartbeat, requestAppVersionReload, verboseDebugLog]);
 
   useEffect(() => {
     if (
@@ -2317,8 +2386,10 @@ export default function App() {
             {visiblePage === 'about' ? (
               <AboutPage
                 isDebugMode={isDebugMode}
+                isUpdateAvailable={Boolean(backendStatus.health.version && backendStatus.health.version !== appVersion)}
                 onEnableDebugMode={enableDebugMode}
                 onAlreadyDebugMode={showAlreadyDebugModeNotice}
+                onRefreshUpdate={() => requestAppVersionReload(backendStatus.health.version, true)}
               />
             ) : null}
 

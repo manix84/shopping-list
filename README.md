@@ -213,7 +213,7 @@ Backend utility routes:
 - `GET /api/health` - includes backend health and database status
 - `GET /api/database/status` - compatibility route for database status only
 
-Backend records are validated before they are stored. Shopping-list timestamps must use canonical ISO format, country codes must match the supported country profiles, and persisted section keys must be known route sections.
+The health payload also includes the backend app version. The frontend compares that with its built version during backend checks and shows the update reload overlay before refreshing if a newer backend/app revision is detected. Backend records are validated before they are stored. Shopping-list timestamps must use canonical ISO format, country codes must match the supported country profiles, and persisted section keys must be known route sections.
 
 ## 🛠️ Debug tools
 
@@ -314,7 +314,7 @@ On supported browsers you can install the app with the browser's install action:
 ### PWA notes
 
 - the app shell, core icons, and built JS/CSS are cached for offline navigation after the service worker has installed
-- online launches and resumes check for updated app assets; when an update reload is needed, a theme-aware translucent overlay with a spinner is shown across the reload
+- online launches and resumes check for updated app assets and backend version changes; when an update reload is needed, a theme-aware translucent overlay with a spinner is shown across the reload
 - the app works offline with local storage even without the backend
 - backend-backed shared lists still need network access to validate, refresh, or load remote list data
 - shared-list notifications are opt-in, only cover item additions while the app/PWA is running, and use service-worker/browser notification delivery with grouped notification tags so later additions update the existing notification silently where the browser supports it

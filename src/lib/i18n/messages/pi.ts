@@ -160,6 +160,7 @@ export const pi: Messages = {
     about: {
       tagline: 'A free, privacy-minded grocery route planner fer yer market run.',
       versionLabel: 'Version',
+      updateAvailableAction: 'Update available',
       hostLabel: 'Host',
       authorLabel: 'Built by',
       authorValue: 'Rob',

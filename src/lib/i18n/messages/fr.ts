@@ -163,6 +163,7 @@ export const fr: Messages = {
     about: {
       tagline: 'Un planificateur de parcours de courses gratuit et respectueux de la vie privée.',
       versionLabel: 'Version',
+      updateAvailableAction: 'Mise à jour disponible',
       hostLabel: 'Hôte',
       authorLabel: 'Créé par',
       authorValue: 'Rob',

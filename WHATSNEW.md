@@ -5,6 +5,7 @@ Keep this file updated when user-visible features, platform changes, major parse
 ## 0.16.x - Current - Backend Visibility, Notifications, and Sauce Routing
 
 - Added automatic PWA update checks so online app launches, resumes, and navigations refresh cached static assets, show a theme-aware translucent spinner overlay across update reloads, and move onto the latest built revision.
+- Added backend-version update detection from `/api/health`, with automatic refresh deferred until the app is hidden/unfocused and a manual About-page update link when versions differ.
 - Added shared-list server-sent events so open backend-backed lists can apply remote changes automatically, with slower polling kept as a fallback.
 - Consolidated backend persistence around `shared_lists`, with each shared-list record carrying its own country profile and list metadata.
 - Added a Debug database-entry tab for the current backend-backed shared-list JSON and an Events trigger to preview the update reload overlay.
