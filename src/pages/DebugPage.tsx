@@ -455,6 +455,15 @@ export function DebugPage({
     setLockedHeartbeatSampleKey(sample.checkedAt);
     setLockedHeartbeatSurface(surface);
   };
+  const handleHeartbeatHistoryRowKeyDown = (
+    event: KeyboardEvent<HTMLTableRowElement>,
+    sample: BackendHeartbeatSample,
+  ) => {
+    if (event.key !== 'Enter' && event.key !== ' ') { return; }
+
+    event.preventDefault();
+    lockHeartbeatSample(sample, 'history');
+  };
   const visibleGraphTooltipKey = lockedHeartbeatSurface === 'graph'
     ? lockedHeartbeatSampleKey
     : hoveredHeartbeatSurface === 'graph' ? hoveredHeartbeatSampleKey : null;
@@ -667,140 +676,143 @@ export function DebugPage({
                 </div>
               ) : null}
             </div>
-            <div className={'heartbeat-graph'}>
-              <div className={'heartbeat-graph-axis'} aria-hidden={'true'}>
-                {heartbeatAxisTicks.map((latencyMs) => (
-                  <span
-                    key={latencyMs}
-                    className={'heartbeat-graph-axis-tick'}
-                    style={{ top: `${heartbeatLatencyY(latencyMs, heartbeatGraphMaxLatencyMs)}%` }}
-                  >
-                    {formatHeartbeatAxisTick(latencyMs)}
-                  </span>
-                ))}
-              </div>
-              <svg viewBox={'0 0 100 100'} preserveAspectRatio={'none'} aria-hidden={'true'}>
-                <defs>
+            <div className={'heartbeat-chart-scroll'} role={'group'} aria-label={messages.pages.debug.heartbeatTitle}>
+              <div className={'heartbeat-graph'}>
+                <div className={'heartbeat-graph-axis'} aria-hidden={'true'}>
+                  {heartbeatAxisTicks.map((latencyMs) => (
+                    <span
+                      key={latencyMs}
+                      className={'heartbeat-graph-axis-tick'}
+                      style={{ top: `${heartbeatLatencyY(latencyMs, heartbeatGraphMaxLatencyMs)}%` }}
+                    >
+                      {formatHeartbeatAxisTick(latencyMs)}
+                    </span>
+                  ))}
+                </div>
+                <svg viewBox={'0 0 100 100'} preserveAspectRatio={'none'} aria-hidden={'true'}>
+                  <defs>
+                    {heartbeatLineSegments.map((segment) => (
+                      <linearGradient
+                        key={segment.gradientId}
+                        id={segment.gradientId}
+                        gradientUnits={'userSpaceOnUse'}
+                        x1={segment.previousPoint.x}
+                        y1={segment.previousPoint.y}
+                        x2={segment.nextPoint.x}
+                        y2={segment.nextPoint.y}
+                      >
+                        <stop offset={'0%'} stopColor={segment.previousColor} />
+                        <stop offset={'100%'} stopColor={segment.nextColor} />
+                      </linearGradient>
+                    ))}
+                  </defs>
+                  <path className={'heartbeat-graph-grid'} d={'M0 25 H100 M0 50 H100 M0 75 H100'} />
+                  <line className={'heartbeat-graph-ghost-line'} x1={'0'} y1={'50'} x2={'100'} y2={'50'} />
+                  {firstHeartbeatSampleSlot && firstHeartbeatSampleSlot.index > 0 ? (
+                    <line
+                      className={'heartbeat-graph-ghost-line'}
+                      x1={heartbeatPoint({ index: firstHeartbeatSampleSlot.index - 1 }, heartbeatGraphMaxLatencyMs).x}
+                      y1={'50'}
+                      x2={heartbeatPoint(firstHeartbeatSampleSlot, heartbeatGraphMaxLatencyMs).x}
+                      y2={heartbeatPoint(firstHeartbeatSampleSlot, heartbeatGraphMaxLatencyMs).y}
+                    />
+                  ) : null}
                   {heartbeatLineSegments.map((segment) => (
-                    <linearGradient
-                      key={segment.gradientId}
-                      id={segment.gradientId}
-                      gradientUnits={'userSpaceOnUse'}
+                    <line
+                      key={segment.key}
+                      className={`heartbeat-graph-line ${segment.isActive ? 'heartbeat-graph-line-active' : ''}`}
+                      style={{ color: segment.nextColor }}
+                      stroke={`url(#${segment.gradientId})`}
                       x1={segment.previousPoint.x}
                       y1={segment.previousPoint.y}
                       x2={segment.nextPoint.x}
                       y2={segment.nextPoint.y}
-                    >
-                      <stop offset={'0%'} stopColor={segment.previousColor} />
-                      <stop offset={'100%'} stopColor={segment.nextColor} />
-                    </linearGradient>
+                    />
                   ))}
-                </defs>
-                <path className={'heartbeat-graph-grid'} d={'M0 25 H100 M0 50 H100 M0 75 H100'} />
-                <line className={'heartbeat-graph-ghost-line'} x1={'0'} y1={'50'} x2={'100'} y2={'50'} />
-                {firstHeartbeatSampleSlot && firstHeartbeatSampleSlot.index > 0 ? (
-                  <line
-                    className={'heartbeat-graph-ghost-line'}
-                    x1={heartbeatPoint({ index: firstHeartbeatSampleSlot.index - 1 }, heartbeatGraphMaxLatencyMs).x}
-                    y1={'50'}
-                    x2={heartbeatPoint(firstHeartbeatSampleSlot, heartbeatGraphMaxLatencyMs).x}
-                    y2={heartbeatPoint(firstHeartbeatSampleSlot, heartbeatGraphMaxLatencyMs).y}
-                  />
-                ) : null}
-                {heartbeatLineSegments.map((segment) => (
-                  <line
-                    key={segment.key}
-                    className={`heartbeat-graph-line ${segment.isActive ? 'heartbeat-graph-line-active' : ''}`}
-                    style={{ color: segment.nextColor }}
-                    stroke={`url(#${segment.gradientId})`}
-                    x1={segment.previousPoint.x}
-                    y1={segment.previousPoint.y}
-                    x2={segment.nextPoint.x}
-                    y2={segment.nextPoint.y}
-                  />
-                ))}
-              </svg>
-              {heartbeatSlots.map((slot) => {
-                const { x, y } = heartbeatPoint(slot, heartbeatGraphMaxLatencyMs);
-                const tone = slot.sample ? heartbeatLatencyTone(slot.sample) : 'ghost';
-                const isActive = slot.sample?.checkedAt === activeHeartbeatSampleKey;
-                const isTooltipVisible = slot.sample?.checkedAt === visibleGraphTooltipKey;
-                if (!slot.sample) {
+                </svg>
+                {heartbeatSlots.map((slot) => {
+                  const { x, y } = heartbeatPoint(slot, heartbeatGraphMaxLatencyMs);
+                  const tone = slot.sample ? heartbeatLatencyTone(slot.sample) : 'ghost';
+                  const isActive = slot.sample?.checkedAt === activeHeartbeatSampleKey;
+                  const isTooltipVisible = slot.sample?.checkedAt === visibleGraphTooltipKey;
+                  if (!slot.sample) {
+                    return (
+                      <span
+                        key={`heartbeat-ghost-${slot.index}`}
+                        className={'heartbeat-graph-point heartbeat-graph-point-ghost'}
+                        style={{ left: `${x}%`, top: `${y}%` }}
+                        aria-hidden={'true'}
+                      />
+                    );
+                  }
+
+                  const sample = slot.sample;
                   return (
-                    <span
-                      key={`heartbeat-ghost-${slot.index}`}
-                      className={'heartbeat-graph-point heartbeat-graph-point-ghost'}
+                    <button
+                      key={`${sample.checkedAt}-${slot.index}`}
+                      type={'button'}
+                      className={`heartbeat-graph-point heartbeat-graph-point-${tone} ${isActive ? 'heartbeat-graph-point-active' : ''} ${isTooltipVisible ? 'heartbeat-graph-point-tooltip-visible' : ''}`}
                       style={{ left: `${x}%`, top: `${y}%` }}
-                      aria-hidden={'true'}
-                    />
+                      aria-label={`${messages.pages.debug.heartbeatLatency}: ${formatHeartbeatLatency(sample)}, ${messages.pages.debug.heartbeatLastChecked}: ${formatHeartbeatTime(sample.checkedAt)}`}
+                      aria-pressed={sample.checkedAt === lockedHeartbeatSampleKey && lockedHeartbeatSurface === 'graph'}
+                      onMouseEnter={() => activateHeartbeatSample(sample, 'graph')}
+                      onMouseLeave={clearActiveHeartbeatSample}
+                      onFocus={() => activateHeartbeatSample(sample, 'graph')}
+                      onBlur={clearActiveHeartbeatSample}
+                      onClick={() => lockHeartbeatSample(sample, 'graph')}
+                    >
+                      <span className={`heartbeat-graph-tooltip heartbeat-graph-tooltip-${tone}`} role={'tooltip'}>
+                        <strong>{formatHeartbeatLatency(sample)}</strong>
+                        <span>{formatHeartbeatTime(sample.checkedAt)}</span>
+                      </span>
+                    </button>
                   );
-                }
+                })}
+              </div>
+              <div
+                className={'heartbeat-status-strip'}
+                role={'group'}
+                aria-label={messages.pages.debug.heartbeatStatusHistory}
+              >
+                {heartbeatSlots.map((slot) => {
+                  const { x } = heartbeatPoint(slot, heartbeatGraphMaxLatencyMs);
+                  if (!slot.sample) {
+                    return (
+                      <span
+                        key={`heartbeat-status-ghost-${slot.index}`}
+                        className={'heartbeat-status-dot heartbeat-status-dot-ghost'}
+                        style={{ '--heartbeat-status-x': `${x}%` } as CSSProperties}
+                        aria-hidden={'true'}
+                      />
+                    );
+                  }
 
-                const sample = slot.sample;
-                return (
-                  <button
-                    key={`${sample.checkedAt}-${slot.index}`}
-                    type={'button'}
-                    className={`heartbeat-graph-point heartbeat-graph-point-${tone} ${isActive ? 'heartbeat-graph-point-active' : ''} ${isTooltipVisible ? 'heartbeat-graph-point-tooltip-visible' : ''}`}
-                    style={{ left: `${x}%`, top: `${y}%` }}
-                    aria-label={`${messages.pages.debug.heartbeatLatency}: ${formatHeartbeatLatency(sample)}, ${messages.pages.debug.heartbeatLastChecked}: ${formatHeartbeatTime(sample.checkedAt)}`}
-                    aria-pressed={sample.checkedAt === lockedHeartbeatSampleKey && lockedHeartbeatSurface === 'graph'}
-                    onMouseEnter={() => activateHeartbeatSample(sample, 'graph')}
-                    onMouseLeave={clearActiveHeartbeatSample}
-                    onFocus={() => activateHeartbeatSample(sample, 'graph')}
-                    onBlur={clearActiveHeartbeatSample}
-                    onClick={() => lockHeartbeatSample(sample, 'graph')}
-                  >
-                    <span className={`heartbeat-graph-tooltip heartbeat-graph-tooltip-${tone}`} role={'tooltip'}>
-                      <strong>{formatHeartbeatLatency(sample)}</strong>
-                      <span>{formatHeartbeatTime(sample.checkedAt)}</span>
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-            <div
-              className={'heartbeat-status-strip'}
-              aria-label={messages.pages.debug.heartbeatStatusHistory}
-            >
-              {heartbeatSlots.map((slot) => {
-                const { x } = heartbeatPoint(slot, heartbeatGraphMaxLatencyMs);
-                if (!slot.sample) {
+                  const sample = slot.sample;
+                  const stateLabel = backendStateLabel({ ...backendStatus, state: sample.state }, messages);
+                  const isActive = sample.checkedAt === activeHeartbeatSampleKey;
+                  const isTooltipVisible = sample.checkedAt === visibleStatusTooltipKey;
                   return (
-                    <span
-                      key={`heartbeat-status-ghost-${slot.index}`}
-                      className={'heartbeat-status-dot heartbeat-status-dot-ghost'}
+                    <button
+                      key={`${sample.checkedAt}-status-${slot.index}`}
+                      type={'button'}
+                      className={`heartbeat-status-dot heartbeat-status-dot-${sample.state} ${isActive ? 'heartbeat-status-dot-active' : ''} ${isTooltipVisible ? 'heartbeat-status-dot-tooltip-visible' : ''}`}
                       style={{ '--heartbeat-status-x': `${x}%` } as CSSProperties}
-                      aria-hidden={'true'}
-                    />
+                      aria-label={`${messages.labels.state}: ${stateLabel}, ${messages.pages.debug.heartbeatLastChecked}: ${formatHeartbeatTime(sample.checkedAt)}`}
+                      aria-pressed={sample.checkedAt === lockedHeartbeatSampleKey && lockedHeartbeatSurface === 'status'}
+                      onMouseEnter={() => activateHeartbeatSample(sample, 'status')}
+                      onMouseLeave={clearActiveHeartbeatSample}
+                      onFocus={() => activateHeartbeatSample(sample, 'status')}
+                      onBlur={clearActiveHeartbeatSample}
+                      onClick={() => lockHeartbeatSample(sample, 'status')}
+                    >
+                      <span className={'heartbeat-status-tooltip'} role={'tooltip'}>
+                        <strong>{stateLabel}</strong>
+                        <span>{formatHeartbeatTime(sample.checkedAt)}</span>
+                      </span>
+                    </button>
                   );
-                }
-
-                const sample = slot.sample;
-                const stateLabel = backendStateLabel({ ...backendStatus, state: sample.state }, messages);
-                const isActive = sample.checkedAt === activeHeartbeatSampleKey;
-                const isTooltipVisible = sample.checkedAt === visibleStatusTooltipKey;
-                return (
-                  <button
-                    key={`${sample.checkedAt}-status-${slot.index}`}
-                    type={'button'}
-                    className={`heartbeat-status-dot heartbeat-status-dot-${sample.state} ${isActive ? 'heartbeat-status-dot-active' : ''} ${isTooltipVisible ? 'heartbeat-status-dot-tooltip-visible' : ''}`}
-                    style={{ '--heartbeat-status-x': `${x}%` } as CSSProperties}
-                    aria-label={`${messages.labels.state}: ${stateLabel}, ${messages.pages.debug.heartbeatLastChecked}: ${formatHeartbeatTime(sample.checkedAt)}`}
-                    aria-pressed={sample.checkedAt === lockedHeartbeatSampleKey && lockedHeartbeatSurface === 'status'}
-                    onMouseEnter={() => activateHeartbeatSample(sample, 'status')}
-                    onMouseLeave={clearActiveHeartbeatSample}
-                    onFocus={() => activateHeartbeatSample(sample, 'status')}
-                    onBlur={clearActiveHeartbeatSample}
-                    onClick={() => lockHeartbeatSample(sample, 'status')}
-                  >
-                    <span className={'heartbeat-status-tooltip'} role={'tooltip'}>
-                      <strong>{stateLabel}</strong>
-                      <span>{formatHeartbeatTime(sample.checkedAt)}</span>
-                    </span>
-                  </button>
-                );
-              })}
+                })}
+              </div>
             </div>
           </div>
           <div className={'table-wrap'}>
@@ -861,9 +873,14 @@ export function DebugPage({
                         }
                       }}
                       className={`debug-table-row-interactive ${sample.checkedAt === activeHeartbeatSampleKey ? 'debug-table-row-active' : ''}`}
+                      tabIndex={0}
+                      aria-label={`${messages.pages.debug.heartbeatLastChecked}: ${formatHeartbeatTime(sample.checkedAt)}, ${messages.labels.state}: ${backendStateLabel({ ...backendStatus, state: sample.state }, messages)}, ${messages.pages.debug.heartbeatLatency}: ${formatHeartbeatLatency(sample)}`}
                       onMouseEnter={() => activateHeartbeatSample(sample, 'history')}
                       onMouseLeave={clearActiveHeartbeatSample}
+                      onFocus={() => activateHeartbeatSample(sample, 'history')}
+                      onBlur={clearActiveHeartbeatSample}
                       onClick={() => lockHeartbeatSample(sample, 'history')}
+                      onKeyDown={(event) => handleHeartbeatHistoryRowKeyDown(event, sample)}
                     >
                       <td>{formatHeartbeatTime(sample.checkedAt)}</td>
                       <td>{backendStateLabel({ ...backendStatus, state: sample.state }, messages)}</td>

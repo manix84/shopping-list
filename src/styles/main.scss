@@ -1161,6 +1161,11 @@ select {
   }
 }
 
+.heartbeat-chart-scroll {
+  overflow: visible;
+  padding: 0 0 2px;
+}
+
 .heartbeat-graph {
   background:
     linear-gradient(180deg, color-mix(in srgb, $panel-alt 84%, transparent), transparent),
@@ -1402,55 +1407,69 @@ select {
 
 .heartbeat-status-dot {
   aspect-ratio: 1;
+  background: transparent;
   border: 0;
   border-radius: 999px;
   cursor: pointer;
+  height: 28px;
   left: var(--heartbeat-status-x);
   margin: 0;
-  max-width: 10px;
-  min-width: 5px;
   padding: 0;
   position: absolute;
   top: 50%;
   transform: translate(-50%, -50%);
   transform-origin: center;
-  width: 100%;
+  width: 28px;
+
+  &::before {
+    background: currentColor;
+    border-radius: inherit;
+    content: "";
+    height: 8px;
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+  }
 }
 
 .heartbeat-status-dot-connected {
-  background: $success-text;
   color: $success-text;
 }
 
 .heartbeat-status-dot-checking {
-  background: $primary;
   color: $primary;
 }
 
 .heartbeat-status-dot-error {
-  background: $danger-text;
   color: $danger-text;
 }
 
 .heartbeat-status-dot-offline {
-  background: $muted;
   color: $muted;
 }
 
 .heartbeat-status-dot-ghost {
-  background: color-mix(in srgb, $muted 24%, transparent);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, $muted 18%, transparent);
   cursor: default;
+
+  &::before {
+    background: color-mix(in srgb, $muted 24%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, $muted 18%, transparent);
+  }
 }
 
 .heartbeat-status-dot-active,
 .heartbeat-status-dot:not(.heartbeat-status-dot-ghost):hover,
 .heartbeat-status-dot:not(.heartbeat-status-dot-ghost):focus-visible {
-  box-shadow:
-    0 0 0 2px $panel,
-    0 0 0 4px currentColor;
   transform: translate(-50%, -50%) scale(1.35);
   z-index: 3;
+
+  &::before {
+    box-shadow:
+      0 0 0 2px $panel,
+      0 0 0 4px currentColor;
+  }
 }
 
 .heartbeat-status-dot:not(.heartbeat-status-dot-ghost):focus-visible {
@@ -1927,6 +1946,8 @@ select {
   }
 
   .button,
+  .heartbeat-graph-tooltip,
+  .heartbeat-status-tooltip,
   .skip-link,
   .share-qr-card,
   .share-qr-frame,
