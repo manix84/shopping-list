@@ -72,6 +72,7 @@ const HEARTBEAT_HISTORY_SLOT_COUNT = 36;
 const HEARTBEAT_TIMEOUT_LATENCY_MS = 800;
 const HEARTBEAT_LATENCY_GRAPH_BASE_MAX_MS = 100;
 const HEARTBEAT_LATENCY_GRAPH_STEP_MS = 100;
+const HEARTBEAT_LATENCY_TONE_MAX_MS = 250;
 const HEARTBEAT_LATENCY_TONES = [
   'excellent',
   'healthy',
@@ -254,12 +255,12 @@ const heartbeatPoint = (slot: HeartbeatHistorySlot, maxLatencyMs: number) => {
 
 const formatHeartbeatAxisTick = (latencyMs: number) => `${latencyMs}ms`;
 
-const heartbeatLatencyTone = (sample: BackendHeartbeatSample, maxLatencyMs: number) => {
+const heartbeatLatencyTone = (sample: BackendHeartbeatSample) => {
   if (isHeartbeatTimeout(sample)) { return 'critical'; }
 
   const toneIndex = Math.min(
     HEARTBEAT_LATENCY_TONES.length - 1,
-    Math.floor((sample.latencyMs / maxLatencyMs) * HEARTBEAT_LATENCY_TONES.length),
+    Math.floor((sample.latencyMs / HEARTBEAT_LATENCY_TONE_MAX_MS) * HEARTBEAT_LATENCY_TONES.length),
   );
   return HEARTBEAT_LATENCY_TONES[toneIndex];
 };
@@ -423,8 +424,8 @@ export function DebugPage({
     const previousSlot = heartbeatSampleSlots[index];
     const previousPoint = heartbeatPoint(previousSlot, heartbeatGraphMaxLatencyMs);
     const nextPoint = heartbeatPoint(slot, heartbeatGraphMaxLatencyMs);
-    const previousTone = heartbeatLatencyTone(previousSlot.sample, heartbeatGraphMaxLatencyMs);
-    const nextTone = heartbeatLatencyTone(slot.sample, heartbeatGraphMaxLatencyMs);
+    const previousTone = heartbeatLatencyTone(previousSlot.sample);
+    const nextTone = heartbeatLatencyTone(slot.sample);
 
     return {
       gradientId: `heartbeat-line-gradient-${previousSlot.index}-${slot.index}`,
@@ -704,7 +705,7 @@ export function DebugPage({
               </svg>
               {heartbeatSlots.map((slot) => {
                 const { x, y } = heartbeatPoint(slot, heartbeatGraphMaxLatencyMs);
-                const tone = slot.sample ? heartbeatLatencyTone(slot.sample, heartbeatGraphMaxLatencyMs) : 'ghost';
+                const tone = slot.sample ? heartbeatLatencyTone(slot.sample) : 'ghost';
                 const isActive = slot.sample?.checkedAt === activeHeartbeatSampleKey;
                 if (!slot.sample) {
                   return (
