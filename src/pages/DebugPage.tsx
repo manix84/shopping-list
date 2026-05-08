@@ -70,8 +70,8 @@ type DebugPageProps = {
 
 const HEARTBEAT_HISTORY_SLOT_COUNT = 36;
 const HEARTBEAT_TIMEOUT_LATENCY_MS = 800;
-const HEARTBEAT_LATENCY_GRAPH_BASE_MAX_MS = 500;
-const HEARTBEAT_LATENCY_GRAPH_STEP_MS = 500;
+const HEARTBEAT_LATENCY_GRAPH_BASE_MAX_MS = 100;
+const HEARTBEAT_LATENCY_GRAPH_STEP_MS = 100;
 
 const backendSummary = (status: BackendStatus, messages: Messages): string => {
   if (status.state === 'connected') { return messages.pages.debug.backendConnected; }
@@ -204,7 +204,7 @@ const heartbeatLatencyGraphMax = (samples: BackendHeartbeatSample[]) => {
   const maxLatency = Math.max(0, ...samples.map((sample) => sample.latencyMs));
   if (maxLatency <= HEARTBEAT_LATENCY_GRAPH_BASE_MAX_MS) { return HEARTBEAT_LATENCY_GRAPH_BASE_MAX_MS; }
 
-  return Math.ceil(maxLatency / HEARTBEAT_LATENCY_GRAPH_STEP_MS) * HEARTBEAT_LATENCY_GRAPH_STEP_MS;
+  return (Math.floor(maxLatency / HEARTBEAT_LATENCY_GRAPH_STEP_MS) + 1) * HEARTBEAT_LATENCY_GRAPH_STEP_MS;
 };
 
 const heartbeatLatencyAxisTicks = (maxLatencyMs: number) => [0, maxLatencyMs / 2, maxLatencyMs];
