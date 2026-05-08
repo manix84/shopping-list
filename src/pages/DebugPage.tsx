@@ -69,6 +69,7 @@ type DebugPageProps = {
 };
 
 const HEARTBEAT_HISTORY_SLOT_COUNT = 36;
+const HEARTBEAT_TIMEOUT_LATENCY_MS = 800;
 
 const backendSummary = (status: BackendStatus, messages: Messages): string => {
   if (status.state === 'connected') { return messages.pages.debug.backendConnected; }
@@ -195,10 +196,12 @@ const backendOperationLabel = (operation: BackendOperationStatus, messages: Mess
 };
 
 const heartbeatLatencyScore = (sample: BackendHeartbeatSample) => {
-  if (sample.state !== 'connected' || !sample.healthOk || !sample.databaseOk) { return 0; }
   const clampedLatency = Math.min(sample.latencyMs, 1_500);
   return 100 - (clampedLatency / 1_500) * 84;
 };
+
+const isHeartbeatTimeout = (sample: BackendHeartbeatSample) =>
+  sample.state === 'offline' && sample.latencyMs >= HEARTBEAT_TIMEOUT_LATENCY_MS;
 
 type HeartbeatHistorySlot = {
   index: number;
@@ -216,12 +219,14 @@ const heartbeatHistorySlots = (samples: BackendHeartbeatSample[]): HeartbeatHist
 
 const heartbeatPoint = (slot: HeartbeatHistorySlot) => {
   const x = (slot.index / (HEARTBEAT_HISTORY_SLOT_COUNT - 1)) * 100;
-  const y = slot.sample ? 100 - heartbeatLatencyScore(slot.sample) : 50;
+  const y = slot.sample && isHeartbeatTimeout(slot.sample)
+    ? 100
+    : slot.sample ? 100 - heartbeatLatencyScore(slot.sample) : 50;
   return { x, y };
 };
 
 const heartbeatLatencyTone = (sample: BackendHeartbeatSample) => {
-  if (sample.state !== 'connected' || !sample.healthOk || !sample.databaseOk) { return 'offline'; }
+  if (isHeartbeatTimeout(sample)) { return 'offline'; }
   if (sample.latencyMs <= 150) { return 'good'; }
   if (sample.latencyMs <= 500) { return 'okay'; }
   return 'poor';
@@ -375,9 +380,6 @@ export function DebugPage({
     slot.sample !== undefined,
   );
   const firstHeartbeatSampleSlot = heartbeatSampleSlots[0];
-  const heartbeatSlotStyle = {
-    '--heartbeat-slot-count': HEARTBEAT_HISTORY_SLOT_COUNT,
-  } as CSSProperties;
   const recentHeartbeatSamples = heartbeatSampleSlots.map((slot) => slot.sample).reverse();
   const activateHeartbeatSample = (sample: BackendHeartbeatSample) => {
     setActiveHeartbeatSampleKey(sample.checkedAt);
@@ -626,20 +628,23 @@ export function DebugPage({
             </div>
             <div
               className={'heartbeat-status-strip'}
-              style={heartbeatSlotStyle}
               aria-hidden={'true'}
             >
-              {heartbeatSlots.map((slot) => (
-                <span
-                  key={slot.sample ? `${slot.sample.checkedAt}-status-${slot.index}` : `heartbeat-status-ghost-${slot.index}`}
-                  className={`heartbeat-status-dot heartbeat-status-dot-${slot.sample?.state ?? 'ghost'}`}
-                  title={
-                    slot.sample
-                      ? `${formatHeartbeatTime(slot.sample.checkedAt)} ${backendStateLabel({ ...backendStatus, state: slot.sample.state }, messages)}`
-                      : messages.pages.debug.heartbeatWaiting
-                  }
-                />
-              ))}
+              {heartbeatSlots.map((slot) => {
+                const { x } = heartbeatPoint(slot);
+                return (
+                  <span
+                    key={slot.sample ? `${slot.sample.checkedAt}-status-${slot.index}` : `heartbeat-status-ghost-${slot.index}`}
+                    className={`heartbeat-status-dot heartbeat-status-dot-${slot.sample?.state ?? 'ghost'}`}
+                    style={{ '--heartbeat-status-x': `${x}%` } as CSSProperties}
+                    title={
+                      slot.sample
+                        ? `${formatHeartbeatTime(slot.sample.checkedAt)} ${backendStateLabel({ ...backendStatus, state: slot.sample.state }, messages)}`
+                        : messages.pages.debug.heartbeatWaiting
+                    }
+                  />
+                );
+              })}
             </div>
           </div>
           <div className={'table-wrap'}>

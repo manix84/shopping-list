@@ -1347,19 +1347,19 @@ select {
 }
 
 .heartbeat-status-strip {
-  align-items: center;
-  display: grid;
-  gap: 6px;
-  grid-template-columns: repeat(var(--heartbeat-slot-count), minmax(0, 1fr));
   min-height: 18px;
+  position: relative;
 }
 
 .heartbeat-status-dot {
   aspect-ratio: 1;
   border-radius: 999px;
-  justify-self: center;
+  left: var(--heartbeat-status-x);
   max-width: 10px;
   min-width: 5px;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
   width: 100%;
 }
 
