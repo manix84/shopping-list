@@ -72,6 +72,24 @@ const HEARTBEAT_HISTORY_SLOT_COUNT = 36;
 const HEARTBEAT_TIMEOUT_LATENCY_MS = 800;
 const HEARTBEAT_LATENCY_GRAPH_BASE_MAX_MS = 100;
 const HEARTBEAT_LATENCY_GRAPH_STEP_MS = 100;
+const HEARTBEAT_LATENCY_TONES = [
+  'excellent',
+  'healthy',
+  'steady',
+  'elevated',
+  'slow',
+  'strained',
+  'critical',
+] as const;
+const HEARTBEAT_LATENCY_TONE_COLORS: Record<(typeof HEARTBEAT_LATENCY_TONES)[number], string> = {
+  excellent: '#16a34a',
+  healthy: '#65a30d',
+  steady: '#ca8a04',
+  elevated: '#f59e0b',
+  slow: '#f97316',
+  strained: '#ea580c',
+  critical: '#dc2626',
+};
 
 const backendSummary = (status: BackendStatus, messages: Messages): string => {
   if (status.state === 'connected') { return messages.pages.debug.backendConnected; }
@@ -236,11 +254,14 @@ const heartbeatPoint = (slot: HeartbeatHistorySlot, maxLatencyMs: number) => {
 
 const formatHeartbeatAxisTick = (latencyMs: number) => `${latencyMs}ms`;
 
-const heartbeatLatencyTone = (sample: BackendHeartbeatSample) => {
-  if (isHeartbeatTimeout(sample)) { return 'offline'; }
-  if (sample.latencyMs <= 150) { return 'good'; }
-  if (sample.latencyMs <= 500) { return 'okay'; }
-  return 'poor';
+const heartbeatLatencyTone = (sample: BackendHeartbeatSample, maxLatencyMs: number) => {
+  if (isHeartbeatTimeout(sample)) { return 'critical'; }
+
+  const toneIndex = Math.min(
+    HEARTBEAT_LATENCY_TONES.length - 1,
+    Math.floor((sample.latencyMs / maxLatencyMs) * HEARTBEAT_LATENCY_TONES.length),
+  );
+  return HEARTBEAT_LATENCY_TONES[toneIndex];
 };
 
 const formatHeartbeatTime = (checkedAt: string) =>
@@ -398,6 +419,23 @@ export function DebugPage({
   const heartbeatGraphMaxLatencyMs = heartbeatLatencyGraphMax(heartbeatSampleSlots.map((slot) => slot.sample));
   const heartbeatAxisTicks = heartbeatLatencyAxisTicks(heartbeatGraphMaxLatencyMs);
   const activeHeartbeatSampleKey = lockedHeartbeatSampleKey ?? hoveredHeartbeatSampleKey;
+  const heartbeatLineSegments = heartbeatSampleSlots.slice(1).map((slot, index) => {
+    const previousSlot = heartbeatSampleSlots[index];
+    const previousPoint = heartbeatPoint(previousSlot, heartbeatGraphMaxLatencyMs);
+    const nextPoint = heartbeatPoint(slot, heartbeatGraphMaxLatencyMs);
+    const previousTone = heartbeatLatencyTone(previousSlot.sample, heartbeatGraphMaxLatencyMs);
+    const nextTone = heartbeatLatencyTone(slot.sample, heartbeatGraphMaxLatencyMs);
+
+    return {
+      gradientId: `heartbeat-line-gradient-${previousSlot.index}-${slot.index}`,
+      isActive: previousSlot.sample.checkedAt === activeHeartbeatSampleKey || slot.sample.checkedAt === activeHeartbeatSampleKey,
+      key: `${slot.sample.checkedAt}-${slot.index}`,
+      nextColor: HEARTBEAT_LATENCY_TONE_COLORS[nextTone],
+      nextPoint,
+      previousColor: HEARTBEAT_LATENCY_TONE_COLORS[previousTone],
+      previousPoint,
+    };
+  });
   const activateHeartbeatSample = (sample: BackendHeartbeatSample) => {
     setHoveredHeartbeatSampleKey(sample.checkedAt);
   };
@@ -624,6 +662,22 @@ export function DebugPage({
                 ))}
               </div>
               <svg viewBox={'0 0 100 100'} preserveAspectRatio={'none'} aria-hidden={'true'}>
+                <defs>
+                  {heartbeatLineSegments.map((segment) => (
+                    <linearGradient
+                      key={segment.gradientId}
+                      id={segment.gradientId}
+                      gradientUnits={'userSpaceOnUse'}
+                      x1={segment.previousPoint.x}
+                      y1={segment.previousPoint.y}
+                      x2={segment.nextPoint.x}
+                      y2={segment.nextPoint.y}
+                    >
+                      <stop offset={'0%'} stopColor={segment.previousColor} />
+                      <stop offset={'100%'} stopColor={segment.nextColor} />
+                    </linearGradient>
+                  ))}
+                </defs>
                 <path className={'heartbeat-graph-grid'} d={'M0 25 H100 M0 50 H100 M0 75 H100'} />
                 <line className={'heartbeat-graph-ghost-line'} x1={'0'} y1={'50'} x2={'100'} y2={'50'} />
                 {firstHeartbeatSampleSlot && firstHeartbeatSampleSlot.index > 0 ? (
@@ -635,28 +689,22 @@ export function DebugPage({
                     y2={heartbeatPoint(firstHeartbeatSampleSlot, heartbeatGraphMaxLatencyMs).y}
                   />
                 ) : null}
-                {heartbeatSampleSlots.slice(1).map((slot, index) => {
-                  const previousSlot = heartbeatSampleSlots[index];
-                  const previousPoint = heartbeatPoint(previousSlot, heartbeatGraphMaxLatencyMs);
-                  const nextPoint = heartbeatPoint(slot, heartbeatGraphMaxLatencyMs);
-                  const isLineActive =
-                    previousSlot.sample.checkedAt === activeHeartbeatSampleKey ||
-                    slot.sample.checkedAt === activeHeartbeatSampleKey;
-                  return (
-                    <line
-                      key={`${slot.sample.checkedAt}-${slot.index}`}
-                      className={`heartbeat-graph-line heartbeat-graph-line-${heartbeatLatencyTone(slot.sample)} ${isLineActive ? 'heartbeat-graph-line-active' : ''}`}
-                      x1={previousPoint.x}
-                      y1={previousPoint.y}
-                      x2={nextPoint.x}
-                      y2={nextPoint.y}
-                    />
-                  );
-                })}
+                {heartbeatLineSegments.map((segment) => (
+                  <line
+                    key={segment.key}
+                    className={`heartbeat-graph-line ${segment.isActive ? 'heartbeat-graph-line-active' : ''}`}
+                    style={{ color: segment.nextColor }}
+                    stroke={`url(#${segment.gradientId})`}
+                    x1={segment.previousPoint.x}
+                    y1={segment.previousPoint.y}
+                    x2={segment.nextPoint.x}
+                    y2={segment.nextPoint.y}
+                  />
+                ))}
               </svg>
               {heartbeatSlots.map((slot) => {
                 const { x, y } = heartbeatPoint(slot, heartbeatGraphMaxLatencyMs);
-                const tone = slot.sample ? heartbeatLatencyTone(slot.sample) : 'ghost';
+                const tone = slot.sample ? heartbeatLatencyTone(slot.sample, heartbeatGraphMaxLatencyMs) : 'ghost';
                 const isActive = slot.sample?.checkedAt === activeHeartbeatSampleKey;
                 if (!slot.sample) {
                   return (
