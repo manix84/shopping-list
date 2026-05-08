@@ -32,8 +32,26 @@ const contentTypes = {
 const sharedListEventClients = new Map();
 
 const sendSharedListEvent = (response, event) => {
-  response.write(`event: ${event.type}\n`);
-  response.write(`data: ${JSON.stringify(event)}\n\n`);
+  if (response.destroyed || response.writableEnded) { return false; }
+
+  try {
+    response.write(`event: ${event.type}\n`);
+    response.write(`data: ${JSON.stringify(event)}\n\n`);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+const sendSharedListComment = (response, comment) => {
+  if (response.destroyed || response.writableEnded) { return false; }
+
+  try {
+    response.write(`: ${comment}\n\n`);
+    return true;
+  } catch {
+    return false;
+  }
 };
 
 const addSharedListEventClient = (request, response, listId) => {
@@ -45,14 +63,24 @@ const addSharedListEventClient = (request, response, listId) => {
     'X-Clacks-Overhead': clacksOverhead,
   });
   response.write('retry: 5000\n\n');
-  sendSharedListEvent(response, { type: 'connected', listId, updatedAt: new Date().toISOString() });
+  if (!sendSharedListEvent(response, { type: 'connected', listId, updatedAt: new Date().toISOString() })) {
+    response.end();
+    return;
+  }
 
   const clients = sharedListEventClients.get(listId) ?? new Set();
   clients.add(response);
   sharedListEventClients.set(listId, clients);
 
   const keepAlive = setInterval(() => {
-    response.write(': keep-alive\n\n');
+    if (!sendSharedListComment(response, 'keep-alive')) {
+      clearInterval(keepAlive);
+      clients.delete(response);
+      if (clients.size === 0) {
+        sharedListEventClients.delete(listId);
+      }
+      response.end();
+    }
   }, 25_000);
 
   request.on('close', () => {
@@ -70,7 +98,13 @@ const publishSharedListEvent = (listId, event) => {
   if (!clients) { return; }
 
   for (const client of clients) {
-    sendSharedListEvent(client, { ...event, listId });
+    if (!sendSharedListEvent(client, { ...event, listId })) {
+      clients.delete(client);
+    }
+  }
+
+  if (clients.size === 0) {
+    sharedListEventClients.delete(listId);
   }
 };
 

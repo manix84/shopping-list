@@ -255,10 +255,23 @@ export const createSharedList = async (record) => {
 export const getSharedList = async (id) => {
   if (!getPool()) {
     const database = await readJsonDatabase();
-    return database.sharedLists[id] ?? {
+    const stored = database.sharedLists[id];
+    if (!stored) {
+      return {
+        id,
+        exists: false,
+        record: defaultRecord(),
+      };
+    }
+
+    const normalizedRecord = normalizeRecord(stored.record);
+    return {
+      ...stored,
       id,
-      exists: false,
-      record: defaultRecord(),
+      exists: stored.exists === true,
+      record: normalizedRecord,
+      createdAt: timestampOrNow(stored.createdAt),
+      updatedAt: normalizedRecord.updatedAt || timestampOrNow(stored.updatedAt),
     };
   }
 

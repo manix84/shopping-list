@@ -129,6 +129,15 @@ type SharedListNotificationGroup = {
   itemNames: string[];
   lastShownAt: number;
 };
+type CurrentShoppingListState = {
+  input: string;
+  items: Item[];
+  countryCode: CountryCode;
+  listId: string;
+  serverBacked: boolean;
+  listName: string;
+  measurementDisplayMode: MeasurementDisplayMode;
+};
 
 const defaultBackendStatus = (): BackendStatus => ({
   state: 'checking',
@@ -492,12 +501,16 @@ export default function App() {
   const [predatorEasterEggRun, setPredatorEasterEggRun] = useState(0);
   const [debugNotificationResult, setDebugNotificationResult] = useState<DebugNotificationResult>();
   const [debugModeNotice, setDebugModeNotice] = useState<ToastPopupData>();
+  const [backendSaveRetryAttempt, setBackendSaveRetryAttempt] = useState(0);
   const currentItemsRef = useRef<Item[]>([]);
   const sharedListNotificationSeenUpdatedAtRef = useRef<Record<string, string>>({});
   const sharedListNotificationGroupRef = useRef<SharedListNotificationGroup>();
   const debugNotificationListIdRef = useRef(DEBUG_NOTIFICATION_LIST_ID);
   const saveRequestIdRef = useRef(0);
-  const lastPersistedRecordRef = useRef<ShoppingListRecord>();
+  const lastLocalPersistedRecordRef = useRef<ShoppingListRecord>();
+  const lastBackendPersistedRecordRef = useRef<ShoppingListRecord>();
+  const pendingBackendSaveRecordRef = useRef<ShoppingListRecord>();
+  const currentShoppingListStateRef = useRef<CurrentShoppingListState>();
   const skipNextAutosaveRef = useRef(false);
   const remoteSyncStatusTimerRef = useRef<number>();
   const suppressNextAutosaveStatusRef = useRef(true);
@@ -524,7 +537,7 @@ export default function App() {
   const currentSharedListDatabaseEntry = useMemo(() => {
     if (!canUseBackend || !isServerBackedList || storageMode !== 'backend') { return undefined; }
 
-    const persistedRecord = lastPersistedRecordRef.current;
+    const persistedRecord = lastBackendPersistedRecordRef.current;
     const persistedUpdatedAt = persistedRecord?.updatedAt;
     const record = recordMatchesCurrentState(persistedRecord, {
       input,
@@ -556,6 +569,18 @@ export default function App() {
   useEffect(() => {
     currentItemsRef.current = items;
   }, [items]);
+
+  useEffect(() => {
+    currentShoppingListStateRef.current = {
+      input,
+      items,
+      countryCode,
+      listId: activeListId,
+      serverBacked: isServerBackedList,
+      listName,
+      measurementDisplayMode,
+    };
+  }, [activeListId, countryCode, input, isServerBackedList, items, listName, measurementDisplayMode]);
 
   useEffect(() => () => {
     if (remoteSyncStatusTimerRef.current) {
@@ -1129,7 +1154,8 @@ export default function App() {
       const record = { ...remotePayload.record, listId: nextListId, serverBacked: true };
       applyRecord(record);
       localStorageRepository.save(record);
-      lastPersistedRecordRef.current = record;
+      lastLocalPersistedRecordRef.current = record;
+      lastBackendPersistedRecordRef.current = record;
       rememberSharedList({
         listId: nextListId,
         listName: record.listName,
@@ -1237,7 +1263,8 @@ export default function App() {
 
           await saveSharedShoppingList(nextListId, selectedRecord);
           localStorageRepository.save(selectedRecord);
-          lastPersistedRecordRef.current = selectedRecord;
+          lastLocalPersistedRecordRef.current = selectedRecord;
+          lastBackendPersistedRecordRef.current = selectedRecord;
           if (remotePayload.exists) {
             rememberSharedList({
               listId: nextListId,
@@ -1280,7 +1307,12 @@ export default function App() {
         countryConfigForMeasurementDisplayMode(selectedRecord.countryCode, measurementDisplayMode),
         selectedRecord.items,
       ));
-      lastPersistedRecordRef.current = selectedRecord;
+      lastLocalPersistedRecordRef.current = selectedRecord;
+      if (nextStorageMode === 'backend') {
+        lastBackendPersistedRecordRef.current = selectedRecord;
+      } else {
+        lastBackendPersistedRecordRef.current = undefined;
+      }
       setIsLoaded(true);
     };
 
@@ -1404,7 +1436,8 @@ export default function App() {
 
         await saveSharedShoppingList(activeListId, selectedRecord);
         localStorageRepository.save(selectedRecord);
-        lastPersistedRecordRef.current = selectedRecord;
+        lastLocalPersistedRecordRef.current = selectedRecord;
+        lastBackendPersistedRecordRef.current = selectedRecord;
         if (remotePayload.exists) {
           rememberSharedList({
             listId: activeListId,
@@ -1530,8 +1563,12 @@ export default function App() {
     skipNextAutosaveRef.current = false;
     const shouldReportSaveStatus = !suppressNextAutosaveStatusRef.current;
     suppressNextAutosaveStatusRef.current = false;
+    const persistedRecordForAutosave =
+      storageMode === 'backend' && canUseBackend
+        ? lastBackendPersistedRecordRef.current
+        : lastLocalPersistedRecordRef.current;
 
-    if (shouldSkipAutosave || recordMatchesCurrentState(lastPersistedRecordRef.current, {
+    if (shouldSkipAutosave || recordMatchesCurrentState(persistedRecordForAutosave, {
       input,
       items,
       countryCode,
@@ -1550,7 +1587,7 @@ export default function App() {
 
     try {
       localStorageRepository.save(record);
-      lastPersistedRecordRef.current = record;
+      lastLocalPersistedRecordRef.current = record;
     } catch (error) {
       console.warn('Unable to save shopping list locally.', error);
       if (shouldReportSaveStatus && saveRequestIdRef.current === saveRequestId) {
@@ -1572,16 +1609,20 @@ export default function App() {
       const backendRecord = { ...record, serverBacked: true };
       void saveSharedShoppingList(activeListId, backendRecord)
         .then(() => {
+          lastBackendPersistedRecordRef.current = backendRecord;
+          pendingBackendSaveRecordRef.current = undefined;
           if (shouldReportSaveStatus && saveRequestIdRef.current === saveRequestId) {
             setSaveStatus('saved');
           }
         })
         .catch((error: unknown) => {
           console.warn('Unable to save shared shopping list to backend.', error);
+          pendingBackendSaveRecordRef.current = backendRecord;
           setBackendOperation(backendOperationStatus('save-failed', errorMessage(error)));
           if (shouldReportSaveStatus && saveRequestIdRef.current === saveRequestId) {
             setSaveStatus('error');
           }
+          window.setTimeout(() => setBackendSaveRetryAttempt((current) => current + 1), SHARED_LIST_SYNC_POLL_MS);
         });
       return;
     }
@@ -1590,6 +1631,41 @@ export default function App() {
       setSaveStatus('saved');
     }
   }, [activeListId, canUseBackend, countryCode, input, isLoaded, isServerBackedList, items, listName, storageMode]);
+
+  useEffect(() => {
+    if (!isLoaded || storageMode !== 'backend' || !canUseBackend) { return; }
+
+    const pendingRecord = pendingBackendSaveRecordRef.current;
+    const currentState = currentShoppingListStateRef.current;
+    if (!pendingRecord || !currentState || currentState.listId !== activeListId) { return; }
+
+    if (!recordMatchesCurrentState(pendingRecord, currentState)) {
+      pendingBackendSaveRecordRef.current = undefined;
+      return;
+    }
+
+    let cancelled = false;
+    void saveSharedShoppingList(activeListId, pendingRecord)
+      .then(() => {
+        if (cancelled) { return; }
+
+        lastBackendPersistedRecordRef.current = pendingRecord;
+        pendingBackendSaveRecordRef.current = undefined;
+        setSaveStatus('saved');
+      })
+      .catch((error: unknown) => {
+        if (cancelled) { return; }
+
+        console.warn('Unable to retry shared shopping list backend save.', error);
+        setBackendOperation(backendOperationStatus('save-failed', errorMessage(error)));
+        setSaveStatus('error');
+        window.setTimeout(() => setBackendSaveRetryAttempt((current) => current + 1), SHARED_LIST_SYNC_POLL_MS);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeListId, backendSaveRetryAttempt, canUseBackend, isLoaded, storageMode]);
 
   useEffect(() => {
     if (
@@ -1856,7 +1932,10 @@ export default function App() {
 
   const applyRecord = (record: ShoppingListRecord) => {
     suppressNextAutosaveStatus();
-    lastPersistedRecordRef.current = record;
+    lastLocalPersistedRecordRef.current = record;
+    if (record.serverBacked === true) {
+      lastBackendPersistedRecordRef.current = record;
+    }
     if (record.listId) {
       setActiveListId(record.listId);
     }
@@ -1876,17 +1955,14 @@ export default function App() {
 
     let cancelled = false;
     let inFlight = false;
+    let isSseOpen = false;
+    let lastFallbackPollAt = 0;
     const syncRemoteRecord = async () => {
       if (cancelled || inFlight) { return; }
+      const currentState = currentShoppingListStateRef.current;
+      if (!currentState || currentState.listId !== activeListId || !currentState.serverBacked) { return; }
 
-      if (!recordMatchesCurrentState(lastPersistedRecordRef.current, {
-        input,
-        items,
-        countryCode,
-        listId: activeListId,
-        serverBacked: isServerBackedList,
-        listName,
-      })) {
+      if (!recordMatchesCurrentState(lastBackendPersistedRecordRef.current, currentState)) {
         return;
       }
 
@@ -1896,7 +1972,7 @@ export default function App() {
         if (cancelled || !remotePayload.exists) { return; }
 
         const remoteUpdatedAt = remotePayload.updatedAt ?? remotePayload.record.updatedAt;
-        const localUpdatedAt = lastPersistedRecordRef.current?.updatedAt;
+        const localUpdatedAt = lastBackendPersistedRecordRef.current?.updatedAt;
         if (timestampValue(remoteUpdatedAt) <= timestampValue(localUpdatedAt)) { return; }
 
         const remoteRecord = {
@@ -1905,7 +1981,9 @@ export default function App() {
           serverBacked: true,
           updatedAt: remoteUpdatedAt,
         };
-        lastPersistedRecordRef.current = remoteRecord;
+        lastLocalPersistedRecordRef.current = remoteRecord;
+        lastBackendPersistedRecordRef.current = remoteRecord;
+        pendingBackendSaveRecordRef.current = undefined;
         suppressNextAutosaveStatusRef.current = true;
         skipNextAutosaveRef.current = true;
         if (remoteSyncStatusTimerRef.current) {
@@ -1920,7 +1998,7 @@ export default function App() {
         setInput(remoteRecord.input);
         setItems(parseItems(
           remoteRecord.input,
-          countryConfigForMeasurementDisplayMode(remoteRecord.countryCode, measurementDisplayMode),
+          countryConfigForMeasurementDisplayMode(remoteRecord.countryCode, currentState.measurementDisplayMode),
           remoteRecord.items,
         ));
         setSharedListHistory(
@@ -1958,13 +2036,23 @@ export default function App() {
         ? undefined
         : new EventSource(sharedShoppingListEventsUrl(activeListId));
     const intervalId = window.setInterval(() => {
+      if (isSseOpen && Date.now() - lastFallbackPollAt < SHARED_LIST_SYNC_SSE_FALLBACK_POLL_MS) { return; }
+      lastFallbackPollAt = Date.now();
       void syncRemoteRecord();
-    }, eventSource ? SHARED_LIST_SYNC_SSE_FALLBACK_POLL_MS : SHARED_LIST_SYNC_POLL_MS);
+    }, SHARED_LIST_SYNC_POLL_MS);
     const handleRemoteListEvent = () => {
       void syncRemoteRecord();
     };
+    const handleEventSourceOpen = () => {
+      isSseOpen = true;
+    };
+    const handleEventSourceError = () => {
+      isSseOpen = false;
+    };
 
     void syncRemoteRecord();
+    eventSource?.addEventListener('open', handleEventSourceOpen);
+    eventSource?.addEventListener('error', handleEventSourceError);
     eventSource?.addEventListener('updated', handleRemoteListEvent);
     eventSource?.addEventListener('deleted', handleRemoteListEvent);
     window.addEventListener('focus', requestSync);
@@ -1975,6 +2063,10 @@ export default function App() {
       cancelled = true;
       eventSource?.close();
       window.clearInterval(intervalId);
+      eventSource?.removeEventListener('open', handleEventSourceOpen);
+      eventSource?.removeEventListener('error', handleEventSourceError);
+      eventSource?.removeEventListener('updated', handleRemoteListEvent);
+      eventSource?.removeEventListener('deleted', handleRemoteListEvent);
       window.removeEventListener('focus', requestSync);
       window.removeEventListener('online', requestSync);
       document.removeEventListener('visibilitychange', requestVisibleSync);
@@ -1982,13 +2074,8 @@ export default function App() {
   }, [
     activeListId,
     canUseBackend,
-    countryCode,
-    input,
     isLoaded,
     isServerBackedList,
-    items,
-    listName,
-    measurementDisplayMode,
     storageMode,
     verboseDebugLog,
   ]);
@@ -2007,7 +2094,8 @@ export default function App() {
       const record = buildRecord(input, items, countryCode, activeListId, true, listName);
       await saveSharedShoppingList(activeListId, record);
       localStorageRepository.save(record);
-      lastPersistedRecordRef.current = record;
+      lastLocalPersistedRecordRef.current = record;
+      lastBackendPersistedRecordRef.current = record;
       rememberSharedList({
         listId: activeListId,
         listName: record.listName,
@@ -2071,7 +2159,8 @@ export default function App() {
     }
 
     const initial = defaultRecord();
-    lastPersistedRecordRef.current = initial;
+    lastLocalPersistedRecordRef.current = initial;
+    lastBackendPersistedRecordRef.current = undefined;
     setActiveListId(initial.listId ?? createUuidV7());
     setIsServerBackedList(false);
     setStorageMode('local');

@@ -6,6 +6,30 @@ const UPDATE_RELOAD_OVERLAY_ID = 'pwa-update-reload-overlay';
 const UPDATE_RELOAD_OVERLAY_STYLE_ID = 'pwa-update-reload-overlay-style';
 const UPDATE_RELOAD_SESSION_KEY = 'smart-shopping-list-update-reload-overlay-v1';
 
+const readUpdateReloadSessionFlag = (): boolean => {
+  try {
+    return window.sessionStorage.getItem(UPDATE_RELOAD_SESSION_KEY) === 'true';
+  } catch {
+    return false;
+  }
+};
+
+const writeUpdateReloadSessionFlag = (): void => {
+  try {
+    window.sessionStorage.setItem(UPDATE_RELOAD_SESSION_KEY, 'true');
+  } catch {
+    // Non-fatal: the overlay still appears before reload, but cannot persist across it.
+  }
+};
+
+const clearUpdateReloadSessionFlag = (): void => {
+  try {
+    window.sessionStorage.removeItem(UPDATE_RELOAD_SESSION_KEY);
+  } catch {
+    // Non-fatal: storage may be unavailable in private or locked-down browser modes.
+  }
+};
+
 const ensureUpdateReloadOverlayStyles = (): void => {
   if (document.getElementById(UPDATE_RELOAD_OVERLAY_STYLE_ID)) { return; }
 
@@ -94,14 +118,14 @@ export const fadeOutUpdateReloadOverlay = (): void => {
 };
 
 export const showUpdateReloadOverlayForReload = (): void => {
-  window.sessionStorage.setItem(UPDATE_RELOAD_SESSION_KEY, 'true');
+  writeUpdateReloadSessionFlag();
   fadeInUpdateReloadOverlay();
 };
 
 export const hideUpdateReloadOverlayAfterReload = (): void => {
-  if (window.sessionStorage.getItem(UPDATE_RELOAD_SESSION_KEY) !== 'true') { return; }
+  if (!readUpdateReloadSessionFlag()) { return; }
 
-  window.sessionStorage.removeItem(UPDATE_RELOAD_SESSION_KEY);
+  clearUpdateReloadSessionFlag();
   createUpdateReloadOverlay('1');
   fadeOutUpdateReloadOverlay();
 };
