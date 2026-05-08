@@ -163,6 +163,7 @@ export const de: Messages = {
     about: {
       tagline: 'Ein kostenloser, datenschutzbewusster Einkaufsroutenplaner.',
       versionLabel: 'Version',
+      updateAvailableAction: 'Update verfügbar',
       hostLabel: 'Host',
       authorLabel: 'Erstellt von',
       authorValue: 'Rob',

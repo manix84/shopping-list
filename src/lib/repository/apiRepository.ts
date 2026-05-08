@@ -69,6 +69,7 @@ export const checkBackendStatus = async (): Promise<BackendStatus> => {
     const health = (await healthResponse.json()) as {
       ok?: unknown;
       mode?: unknown;
+      version?: unknown;
       database?: ApiDatabaseStatusPayload;
     };
     const database = health.database;
@@ -78,6 +79,7 @@ export const checkBackendStatus = async (): Promise<BackendStatus> => {
       health: {
         ok: health.ok === true,
         mode: typeof health.mode === 'string' ? health.mode : undefined,
+        version: typeof health.version === 'string' ? health.version : undefined,
       },
       database: {
         ok: health.ok === true && database?.ok === true,

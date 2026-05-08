@@ -10,11 +10,19 @@ const DEBUG_MODE_TAP_RESET_MS = 2_000;
 
 type AboutPageProps = {
   isDebugMode: boolean;
+  isUpdateAvailable: boolean;
   onEnableDebugMode: () => void;
   onAlreadyDebugMode: () => void;
+  onRefreshUpdate: () => void;
 };
 
-export function AboutPage({ isDebugMode, onEnableDebugMode, onAlreadyDebugMode }: AboutPageProps) {
+export function AboutPage({
+  isDebugMode,
+  isUpdateAvailable,
+  onEnableDebugMode,
+  onAlreadyDebugMode,
+  onRefreshUpdate,
+}: AboutPageProps) {
   const { messages } = useI18n();
   const about = messages.pages.about;
   const runtimeHostname =
@@ -79,6 +87,15 @@ export function AboutPage({ isDebugMode, onEnableDebugMode, onAlreadyDebugMode }
               <span onPointerUp={handleVersionTap}>
                 {appVersion}
               </span>
+              {isUpdateAvailable ? (
+                <>
+                  {' ('}
+                  <button className={'button button-link'} type={'button'} onClick={onRefreshUpdate}>
+                    {about.updateAvailableAction}
+                  </button>
+                  {')'}
+                </>
+              ) : null}
             </dd>
           </div>
           <div>

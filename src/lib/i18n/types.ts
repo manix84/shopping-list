@@ -157,6 +157,7 @@ export type Messages = {
     about: {
       tagline: string;
       versionLabel: string;
+      updateAvailableAction: string;
       hostLabel: string;
       authorLabel: string;
       authorValue: string;

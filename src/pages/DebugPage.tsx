@@ -975,7 +975,7 @@ export function DebugPage({
               backendStatus.state === 'connected' || backendStatus.state === 'error'
                 ? `${messages.labels.state} ${backendStateLabel(backendStatus, messages)}, ${messages.labels.mode} ${
                     backendStatus.health.mode ?? messages.labels.unknown
-                  }`
+                  }, ${messages.pages.about.versionLabel} ${backendStatus.health.version ?? messages.labels.unknown}`
                 : `${messages.labels.state} ${backendStateLabel(backendStatus, messages)}`
             }
             passed={backendStatus.health.ok}
@@ -1010,6 +1010,10 @@ export function DebugPage({
                       ? databaseAdapterLabel(backendStatus, messages)
                       : messages.pages.debug.unavailable}
                   </td>
+                </tr>
+                <tr>
+                  <th scope={'row'}>{messages.pages.about.versionLabel}</th>
+                  <td>{backendStatus.health.version ?? messages.pages.debug.unavailable}</td>
                 </tr>
                 <tr>
                   <th scope={'row'}>{messages.labels.sharedLists}</th>

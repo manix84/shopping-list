@@ -161,6 +161,7 @@ export const it: Messages = {
     about: {
       tagline: 'Un pianificatore gratuito del percorso spesa attento alla privacy.',
       versionLabel: 'Versione',
+      updateAvailableAction: 'Aggiornamento disponibile',
       hostLabel: 'Host',
       authorLabel: 'Creato da',
       authorValue: 'Rob',

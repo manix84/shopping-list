@@ -1,4 +1,4 @@
-import { createReadStream } from 'node:fs';
+import { createReadStream, readFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { extname, join, resolve } from 'node:path';
@@ -15,6 +15,7 @@ import { isShoppingListRecord } from './validation.mjs';
 
 const port = Number(process.env.PORT ?? 8787);
 const distDir = resolve('dist');
+const appVersion = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')).version;
 const homeAssistantIntegrationEnabled = process.env.ENABLE_HOME_ASSISTANT_INTEGRATION === 'true';
 const clacksOverhead = 'GNU Terry Pratchett';
 
@@ -164,7 +165,7 @@ const handleApi = async (request, response, path) => {
   }
 
   if (request.method === 'GET' && path === '/api/health') {
-    sendJson(response, 200, { ok: true, mode: 'backend', database: await getDatabaseStatus() });
+    sendJson(response, 200, { ok: true, mode: 'backend', version: appVersion, database: await getDatabaseStatus() });
     return;
   }
 
