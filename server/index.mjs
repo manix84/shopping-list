@@ -29,6 +29,51 @@ const contentTypes = {
   '.webmanifest': 'application/manifest+json; charset=utf-8',
 };
 
+const sharedListEventClients = new Map();
+
+const sendSharedListEvent = (response, event) => {
+  response.write(`event: ${event.type}\n`);
+  response.write(`data: ${JSON.stringify(event)}\n\n`);
+};
+
+const addSharedListEventClient = (request, response, listId) => {
+  response.writeHead(200, {
+    'Content-Type': 'text/event-stream; charset=utf-8',
+    'Cache-Control': 'no-cache, no-transform',
+    Connection: 'keep-alive',
+    'X-Accel-Buffering': 'no',
+    'X-Clacks-Overhead': clacksOverhead,
+  });
+  response.write('retry: 5000\n\n');
+  sendSharedListEvent(response, { type: 'connected', listId, updatedAt: new Date().toISOString() });
+
+  const clients = sharedListEventClients.get(listId) ?? new Set();
+  clients.add(response);
+  sharedListEventClients.set(listId, clients);
+
+  const keepAlive = setInterval(() => {
+    response.write(': keep-alive\n\n');
+  }, 25_000);
+
+  request.on('close', () => {
+    clearInterval(keepAlive);
+    clients.delete(response);
+    if (clients.size === 0) {
+      sharedListEventClients.delete(listId);
+    }
+    response.end();
+  });
+};
+
+const publishSharedListEvent = (listId, event) => {
+  const clients = sharedListEventClients.get(listId);
+  if (!clients) { return; }
+
+  for (const client of clients) {
+    sendSharedListEvent(client, { ...event, listId });
+  }
+};
+
 const sendJson = (response, statusCode, payload) => {
   response.writeHead(statusCode, {
     'Content-Type': 'application/json; charset=utf-8',
@@ -105,6 +150,23 @@ const handleApi = async (request, response, path) => {
     return;
   }
 
+  const sharedListEventsMatch = path.match(/^\/api\/shared-lists\/([^/]+)\/events$/);
+  if (sharedListEventsMatch) {
+    const id = sharedListEventsMatch[1];
+    if (!isSharedListId(id)) {
+      sendJson(response, 400, { error: 'Invalid shared list id' });
+      return;
+    }
+
+    if (request.method !== 'GET') {
+      sendJson(response, 405, { error: 'Method not allowed' });
+      return;
+    }
+
+    addSharedListEventClient(request, response, id);
+    return;
+  }
+
   const sharedListMatch = path.match(/^\/api\/shared-lists\/([^/]+)$/);
   if (sharedListMatch) {
     const id = sharedListMatch[1];
@@ -125,12 +187,16 @@ const handleApi = async (request, response, path) => {
         return;
       }
 
-      sendJson(response, 200, await saveSharedList(id, record));
+      const payload = await saveSharedList(id, record);
+      publishSharedListEvent(id, { type: 'updated', updatedAt: payload.updatedAt ?? payload.record.updatedAt });
+      sendJson(response, 200, payload);
       return;
     }
 
     if (request.method === 'DELETE') {
-      sendJson(response, 200, await clearSharedList(id));
+      const payload = await clearSharedList(id);
+      publishSharedListEvent(id, { type: 'deleted', updatedAt: new Date().toISOString() });
+      sendJson(response, 200, payload);
       return;
     }
   }

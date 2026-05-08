@@ -75,6 +75,7 @@ export const fr: Messages = {
     saveFailed: 'Échec de l’enregistrement',
     saved: 'Enregistré',
     saving: 'Enregistrement',
+    syncing: 'Synchronisation',
     section: 'Section',
     sharedLink: 'Lien partagé',
     sharedLists: 'listes partagées',

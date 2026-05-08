@@ -261,7 +261,7 @@ export type BackendOperationStatus = {
   detail?: string;
 };
 
-export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
+export type SaveStatus = 'idle' | 'saving' | 'syncing' | 'saved' | 'error';
 
 export type DebugSettings = {
   forceLocalStorage: boolean;

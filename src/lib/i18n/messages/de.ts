@@ -75,6 +75,7 @@ export const de: Messages = {
     saveFailed: 'Speichern fehlgeschlagen',
     saved: 'Gespeichert',
     saving: 'Speichern',
+    syncing: 'Synchronisieren',
     section: 'Bereich',
     sharedLink: 'Freigabelink',
     sharedLists: 'freigegebene Listen',

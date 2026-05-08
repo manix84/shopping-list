@@ -75,6 +75,7 @@ export const pi: Messages = {
     saveFailed: 'Save failed',
     saved: 'Saved',
     saving: 'Saving',
+    syncing: 'Syncing',
     section: 'Deck',
     sharedLink: 'Shared chart',
     sharedLists: 'shared ledgers',

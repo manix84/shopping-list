@@ -118,6 +118,9 @@ export const loadSharedShoppingList = async (listId: string): Promise<ApiShoppin
   };
 };
 
+export const sharedShoppingListEventsUrl = (listId: string): string =>
+  apiUrl(`/api/shared-lists/${listId}/events`);
+
 export const saveSharedShoppingList = async (listId: string, record: ShoppingListRecord): Promise<void> => {
   const sharedRecord: ShoppingListRecord = {
     ...record,

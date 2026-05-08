@@ -74,6 +74,7 @@ export const ro: Messages = {
     saveFailed: 'Salvarea a eșuat',
     saved: 'Salvat',
     saving: 'Se salvează',
+    syncing: 'Se sincronizează',
     section: 'Secțiune',
     sharedLink: 'Link partajat',
     sharedLists: 'liste partajate',

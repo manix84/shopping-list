@@ -84,6 +84,7 @@ export type Messages = {
     saveFailed: string;
     saved: string;
     saving: string;
+    syncing: string;
     section: string;
     sharedLink: string;
     sharedLists: string;

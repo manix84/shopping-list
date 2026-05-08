@@ -40,6 +40,7 @@ import {
   clearSharedShoppingList,
   loadSharedShoppingList,
   saveSharedShoppingList,
+  sharedShoppingListEventsUrl,
 } from './lib/repository/apiRepository';
 import {
   defaultRecord,
@@ -71,6 +72,7 @@ const BACKEND_HEARTBEAT_CONNECTED_MS = 5_000;
 const BACKEND_HEARTBEAT_RETRY_MS = 1_500;
 const BACKEND_HEARTBEAT_HISTORY_LIMIT = 36;
 const SHARED_LIST_NOTIFICATION_POLL_MS = 30_000;
+const SHARED_LIST_SYNC_POLL_MS = 5_000;
 const SHARED_LIST_NOTIFICATION_GROUP_MS = 2 * 60_000;
 const SHARED_LIST_NOTIFICATION_PREVIEW_LIMIT = 3;
 const NOTIFICATION_SERVICE_WORKER_READY_TIMEOUT_MS = 750;
@@ -366,6 +368,11 @@ const recordMatchesCurrentState = (
   (record.listName ?? undefined) === (listName.trim() || undefined) &&
   JSON.stringify(record.items) === JSON.stringify(items);
 
+const timestampValue = (value: string | undefined): number => {
+  const parsed = Date.parse(value ?? '');
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
 function updateItemTextInInput(input: string, previousDisplay: string, nextDisplay: string): string {
   const lines = input.split('\n');
   const index = lines.findIndex((line) => cleanLine(line) === cleanLine(previousDisplay));
@@ -426,6 +433,7 @@ export default function App() {
   const saveRequestIdRef = useRef(0);
   const lastPersistedRecordRef = useRef<ShoppingListRecord>();
   const skipNextAutosaveRef = useRef(false);
+  const remoteSyncStatusTimerRef = useRef<number>();
   const suppressNextAutosaveStatusRef = useRef(true);
   const suppressNextAutosaveStatus = () => {
     suppressNextAutosaveStatusRef.current = true;
@@ -480,6 +488,13 @@ export default function App() {
   useEffect(() => {
     currentItemsRef.current = items;
   }, [items]);
+
+  useEffect(() => () => {
+    if (remoteSyncStatusTimerRef.current) {
+      window.clearTimeout(remoteSyncStatusTimerRef.current);
+      remoteSyncStatusTimerRef.current = undefined;
+    }
+  }, []);
 
   const changePage = (nextPage: PageKey) => {
     setRoute((current) => ({
@@ -1783,6 +1798,128 @@ export default function App() {
       record.items,
     ));
   };
+
+  useEffect(() => {
+    if (!isLoaded || !isServerBackedList || storageMode !== 'backend' || !canUseBackend) { return; }
+
+    let cancelled = false;
+    let inFlight = false;
+    const syncRemoteRecord = async () => {
+      if (cancelled || inFlight) { return; }
+
+      if (!recordMatchesCurrentState(lastPersistedRecordRef.current, {
+        input,
+        items,
+        countryCode,
+        listId: activeListId,
+        serverBacked: isServerBackedList,
+        listName,
+      })) {
+        return;
+      }
+
+      inFlight = true;
+      try {
+        const remotePayload = await loadSharedShoppingList(activeListId);
+        if (cancelled || !remotePayload.exists) { return; }
+
+        const remoteUpdatedAt = remotePayload.updatedAt ?? remotePayload.record.updatedAt;
+        const localUpdatedAt = lastPersistedRecordRef.current?.updatedAt;
+        if (timestampValue(remoteUpdatedAt) <= timestampValue(localUpdatedAt)) { return; }
+
+        const remoteRecord = {
+          ...remotePayload.record,
+          listId: activeListId,
+          serverBacked: true,
+          updatedAt: remoteUpdatedAt,
+        };
+        lastPersistedRecordRef.current = remoteRecord;
+        suppressNextAutosaveStatusRef.current = true;
+        skipNextAutosaveRef.current = true;
+        if (remoteSyncStatusTimerRef.current) {
+          window.clearTimeout(remoteSyncStatusTimerRef.current);
+        }
+        setSaveStatus('syncing');
+        localStorageRepository.save(remoteRecord);
+        setStorageMode('backend');
+        setIsServerBackedList(true);
+        setCountryCode(remoteRecord.countryCode);
+        setListName(remoteRecord.listName ?? '');
+        setInput(remoteRecord.input);
+        setItems(parseItems(
+          remoteRecord.input,
+          countryConfigForMeasurementDisplayMode(remoteRecord.countryCode, measurementDisplayMode),
+          remoteRecord.items,
+        ));
+        setSharedListHistory(
+          sharedListHistoryRepository.remember({
+            listId: activeListId,
+            listName: remoteRecord.listName,
+            itemPreview: getSharedListPreview(remoteRecord.items),
+            createdAt: remotePayload.createdAt,
+            updatedAt: remoteUpdatedAt,
+            viewedAt: new Date().toISOString(),
+          }),
+        );
+        remoteSyncStatusTimerRef.current = window.setTimeout(() => {
+          setSaveStatus('saved');
+          remoteSyncStatusTimerRef.current = undefined;
+        }, 300);
+        verboseDebugLog('shared list remote update applied', { listId: activeListId, updatedAt: remoteUpdatedAt });
+      } catch (error) {
+        verboseDebugLog('shared list remote update check failed', { listId: activeListId, error });
+      } finally {
+        inFlight = false;
+      }
+    };
+
+    const intervalId = window.setInterval(() => {
+      void syncRemoteRecord();
+    }, SHARED_LIST_SYNC_POLL_MS);
+    const requestSync = () => {
+      void syncRemoteRecord();
+    };
+    const requestVisibleSync = () => {
+      if (document.visibilityState === 'visible') {
+        void syncRemoteRecord();
+      }
+    };
+    const eventSource =
+      typeof EventSource === 'undefined'
+        ? undefined
+        : new EventSource(sharedShoppingListEventsUrl(activeListId));
+    const handleRemoteListEvent = () => {
+      void syncRemoteRecord();
+    };
+
+    void syncRemoteRecord();
+    eventSource?.addEventListener('updated', handleRemoteListEvent);
+    eventSource?.addEventListener('deleted', handleRemoteListEvent);
+    window.addEventListener('focus', requestSync);
+    window.addEventListener('online', requestSync);
+    document.addEventListener('visibilitychange', requestVisibleSync);
+
+    return () => {
+      cancelled = true;
+      eventSource?.close();
+      window.clearInterval(intervalId);
+      window.removeEventListener('focus', requestSync);
+      window.removeEventListener('online', requestSync);
+      document.removeEventListener('visibilitychange', requestVisibleSync);
+    };
+  }, [
+    activeListId,
+    canUseBackend,
+    countryCode,
+    input,
+    isLoaded,
+    isServerBackedList,
+    items,
+    listName,
+    measurementDisplayMode,
+    storageMode,
+    verboseDebugLog,
+  ]);
 
   const handleCreateSharedLink = async () => {
     if (!canUseBackend) {

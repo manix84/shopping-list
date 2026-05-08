@@ -75,6 +75,7 @@ export const nl: Messages = {
     saveFailed: 'Opslaan mislukt',
     saved: 'Opgeslagen',
     saving: 'Opslaan',
+    syncing: 'Synchroniseren',
     section: 'Sectie',
     sharedLink: 'Deellink',
     sharedLists: 'gedeelde lijsten',

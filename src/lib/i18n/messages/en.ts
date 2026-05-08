@@ -71,6 +71,7 @@ export const en: Messages = {
     saveFailed: 'Save failed',
     saved: 'Saved',
     saving: 'Saving',
+    syncing: 'Syncing',
     section: 'Section',
     sharedLink: 'Shared link',
     sharedLists: 'shared lists',

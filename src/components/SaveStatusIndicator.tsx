@@ -16,6 +16,9 @@ export const getSaveStatusIndicatorConfig = (status: SaveStatus, messages: Messa
   if (status === 'saving') {
     return { icon: mdiCloudSync, label: messages.labels.saving };
   }
+  if (status === 'syncing') {
+    return { icon: mdiCloudSync, label: messages.labels.syncing };
+  }
   if (status === 'error') {
     return { icon: mdiCloudAlert, label: messages.labels.saveFailed };
   }

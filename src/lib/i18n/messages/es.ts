@@ -70,6 +70,7 @@ export const es: Messages = {
     saveFailed: 'Error al guardar',
     saved: 'Guardado',
     saving: 'Guardando',
+    syncing: 'Sincronizando',
     section: 'Sección',
     sharedLink: 'Enlace compartido',
     sharedLists: 'listas compartidas',
