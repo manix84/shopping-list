@@ -213,6 +213,14 @@ export type Messages = {
       backendError: string;
       backendOffline: string;
       heartbeatTitle: string;
+      heartbeatTitleWithQuality: string;
+      heartbeatQualityWaiting: string;
+      heartbeatQualityChecking: string;
+      heartbeatQualityHealthy: string;
+      heartbeatQualityGood: string;
+      heartbeatQualityOkay: string;
+      heartbeatQualityPoor: string;
+      heartbeatQualityCritical: string;
       heartbeatSubtitle: string;
       heartbeatLastChecked: string;
       heartbeatLatency: string;

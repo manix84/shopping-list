@@ -253,6 +253,21 @@ const heartbeatSampleStateLabel = (sample: BackendHeartbeatSample, messages: Mes
 const formatHeartbeatLatency = (sample: BackendHeartbeatSample, messages: Messages) =>
   isHeartbeatFailed(sample) ? heartbeatSampleStateLabel(sample, messages) : `${sample.latencyMs}ms`;
 
+const heartbeatQualityLabel = (sample: BackendHeartbeatSample | undefined, messages: Messages) => {
+  if (!sample) { return messages.pages.debug.heartbeatQualityWaiting; }
+  if (sample.state === 'checking') { return messages.pages.debug.heartbeatQualityChecking; }
+  if (isHeartbeatFailed(sample)) { return messages.pages.debug.heartbeatQualityCritical; }
+  if (sample.latencyMs <= 50) { return messages.pages.debug.heartbeatQualityHealthy; }
+  if (sample.latencyMs <= 100) { return messages.pages.debug.heartbeatQualityGood; }
+  if (sample.latencyMs <= 175) { return messages.pages.debug.heartbeatQualityOkay; }
+  return messages.pages.debug.heartbeatQualityPoor;
+};
+
+const heartbeatTitleWithQuality = (quality: string, messages: Messages) =>
+  messages.pages.debug.heartbeatTitleWithQuality
+    .replace('{title}', messages.pages.debug.heartbeatTitle)
+    .replace('{quality}', quality);
+
 const heartbeatLatencyToneColor = (sample: BackendHeartbeatSample) => {
   if (isHeartbeatFailed(sample)) { return HEARTBEAT_LATENCY_FAILURE_COLOR; }
 
@@ -414,6 +429,8 @@ export function DebugPage({
   };
   const latestHeartbeat = heartbeatSamples.at(-1);
   const heartbeatTone = latestHeartbeat?.state ?? backendStatus.state;
+  const heartbeatQuality = heartbeatQualityLabel(latestHeartbeat, messages);
+  const heartbeatTitle = heartbeatTitleWithQuality(heartbeatQuality, messages);
   const heartbeatPulseColor = latestHeartbeat ? heartbeatLatencyToneColor(latestHeartbeat) : undefined;
   const heartbeatSlots = heartbeatHistorySlots(heartbeatSamples);
   const heartbeatSampleSlots = heartbeatSlots.filter((slot): slot is HeartbeatHistorySlot & { sample: BackendHeartbeatSample } =>
@@ -645,11 +662,11 @@ export function DebugPage({
                 <span className={'heartbeat-pulse-core'} />
               </div>
               <div>
-                <h3 className={'title title-xs'}>{messages.pages.debug.heartbeatTitle}</h3>
+                <h3 className={'title title-xs'}>{heartbeatTitle}</h3>
                 <p className={'small-text'}>{messages.pages.debug.heartbeatSubtitle}</p>
               </div>
             </div>
-            <div className={'heartbeat-metrics'} aria-label={messages.pages.debug.heartbeatTitle}>
+            <div className={'heartbeat-metrics'} aria-label={heartbeatTitle}>
               <div>
                 <span>{messages.pages.debug.heartbeatLastChecked}</span>
                 <strong>
@@ -675,7 +692,7 @@ export function DebugPage({
                 </div>
               ) : null}
             </div>
-            <div className={'heartbeat-chart-scroll'} role={'group'} aria-label={messages.pages.debug.heartbeatTitle}>
+            <div className={'heartbeat-chart-scroll'} role={'group'} aria-label={heartbeatTitle}>
               <div className={'heartbeat-graph'}>
                 <div className={'heartbeat-graph-axis'} aria-hidden={'true'}>
                   {heartbeatAxisTicks.map((latencyMs) => (
