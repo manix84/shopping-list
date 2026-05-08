@@ -340,6 +340,32 @@ const recordFromCurrentState = ({
   countryCode,
 });
 
+const recordMatchesCurrentState = (
+  record: ShoppingListRecord | undefined,
+  {
+    input,
+    items,
+    countryCode,
+    listId,
+    serverBacked,
+    listName,
+  }: {
+    input: string;
+    items: Item[];
+    countryCode: CountryCode;
+    listId: string;
+    serverBacked: boolean;
+    listName: string;
+  },
+): record is ShoppingListRecord =>
+  record !== undefined &&
+  record.listId === listId &&
+  record.input === input &&
+  record.countryCode === countryCode &&
+  record.serverBacked === serverBacked &&
+  (record.listName ?? undefined) === (listName.trim() || undefined) &&
+  JSON.stringify(record.items) === JSON.stringify(items);
+
 function updateItemTextInInput(input: string, previousDisplay: string, nextDisplay: string): string {
   const lines = input.split('\n');
   const index = lines.findIndex((line) => cleanLine(line) === cleanLine(previousDisplay));
@@ -399,9 +425,11 @@ export default function App() {
   const debugNotificationListIdRef = useRef(DEBUG_NOTIFICATION_LIST_ID);
   const saveRequestIdRef = useRef(0);
   const lastPersistedRecordRef = useRef<ShoppingListRecord>();
+  const skipNextAutosaveRef = useRef(false);
   const suppressNextAutosaveStatusRef = useRef(true);
   const suppressNextAutosaveStatus = () => {
     suppressNextAutosaveStatusRef.current = true;
+    skipNextAutosaveRef.current = true;
     setSaveStatus('idle');
   };
 
@@ -421,23 +449,25 @@ export default function App() {
       : `${window.location.origin}${appBasePath}/list/${activeListId}/edit`;
   const currentSharedListDatabaseEntry = useMemo(() => {
     const persistedRecord = lastPersistedRecordRef.current;
-    const record =
-      persistedRecord &&
-      persistedRecord.listId === activeListId &&
-      persistedRecord.input === input &&
-      persistedRecord.countryCode === countryCode &&
-      persistedRecord.serverBacked === isServerBackedList &&
-      (persistedRecord.listName ?? '') === listName.trim()
-        ? { ...persistedRecord, items }
-        : recordFromCurrentState({
-            input,
-            items,
-            countryCode,
-            listId: activeListId,
-            serverBacked: isServerBackedList,
-            listName,
-            updatedAt: persistedRecord?.updatedAt,
-          });
+    const persistedUpdatedAt = persistedRecord?.updatedAt;
+    const record = recordMatchesCurrentState(persistedRecord, {
+      input,
+      items,
+      countryCode,
+      listId: activeListId,
+      serverBacked: isServerBackedList,
+      listName,
+    })
+      ? persistedRecord
+      : recordFromCurrentState({
+          input,
+          items,
+          countryCode,
+          listId: activeListId,
+          serverBacked: isServerBackedList,
+          listName,
+          updatedAt: persistedUpdatedAt,
+        });
     return {
       id: activeListId,
       exists: true,
@@ -1163,6 +1193,7 @@ export default function App() {
         countryConfigForMeasurementDisplayMode(selectedRecord.countryCode, measurementDisplayMode),
         selectedRecord.items,
       ));
+      lastPersistedRecordRef.current = selectedRecord;
       setIsLoaded(true);
     };
 
@@ -1408,8 +1439,22 @@ export default function App() {
     if (!isLoaded) { return; }
     const saveRequestId = saveRequestIdRef.current + 1;
     saveRequestIdRef.current = saveRequestId;
+    const shouldSkipAutosave = skipNextAutosaveRef.current;
+    skipNextAutosaveRef.current = false;
     const shouldReportSaveStatus = !suppressNextAutosaveStatusRef.current;
     suppressNextAutosaveStatusRef.current = false;
+
+    if (shouldSkipAutosave || recordMatchesCurrentState(lastPersistedRecordRef.current, {
+      input,
+      items,
+      countryCode,
+      listId: activeListId,
+      serverBacked: isServerBackedList,
+      listName,
+    })) {
+      return;
+    }
+
     if (shouldReportSaveStatus) {
       setSaveStatus('saving');
     }
