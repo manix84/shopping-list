@@ -368,6 +368,8 @@ export const en: Messages = {
       eventToastPlainMessage: 'This popup intentionally has no title or icon.',
       eventPwaInstallNudgeLabel: 'PWA install nudge',
       eventPwaInstallNudgeHint: 'Shows the floating install prompt without waiting for browser timing.',
+      eventPwaUpdateOverlayLabel: 'Update overlay',
+      eventPwaUpdateOverlayHint: 'Previews the themed overlay shown while an app update reload is in progress.',
       eventSecretAisleLabel: 'Secret aisle overlay',
       eventSecretAisleHint: 'Opens the hidden overlay used by the app header interaction.',
       eventPredatorLabel: 'Startup visual effect',

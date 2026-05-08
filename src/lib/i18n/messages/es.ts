@@ -374,6 +374,8 @@ export const es: Messages = {
       eventToastPlainMessage: 'Este popup no tiene título ni icono intencionadamente.',
       eventPwaInstallNudgeLabel: 'Aviso de instalación PWA',
       eventPwaInstallNudgeHint: 'Muestra el aviso flotante de instalación sin esperar al navegador.',
+      eventPwaUpdateOverlayLabel: 'Superposición de actualización',
+      eventPwaUpdateOverlayHint: 'Previsualiza la superposición temática que aparece durante la recarga de una actualización.',
       eventSecretAisleLabel: 'Superposición de pasillo secreto',
       eventSecretAisleHint: 'Abre la superposición oculta usada por la interacción del encabezado.',
       eventPredatorLabel: 'Efecto visual de inicio',

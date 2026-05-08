@@ -1485,6 +1485,11 @@ export function DebugPage({
               onClick={() => onDebugEventTest('pwa-install-nudge')}
             />
             <DebugEventButton
+              label={messages.pages.debug.eventPwaUpdateOverlayLabel}
+              hint={messages.pages.debug.eventPwaUpdateOverlayHint}
+              onClick={() => onDebugEventTest('pwa-update-overlay')}
+            />
+            <DebugEventButton
               label={messages.pages.debug.eventSecretAisleLabel}
               hint={messages.pages.debug.eventSecretAisleHint}
               onClick={() => onDebugEventTest('secret-aisle')}

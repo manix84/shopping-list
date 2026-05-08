@@ -379,6 +379,8 @@ export const fr: Messages = {
       eventToastPlainMessage: 'Ce popup n’a volontairement ni titre ni icône.',
       eventPwaInstallNudgeLabel: 'Invite d’installation PWA',
       eventPwaInstallNudgeHint: 'Affiche l’invite flottante d’installation sans attendre le navigateur.',
+      eventPwaUpdateOverlayLabel: 'Superposition de mise à jour',
+      eventPwaUpdateOverlayHint: 'Prévisualise la superposition du thème affichée pendant le rechargement d’une mise à jour.',
       eventSecretAisleLabel: 'Superposition allée secrète',
       eventSecretAisleHint: 'Ouvre la superposition cachée utilisée par l’interaction de l’en-tête.',
       eventPredatorLabel: 'Effet visuel de démarrage',

@@ -335,6 +335,8 @@ export type Messages = {
       eventToastPlainMessage: string;
       eventPwaInstallNudgeLabel: string;
       eventPwaInstallNudgeHint: string;
+      eventPwaUpdateOverlayLabel: string;
+      eventPwaUpdateOverlayHint: string;
       eventSecretAisleLabel: string;
       eventSecretAisleHint: string;
       eventPredatorLabel: string;

@@ -376,6 +376,8 @@ export const ro: Messages = {
       eventToastPlainMessage: 'Acest popup nu are intenționat titlu sau pictogramă.',
       eventPwaInstallNudgeLabel: 'Invitație instalare PWA',
       eventPwaInstallNudgeHint: 'Afișează invitația flotantă de instalare fără a aștepta browserul.',
+      eventPwaUpdateOverlayLabel: 'Suprapunere actualizare',
+      eventPwaUpdateOverlayHint: 'Previzualizează suprapunerea temei afișată în timpul reîncărcării unei actualizări.',
       eventSecretAisleLabel: 'Suprapunere culoar secret',
       eventSecretAisleHint: 'Deschide suprapunerea ascunsă folosită de interacțiunea antetului.',
       eventPredatorLabel: 'Efect vizual de pornire',

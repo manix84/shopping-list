@@ -377,6 +377,8 @@ export const it: Messages = {
       eventToastPlainMessage: 'Questo popup non ha volutamente titolo né icona.',
       eventPwaInstallNudgeLabel: 'Suggerimento installazione PWA',
       eventPwaInstallNudgeHint: 'Mostra il suggerimento flottante di installazione senza attendere il browser.',
+      eventPwaUpdateOverlayLabel: 'Overlay aggiornamento',
+      eventPwaUpdateOverlayHint: 'Mostra in anteprima l’overlay del tema durante il ricaricamento di un aggiornamento.',
       eventSecretAisleLabel: 'Overlay corridoio segreto',
       eventSecretAisleHint: 'Apre l’overlay nascosto usato dall’interazione dell’intestazione.',
       eventPredatorLabel: 'Effetto visivo di avvio',

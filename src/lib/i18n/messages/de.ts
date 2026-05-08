@@ -379,6 +379,8 @@ export const de: Messages = {
       eventToastPlainMessage: 'Dieses Popup hat absichtlich keinen Titel und kein Icon.',
       eventPwaInstallNudgeLabel: 'PWA-Installationshinweis',
       eventPwaInstallNudgeHint: 'Zeigt den schwebenden Installationshinweis ohne Browser-Timing.',
+      eventPwaUpdateOverlayLabel: 'Update-Overlay',
+      eventPwaUpdateOverlayHint: 'Zeigt das Design-Overlay, das während eines App-Update-Neuladens erscheint.',
       eventSecretAisleLabel: 'Geheimer-Gang-Overlay',
       eventSecretAisleHint: 'Öffnet das versteckte Overlay der App-Header-Interaktion.',
       eventPredatorLabel: 'Start-Animationseffekt',

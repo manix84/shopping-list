@@ -377,6 +377,8 @@ export const nl: Messages = {
       eventToastPlainMessage: 'Deze pop-up heeft bewust geen titel of pictogram.',
       eventPwaInstallNudgeLabel: 'PWA-installatiemelding',
       eventPwaInstallNudgeHint: 'Toont de zwevende installatieprompt zonder op browser-timing te wachten.',
+      eventPwaUpdateOverlayLabel: 'Update-overlay',
+      eventPwaUpdateOverlayHint: 'Toont de thema-overlay die verschijnt terwijl een app-update herlaadt.',
       eventSecretAisleLabel: 'Geheime-gang overlay',
       eventSecretAisleHint: 'Opent de verborgen overlay van de app-headerinteractie.',
       eventPredatorLabel: 'Visueel starteffect',

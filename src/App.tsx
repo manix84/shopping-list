@@ -55,6 +55,7 @@ import { extractSharedListId } from './lib/sharedLinks';
 import { cleanLine, stripDisplaySizeLabel } from './lib/stringUtils';
 import { loadRouteViewMode, saveRouteViewMode } from './lib/routeViewPreference';
 import { getResolvedTheme, loadThemeMode, saveThemeMode } from './lib/themePreference';
+import { previewUpdateReloadOverlay } from './lib/updateReloadOverlay';
 import { createUuidV7 } from './lib/uuid';
 import { formatCountQuantity } from './lib/quantity';
 import { extractVariant } from './lib/variant';
@@ -882,6 +883,10 @@ export default function App() {
     }
     if (kind === 'pwa-install-nudge') {
       setIsPwaInstallNudgeVisible(true);
+      return;
+    }
+    if (kind === 'pwa-update-overlay') {
+      previewUpdateReloadOverlay();
       return;
     }
     if (kind === 'secret-aisle') {

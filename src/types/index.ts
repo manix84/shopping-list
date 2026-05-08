@@ -19,6 +19,7 @@ export type DebugTabKey =
 export type DebugNotificationTestKey = 'minimal' | 'single-item' | 'few-items' | 'large-batch' | 'silent-follow-up';
 export type DebugEventTestKey =
   | 'pwa-install-nudge'
+  | 'pwa-update-overlay'
   | 'secret-aisle'
   | 'predator'
   | 'toast-success'
