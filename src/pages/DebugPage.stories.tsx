@@ -128,7 +128,7 @@ export const HeartbeatTimeline: Story = {
     await expect(canvas.getByRole('group', { name: /backend heartbeat/i })).toBeVisible();
     await expect(canvas.getByText('0ms')).toBeVisible();
     await expect(canvas.getByText(/status history/i)).toBeVisible();
-    await expect(canvas.getAllByText('offline').length).toBeGreaterThan(0);
+    await expect(canvas.getAllByText(/offline/i).length).toBeGreaterThan(0);
   },
 };
 

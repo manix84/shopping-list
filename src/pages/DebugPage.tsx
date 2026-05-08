@@ -71,7 +71,6 @@ type DebugPageProps = {
 type HeartbeatInteractionSurface = 'graph' | 'history' | 'status';
 
 const HEARTBEAT_HISTORY_SLOT_COUNT = 36;
-const HEARTBEAT_TIMEOUT_LATENCY_MS = 800;
 const HEARTBEAT_LATENCY_GRAPH_BASE_MAX_MS = 100;
 const HEARTBEAT_LATENCY_GRAPH_STEP_MS = 100;
 const HEARTBEAT_LATENCY_TONE_MAX_MS = 250;
@@ -218,8 +217,8 @@ const backendOperationLabel = (operation: BackendOperationStatus, messages: Mess
   return labels[operation.state];
 };
 
-const isHeartbeatTimeout = (sample: BackendHeartbeatSample) =>
-  sample.state === 'offline' && sample.latencyMs >= HEARTBEAT_TIMEOUT_LATENCY_MS;
+const isHeartbeatFailed = (sample: BackendHeartbeatSample) =>
+  sample.state !== 'connected' || !sample.healthOk || !sample.databaseOk;
 
 const heartbeatLatencyGraphMax = (samples: BackendHeartbeatSample[]) => {
   const maxLatency = Math.max(0, ...samples.map((sample) => sample.latencyMs));
@@ -249,18 +248,26 @@ const heartbeatHistorySlots = (samples: BackendHeartbeatSample[]): HeartbeatHist
 
 const heartbeatPoint = (slot: HeartbeatHistorySlot, maxLatencyMs: number) => {
   const x = (slot.index / (HEARTBEAT_HISTORY_SLOT_COUNT - 1)) * 100;
-  const y = slot.sample && (slot.sample.state === 'offline' || isHeartbeatTimeout(slot.sample))
+  const y = slot.sample && isHeartbeatFailed(slot.sample)
     ? 100
     : slot.sample ? heartbeatLatencyY(slot.sample.latencyMs, maxLatencyMs) : 50;
   return { x, y };
 };
 
 const formatHeartbeatAxisTick = (latencyMs: number) => `${latencyMs}ms`;
-const formatHeartbeatLatency = (sample: BackendHeartbeatSample) =>
-  sample.state === 'offline' ? 'offline' : `${sample.latencyMs}ms`;
+
+const heartbeatSampleStateLabel = (sample: BackendHeartbeatSample, messages: Messages) => {
+  if (sample.state === 'checking') { return messages.backendStatus.checking; }
+  if (sample.state === 'error' || !sample.healthOk || !sample.databaseOk) { return messages.backendStatus.issue; }
+  if (sample.state === 'offline') { return messages.backendStatus.frontendOnly; }
+  return messages.backendStatus.connected;
+};
+
+const formatHeartbeatLatency = (sample: BackendHeartbeatSample, messages: Messages) =>
+  isHeartbeatFailed(sample) ? heartbeatSampleStateLabel(sample, messages) : `${sample.latencyMs}ms`;
 
 const heartbeatLatencyTone = (sample: BackendHeartbeatSample) => {
-  if (sample.state === 'offline') { return 'critical'; }
+  if (isHeartbeatFailed(sample)) { return 'critical'; }
 
   const toneIndex = Math.min(
     HEARTBEAT_LATENCY_TONES.length - 1,
@@ -660,7 +667,7 @@ export function DebugPage({
               </div>
               <div>
                 <span>{messages.pages.debug.heartbeatLatency}</span>
-                <strong>{latestHeartbeat ? formatHeartbeatLatency(latestHeartbeat) : messages.pages.debug.unavailable}</strong>
+                <strong>{latestHeartbeat ? formatHeartbeatLatency(latestHeartbeat, messages) : messages.pages.debug.unavailable}</strong>
               </div>
               <div>
                 <span>{messages.labels.state}</span>
@@ -754,7 +761,7 @@ export function DebugPage({
                       type={'button'}
                       className={`heartbeat-graph-point heartbeat-graph-point-${tone} ${isActive ? 'heartbeat-graph-point-active' : ''} ${isTooltipVisible ? 'heartbeat-graph-point-tooltip-visible' : ''}`}
                       style={{ left: `${x}%`, top: `${y}%` }}
-                      aria-label={`${messages.pages.debug.heartbeatLatency}: ${formatHeartbeatLatency(sample)}, ${messages.pages.debug.heartbeatLastChecked}: ${formatHeartbeatTime(sample.checkedAt)}`}
+                      aria-label={`${messages.pages.debug.heartbeatLatency}: ${formatHeartbeatLatency(sample, messages)}, ${messages.pages.debug.heartbeatLastChecked}: ${formatHeartbeatTime(sample.checkedAt)}`}
                       aria-pressed={sample.checkedAt === lockedHeartbeatSampleKey && lockedHeartbeatSurface === 'graph'}
                       onMouseEnter={() => activateHeartbeatSample(sample, 'graph')}
                       onMouseLeave={clearActiveHeartbeatSample}
@@ -763,7 +770,7 @@ export function DebugPage({
                       onClick={() => lockHeartbeatSample(sample, 'graph')}
                     >
                       <span className={`heartbeat-graph-tooltip heartbeat-graph-tooltip-${tone}`} role={'tooltip'}>
-                        <strong>{formatHeartbeatLatency(sample)}</strong>
+                        <strong>{formatHeartbeatLatency(sample, messages)}</strong>
                         <span>{formatHeartbeatTime(sample.checkedAt)}</span>
                       </span>
                     </button>
@@ -875,7 +882,9 @@ export function DebugPage({
                       }}
                       className={`debug-table-row-interactive ${sample.checkedAt === activeHeartbeatSampleKey ? 'debug-table-row-active' : ''}`}
                       tabIndex={0}
-                      aria-label={`${messages.pages.debug.heartbeatLastChecked}: ${formatHeartbeatTime(sample.checkedAt)}, ${messages.labels.state}: ${backendStateLabel({ ...backendStatus, state: sample.state }, messages)}, ${messages.pages.debug.heartbeatLatency}: ${formatHeartbeatLatency(sample)}`}
+                      role={'button'}
+                      aria-pressed={sample.checkedAt === lockedHeartbeatSampleKey && lockedHeartbeatSurface === 'history'}
+                      aria-label={`${messages.pages.debug.heartbeatLastChecked}: ${formatHeartbeatTime(sample.checkedAt)}, ${messages.labels.state}: ${backendStateLabel({ ...backendStatus, state: sample.state }, messages)}, ${messages.pages.debug.heartbeatLatency}: ${formatHeartbeatLatency(sample, messages)}`}
                       onMouseEnter={() => activateHeartbeatSample(sample, 'history')}
                       onMouseLeave={clearActiveHeartbeatSample}
                       onFocus={() => activateHeartbeatSample(sample, 'history')}
@@ -892,7 +901,7 @@ export function DebugPage({
                           ? databaseAdapterLabel({ ...backendStatus, database: { ...backendStatus.database, adapter: sample.adapter } }, messages)
                           : messages.pages.debug.unavailable}
                       </td>
-                      <td>{formatHeartbeatLatency(sample)}</td>
+                      <td>{formatHeartbeatLatency(sample, messages)}</td>
                     </tr>
                   ))
                 )}

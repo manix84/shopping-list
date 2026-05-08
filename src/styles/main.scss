@@ -1252,14 +1252,6 @@ select {
   stroke-width: 4;
 }
 
-.heartbeat-graph-line-excellent { stroke: #16a34a; }
-.heartbeat-graph-line-healthy { stroke: #65a30d; }
-.heartbeat-graph-line-steady { stroke: #ca8a04; }
-.heartbeat-graph-line-elevated { stroke: #f59e0b; }
-.heartbeat-graph-line-slow { stroke: #f97316; }
-.heartbeat-graph-line-strained { stroke: #ea580c; }
-.heartbeat-graph-line-critical { stroke: $danger-text; }
-
 .heartbeat-graph-point {
   background: transparent;
   border: 0;
@@ -1966,9 +1958,10 @@ select {
 
   .button,
   .heartbeat-pulse,
-  .heartbeat-pulse::before,
-  .heartbeat-pulse::after,
-  .heartbeat-pulse span,
+  .heartbeat-pulse-ring,
+  .heartbeat-pulse-ring::before,
+  .heartbeat-pulse-ring::after,
+  .heartbeat-pulse-core,
   .heartbeat-graph-tooltip,
   .heartbeat-status-tooltip,
   .skip-link,
