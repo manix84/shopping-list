@@ -1125,13 +1125,9 @@ select {
   color: $success-text;
 }
 
-.heartbeat-pulse-excellent { color: #16a34a; }
-.heartbeat-pulse-healthy { color: #65a30d; }
-.heartbeat-pulse-steady { color: #ca8a04; }
-.heartbeat-pulse-elevated { color: #f59e0b; }
-.heartbeat-pulse-slow { color: #f97316; }
-.heartbeat-pulse-strained { color: #ea580c; }
-.heartbeat-pulse-critical { color: $danger-text; }
+.heartbeat-pulse-sample {
+  color: var(--heartbeat-tone-color);
+}
 
 .heartbeat-pulse-checking,
 .heartbeat-card-checking .heartbeat-graph-line {
@@ -1286,13 +1282,9 @@ select {
   }
 }
 
-.heartbeat-graph-point-excellent { color: #16a34a; }
-.heartbeat-graph-point-healthy { color: #65a30d; }
-.heartbeat-graph-point-steady { color: #ca8a04; }
-.heartbeat-graph-point-elevated { color: #f59e0b; }
-.heartbeat-graph-point-slow { color: #f97316; }
-.heartbeat-graph-point-strained { color: #ea580c; }
-.heartbeat-graph-point-critical { color: $danger-text; }
+.heartbeat-graph-point-sample {
+  color: var(--heartbeat-tone-color);
+}
 
 .heartbeat-graph-point-ghost {
   background: transparent;
@@ -1318,8 +1310,9 @@ select {
   border: 1px solid currentColor;
   border-radius: 6px;
   bottom: calc(100% + 8px);
+  background: color-mix(in srgb, currentColor 13%, $panel);
   box-shadow: $shadow;
-  color: $text;
+  color: inherit;
   display: grid;
   gap: 2px;
   left: 50%;
@@ -1374,41 +1367,6 @@ select {
   opacity: 1;
   transform: translate(-50%, 0);
   visibility: visible;
-}
-
-.heartbeat-graph-tooltip-excellent {
-  background: color-mix(in srgb, #dcfce7 88%, $panel);
-  color: #166534;
-}
-
-.heartbeat-graph-tooltip-healthy {
-  background: color-mix(in srgb, #ecfccb 88%, $panel);
-  color: #3f6212;
-}
-
-.heartbeat-graph-tooltip-steady {
-  background: color-mix(in srgb, #fef9c3 88%, $panel);
-  color: #854d0e;
-}
-
-.heartbeat-graph-tooltip-elevated {
-  background: color-mix(in srgb, #fef3c7 88%, $panel);
-  color: #92400e;
-}
-
-.heartbeat-graph-tooltip-slow {
-  background: color-mix(in srgb, #ffedd5 88%, $panel);
-  color: #9a3412;
-}
-
-.heartbeat-graph-tooltip-strained {
-  background: color-mix(in srgb, #fed7aa 88%, $panel);
-  color: #9a3412;
-}
-
-.heartbeat-graph-tooltip-critical {
-  background: color-mix(in srgb, $danger-bg 88%, $panel);
-  color: $danger-text;
 }
 
 .heartbeat-status-strip {
