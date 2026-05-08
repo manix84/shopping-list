@@ -1183,6 +1183,27 @@ select {
   vector-effect: non-scaling-stroke;
 }
 
+.heartbeat-graph-axis {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 1;
+}
+
+.heartbeat-graph-axis-tick {
+  color: color-mix(in srgb, $muted 64%, transparent);
+  font-size: 0.64rem;
+  font-weight: 700;
+  left: 8px;
+  line-height: 1;
+  position: absolute;
+  text-shadow:
+    0 0 4px $panel-alt,
+    0 0 8px $panel-alt,
+    0 1px 0 $panel;
+  transform: translateY(-50%);
+}
+
 .heartbeat-graph-ghost-line {
   stroke: color-mix(in srgb, $muted 24%, transparent);
   stroke-linecap: round;
