@@ -68,6 +68,8 @@ type DebugPageProps = {
   onBackToSettings: () => void;
 };
 
+type HeartbeatInteractionSurface = 'graph' | 'history' | 'status';
+
 const HEARTBEAT_HISTORY_SLOT_COUNT = 36;
 const HEARTBEAT_TIMEOUT_LATENCY_MS = 800;
 const HEARTBEAT_LATENCY_GRAPH_BASE_MAX_MS = 100;
@@ -247,16 +249,18 @@ const heartbeatHistorySlots = (samples: BackendHeartbeatSample[]): HeartbeatHist
 
 const heartbeatPoint = (slot: HeartbeatHistorySlot, maxLatencyMs: number) => {
   const x = (slot.index / (HEARTBEAT_HISTORY_SLOT_COUNT - 1)) * 100;
-  const y = slot.sample && isHeartbeatTimeout(slot.sample)
+  const y = slot.sample && (slot.sample.state === 'offline' || isHeartbeatTimeout(slot.sample))
     ? 100
     : slot.sample ? heartbeatLatencyY(slot.sample.latencyMs, maxLatencyMs) : 50;
   return { x, y };
 };
 
 const formatHeartbeatAxisTick = (latencyMs: number) => `${latencyMs}ms`;
+const formatHeartbeatLatency = (sample: BackendHeartbeatSample) =>
+  sample.state === 'offline' ? 'offline' : `${sample.latencyMs}ms`;
 
 const heartbeatLatencyTone = (sample: BackendHeartbeatSample) => {
-  if (isHeartbeatTimeout(sample)) { return 'critical'; }
+  if (sample.state === 'offline') { return 'critical'; }
 
   const toneIndex = Math.min(
     HEARTBEAT_LATENCY_TONES.length - 1,
@@ -366,7 +370,9 @@ export function DebugPage({
 }: DebugPageProps) {
   const { messages } = useI18n();
   const [hoveredHeartbeatSampleKey, setHoveredHeartbeatSampleKey] = useState<string | null>(null);
+  const [hoveredHeartbeatSurface, setHoveredHeartbeatSurface] = useState<HeartbeatInteractionSurface | null>(null);
   const [lockedHeartbeatSampleKey, setLockedHeartbeatSampleKey] = useState<string | null>(null);
+  const [lockedHeartbeatSurface, setLockedHeartbeatSurface] = useState<HeartbeatInteractionSurface | null>(null);
   const heartbeatHistoryWrapRef = useRef<HTMLDivElement | null>(null);
   const heartbeatHistoryRowRefs = useRef(new Map<string, HTMLTableRowElement>());
   const runtimeLocation =
@@ -437,21 +443,30 @@ export function DebugPage({
       previousPoint,
     };
   });
-  const activateHeartbeatSample = (sample: BackendHeartbeatSample) => {
+  const activateHeartbeatSample = (sample: BackendHeartbeatSample, surface: HeartbeatInteractionSurface) => {
     setHoveredHeartbeatSampleKey(sample.checkedAt);
+    setHoveredHeartbeatSurface(surface);
   };
   const clearActiveHeartbeatSample = () => {
     setHoveredHeartbeatSampleKey(null);
+    setHoveredHeartbeatSurface(null);
   };
-  const lockHeartbeatSample = (sample: BackendHeartbeatSample) => {
+  const lockHeartbeatSample = (sample: BackendHeartbeatSample, surface: HeartbeatInteractionSurface) => {
     setLockedHeartbeatSampleKey(sample.checkedAt);
+    setLockedHeartbeatSurface(surface);
   };
+  const visibleGraphTooltipKey = lockedHeartbeatSurface === 'graph'
+    ? lockedHeartbeatSampleKey
+    : hoveredHeartbeatSurface === 'graph' ? hoveredHeartbeatSampleKey : null;
+  const visibleStatusTooltipKey = lockedHeartbeatSurface === 'status'
+    ? lockedHeartbeatSampleKey
+    : hoveredHeartbeatSurface === 'status' ? hoveredHeartbeatSampleKey : null;
 
   useEffect(() => {
-    if (!activeHeartbeatSampleKey) { return; }
+    if (!lockedHeartbeatSampleKey) { return; }
 
     const wrap = heartbeatHistoryWrapRef.current;
-    const row = heartbeatHistoryRowRefs.current.get(activeHeartbeatSampleKey);
+    const row = heartbeatHistoryRowRefs.current.get(lockedHeartbeatSampleKey);
     if (!wrap || !row) { return; }
 
     const nextScrollTop = row.offsetTop - (wrap.clientHeight / 2) + (row.clientHeight / 2);
@@ -459,7 +474,7 @@ export function DebugPage({
       top: Math.max(0, nextScrollTop),
       behavior: 'smooth',
     });
-  }, [activeHeartbeatSampleKey]);
+  }, [lockedHeartbeatSampleKey]);
 
   useEffect(() => {
     if (typeof document === 'undefined') { return undefined; }
@@ -469,7 +484,9 @@ export function DebugPage({
       if (target instanceof Element && target.closest('.heartbeat-graph-point')) { return; }
 
       setHoveredHeartbeatSampleKey(null);
+      setHoveredHeartbeatSurface(null);
       setLockedHeartbeatSampleKey(null);
+      setLockedHeartbeatSurface(null);
     };
 
     document.addEventListener('pointerdown', clearLockedHeartbeatSample);
@@ -633,7 +650,7 @@ export function DebugPage({
               </div>
               <div>
                 <span>{messages.pages.debug.heartbeatLatency}</span>
-                <strong>{latestHeartbeat ? `${latestHeartbeat.latencyMs}ms` : messages.pages.debug.unavailable}</strong>
+                <strong>{latestHeartbeat ? formatHeartbeatLatency(latestHeartbeat) : messages.pages.debug.unavailable}</strong>
               </div>
               <div>
                 <span>{messages.labels.state}</span>
@@ -707,6 +724,7 @@ export function DebugPage({
                 const { x, y } = heartbeatPoint(slot, heartbeatGraphMaxLatencyMs);
                 const tone = slot.sample ? heartbeatLatencyTone(slot.sample) : 'ghost';
                 const isActive = slot.sample?.checkedAt === activeHeartbeatSampleKey;
+                const isTooltipVisible = slot.sample?.checkedAt === visibleGraphTooltipKey;
                 if (!slot.sample) {
                   return (
                     <span
@@ -723,18 +741,18 @@ export function DebugPage({
                   <button
                     key={`${sample.checkedAt}-${slot.index}`}
                     type={'button'}
-                    className={`heartbeat-graph-point heartbeat-graph-point-${tone} ${isActive ? 'heartbeat-graph-point-active' : ''}`}
+                    className={`heartbeat-graph-point heartbeat-graph-point-${tone} ${isActive ? 'heartbeat-graph-point-active' : ''} ${isTooltipVisible ? 'heartbeat-graph-point-tooltip-visible' : ''}`}
                     style={{ left: `${x}%`, top: `${y}%` }}
-                    aria-label={`${messages.pages.debug.heartbeatLatency}: ${sample.latencyMs}ms, ${messages.pages.debug.heartbeatLastChecked}: ${formatHeartbeatTime(sample.checkedAt)}`}
-                    aria-pressed={sample.checkedAt === lockedHeartbeatSampleKey}
-                    onMouseEnter={() => activateHeartbeatSample(sample)}
+                    aria-label={`${messages.pages.debug.heartbeatLatency}: ${formatHeartbeatLatency(sample)}, ${messages.pages.debug.heartbeatLastChecked}: ${formatHeartbeatTime(sample.checkedAt)}`}
+                    aria-pressed={sample.checkedAt === lockedHeartbeatSampleKey && lockedHeartbeatSurface === 'graph'}
+                    onMouseEnter={() => activateHeartbeatSample(sample, 'graph')}
                     onMouseLeave={clearActiveHeartbeatSample}
-                    onFocus={() => activateHeartbeatSample(sample)}
+                    onFocus={() => activateHeartbeatSample(sample, 'graph')}
                     onBlur={clearActiveHeartbeatSample}
-                    onClick={() => lockHeartbeatSample(sample)}
+                    onClick={() => lockHeartbeatSample(sample, 'graph')}
                   >
                     <span className={`heartbeat-graph-tooltip heartbeat-graph-tooltip-${tone}`} role={'tooltip'}>
-                      <strong>{sample.latencyMs}ms</strong>
+                      <strong>{formatHeartbeatLatency(sample)}</strong>
                       <span>{formatHeartbeatTime(sample.checkedAt)}</span>
                     </span>
                   </button>
@@ -743,21 +761,44 @@ export function DebugPage({
             </div>
             <div
               className={'heartbeat-status-strip'}
-              aria-hidden={'true'}
+              aria-label={messages.pages.debug.heartbeatStatusHistory}
             >
               {heartbeatSlots.map((slot) => {
                 const { x } = heartbeatPoint(slot, heartbeatGraphMaxLatencyMs);
+                if (!slot.sample) {
+                  return (
+                    <span
+                      key={`heartbeat-status-ghost-${slot.index}`}
+                      className={'heartbeat-status-dot heartbeat-status-dot-ghost'}
+                      style={{ '--heartbeat-status-x': `${x}%` } as CSSProperties}
+                      aria-hidden={'true'}
+                    />
+                  );
+                }
+
+                const sample = slot.sample;
+                const stateLabel = backendStateLabel({ ...backendStatus, state: sample.state }, messages);
+                const isActive = sample.checkedAt === activeHeartbeatSampleKey;
+                const isTooltipVisible = sample.checkedAt === visibleStatusTooltipKey;
                 return (
-                  <span
-                    key={slot.sample ? `${slot.sample.checkedAt}-status-${slot.index}` : `heartbeat-status-ghost-${slot.index}`}
-                    className={`heartbeat-status-dot heartbeat-status-dot-${slot.sample?.state ?? 'ghost'}`}
+                  <button
+                    key={`${sample.checkedAt}-status-${slot.index}`}
+                    type={'button'}
+                    className={`heartbeat-status-dot heartbeat-status-dot-${sample.state} ${isActive ? 'heartbeat-status-dot-active' : ''} ${isTooltipVisible ? 'heartbeat-status-dot-tooltip-visible' : ''}`}
                     style={{ '--heartbeat-status-x': `${x}%` } as CSSProperties}
-                    title={
-                      slot.sample
-                        ? `${formatHeartbeatTime(slot.sample.checkedAt)} ${backendStateLabel({ ...backendStatus, state: slot.sample.state }, messages)}`
-                        : messages.pages.debug.heartbeatWaiting
-                    }
-                  />
+                    aria-label={`${messages.labels.state}: ${stateLabel}, ${messages.pages.debug.heartbeatLastChecked}: ${formatHeartbeatTime(sample.checkedAt)}`}
+                    aria-pressed={sample.checkedAt === lockedHeartbeatSampleKey && lockedHeartbeatSurface === 'status'}
+                    onMouseEnter={() => activateHeartbeatSample(sample, 'status')}
+                    onMouseLeave={clearActiveHeartbeatSample}
+                    onFocus={() => activateHeartbeatSample(sample, 'status')}
+                    onBlur={clearActiveHeartbeatSample}
+                    onClick={() => lockHeartbeatSample(sample, 'status')}
+                  >
+                    <span className={'heartbeat-status-tooltip'} role={'tooltip'}>
+                      <strong>{stateLabel}</strong>
+                      <span>{formatHeartbeatTime(sample.checkedAt)}</span>
+                    </span>
+                  </button>
                 );
               })}
             </div>
@@ -819,7 +860,10 @@ export function DebugPage({
                           heartbeatHistoryRowRefs.current.delete(sample.checkedAt);
                         }
                       }}
-                      className={sample.checkedAt === activeHeartbeatSampleKey ? 'debug-table-row-active' : undefined}
+                      className={`debug-table-row-interactive ${sample.checkedAt === activeHeartbeatSampleKey ? 'debug-table-row-active' : ''}`}
+                      onMouseEnter={() => activateHeartbeatSample(sample, 'history')}
+                      onMouseLeave={clearActiveHeartbeatSample}
+                      onClick={() => lockHeartbeatSample(sample, 'history')}
                     >
                       <td>{formatHeartbeatTime(sample.checkedAt)}</td>
                       <td>{backendStateLabel({ ...backendStatus, state: sample.state }, messages)}</td>
@@ -830,7 +874,7 @@ export function DebugPage({
                           ? databaseAdapterLabel({ ...backendStatus, database: { ...backendStatus.database, adapter: sample.adapter } }, messages)
                           : messages.pages.debug.unavailable}
                       </td>
-                      <td>{sample.latencyMs}ms</td>
+                      <td>{formatHeartbeatLatency(sample)}</td>
                     </tr>
                   ))
                 )}
