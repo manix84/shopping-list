@@ -1111,6 +1111,15 @@ select {
   padding-top: 14px;
 }
 
+.debug-notification-result-panel {
+  background: $panel-alt;
+  border: 1px solid $border;
+  border-radius: 8px;
+  min-height: 190px;
+  overflow: auto;
+  padding: 12px;
+}
+
 .debug-setting-switch-input {
   appearance: none;
   background: $border;

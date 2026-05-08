@@ -1399,17 +1399,18 @@ export function DebugPage({
                   <th scope={'row'}>{messages.pages.debug.eventNotificationPreferenceLabel}</th>
                   <td>{String(notificationsEnabled)}</td>
                 </tr>
-                <tr>
-                  <th scope={'row'}>{messages.pages.debug.eventNotificationLastTestLabel}</th>
-                  <td>
-                    <DebugNotificationResultView
-                      result={debugNotificationResult}
-                      messages={messages}
-                    />
-                  </td>
-                </tr>
               </tbody>
             </table>
+          </div>
+          <div
+            className={'debug-notification-result-panel'}
+            aria-live={'polite'}
+            aria-label={messages.pages.debug.eventNotificationLastTestLabel}
+          >
+            <DebugNotificationResultView
+              result={debugNotificationResult}
+              messages={messages}
+            />
           </div>
           <section className={'debug-event-group stack'}>
             <div>

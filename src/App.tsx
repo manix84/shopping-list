@@ -75,7 +75,9 @@ const SHARED_LIST_NOTIFICATION_POLL_MS = 30_000;
 const SHARED_LIST_SYNC_POLL_MS = 5_000;
 const SHARED_LIST_NOTIFICATION_GROUP_MS = 2 * 60_000;
 const SHARED_LIST_NOTIFICATION_PREVIEW_LIMIT = 3;
-const NOTIFICATION_SERVICE_WORKER_READY_TIMEOUT_MS = 750;
+const NOTIFICATION_SERVICE_WORKER_READY_TIMEOUT_MS = 3_000;
+const NOTIFICATION_WORKER_SCOPE_PATH = 'notification-worker/';
+const NOTIFICATION_WORKER_SCRIPT_PATH = 'notification-sw.js';
 const DEBUG_NOTIFICATION_LIST_ID = 'debug-notifications';
 const DEBUG_MODE_NOTICE_DURATION_MS = 4_000;
 const DEV_TITLE_SUFFIX = ' [Dev]';
@@ -261,6 +263,68 @@ const serviceWorkerReadyWithTimeout = async (): Promise<ServiceWorkerRegistratio
       window.clearTimeout(timeoutId);
     }
   }
+};
+
+const waitForServiceWorkerActivation = async (
+  registration: ServiceWorkerRegistration,
+): Promise<ServiceWorkerRegistration | undefined> => {
+  if (registration.active) { return registration; }
+
+  const worker = registration.installing ?? registration.waiting;
+  if (!worker) { return undefined; }
+
+  return new Promise((resolve) => {
+    let timeoutId: number | undefined;
+    const finish = (nextRegistration: ServiceWorkerRegistration | undefined) => {
+      if (timeoutId !== undefined) {
+        window.clearTimeout(timeoutId);
+        timeoutId = undefined;
+      }
+      worker.removeEventListener('statechange', handleStateChange);
+      resolve(nextRegistration);
+    };
+    const handleStateChange = () => {
+      if (worker.state === 'activated') {
+        finish(registration);
+      }
+    };
+
+    timeoutId = window.setTimeout(() => finish(registration.active ? registration : undefined), NOTIFICATION_SERVICE_WORKER_READY_TIMEOUT_MS);
+    worker.addEventListener('statechange', handleStateChange);
+    handleStateChange();
+  });
+};
+
+const serviceWorkerRegistrationForNotifications = async (): Promise<ServiceWorkerRegistration | undefined> => {
+  if (typeof window === 'undefined' || typeof navigator === 'undefined' || !('serviceWorker' in navigator)) {
+    return undefined;
+  }
+
+  const appBaseUrl = new URL(import.meta.env.BASE_URL, window.location.origin);
+  const appRegistration = await navigator.serviceWorker.getRegistration(appBaseUrl.href).catch(() => undefined);
+  if (appRegistration?.active) {
+    return appRegistration;
+  }
+
+  const notificationWorkerScope = new URL(NOTIFICATION_WORKER_SCOPE_PATH, appBaseUrl).href;
+  const notificationRegistration = await navigator.serviceWorker
+    .getRegistration(notificationWorkerScope)
+    .catch(() => undefined);
+  if (notificationRegistration?.active) {
+    return notificationRegistration;
+  }
+
+  if (window.isSecureContext) {
+    const notificationWorkerScript = new URL(NOTIFICATION_WORKER_SCRIPT_PATH, appBaseUrl).href;
+    const registeredNotificationWorker = await navigator.serviceWorker
+      .register(notificationWorkerScript, { scope: notificationWorkerScope, updateViaCache: 'none' })
+      .catch(() => undefined);
+    if (registeredNotificationWorker) {
+      return waitForServiceWorkerActivation(registeredNotificationWorker);
+    }
+  }
+
+  return serviceWorkerReadyWithTimeout();
 };
 
 const updateBrowserIcon = (theme: 'light' | 'dark'): void => {
@@ -611,7 +675,7 @@ export default function App() {
     if (browserNotificationPermission() !== 'granted') { return 'blocked'; }
     if (typeof window === 'undefined') { return 'failed'; }
 
-    const registration = await serviceWorkerReadyWithTimeout().catch(() => undefined);
+    const registration = await serviceWorkerRegistrationForNotifications().catch(() => undefined);
     if (registration?.showNotification) {
       try {
         await registration.showNotification(title, options);
