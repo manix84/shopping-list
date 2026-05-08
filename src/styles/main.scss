@@ -414,6 +414,35 @@ select {
 
 .debug-table-row-interactive {
   cursor: pointer;
+  position: relative;
+
+  &:focus-within {
+    background: color-mix(in srgb, $primary 9%, transparent);
+    box-shadow: inset 3px 0 0 $primary;
+  }
+}
+
+.heartbeat-history-row-button {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  color: transparent;
+  cursor: pointer;
+  height: 100%;
+  inset: 0;
+  padding: 0;
+  position: absolute;
+  width: 100%;
+  z-index: 1;
+
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $primary;
+    outline-offset: -2px;
+  }
 }
 
 .heartbeat-status-history-wrap .debug-table thead th {

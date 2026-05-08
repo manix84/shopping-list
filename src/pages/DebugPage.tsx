@@ -437,7 +437,7 @@ export function DebugPage({
     slot.sample !== undefined,
   );
   const firstHeartbeatSampleSlot = heartbeatSampleSlots[0];
-  const recentHeartbeatSamples = heartbeatSampleSlots.map((slot) => slot.sample).reverse();
+  const heartbeatHistorySamples = heartbeatSampleSlots.map((slot) => slot.sample).reverse();
   const heartbeatGraphMaxLatencyMs = heartbeatLatencyGraphMax(heartbeatSampleSlots.map((slot) => slot.sample));
   const heartbeatAxisTicks = heartbeatLatencyAxisTicks(heartbeatGraphMaxLatencyMs);
   const activeHeartbeatSampleKey = lockedHeartbeatSampleKey ?? hoveredHeartbeatSampleKey;
@@ -469,15 +469,6 @@ export function DebugPage({
   const lockHeartbeatSample = (sample: BackendHeartbeatSample, surface: HeartbeatInteractionSurface) => {
     setLockedHeartbeatSampleKey(sample.checkedAt);
     setLockedHeartbeatSurface(surface);
-  };
-  const handleHeartbeatHistoryRowKeyDown = (
-    event: KeyboardEvent<HTMLTableRowElement>,
-    sample: BackendHeartbeatSample,
-  ) => {
-    if (event.key !== 'Enter' && event.key !== ' ') { return; }
-
-    event.preventDefault();
-    lockHeartbeatSample(sample, 'history');
   };
   const visibleGraphTooltipKey = lockedHeartbeatSurface === 'graph'
     ? lockedHeartbeatSampleKey
@@ -873,12 +864,12 @@ export function DebugPage({
                 </tr>
               </thead>
               <tbody>
-                {recentHeartbeatSamples.length === 0 ? (
+                {heartbeatHistorySamples.length === 0 ? (
                   <tr>
                     <td colSpan={6}>{messages.pages.debug.heartbeatWaiting}</td>
                   </tr>
                 ) : (
-                  recentHeartbeatSamples.map((sample, index) => (
+                  heartbeatHistorySamples.map((sample, index) => (
                     <tr
                       key={`${sample.checkedAt}-row-${index}`}
                       ref={(node) => {
@@ -889,18 +880,21 @@ export function DebugPage({
                         }
                       }}
                       className={`debug-table-row-interactive ${sample.checkedAt === activeHeartbeatSampleKey ? 'debug-table-row-active' : ''}`}
-                      tabIndex={0}
-                      role={'button'}
-                      aria-pressed={sample.checkedAt === lockedHeartbeatSampleKey && lockedHeartbeatSurface === 'history'}
-                      aria-label={`${messages.pages.debug.heartbeatLastChecked}: ${formatHeartbeatTime(sample.checkedAt)}, ${messages.labels.state}: ${backendStateLabel({ ...backendStatus, state: sample.state }, messages)}, ${messages.pages.debug.heartbeatLatency}: ${formatHeartbeatLatency(sample, messages)}`}
                       onMouseEnter={() => activateHeartbeatSample(sample, 'history')}
                       onMouseLeave={clearActiveHeartbeatSample}
-                      onFocus={() => activateHeartbeatSample(sample, 'history')}
-                      onBlur={clearActiveHeartbeatSample}
-                      onClick={() => lockHeartbeatSample(sample, 'history')}
-                      onKeyDown={(event) => handleHeartbeatHistoryRowKeyDown(event, sample)}
                     >
-                      <td>{formatHeartbeatTime(sample.checkedAt)}</td>
+                      <td>
+                        <button
+                          type={'button'}
+                          className={'heartbeat-history-row-button'}
+                          aria-pressed={sample.checkedAt === lockedHeartbeatSampleKey && lockedHeartbeatSurface === 'history'}
+                          aria-label={`${messages.pages.debug.heartbeatLastChecked}: ${formatHeartbeatTime(sample.checkedAt)}, ${messages.labels.state}: ${backendStateLabel({ ...backendStatus, state: sample.state }, messages)}, ${messages.pages.debug.heartbeatLatency}: ${formatHeartbeatLatency(sample, messages)}`}
+                          onFocus={() => activateHeartbeatSample(sample, 'history')}
+                          onBlur={clearActiveHeartbeatSample}
+                          onClick={() => lockHeartbeatSample(sample, 'history')}
+                        />
+                        {formatHeartbeatTime(sample.checkedAt)}
+                      </td>
                       <td>{backendStateLabel({ ...backendStatus, state: sample.state }, messages)}</td>
                       <td>{checkLabel(sample.healthOk, messages)}</td>
                       <td>{checkLabel(sample.databaseOk, messages)}</td>

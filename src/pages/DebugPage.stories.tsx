@@ -137,8 +137,9 @@ export const InteractionStates: Story = {
   render: renderDebugPage,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const graphPoint = canvas.getAllByRole('button', { name: /latency:/i }).at(-1);
-    const statusPoint = canvas.getAllByRole('button', { name: /state:/i }).at(-1);
+    const heartbeatGraph = within(canvas.getByRole('group', { name: /backend heartbeat/i }));
+    const graphPoint = heartbeatGraph.getAllByRole('button', { name: /latency:/i }).at(-1);
+    const statusPoint = heartbeatGraph.getAllByRole('button', { name: /state:/i }).at(-1);
 
     if (!graphPoint || !statusPoint) {
       throw new Error('Expected heartbeat graph and status controls');

@@ -44,8 +44,21 @@ const cacheUrlIfAvailable = async (cache, url) => {
   }
 };
 
+const cacheRequiredUrl = async (cache, url) => {
+  const response = await fetch(url, { cache: 'reload' });
+  if (!response.ok) {
+    throw new Error(`Unable to cache required asset ${url}: ${response.status}`);
+  }
+
+  await cache.put(url, response);
+};
+
 const cacheOptionalUrls = async (cache, urls) => {
   await Promise.all([...new Set(urls)].map((url) => cacheUrlIfAvailable(cache, url)));
+};
+
+const cacheRequiredUrls = async (cache, urls) => {
+  await Promise.all([...new Set(urls)].map((url) => cacheRequiredUrl(cache, url)));
 };
 
 const cacheAppShell = async (cache) => {
@@ -65,7 +78,8 @@ const cacheAppShell = async (cache) => {
 const cacheAssets = async () => {
   const cache = await caches.open(CACHE_NAME);
   const html = await cacheAppShell(cache);
-  await cacheOptionalUrls(cache, [...staticAssetUrls(), ...(await buildAssetUrls(html))]);
+  await cacheRequiredUrls(cache, await buildAssetUrls(html));
+  await cacheOptionalUrls(cache, staticAssetUrls());
 };
 
 const missingCachedUrls = async (cache, urls) => {
@@ -93,7 +107,7 @@ const refreshCachedAppShell = async (response, request) => {
 
   const missingAssetUrls = await missingCachedUrls(cache, buildAssetUrlsFromHtml(html));
   if (missingAssetUrls.length > 0) {
-    await cacheOptionalUrls(cache, missingAssetUrls);
+    await cacheRequiredUrls(cache, missingAssetUrls);
   }
 };
 
