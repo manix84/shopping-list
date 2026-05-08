@@ -84,6 +84,7 @@ export type Messages = {
     saveFailed: string;
     saved: string;
     saving: string;
+    syncing: string;
     section: string;
     sharedLink: string;
     sharedLists: string;
@@ -212,6 +213,7 @@ export type Messages = {
       backendChecking: string;
       backendError: string;
       backendOffline: string;
+      tabDatabaseEntry: string;
       heartbeatTitle: string;
       heartbeatTitleWithQuality: string;
       heartbeatQualityWaiting: string;
@@ -250,6 +252,9 @@ export type Messages = {
       databaseTypePostgres: string;
       appStorageModeLabel: string;
       backendAdapterLabel: string;
+      databaseEntryTitle: string;
+      databaseEntrySubtitle: string;
+      databaseEntryUnavailable: string;
       configTitle: string;
       configSubtitle: string;
       matcherTitle: string;
@@ -330,6 +335,8 @@ export type Messages = {
       eventToastPlainMessage: string;
       eventPwaInstallNudgeLabel: string;
       eventPwaInstallNudgeHint: string;
+      eventPwaUpdateOverlayLabel: string;
+      eventPwaUpdateOverlayHint: string;
       eventSecretAisleLabel: string;
       eventSecretAisleHint: string;
       eventPredatorLabel: string;

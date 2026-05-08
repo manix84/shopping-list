@@ -70,6 +70,7 @@ export const es: Messages = {
     saveFailed: 'Error al guardar',
     saved: 'Guardado',
     saving: 'Guardando',
+    syncing: 'Sincronizando',
     section: 'Sección',
     sharedLink: 'Enlace compartido',
     sharedLists: 'listas compartidas',
@@ -224,6 +225,7 @@ export const es: Messages = {
         'El backend respondió, pero una o más comprobaciones fallaron.',
       backendOffline:
         'El backend está sin conexión; la aplicación usa almacenamiento solo de frontend.',
+      tabDatabaseEntry: 'Entrada de base de datos',
       heartbeatTitle: 'Latido del backend',
       heartbeatTitleWithQuality: '{title} - {quality}',
       heartbeatQualityWaiting: 'En espera',
@@ -263,6 +265,11 @@ export const es: Messages = {
       databaseTypePostgres: 'PostgreSQL',
       appStorageModeLabel: 'Modo de almacenamiento de la app',
       backendAdapterLabel: 'Adaptador backend',
+      databaseEntryTitle: 'Entrada actual de la lista compartida',
+      databaseEntrySubtitle:
+        'La forma JSON guardada en sharedLists para la lista activa.',
+      databaseEntryUnavailable:
+        'Aún no hay una entrada de lista compartida actual disponible.',
       configTitle: 'Comprobaciones de configuración de país',
       configSubtitle:
         'Valida la estructura del perfil, la cobertura de palabras clave y su sección propietaria.',
@@ -367,10 +374,12 @@ export const es: Messages = {
       eventToastPlainMessage: 'Este popup no tiene título ni icono intencionadamente.',
       eventPwaInstallNudgeLabel: 'Aviso de instalación PWA',
       eventPwaInstallNudgeHint: 'Muestra el aviso flotante de instalación sin esperar al navegador.',
+      eventPwaUpdateOverlayLabel: 'Superposición de actualización',
+      eventPwaUpdateOverlayHint: 'Previsualiza la superposición temática que aparece durante la recarga de una actualización.',
       eventSecretAisleLabel: 'Superposición de pasillo secreto',
       eventSecretAisleHint: 'Abre la superposición oculta usada por la interacción del encabezado.',
-      eventPredatorLabel: 'Efecto visual de inicio',
-      eventPredatorHint: 'Ejecuta el efecto animado normalmente activado por la secuencia oculta de teclas.',
+      eventPredatorLabel: 'Easter egg Predator',
+      eventPredatorHint: 'Ejecuta la superposición oculta de Predator activada normalmente por la secuencia secreta de teclas.',
       eventTriggerAction: 'Activar',
       eventNotificationPermissionLabel: 'Permiso de notificaciones',
       eventNotificationPreferenceLabel: 'Ajuste de notificaciones',

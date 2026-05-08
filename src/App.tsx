@@ -40,6 +40,7 @@ import {
   clearSharedShoppingList,
   loadSharedShoppingList,
   saveSharedShoppingList,
+  sharedShoppingListEventsUrl,
 } from './lib/repository/apiRepository';
 import {
   defaultRecord,
@@ -54,6 +55,7 @@ import { extractSharedListId } from './lib/sharedLinks';
 import { cleanLine, stripDisplaySizeLabel } from './lib/stringUtils';
 import { loadRouteViewMode, saveRouteViewMode } from './lib/routeViewPreference';
 import { getResolvedTheme, loadThemeMode, saveThemeMode } from './lib/themePreference';
+import { previewUpdateReloadOverlay } from './lib/updateReloadOverlay';
 import { createUuidV7 } from './lib/uuid';
 import { formatCountQuantity } from './lib/quantity';
 import { extractVariant } from './lib/variant';
@@ -71,9 +73,13 @@ const BACKEND_HEARTBEAT_CONNECTED_MS = 5_000;
 const BACKEND_HEARTBEAT_RETRY_MS = 1_500;
 const BACKEND_HEARTBEAT_HISTORY_LIMIT = 36;
 const SHARED_LIST_NOTIFICATION_POLL_MS = 30_000;
+const SHARED_LIST_SYNC_POLL_MS = 5_000;
+const SHARED_LIST_SYNC_SSE_FALLBACK_POLL_MS = 60_000;
 const SHARED_LIST_NOTIFICATION_GROUP_MS = 2 * 60_000;
 const SHARED_LIST_NOTIFICATION_PREVIEW_LIMIT = 3;
-const NOTIFICATION_SERVICE_WORKER_READY_TIMEOUT_MS = 750;
+const NOTIFICATION_SERVICE_WORKER_READY_TIMEOUT_MS = 3_000;
+const NOTIFICATION_WORKER_SCOPE_PATH = 'notification-worker/';
+const NOTIFICATION_WORKER_SCRIPT_PATH = 'notification-sw.js';
 const DEBUG_NOTIFICATION_LIST_ID = 'debug-notifications';
 const DEBUG_MODE_NOTICE_DURATION_MS = 4_000;
 const DEV_TITLE_SUFFIX = ' [Dev]';
@@ -122,6 +128,15 @@ type SharedListNotificationGroup = {
   itemIds: Set<string>;
   itemNames: string[];
   lastShownAt: number;
+};
+type CurrentShoppingListState = {
+  input: string;
+  items: Item[];
+  countryCode: CountryCode;
+  listId: string;
+  serverBacked: boolean;
+  listName: string;
+  measurementDisplayMode: MeasurementDisplayMode;
 };
 
 const defaultBackendStatus = (): BackendStatus => ({
@@ -261,6 +276,68 @@ const serviceWorkerReadyWithTimeout = async (): Promise<ServiceWorkerRegistratio
   }
 };
 
+const waitForServiceWorkerActivation = async (
+  registration: ServiceWorkerRegistration,
+): Promise<ServiceWorkerRegistration | undefined> => {
+  if (registration.active) { return registration; }
+
+  const worker = registration.installing ?? registration.waiting;
+  if (!worker) { return undefined; }
+
+  return new Promise((resolve) => {
+    let timeoutId: number | undefined;
+    const finish = (nextRegistration: ServiceWorkerRegistration | undefined) => {
+      if (timeoutId !== undefined) {
+        window.clearTimeout(timeoutId);
+        timeoutId = undefined;
+      }
+      worker.removeEventListener('statechange', handleStateChange);
+      resolve(nextRegistration);
+    };
+    const handleStateChange = () => {
+      if (worker.state === 'activated') {
+        finish(registration);
+      }
+    };
+
+    timeoutId = window.setTimeout(() => finish(registration.active ? registration : undefined), NOTIFICATION_SERVICE_WORKER_READY_TIMEOUT_MS);
+    worker.addEventListener('statechange', handleStateChange);
+    handleStateChange();
+  });
+};
+
+const serviceWorkerRegistrationForNotifications = async (): Promise<ServiceWorkerRegistration | undefined> => {
+  if (typeof window === 'undefined' || typeof navigator === 'undefined' || !('serviceWorker' in navigator)) {
+    return undefined;
+  }
+
+  const appBaseUrl = new URL(import.meta.env.BASE_URL, window.location.origin);
+  const appRegistration = await navigator.serviceWorker.getRegistration(appBaseUrl.href).catch(() => undefined);
+  if (appRegistration?.active) {
+    return appRegistration;
+  }
+
+  const notificationWorkerScope = new URL(NOTIFICATION_WORKER_SCOPE_PATH, appBaseUrl).href;
+  const notificationRegistration = await navigator.serviceWorker
+    .getRegistration(notificationWorkerScope)
+    .catch(() => undefined);
+  if (notificationRegistration?.active) {
+    return notificationRegistration;
+  }
+
+  if (window.isSecureContext) {
+    const notificationWorkerScript = new URL(NOTIFICATION_WORKER_SCRIPT_PATH, appBaseUrl).href;
+    const registeredNotificationWorker = await navigator.serviceWorker
+      .register(notificationWorkerScript, { scope: notificationWorkerScope, updateViaCache: 'none' })
+      .catch(() => undefined);
+    if (registeredNotificationWorker) {
+      return waitForServiceWorkerActivation(registeredNotificationWorker);
+    }
+  }
+
+  return serviceWorkerReadyWithTimeout();
+};
+
 const updateBrowserIcon = (theme: 'light' | 'dark'): void => {
   if (typeof document === 'undefined') { return; }
 
@@ -313,6 +390,63 @@ const countryConfigForMeasurementDisplayMode = (
 ) => withMeasurementDisplayMode(COUNTRY_CONFIGS[countryCode], displayMode);
 
 const getSharedListPreview = (items: Item[]): string[] => items.slice(0, 6).map((item) => item.raw);
+
+const recordFromCurrentState = ({
+  input,
+  items,
+  countryCode,
+  listId,
+  serverBacked,
+  listName,
+  updatedAt,
+}: {
+  input: string;
+  items: Item[];
+  countryCode: CountryCode;
+  listId: string;
+  serverBacked: boolean;
+  listName: string;
+  updatedAt?: string;
+}): ShoppingListRecord => ({
+  listId,
+  serverBacked,
+  listName: listName.trim() || undefined,
+  input,
+  items,
+  updatedAt: updatedAt ?? new Date().toISOString(),
+  countryCode,
+});
+
+const recordMatchesCurrentState = (
+  record: ShoppingListRecord | undefined,
+  {
+    input,
+    items,
+    countryCode,
+    listId,
+    serverBacked,
+    listName,
+  }: {
+    input: string;
+    items: Item[];
+    countryCode: CountryCode;
+    listId: string;
+    serverBacked: boolean;
+    listName: string;
+  },
+): record is ShoppingListRecord =>
+  record !== undefined &&
+  record.listId === listId &&
+  record.input === input &&
+  record.countryCode === countryCode &&
+  record.serverBacked === serverBacked &&
+  (record.listName ?? undefined) === (listName.trim() || undefined) &&
+  JSON.stringify(record.items) === JSON.stringify(items);
+
+const timestampValue = (value: string | undefined): number => {
+  const parsed = Date.parse(value ?? '');
+  return Number.isFinite(parsed) ? parsed : 0;
+};
 
 function updateItemTextInInput(input: string, previousDisplay: string, nextDisplay: string): string {
   const lines = input.split('\n');
@@ -367,14 +501,22 @@ export default function App() {
   const [predatorEasterEggRun, setPredatorEasterEggRun] = useState(0);
   const [debugNotificationResult, setDebugNotificationResult] = useState<DebugNotificationResult>();
   const [debugModeNotice, setDebugModeNotice] = useState<ToastPopupData>();
+  const [backendSaveRetryAttempt, setBackendSaveRetryAttempt] = useState(0);
   const currentItemsRef = useRef<Item[]>([]);
   const sharedListNotificationSeenUpdatedAtRef = useRef<Record<string, string>>({});
   const sharedListNotificationGroupRef = useRef<SharedListNotificationGroup>();
   const debugNotificationListIdRef = useRef(DEBUG_NOTIFICATION_LIST_ID);
   const saveRequestIdRef = useRef(0);
+  const lastLocalPersistedRecordRef = useRef<ShoppingListRecord>();
+  const lastBackendPersistedRecordRef = useRef<ShoppingListRecord>();
+  const pendingBackendSaveRecordRef = useRef<ShoppingListRecord>();
+  const currentShoppingListStateRef = useRef<CurrentShoppingListState>();
+  const skipNextAutosaveRef = useRef(false);
+  const remoteSyncStatusTimerRef = useRef<number>();
   const suppressNextAutosaveStatusRef = useRef(true);
   const suppressNextAutosaveStatus = () => {
     suppressNextAutosaveStatusRef.current = true;
+    skipNextAutosaveRef.current = true;
     setSaveStatus('idle');
   };
 
@@ -392,11 +534,60 @@ export default function App() {
     typeof window === 'undefined' || !canUseBackend || !isServerBackedList
       ? undefined
       : `${window.location.origin}${appBasePath}/list/${activeListId}/edit`;
+  const currentSharedListDatabaseEntry = useMemo(() => {
+    if (!canUseBackend || !isServerBackedList || storageMode !== 'backend') { return undefined; }
+
+    const persistedRecord = lastBackendPersistedRecordRef.current;
+    const persistedUpdatedAt = persistedRecord?.updatedAt;
+    const record = recordMatchesCurrentState(persistedRecord, {
+      input,
+      items,
+      countryCode,
+      listId: activeListId,
+      serverBacked: isServerBackedList,
+      listName,
+    })
+      ? persistedRecord
+      : recordFromCurrentState({
+          input,
+          items,
+          countryCode,
+          listId: activeListId,
+          serverBacked: isServerBackedList,
+          listName,
+          updatedAt: persistedUpdatedAt,
+        });
+    return {
+      id: activeListId,
+      exists: true,
+      record,
+      updatedAt: record.updatedAt,
+    };
+  }, [activeListId, canUseBackend, countryCode, input, isServerBackedList, items, listName, storageMode]);
   const shareErrorMessage = shareError ? messages.sharing[shareError] : undefined;
 
   useEffect(() => {
     currentItemsRef.current = items;
   }, [items]);
+
+  useEffect(() => {
+    currentShoppingListStateRef.current = {
+      input,
+      items,
+      countryCode,
+      listId: activeListId,
+      serverBacked: isServerBackedList,
+      listName,
+      measurementDisplayMode,
+    };
+  }, [activeListId, countryCode, input, isServerBackedList, items, listName, measurementDisplayMode]);
+
+  useEffect(() => () => {
+    if (remoteSyncStatusTimerRef.current) {
+      window.clearTimeout(remoteSyncStatusTimerRef.current);
+      remoteSyncStatusTimerRef.current = undefined;
+    }
+  }, []);
 
   const changePage = (nextPage: PageKey) => {
     setRoute((current) => ({
@@ -513,7 +704,7 @@ export default function App() {
     if (browserNotificationPermission() !== 'granted') { return 'blocked'; }
     if (typeof window === 'undefined') { return 'failed'; }
 
-    const registration = await serviceWorkerReadyWithTimeout().catch(() => undefined);
+    const registration = await serviceWorkerRegistrationForNotifications().catch(() => undefined);
     if (registration?.showNotification) {
       try {
         await registration.showNotification(title, options);
@@ -717,6 +908,10 @@ export default function App() {
     }
     if (kind === 'pwa-install-nudge') {
       setIsPwaInstallNudgeVisible(true);
+      return;
+    }
+    if (kind === 'pwa-update-overlay') {
+      previewUpdateReloadOverlay();
       return;
     }
     if (kind === 'secret-aisle') {
@@ -959,6 +1154,8 @@ export default function App() {
       const record = { ...remotePayload.record, listId: nextListId, serverBacked: true };
       applyRecord(record);
       localStorageRepository.save(record);
+      lastLocalPersistedRecordRef.current = record;
+      lastBackendPersistedRecordRef.current = record;
       rememberSharedList({
         listId: nextListId,
         listName: record.listName,
@@ -1066,6 +1263,8 @@ export default function App() {
 
           await saveSharedShoppingList(nextListId, selectedRecord);
           localStorageRepository.save(selectedRecord);
+          lastLocalPersistedRecordRef.current = selectedRecord;
+          lastBackendPersistedRecordRef.current = selectedRecord;
           if (remotePayload.exists) {
             rememberSharedList({
               listId: nextListId,
@@ -1108,6 +1307,12 @@ export default function App() {
         countryConfigForMeasurementDisplayMode(selectedRecord.countryCode, measurementDisplayMode),
         selectedRecord.items,
       ));
+      lastLocalPersistedRecordRef.current = selectedRecord;
+      if (nextStorageMode === 'backend') {
+        lastBackendPersistedRecordRef.current = selectedRecord;
+      } else {
+        lastBackendPersistedRecordRef.current = undefined;
+      }
       setIsLoaded(true);
     };
 
@@ -1231,6 +1436,8 @@ export default function App() {
 
         await saveSharedShoppingList(activeListId, selectedRecord);
         localStorageRepository.save(selectedRecord);
+        lastLocalPersistedRecordRef.current = selectedRecord;
+        lastBackendPersistedRecordRef.current = selectedRecord;
         if (remotePayload.exists) {
           rememberSharedList({
             listId: activeListId,
@@ -1352,8 +1559,26 @@ export default function App() {
     if (!isLoaded) { return; }
     const saveRequestId = saveRequestIdRef.current + 1;
     saveRequestIdRef.current = saveRequestId;
+    const shouldSkipAutosave = skipNextAutosaveRef.current;
+    skipNextAutosaveRef.current = false;
     const shouldReportSaveStatus = !suppressNextAutosaveStatusRef.current;
     suppressNextAutosaveStatusRef.current = false;
+    const persistedRecordForAutosave =
+      storageMode === 'backend' && canUseBackend
+        ? lastBackendPersistedRecordRef.current
+        : lastLocalPersistedRecordRef.current;
+
+    if (shouldSkipAutosave || recordMatchesCurrentState(persistedRecordForAutosave, {
+      input,
+      items,
+      countryCode,
+      listId: activeListId,
+      serverBacked: isServerBackedList,
+      listName,
+    })) {
+      return;
+    }
+
     if (shouldReportSaveStatus) {
       setSaveStatus('saving');
     }
@@ -1362,6 +1587,7 @@ export default function App() {
 
     try {
       localStorageRepository.save(record);
+      lastLocalPersistedRecordRef.current = record;
     } catch (error) {
       console.warn('Unable to save shopping list locally.', error);
       if (shouldReportSaveStatus && saveRequestIdRef.current === saveRequestId) {
@@ -1383,16 +1609,20 @@ export default function App() {
       const backendRecord = { ...record, serverBacked: true };
       void saveSharedShoppingList(activeListId, backendRecord)
         .then(() => {
+          lastBackendPersistedRecordRef.current = backendRecord;
+          pendingBackendSaveRecordRef.current = undefined;
           if (shouldReportSaveStatus && saveRequestIdRef.current === saveRequestId) {
             setSaveStatus('saved');
           }
         })
         .catch((error: unknown) => {
           console.warn('Unable to save shared shopping list to backend.', error);
+          pendingBackendSaveRecordRef.current = backendRecord;
           setBackendOperation(backendOperationStatus('save-failed', errorMessage(error)));
           if (shouldReportSaveStatus && saveRequestIdRef.current === saveRequestId) {
             setSaveStatus('error');
           }
+          window.setTimeout(() => setBackendSaveRetryAttempt((current) => current + 1), SHARED_LIST_SYNC_POLL_MS);
         });
       return;
     }
@@ -1401,6 +1631,41 @@ export default function App() {
       setSaveStatus('saved');
     }
   }, [activeListId, canUseBackend, countryCode, input, isLoaded, isServerBackedList, items, listName, storageMode]);
+
+  useEffect(() => {
+    if (!isLoaded || storageMode !== 'backend' || !canUseBackend) { return; }
+
+    const pendingRecord = pendingBackendSaveRecordRef.current;
+    const currentState = currentShoppingListStateRef.current;
+    if (!pendingRecord || !currentState || currentState.listId !== activeListId) { return; }
+
+    if (!recordMatchesCurrentState(pendingRecord, currentState)) {
+      pendingBackendSaveRecordRef.current = undefined;
+      return;
+    }
+
+    let cancelled = false;
+    void saveSharedShoppingList(activeListId, pendingRecord)
+      .then(() => {
+        if (cancelled) { return; }
+
+        lastBackendPersistedRecordRef.current = pendingRecord;
+        pendingBackendSaveRecordRef.current = undefined;
+        setSaveStatus('saved');
+      })
+      .catch((error: unknown) => {
+        if (cancelled) { return; }
+
+        console.warn('Unable to retry shared shopping list backend save.', error);
+        setBackendOperation(backendOperationStatus('save-failed', errorMessage(error)));
+        setSaveStatus('error');
+        window.setTimeout(() => setBackendSaveRetryAttempt((current) => current + 1), SHARED_LIST_SYNC_POLL_MS);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeListId, backendSaveRetryAttempt, canUseBackend, isLoaded, storageMode]);
 
   useEffect(() => {
     if (
@@ -1667,6 +1932,10 @@ export default function App() {
 
   const applyRecord = (record: ShoppingListRecord) => {
     suppressNextAutosaveStatus();
+    lastLocalPersistedRecordRef.current = record;
+    if (record.serverBacked === true) {
+      lastBackendPersistedRecordRef.current = record;
+    }
     if (record.listId) {
       setActiveListId(record.listId);
     }
@@ -1680,6 +1949,136 @@ export default function App() {
       record.items,
     ));
   };
+
+  useEffect(() => {
+    if (!isLoaded || !isServerBackedList || storageMode !== 'backend' || !canUseBackend) { return; }
+
+    let cancelled = false;
+    let inFlight = false;
+    let isSseOpen = false;
+    let lastFallbackPollAt = 0;
+    const syncRemoteRecord = async () => {
+      if (cancelled || inFlight) { return; }
+      const currentState = currentShoppingListStateRef.current;
+      if (!currentState || currentState.listId !== activeListId || !currentState.serverBacked) { return; }
+
+      if (!recordMatchesCurrentState(lastBackendPersistedRecordRef.current, currentState)) {
+        return;
+      }
+
+      inFlight = true;
+      try {
+        const remotePayload = await loadSharedShoppingList(activeListId);
+        if (cancelled || !remotePayload.exists) { return; }
+
+        const remoteUpdatedAt = remotePayload.updatedAt ?? remotePayload.record.updatedAt;
+        const localUpdatedAt = lastBackendPersistedRecordRef.current?.updatedAt;
+        if (timestampValue(remoteUpdatedAt) <= timestampValue(localUpdatedAt)) { return; }
+
+        const remoteRecord = {
+          ...remotePayload.record,
+          listId: activeListId,
+          serverBacked: true,
+          updatedAt: remoteUpdatedAt,
+        };
+        lastLocalPersistedRecordRef.current = remoteRecord;
+        lastBackendPersistedRecordRef.current = remoteRecord;
+        pendingBackendSaveRecordRef.current = undefined;
+        suppressNextAutosaveStatusRef.current = true;
+        skipNextAutosaveRef.current = true;
+        if (remoteSyncStatusTimerRef.current) {
+          window.clearTimeout(remoteSyncStatusTimerRef.current);
+        }
+        setSaveStatus('syncing');
+        localStorageRepository.save(remoteRecord);
+        setStorageMode('backend');
+        setIsServerBackedList(true);
+        setCountryCode(remoteRecord.countryCode);
+        setListName(remoteRecord.listName ?? '');
+        setInput(remoteRecord.input);
+        setItems(parseItems(
+          remoteRecord.input,
+          countryConfigForMeasurementDisplayMode(remoteRecord.countryCode, currentState.measurementDisplayMode),
+          remoteRecord.items,
+        ));
+        setSharedListHistory(
+          sharedListHistoryRepository.remember({
+            listId: activeListId,
+            listName: remoteRecord.listName,
+            itemPreview: getSharedListPreview(remoteRecord.items),
+            createdAt: remotePayload.createdAt,
+            updatedAt: remoteUpdatedAt,
+            viewedAt: new Date().toISOString(),
+          }),
+        );
+        remoteSyncStatusTimerRef.current = window.setTimeout(() => {
+          setSaveStatus('saved');
+          remoteSyncStatusTimerRef.current = undefined;
+        }, 300);
+        verboseDebugLog('shared list remote update applied', { listId: activeListId, updatedAt: remoteUpdatedAt });
+      } catch (error) {
+        verboseDebugLog('shared list remote update check failed', { listId: activeListId, error });
+      } finally {
+        inFlight = false;
+      }
+    };
+
+    const requestSync = () => {
+      void syncRemoteRecord();
+    };
+    const requestVisibleSync = () => {
+      if (document.visibilityState === 'visible') {
+        void syncRemoteRecord();
+      }
+    };
+    const eventSource =
+      typeof EventSource === 'undefined'
+        ? undefined
+        : new EventSource(sharedShoppingListEventsUrl(activeListId));
+    const intervalId = window.setInterval(() => {
+      if (isSseOpen && Date.now() - lastFallbackPollAt < SHARED_LIST_SYNC_SSE_FALLBACK_POLL_MS) { return; }
+      lastFallbackPollAt = Date.now();
+      void syncRemoteRecord();
+    }, SHARED_LIST_SYNC_POLL_MS);
+    const handleRemoteListEvent = () => {
+      void syncRemoteRecord();
+    };
+    const handleEventSourceOpen = () => {
+      isSseOpen = true;
+    };
+    const handleEventSourceError = () => {
+      isSseOpen = false;
+    };
+
+    void syncRemoteRecord();
+    eventSource?.addEventListener('open', handleEventSourceOpen);
+    eventSource?.addEventListener('error', handleEventSourceError);
+    eventSource?.addEventListener('updated', handleRemoteListEvent);
+    eventSource?.addEventListener('deleted', handleRemoteListEvent);
+    window.addEventListener('focus', requestSync);
+    window.addEventListener('online', requestSync);
+    document.addEventListener('visibilitychange', requestVisibleSync);
+
+    return () => {
+      cancelled = true;
+      eventSource?.close();
+      window.clearInterval(intervalId);
+      eventSource?.removeEventListener('open', handleEventSourceOpen);
+      eventSource?.removeEventListener('error', handleEventSourceError);
+      eventSource?.removeEventListener('updated', handleRemoteListEvent);
+      eventSource?.removeEventListener('deleted', handleRemoteListEvent);
+      window.removeEventListener('focus', requestSync);
+      window.removeEventListener('online', requestSync);
+      document.removeEventListener('visibilitychange', requestVisibleSync);
+    };
+  }, [
+    activeListId,
+    canUseBackend,
+    isLoaded,
+    isServerBackedList,
+    storageMode,
+    verboseDebugLog,
+  ]);
 
   const handleCreateSharedLink = async () => {
     if (!canUseBackend) {
@@ -1695,6 +2094,8 @@ export default function App() {
       const record = buildRecord(input, items, countryCode, activeListId, true, listName);
       await saveSharedShoppingList(activeListId, record);
       localStorageRepository.save(record);
+      lastLocalPersistedRecordRef.current = record;
+      lastBackendPersistedRecordRef.current = record;
       rememberSharedList({
         listId: activeListId,
         listName: record.listName,
@@ -1758,6 +2159,8 @@ export default function App() {
     }
 
     const initial = defaultRecord();
+    lastLocalPersistedRecordRef.current = initial;
+    lastBackendPersistedRecordRef.current = undefined;
     setActiveListId(initial.listId ?? createUuidV7());
     setIsServerBackedList(false);
     setStorageMode('local');
@@ -1928,6 +2331,7 @@ export default function App() {
                 notificationsEnabled={notificationsEnabled}
                 notificationPermission={notificationPermission}
                 debugNotificationResult={debugNotificationResult}
+                currentSharedListDatabaseEntry={currentSharedListDatabaseEntry}
                 items={items}
                 config={config}
                 matcherTests={matcherTests}

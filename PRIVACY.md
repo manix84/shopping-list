@@ -17,13 +17,15 @@ The app may store:
 
 In frontend-only mode, this is stored in your browser's local storage on your device.
 
-When the optional backend is running, shopping lists, shared lists, and the country profile can be stored in the backend database file so they can survive restarts and support shared links. Language, theme, route density, and measurement display mode remain device/browser preferences.
+When the optional backend is running, backend-backed shared lists can be stored in the backend database so they can survive restarts, support shared links, and sync changes between active clients. The country profile is stored as part of each shared-list record. Language, theme, route density, and measurement display mode remain device/browser preferences.
 
 ## Shared links
 
 If you create or open a shared list link, anyone with that link can view and edit that shared list. Treat shared list URLs like a lightweight access key.
 
 The app does not add accounts, passwords, user tracking, or analytics around shared links.
+
+Open shared lists may keep a live backend connection for server-sent update events so changes from another device can appear automatically. Those events are scoped to the shared list id in the URL.
 
 ## Home Assistant
 

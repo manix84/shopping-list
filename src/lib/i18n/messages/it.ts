@@ -74,6 +74,7 @@ export const it: Messages = {
     saveFailed: 'Salvataggio non riuscito',
     saved: 'Salvato',
     saving: 'Salvataggio',
+    syncing: 'Sincronizzazione',
     section: 'Sezione',
     sharedLink: 'Link condiviso',
     sharedLists: 'liste condivise',
@@ -227,6 +228,7 @@ export const it: Messages = {
         'Il backend ha risposto, ma uno o più controlli sono falliti.',
       backendOffline:
         'Il backend è offline; l’app usa solo archiviazione frontend.',
+      tabDatabaseEntry: 'Voce database',
       heartbeatTitle: 'Heartbeat backend',
       heartbeatTitleWithQuality: '{title} - {quality}',
       heartbeatQualityWaiting: 'In attesa',
@@ -266,6 +268,11 @@ export const it: Messages = {
       databaseTypePostgres: 'PostgreSQL',
       appStorageModeLabel: 'Modalità archiviazione app',
       backendAdapterLabel: 'Adapter backend',
+      databaseEntryTitle: 'Voce database della lista condivisa corrente',
+      databaseEntrySubtitle:
+        'La struttura JSON salvata in sharedLists per la lista attiva.',
+      databaseEntryUnavailable:
+        'Non è ancora disponibile una voce per la lista condivisa corrente.',
       configTitle: 'Autocontrolli profilo paese',
       configSubtitle:
         'Convalida struttura del profilo, copertura delle parole chiave e sezioni proprietarie.',
@@ -370,10 +377,12 @@ export const it: Messages = {
       eventToastPlainMessage: 'Questo popup non ha volutamente titolo né icona.',
       eventPwaInstallNudgeLabel: 'Suggerimento installazione PWA',
       eventPwaInstallNudgeHint: 'Mostra il suggerimento flottante di installazione senza attendere il browser.',
+      eventPwaUpdateOverlayLabel: 'Overlay aggiornamento',
+      eventPwaUpdateOverlayHint: 'Mostra in anteprima l’overlay del tema durante il ricaricamento di un aggiornamento.',
       eventSecretAisleLabel: 'Overlay corridoio segreto',
       eventSecretAisleHint: 'Apre l’overlay nascosto usato dall’interazione dell’intestazione.',
-      eventPredatorLabel: 'Effetto visivo di avvio',
-      eventPredatorHint: 'Esegue l’effetto animato normalmente attivato dalla sequenza nascosta di tasti.',
+      eventPredatorLabel: 'Easter egg Predator',
+      eventPredatorHint: 'Esegue l’overlay Predator nascosto normalmente attivato dalla sequenza segreta di tasti.',
       eventTriggerAction: 'Attiva',
       eventNotificationPermissionLabel: 'Autorizzazione notifiche',
       eventNotificationPreferenceLabel: 'Impostazione notifiche',

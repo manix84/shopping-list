@@ -75,6 +75,7 @@ export const de: Messages = {
     saveFailed: 'Speichern fehlgeschlagen',
     saved: 'Gespeichert',
     saving: 'Speichern',
+    syncing: 'Synchronisieren',
     section: 'Bereich',
     sharedLink: 'Freigabelink',
     sharedLists: 'freigegebene Listen',
@@ -229,6 +230,7 @@ export const de: Messages = {
         'Das Backend hat geantwortet, aber eine oder mehrere Prüfungen sind fehlgeschlagen.',
       backendOffline:
         'Das Backend ist offline; die App nutzt nur Frontend-Speicher.',
+      tabDatabaseEntry: 'Datenbankeintrag',
       heartbeatTitle: 'Backend-Heartbeat',
       heartbeatTitleWithQuality: '{title} - {quality}',
       heartbeatQualityWaiting: 'Wartet',
@@ -268,6 +270,11 @@ export const de: Messages = {
       databaseTypePostgres: 'PostgreSQL',
       appStorageModeLabel: 'App-Speichermodus',
       backendAdapterLabel: 'Backend-Adapter',
+      databaseEntryTitle: 'Aktueller Datenbankeintrag der freigegebenen Liste',
+      databaseEntrySubtitle:
+        'Die JSON-Struktur, die unter sharedLists für die aktive Liste gespeichert wird.',
+      databaseEntryUnavailable:
+        'Noch kein aktueller Eintrag für eine freigegebene Liste verfügbar.',
       configTitle: 'Länderprofil-Selbsttests',
       configSubtitle:
         'Prüft Profilstruktur, Keyword-Abdeckung und die zugehörigen Matcher-Bereiche.',
@@ -372,10 +379,12 @@ export const de: Messages = {
       eventToastPlainMessage: 'Dieses Popup hat absichtlich keinen Titel und kein Icon.',
       eventPwaInstallNudgeLabel: 'PWA-Installationshinweis',
       eventPwaInstallNudgeHint: 'Zeigt den schwebenden Installationshinweis ohne Browser-Timing.',
+      eventPwaUpdateOverlayLabel: 'Update-Overlay',
+      eventPwaUpdateOverlayHint: 'Zeigt das Design-Overlay, das während eines App-Update-Neuladens erscheint.',
       eventSecretAisleLabel: 'Geheimer-Gang-Overlay',
       eventSecretAisleHint: 'Öffnet das versteckte Overlay der App-Header-Interaktion.',
-      eventPredatorLabel: 'Start-Animationseffekt',
-      eventPredatorHint: 'Startet den animierten Effekt der versteckten Tastensequenz.',
+      eventPredatorLabel: 'Predator-Easter-Egg',
+      eventPredatorHint: 'Startet das versteckte Predator-Overlay der geheimen Tastensequenz.',
       eventTriggerAction: 'Auslösen',
       eventNotificationPermissionLabel: 'Benachrichtigungsberechtigung',
       eventNotificationPreferenceLabel: 'Benachrichtigungseinstellung',

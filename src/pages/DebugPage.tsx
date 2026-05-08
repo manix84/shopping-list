@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
 import type {
   BackendStatus,
   BackendHeartbeatSample,
@@ -19,6 +19,7 @@ import type {
   StorageTestResult,
   UnitQuantityTestResult,
   VariantTestResult,
+  ShoppingListRecord,
 } from '../types';
 import { Card } from '../components/Card';
 import { ParsedItemCard } from '../components/ParsedItemCard';
@@ -35,6 +36,12 @@ type DebugPageProps = {
   notificationsEnabled: boolean;
   notificationPermission: NotificationPermission | 'unsupported';
   debugNotificationResult?: DebugNotificationResult;
+  currentSharedListDatabaseEntry?: {
+    id: string;
+    exists: boolean;
+    record: ShoppingListRecord;
+    updatedAt: string;
+  };
   items: Item[];
   config: CountryConfig;
   matcherTests: MatcherTestResult[];
@@ -79,6 +86,39 @@ const HEARTBEAT_LATENCY_TONE_COUNT = 25;
 const HEARTBEAT_LATENCY_TONE_START_HUE = 142;
 const HEARTBEAT_LATENCY_TONE_END_HUE = 0;
 const HEARTBEAT_LATENCY_FAILURE_COLOR = '#dc2626';
+
+const JSON_TOKEN_PATTERN =
+  /("(?:\\.|[^"\\])*"(?=\s*:)|"(?:\\.|[^"\\])*"|true|false|null|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?|[{}[\],:])/g;
+
+const jsonTokenClass = (token: string, isKey = false) => {
+  if (/^"/.test(token)) { return isKey ? 'json-token-key' : 'json-token-string'; }
+  if (token === 'true' || token === 'false') { return 'json-token-boolean'; }
+  if (token === 'null') { return 'json-token-null'; }
+  if (/^-?\d/.test(token)) { return 'json-token-number'; }
+  return 'json-token-punctuation';
+};
+
+const highlightedJsonLine = (line: string) => {
+  const parts: Array<{ text: string; className?: string }> = [];
+  let lastIndex = 0;
+
+  for (const match of line.matchAll(JSON_TOKEN_PATTERN)) {
+    const token = match[0];
+    const index = match.index ?? 0;
+    if (index > lastIndex) {
+      parts.push({ text: line.slice(lastIndex, index) });
+    }
+    const isKey = /^"/.test(token) && line.slice(index + token.length).trimStart().startsWith(':');
+    parts.push({ text: token, className: jsonTokenClass(token, isKey) });
+    lastIndex = index + token.length;
+  }
+
+  if (lastIndex < line.length) {
+    parts.push({ text: line.slice(lastIndex) });
+  }
+
+  return parts;
+};
 
 const backendSummary = (status: BackendStatus, messages: Messages): string => {
   if (status.state === 'connected') { return messages.pages.debug.backendConnected; }
@@ -348,6 +388,7 @@ export function DebugPage({
   notificationsEnabled,
   notificationPermission,
   debugNotificationResult,
+  currentSharedListDatabaseEntry,
   items,
   config,
   matcherTests,
@@ -401,6 +442,7 @@ export function DebugPage({
     { key: 'parsed', label: messages.pages.debug.tabParsed },
     { key: 'state', label: messages.pages.debug.tabState },
     { key: 'backend', label: messages.pages.debug.tabBackend },
+    { key: 'database-entry', label: messages.pages.debug.tabDatabaseEntry },
     { key: 'config', label: messages.pages.debug.tabConfig },
     { key: 'matcher', label: messages.pages.debug.tabMatcher },
     { key: 'quantity', label: messages.pages.debug.tabQuantity },
@@ -441,6 +483,13 @@ export function DebugPage({
   const heartbeatGraphMaxLatencyMs = heartbeatLatencyGraphMax(heartbeatSampleSlots.map((slot) => slot.sample));
   const heartbeatAxisTicks = heartbeatLatencyAxisTicks(heartbeatGraphMaxLatencyMs);
   const activeHeartbeatSampleKey = lockedHeartbeatSampleKey ?? hoveredHeartbeatSampleKey;
+  const currentSharedListJson = useMemo(
+    () =>
+      activeTab === 'database-entry' && currentSharedListDatabaseEntry
+        ? JSON.stringify(currentSharedListDatabaseEntry, null, 2)
+        : undefined,
+    [activeTab, currentSharedListDatabaseEntry],
+  );
   const heartbeatLineSegments = heartbeatSampleSlots.slice(1).map((slot, index) => {
     const previousSlot = heartbeatSampleSlots[index];
     const previousPoint = heartbeatPoint(previousSlot, heartbeatGraphMaxLatencyMs);
@@ -938,12 +987,8 @@ export function DebugPage({
             expected={messages.pages.debug.databaseExpected}
             actual={
               backendStatus.database.ok
-                ? `${messages.labels.available}, ${messages.labels.defaultList} ${
-                    backendStatus.database.shoppingListExists ? messages.labels.exists : messages.labels.empty
-                  }, ${messages.labels.sharedLists} ${
+                ? `${messages.labels.available}, ${messages.labels.sharedLists} ${
                     backendStatus.database.sharedListCount ?? 0
-                  }, ${messages.labels.countryProfile} ${
-                    backendStatus.database.settingsCountryCode ?? messages.labels.unknown
                   }, ${messages.labels.updated} ${backendStatus.database.updatedAt ?? messages.labels.unknown}`
                 : `${messages.labels.state} ${backendStateLabel(backendStatus, messages)}`
             }
@@ -967,16 +1012,6 @@ export function DebugPage({
                   </td>
                 </tr>
                 <tr>
-                  <th scope={'row'}>{messages.labels.defaultList}</th>
-                  <td>
-                    {typeof backendStatus.database.shoppingListExists === 'boolean'
-                      ? backendStatus.database.shoppingListExists
-                        ? messages.labels.exists
-                        : messages.labels.empty
-                      : messages.pages.debug.unavailable}
-                  </td>
-                </tr>
-                <tr>
                   <th scope={'row'}>{messages.labels.sharedLists}</th>
                   <td>{backendStatus.database.sharedListCount ?? messages.pages.debug.unavailable}</td>
                 </tr>
@@ -987,6 +1022,49 @@ export function DebugPage({
               </tbody>
             </table>
           </div>
+        </Card>
+      ) : null}
+
+      {activeTab === 'database-entry' ? (
+        <Card
+          id={'debug-panel-database-entry'}
+          role={'tabpanel'}
+          aria-labelledby={'debug-tab-database-entry'}
+          header={
+            <>
+              <h2 className={'title title-sm'}>{messages.pages.debug.databaseEntryTitle}</h2>
+              <p className={'subtitle'}>{messages.pages.debug.databaseEntrySubtitle}</p>
+            </>
+          }
+        >
+          {currentSharedListJson ? (
+            <div className={'json-viewer'} role={'region'} aria-label={messages.pages.debug.databaseEntryTitle}>
+              <pre>
+                <code>
+                  {currentSharedListJson.split('\n').map((line, lineIndex) => (
+                    <span key={lineIndex} className={'json-line'}>
+                      <span className={'json-line-number'} aria-hidden={'true'}>
+                        {lineIndex + 1}
+                      </span>
+                      <span className={'json-line-code'}>
+                        {highlightedJsonLine(line).map((part, partIndex) => (
+                          part.className ? (
+                            <span key={partIndex} className={part.className}>
+                              {part.text}
+                            </span>
+                          ) : (
+                            <span key={partIndex}>{part.text}</span>
+                          )
+                        ))}
+                      </span>
+                    </span>
+                  ))}
+                </code>
+              </pre>
+            </div>
+          ) : (
+            <div className={'empty-state'}>{messages.pages.debug.databaseEntryUnavailable}</div>
+          )}
         </Card>
       ) : null}
 
@@ -1321,17 +1399,18 @@ export function DebugPage({
                   <th scope={'row'}>{messages.pages.debug.eventNotificationPreferenceLabel}</th>
                   <td>{String(notificationsEnabled)}</td>
                 </tr>
-                <tr>
-                  <th scope={'row'}>{messages.pages.debug.eventNotificationLastTestLabel}</th>
-                  <td>
-                    <DebugNotificationResultView
-                      result={debugNotificationResult}
-                      messages={messages}
-                    />
-                  </td>
-                </tr>
               </tbody>
             </table>
+          </div>
+          <div
+            className={'debug-notification-result-panel'}
+            aria-live={'polite'}
+            aria-label={messages.pages.debug.eventNotificationLastTestLabel}
+          >
+            <DebugNotificationResultView
+              result={debugNotificationResult}
+              messages={messages}
+            />
           </div>
           <section className={'debug-event-group stack'}>
             <div>
@@ -1404,6 +1483,11 @@ export function DebugPage({
               label={messages.pages.debug.eventPwaInstallNudgeLabel}
               hint={messages.pages.debug.eventPwaInstallNudgeHint}
               onClick={() => onDebugEventTest('pwa-install-nudge')}
+            />
+            <DebugEventButton
+              label={messages.pages.debug.eventPwaUpdateOverlayLabel}
+              hint={messages.pages.debug.eventPwaUpdateOverlayHint}
+              onClick={() => onDebugEventTest('pwa-update-overlay')}
             />
             <DebugEventButton
               label={messages.pages.debug.eventSecretAisleLabel}

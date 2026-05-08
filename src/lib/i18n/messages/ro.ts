@@ -74,6 +74,7 @@ export const ro: Messages = {
     saveFailed: 'Salvarea a eșuat',
     saved: 'Salvat',
     saving: 'Se salvează',
+    syncing: 'Se sincronizează',
     section: 'Secțiune',
     sharedLink: 'Link partajat',
     sharedLists: 'liste partajate',
@@ -227,6 +228,7 @@ export const ro: Messages = {
         'Backendul a răspuns, dar una sau mai multe verificări au eșuat.',
       backendOffline:
         'Backendul este offline; aplicația folosește doar stocare frontend.',
+      tabDatabaseEntry: 'Intrare bază de date',
       heartbeatTitle: 'Heartbeat backend',
       heartbeatTitleWithQuality: '{title} - {quality}',
       heartbeatQualityWaiting: 'În așteptare',
@@ -265,6 +267,11 @@ export const ro: Messages = {
       databaseTypePostgres: 'PostgreSQL',
       appStorageModeLabel: 'Mod stocare aplicație',
       backendAdapterLabel: 'Adaptor backend',
+      databaseEntryTitle: 'Intrarea curentă din baza de date pentru lista partajată',
+      databaseEntrySubtitle:
+        'Structura JSON salvată în sharedLists pentru lista activă.',
+      databaseEntryUnavailable:
+        'Nu există încă o intrare curentă pentru lista partajată.',
       configTitle: 'Autoverificări profil de țară',
       configSubtitle:
         'Validează structura profilului, acoperirea cuvintelor cheie și secțiunile lor proprietare.',
@@ -369,10 +376,12 @@ export const ro: Messages = {
       eventToastPlainMessage: 'Acest popup nu are intenționat titlu sau pictogramă.',
       eventPwaInstallNudgeLabel: 'Invitație instalare PWA',
       eventPwaInstallNudgeHint: 'Afișează invitația flotantă de instalare fără a aștepta browserul.',
+      eventPwaUpdateOverlayLabel: 'Suprapunere actualizare',
+      eventPwaUpdateOverlayHint: 'Previzualizează suprapunerea temei afișată în timpul reîncărcării unei actualizări.',
       eventSecretAisleLabel: 'Suprapunere culoar secret',
       eventSecretAisleHint: 'Deschide suprapunerea ascunsă folosită de interacțiunea antetului.',
-      eventPredatorLabel: 'Efect vizual de pornire',
-      eventPredatorHint: 'Rulează efectul animat declanșat normal de secvența ascunsă de taste.',
+      eventPredatorLabel: 'Easter egg Predator',
+      eventPredatorHint: 'Rulează suprapunerea Predator ascunsă, declanșată normal de secvența secretă de taste.',
       eventTriggerAction: 'Declanșează',
       eventNotificationPermissionLabel: 'Permisiune notificări',
       eventNotificationPreferenceLabel: 'Setare notificări',

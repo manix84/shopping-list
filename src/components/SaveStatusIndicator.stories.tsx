@@ -19,7 +19,7 @@ const meta = {
   argTypes: {
     status: {
       control: 'select',
-      options: ['idle', 'saving', 'saved', 'error'],
+      options: ['idle', 'saving', 'syncing', 'saved', 'error'],
     },
   },
 } satisfies Meta<SaveStatusIndicatorStoryArgs>;
@@ -29,7 +29,9 @@ export default meta;
 type Story = StoryObj<SaveStatusIndicatorStoryArgs>;
 
 const labelForStatus = (status: SaveStatus) =>
-  status === 'saving' ? /saving/i : status === 'saved' ? /saved/i : status === 'error' ? /save failed/i : undefined;
+  status === 'saving'
+    ? /saving/i
+    : status === 'syncing' ? /syncing/i : status === 'saved' ? /saved/i : status === 'error' ? /save failed/i : undefined;
 
 const playSaveStatusIndicator: Story['play'] = async ({ args, canvasElement }) => {
   const canvas = within(canvasElement);
@@ -79,6 +81,14 @@ export const Saving: Story = {
 export const Saved: Story = {
   args: {
     status: 'saved',
+  },
+  render: Saving.render,
+  play: playSaveStatusIndicator,
+};
+
+export const Syncing: Story = {
+  args: {
+    status: 'syncing',
   },
   render: Saving.render,
   play: playSaveStatusIndicator,

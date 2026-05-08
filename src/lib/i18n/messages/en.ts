@@ -71,6 +71,7 @@ export const en: Messages = {
     saveFailed: 'Save failed',
     saved: 'Saved',
     saving: 'Saving',
+    syncing: 'Syncing',
     section: 'Section',
     sharedLink: 'Shared link',
     sharedLists: 'shared lists',
@@ -219,6 +220,7 @@ export const en: Messages = {
       backendError: 'Backend responded, but one or more checks failed.',
       backendOffline:
         'Backend is offline; the app is using frontend-only storage.',
+      tabDatabaseEntry: 'Database entry',
       heartbeatTitle: 'Backend heartbeat',
       heartbeatTitleWithQuality: '{title} - {quality}',
       heartbeatQualityWaiting: 'Waiting',
@@ -257,6 +259,11 @@ export const en: Messages = {
       databaseTypePostgres: 'PostgreSQL',
       appStorageModeLabel: 'App storage mode',
       backendAdapterLabel: 'Backend adapter',
+      databaseEntryTitle: 'Current shared list database entry',
+      databaseEntrySubtitle:
+        'The JSON shape saved under sharedLists for the active list.',
+      databaseEntryUnavailable:
+        'No current shared list entry is available yet.',
       configTitle: 'Country config self-checks',
       configSubtitle:
         'Validate the selected country profile shape, keyword coverage, and matcher ownership.',
@@ -361,10 +368,12 @@ export const en: Messages = {
       eventToastPlainMessage: 'This popup intentionally has no title or icon.',
       eventPwaInstallNudgeLabel: 'PWA install nudge',
       eventPwaInstallNudgeHint: 'Shows the floating install prompt without waiting for browser timing.',
+      eventPwaUpdateOverlayLabel: 'Update overlay',
+      eventPwaUpdateOverlayHint: 'Previews the themed overlay shown while an app update reload is in progress.',
       eventSecretAisleLabel: 'Secret aisle overlay',
       eventSecretAisleHint: 'Opens the hidden overlay used by the app header interaction.',
-      eventPredatorLabel: 'Startup visual effect',
-      eventPredatorHint: 'Runs the animated effect normally triggered by the hidden key sequence.',
+      eventPredatorLabel: 'Predator easter egg',
+      eventPredatorHint: 'Runs the hidden Predator overlay normally triggered by the secret key sequence.',
       eventTriggerAction: 'Trigger',
       eventNotificationPermissionLabel: 'Notification permission',
       eventNotificationPreferenceLabel: 'Notification setting',

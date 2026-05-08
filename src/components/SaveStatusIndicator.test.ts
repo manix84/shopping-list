@@ -14,6 +14,7 @@ describe('SaveStatusIndicator helpers', () => {
   it('maps visible save states to localized labels and icons', () => {
     const expected: Array<{ status: SaveStatus; label: string; icon: string }> = [
       { status: 'saving', label: messages.labels.saving, icon: mdiCloudSync },
+      { status: 'syncing', label: messages.labels.syncing, icon: mdiCloudSync },
       { status: 'saved', label: messages.labels.saved, icon: mdiCloudCheck },
       { status: 'error', label: messages.labels.saveFailed, icon: mdiCloudAlert },
     ];

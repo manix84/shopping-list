@@ -3,6 +3,7 @@ export type DebugTabKey =
   | 'parsed'
   | 'state'
   | 'backend'
+  | 'database-entry'
   | 'config'
   | 'matcher'
   | 'quantity'
@@ -18,6 +19,7 @@ export type DebugTabKey =
 export type DebugNotificationTestKey = 'minimal' | 'single-item' | 'few-items' | 'large-batch' | 'silent-follow-up';
 export type DebugEventTestKey =
   | 'pwa-install-nudge'
+  | 'pwa-update-overlay'
   | 'secret-aisle'
   | 'predator'
   | 'toast-success'
@@ -107,11 +109,6 @@ export type ShoppingListRecord = {
   items: Item[];
   updatedAt: string;
   countryCode: CountryCode;
-};
-
-export type AppSettingsRecord = {
-  countryCode: CountryCode;
-  updatedAt: string;
 };
 
 export type SharedListHistoryEntry = {
@@ -265,7 +262,7 @@ export type BackendOperationStatus = {
   detail?: string;
 };
 
-export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
+export type SaveStatus = 'idle' | 'saving' | 'syncing' | 'saved' | 'error';
 
 export type DebugSettings = {
   forceLocalStorage: boolean;
@@ -286,10 +283,6 @@ export type BackendStatus = {
   database: {
     ok: boolean;
     adapter?: BackendDatabaseAdapter;
-    settingsExists?: boolean;
-    settingsCountryCode?: CountryCode;
-    settingsUpdatedAt?: string;
-    shoppingListExists?: boolean;
     updatedAt?: string;
     sharedListCount?: number;
     error?: string;

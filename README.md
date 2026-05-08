@@ -6,7 +6,7 @@
 
 [![Version](https://img.shields.io/github/package-json/v/manix84/shopping-list?filename=package.json&label=version)](package.json) [![Compressed app shell size](https://img.badgesize.io/https://manix84.github.io/shopping-list/index.html?compression=gzip&label=compressed%20app%20shell&color=blue&size=dec)](https://manix84.github.io/shopping-list/)
 
-A React + TypeScript shopping list app that turns a rough grocery list into an ordered route through the store. It runs as a static frontend by default, can install as a PWA, and can use an optional backend for shared lists and durable settings.
+A React + TypeScript shopping list app that turns a rough grocery list into an ordered route through the store. It runs as a static frontend by default, can install as a PWA, and can use an optional backend for shared lists.
 
 See [What's New](WHATSNEW.md) for recent changes and major app milestones.
 
@@ -41,7 +41,7 @@ The generator uses Playwright Chromium. If the browser binary is missing after i
 - generates themed QR codes for shared lists and can scan shared-list QR codes when the browser supports camera scanning
 - can optionally show grouped, low-noise browser notifications when another device adds items to an open shared list while the app is not focused
 - remembers recently opened shared lists locally on the device for quick reopening
-- stores the country profile in the backend when available, with local fallback
+- stores each shared list's country profile with that shared-list record, with local fallback
 - supports English, Spanish, French, German, Dutch, Italian, Romanian, and Pirate UI text, defaulting from the browser language
 - supports light, dark, and system themes, including PWA chrome theme colours
 - includes debug self-checks and diagnostics for backend health, heartbeat latency, database type, runtime host, state consistency, quantity parsing, measurement conversion, variants, storage, section matching, and active shop layout
@@ -92,7 +92,7 @@ The app can run in two modes:
 - frontend-only mode uses browser `localStorage` and works as a static site
 - backend mode is enabled automatically when `/api/health` responds
 
-When backend mode is available, the app loads the browser record and the backend record, chooses the newest saved record using `updatedAt`, writes that winning record to both places, then keeps saving future edits to both local cache and the backend. The country profile is also stored in the backend settings record and cached locally for offline use. Language remains a browser preference and defaults from the user's browser language.
+When backend mode is available for a shared list, the app loads the browser record and the backend shared-list record, chooses the newest saved record using `updatedAt`, writes that winning record to both places, then keeps saving future edits to both local cache and the backend. The country profile is stored as part of each shared-list record. Language, theme, route density, and measurement display mode remain browser preferences and default from the user's browser environment.
 
 ### Running Locally
 
@@ -154,10 +154,8 @@ Password: shopping_list
 SSL: disabled
 ```
 
-The local setup creates these app tables:
+The local setup creates this app table:
 
-- `app_settings`
-- `shopping_list`
 - `shared_lists`
 
 If a database client cannot connect, check Docker is running and the Postgres container is up:
@@ -214,8 +212,6 @@ Backend utility routes:
 
 - `GET /api/health` - includes backend health and database status
 - `GET /api/database/status` - compatibility route for database status only
-- `GET /api/settings`
-- `PUT /api/settings`
 
 Backend records are validated before they are stored. Shopping-list timestamps must use canonical ISO format, country codes must match the supported country profiles, and persisted section keys must be known route sections.
 
@@ -228,11 +224,13 @@ Debug tabs include:
 - `Parsed` - inspect and edit the structured items generated from the current list
 - `State` - validate parser, matcher, progress, variants, and list identity state
 - `Backend` - inspect backend health, current storage type, database metadata, heartbeat history, and latency trend
+- `Database Entry` - inspect the current backend-backed shared-list record as highlighted JSON
+- `Events` - manually trigger notification examples, toast variants, install/update overlays, and hidden interaction previews
 - `Host` - show the current hostname, host, origin, protocol, and Vite base path so installed PWAs can be checked against the domain they are running from
 - `Config`, `Matcher`, `Quantities`, `Measurements`, `Weights`, `Variants`, `Layout`, `Sections`, and `Storage` - self-checks and reference data for parser and route behaviour
 - `Settings` - debug-only switches that should stay out of the main user settings area
 
-The Backend tab reports whether the app is currently using `LocalStorage`, backend JSON DB fallback, or PostgreSQL. It only displays non-sensitive database details: adapter type, default-list state, shared-list count, country profile, and timestamps. The heartbeat panel records recent backend status checks, latest latency, and a latency-coloured sparkline: green for fast checks, yellow for okay latency, orange for slow latency, and red for disconnected/error states.
+The Backend tab reports whether the app is currently using `LocalStorage`, backend JSON DB fallback, or PostgreSQL. It only displays non-sensitive database details: adapter type, shared-list count, and timestamps. The heartbeat panel records recent backend status checks, latest latency, and a latency-coloured sparkline using a fixed latency scale, with disconnected/error states shown as failed/offline samples.
 
 Debug Settings currently include:
 
@@ -259,7 +257,7 @@ HOME_ASSISTANT_TOKEN=your-long-lived-access-token
 Disabled-by-default backend routes:
 
 - `GET /api/home-assistant/status`
-- `POST /api/home-assistant/sync` pushes the current backend shopping list to Home Assistant
+- `POST /api/home-assistant/sync` pushes a supplied shopping-list record, or a stored shared list referenced by `listId`, to Home Assistant
 - `POST /api/home-assistant/add-item` with `{ "name": "Milk" }`
 - `POST /api/home-assistant/remove-item` with `{ "name": "Milk" }`
 - `POST /api/home-assistant/complete-item` with `{ "name": "Milk" }`
@@ -275,6 +273,8 @@ Every browser session has an internal UUIDv7-style list id. When the backend is 
 ```
 
 Anyone with the link can edit the same list. Changes are saved to the shared backend record after each completed app state change and cached locally as an offline backup. If the backend is offline, new offline-only lists keep their UUID hidden from the URL; lists that have already been backend-backed keep the `/list/<uuidv7>` URL and render from local storage until the backend comes back.
+
+When supported by the browser and backend, open shared lists subscribe to server-sent events for remote changes. SSE updates trigger an immediate backend fetch and a short working indicator while incoming changes are applied. A slower fallback poll remains in place for missed events or browsers without `EventSource`.
 
 The sharing panel also supports:
 
@@ -295,6 +295,7 @@ Shared list API routes:
 - `GET /api/shared-lists/:id`
 - `PUT /api/shared-lists/:id`
 - `DELETE /api/shared-lists/:id`
+- `GET /api/shared-lists/:id/events` - server-sent events for shared-list updates and deletes
 
 ## 📲 PWA install
 
@@ -313,9 +314,10 @@ On supported browsers you can install the app with the browser's install action:
 ### PWA notes
 
 - the app shell, core icons, and built JS/CSS are cached for offline navigation after the service worker has installed
+- online launches and resumes check for updated app assets; when an update reload is needed, a theme-aware translucent overlay with a spinner is shown across the reload
 - the app works offline with local storage even without the backend
 - backend-backed shared lists still need network access to validate, refresh, or load remote list data
-- shared-list notifications are opt-in, only cover item additions while the app/PWA is running, and use grouped notification tags so later additions update the existing notification silently where the browser supports it
+- shared-list notifications are opt-in, only cover item additions while the app/PWA is running, and use service-worker/browser notification delivery with grouped notification tags so later additions update the existing notification silently where the browser supports it
 - QR scanning depends on browser camera support and `BarcodeDetector`; if it is unavailable, the scanner action is hidden and you can paste the shared UUID or URL manually
 - if you change icons or manifest colours, some installed shells keep stale assets until the app is removed and installed again
 
@@ -367,13 +369,15 @@ The app version shown on the About page comes from `package.json`. Use `npm run 
 
 The repo installs `.githooks/pre-commit` through `npm run prepare`. The pre-commit hook runs lint, applies the configured automatic version bump, and stages `package.json` plus `package-lock.json`. Set `VERSION_BUMP=major`, `VERSION_BUMP=minor`, or `VERSION_BUMP=patch` when you need to control the bump for a specific commit.
 
+Pushes to `main` automatically create an annotated git tag and GitHub Release. The release workflow uses `v<package.json version>` as the tag when it is available, and falls back to a SHA-suffixed tag if that version tag already exists so every `main` push still has a release point.
+
 ## 🚢 Deployment
 
-The repo includes a GitHub Actions workflow in `.github/workflows/deploy-gh-pages.yml` that builds on push to `main` and publishes `dist/` to GitHub Pages. The production build copies `dist/index.html` to `dist/404.html` so direct path-based SPA links work when opened or refreshed on GitHub Pages.
+The repo includes GitHub Actions workflows that build on push to `main`, publish `dist/` to GitHub Pages, and create a GitHub Release for the pushed commit. The production build copies `dist/index.html` to `dist/404.html` so direct path-based SPA links work when opened or refreshed on GitHub Pages.
 
 ## 🧱 Project structure
 
-- `server` file-backed backend API and disabled Home Assistant integration stub
+- `server` Postgres/JSON-backed API and disabled Home Assistant integration stub
 - `src/config/countries` country-specific supermarket configs
 - `src/lib` parsing, matching, routing helpers, and debug checks
 - `src/lib/repository` persistence layer

@@ -75,6 +75,7 @@ export const fr: Messages = {
     saveFailed: 'Échec de l’enregistrement',
     saved: 'Enregistré',
     saving: 'Enregistrement',
+    syncing: 'Synchronisation',
     section: 'Section',
     sharedLink: 'Lien partagé',
     sharedLists: 'listes partagées',
@@ -229,6 +230,7 @@ export const fr: Messages = {
         'Le backend a répondu, mais une ou plusieurs vérifications ont échoué.',
       backendOffline:
         'Le backend est hors ligne ; l’application utilise uniquement le stockage frontend.',
+      tabDatabaseEntry: 'Entrée base de données',
       heartbeatTitle: 'Heartbeat backend',
       heartbeatTitleWithQuality: '{title} - {quality}',
       heartbeatQualityWaiting: 'En attente',
@@ -268,6 +270,11 @@ export const fr: Messages = {
       databaseTypePostgres: 'PostgreSQL',
       appStorageModeLabel: 'Mode de stockage de l’app',
       backendAdapterLabel: 'Adaptateur backend',
+      databaseEntryTitle: 'Entrée de base de données de la liste partagée active',
+      databaseEntrySubtitle:
+        'La structure JSON enregistrée sous sharedLists pour la liste active.',
+      databaseEntryUnavailable:
+        'Aucune entrée de liste partagée active n’est encore disponible.',
       configTitle: 'Auto-vérifications du profil pays',
       configSubtitle:
         'Validez la structure du profil, la couverture des mots-clés et leur section propriétaire.',
@@ -372,10 +379,12 @@ export const fr: Messages = {
       eventToastPlainMessage: 'Ce popup n’a volontairement ni titre ni icône.',
       eventPwaInstallNudgeLabel: 'Invite d’installation PWA',
       eventPwaInstallNudgeHint: 'Affiche l’invite flottante d’installation sans attendre le navigateur.',
+      eventPwaUpdateOverlayLabel: 'Superposition de mise à jour',
+      eventPwaUpdateOverlayHint: 'Prévisualise la superposition du thème affichée pendant le rechargement d’une mise à jour.',
       eventSecretAisleLabel: 'Superposition allée secrète',
       eventSecretAisleHint: 'Ouvre la superposition cachée utilisée par l’interaction de l’en-tête.',
-      eventPredatorLabel: 'Effet visuel de démarrage',
-      eventPredatorHint: 'Lance l’effet animé normalement déclenché par la séquence de touches cachée.',
+      eventPredatorLabel: 'Easter egg Predator',
+      eventPredatorHint: 'Lance la superposition Predator cachée normalement déclenchée par la séquence de touches secrète.',
       eventTriggerAction: 'Déclencher',
       eventNotificationPermissionLabel: 'Autorisation des notifications',
       eventNotificationPreferenceLabel: 'Réglage des notifications',

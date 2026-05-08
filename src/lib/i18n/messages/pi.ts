@@ -75,6 +75,7 @@ export const pi: Messages = {
     saveFailed: 'Save failed',
     saved: 'Saved',
     saving: 'Saving',
+    syncing: 'Syncing',
     section: 'Deck',
     sharedLink: 'Shared chart',
     sharedLists: 'shared ledgers',
@@ -226,6 +227,7 @@ export const pi: Messages = {
         'Backend answered, but one or more checks went to Davy Jones.',
       backendOffline:
         'Backend be offline; the app be using frontend stowage only.',
+      tabDatabaseEntry: 'Database entry',
       heartbeatTitle: 'Backend heartbeat',
       heartbeatTitleWithQuality: '{title} - {quality}',
       heartbeatQualityWaiting: 'Waitin’',
@@ -264,6 +266,11 @@ export const pi: Messages = {
       databaseTypePostgres: 'PostgreSQL',
       appStorageModeLabel: 'App stowage mode',
       backendAdapterLabel: 'Backend adapter',
+      databaseEntryTitle: 'Current shared list database entry',
+      databaseEntrySubtitle:
+        'The JSON shape stowed under sharedLists fer the active list.',
+      databaseEntryUnavailable:
+        'No current shared list entry be available yet.',
       configTitle: 'Waters profile self-checks',
       configSubtitle:
         'Check profile shape, keyword coverage, and matcher ownership.',
@@ -368,10 +375,12 @@ export const pi: Messages = {
       eventToastPlainMessage: 'This popup intentionally has no title or icon.',
       eventPwaInstallNudgeLabel: 'PWA install nudge',
       eventPwaInstallNudgeHint: 'Shows the floating install prompt without waiting for browser timing.',
+      eventPwaUpdateOverlayLabel: 'Update overlay',
+      eventPwaUpdateOverlayHint: 'Previews the themed overlay shown while an app update reload is in progress.',
       eventSecretAisleLabel: 'Secret aisle overlay',
       eventSecretAisleHint: 'Opens the hidden overlay used by the app header interaction.',
-      eventPredatorLabel: 'Startup visual effect',
-      eventPredatorHint: 'Runs the animated effect normally triggered by the hidden key sequence.',
+      eventPredatorLabel: 'Predator easter egg',
+      eventPredatorHint: 'Runs the hidden Predator overlay normally triggered by the secret key sequence.',
       eventTriggerAction: 'Trigger',
       eventNotificationPermissionLabel: 'Notification permission',
       eventNotificationPreferenceLabel: 'Notification setting',

@@ -75,6 +75,7 @@ export const nl: Messages = {
     saveFailed: 'Opslaan mislukt',
     saved: 'Opgeslagen',
     saving: 'Opslaan',
+    syncing: 'Synchroniseren',
     section: 'Sectie',
     sharedLink: 'Deellink',
     sharedLists: 'gedeelde lijsten',
@@ -228,6 +229,7 @@ export const nl: Messages = {
         'Backend antwoordde, maar een of meer controles zijn mislukt.',
       backendOffline:
         'Backend is offline; de app gebruikt alleen frontend-opslag.',
+      tabDatabaseEntry: 'Database-item',
       heartbeatTitle: 'Backend-heartbeat',
       heartbeatTitleWithQuality: '{title} - {quality}',
       heartbeatQualityWaiting: 'Wacht',
@@ -266,6 +268,11 @@ export const nl: Messages = {
       databaseTypePostgres: 'PostgreSQL',
       appStorageModeLabel: 'App-opslagmodus',
       backendAdapterLabel: 'Backendadapter',
+      databaseEntryTitle: 'Huidig database-item van gedeelde lijst',
+      databaseEntrySubtitle:
+        'De JSON-vorm die onder sharedLists voor de actieve lijst wordt opgeslagen.',
+      databaseEntryUnavailable:
+        'Er is nog geen huidig gedeeldelijst-item beschikbaar.',
       configTitle: 'Landprofiel-zelftests',
       configSubtitle:
         'Controleer profielstructuur, trefwoorddekking en de bijbehorende matcher-secties.',
@@ -370,10 +377,12 @@ export const nl: Messages = {
       eventToastPlainMessage: 'Deze pop-up heeft bewust geen titel of pictogram.',
       eventPwaInstallNudgeLabel: 'PWA-installatiemelding',
       eventPwaInstallNudgeHint: 'Toont de zwevende installatieprompt zonder op browser-timing te wachten.',
+      eventPwaUpdateOverlayLabel: 'Update-overlay',
+      eventPwaUpdateOverlayHint: 'Toont de thema-overlay die verschijnt terwijl een app-update herlaadt.',
       eventSecretAisleLabel: 'Geheime-gang overlay',
       eventSecretAisleHint: 'Opent de verborgen overlay van de app-headerinteractie.',
-      eventPredatorLabel: 'Visueel starteffect',
-      eventPredatorHint: 'Start het geanimeerde effect van de verborgen toetsreeks.',
+      eventPredatorLabel: 'Predator-easter egg',
+      eventPredatorHint: 'Start de verborgen Predator-overlay die normaal door de geheime toetsreeks wordt geactiveerd.',
       eventTriggerAction: 'Activeren',
       eventNotificationPermissionLabel: 'Meldingstoestemming',
       eventNotificationPreferenceLabel: 'Meldingsinstelling',

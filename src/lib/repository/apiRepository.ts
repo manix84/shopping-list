@@ -1,5 +1,4 @@
-import { isCountryCode } from '../../config/countries';
-import type { AppSettingsRecord, BackendDatabaseAdapter, BackendStatus, ShoppingListRecord } from '../../types';
+import type { BackendDatabaseAdapter, BackendStatus, ShoppingListRecord } from '../../types';
 import { decodeShoppingListRecord, encodeShoppingListRecord } from './recordCodec';
 
 export type ApiShoppingListPayload = {
@@ -7,11 +6,6 @@ export type ApiShoppingListPayload = {
   exists: boolean;
   createdAt?: string;
   updatedAt?: string;
-};
-
-export type ApiSettingsPayload = {
-  record: AppSettingsRecord;
-  exists: boolean;
 };
 
 const DEFAULT_TIMEOUT_MS = 800;
@@ -47,10 +41,6 @@ type ApiDatabaseStatusPayload = {
   ok?: unknown;
   adapter?: unknown;
   path?: unknown;
-  settingsExists?: unknown;
-  settingsCountryCode?: unknown;
-  settingsUpdatedAt?: unknown;
-  shoppingListExists?: unknown;
   updatedAt?: unknown;
   sharedListCount?: unknown;
   error?: unknown;
@@ -92,10 +82,6 @@ export const checkBackendStatus = async (): Promise<BackendStatus> => {
       database: {
         ok: health.ok === true && database?.ok === true,
         adapter: backendDatabaseAdapter(database?.adapter, database?.path),
-        settingsExists: typeof database?.settingsExists === 'boolean' ? database.settingsExists : undefined,
-        settingsCountryCode: isCountryCode(database?.settingsCountryCode) ? database.settingsCountryCode : undefined,
-        settingsUpdatedAt: typeof database?.settingsUpdatedAt === 'string' ? database.settingsUpdatedAt : undefined,
-        shoppingListExists: typeof database?.shoppingListExists === 'boolean' ? database.shoppingListExists : undefined,
         updatedAt: typeof database?.updatedAt === 'string' ? database.updatedAt : undefined,
         sharedListCount: typeof database?.sharedListCount === 'number' ? database.sharedListCount : undefined,
         error: typeof database?.error === 'string' ? database.error : undefined,
@@ -132,40 +118,8 @@ export const loadSharedShoppingList = async (listId: string): Promise<ApiShoppin
   };
 };
 
-export const loadAppSettings = async (): Promise<ApiSettingsPayload> => {
-  const response = await fetchWithTimeout('/api/settings', {}, 2_000);
-  if (!response.ok) {
-    throw new Error(`Unable to load app settings: ${response.status}`);
-  }
-
-  const payload = (await response.json()) as {
-    record?: { countryCode?: unknown; updatedAt?: unknown };
-    exists?: unknown;
-  };
-
-  return {
-    exists: payload.exists === true,
-    record: {
-      countryCode: isCountryCode(payload.record?.countryCode) ? payload.record.countryCode : 'uk',
-      updatedAt: typeof payload.record?.updatedAt === 'string' ? payload.record.updatedAt : '1970-01-01T00:00:00.000Z',
-    },
-  };
-};
-
-export const saveAppSettings = async (record: AppSettingsRecord): Promise<void> => {
-  const response = await fetchWithTimeout(
-    '/api/settings',
-    {
-      method: 'PUT',
-      body: JSON.stringify(record),
-    },
-    2_000,
-  );
-
-  if (!response.ok) {
-    throw new Error(`Unable to save app settings: ${response.status}`);
-  }
-};
+export const sharedShoppingListEventsUrl = (listId: string): string =>
+  apiUrl(`/api/shared-lists/${listId}/events`);
 
 export const saveSharedShoppingList = async (listId: string, record: ShoppingListRecord): Promise<void> => {
   const sharedRecord: ShoppingListRecord = {

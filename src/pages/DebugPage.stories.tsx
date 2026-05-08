@@ -43,9 +43,6 @@ const backendStatus: BackendStatus = {
   database: {
     ok: true,
     adapter: 'postgres',
-    settingsExists: true,
-    settingsCountryCode: 'uk',
-    shoppingListExists: true,
     sharedListCount: 2,
     updatedAt: new Date(now).toISOString(),
   },
@@ -75,6 +72,20 @@ const meta = {
     storageMode: 'backend',
     notificationsEnabled: true,
     notificationPermission: 'granted',
+    currentSharedListDatabaseEntry: {
+      id: '019dbf30-56de-7b2b-aacc-a5ae59430d7f',
+      exists: true,
+      record: {
+        listId: '019dbf30-56de-7b2b-aacc-a5ae59430d7f',
+        serverBacked: true,
+        listName: 'Weekly shop',
+        input: 'milk\neggs',
+        items: sampleItems.slice(0, 2),
+        updatedAt: new Date(now).toISOString(),
+        countryCode: 'uk',
+      },
+      updatedAt: new Date(now).toISOString(),
+    },
     items: sampleItems,
     config: COUNTRY_CONFIGS.uk,
     matcherTests: [],
@@ -153,5 +164,19 @@ export const InteractionStates: Story = {
 
     await userEvent.click(canvas.getByText(/status history/i));
     await expect(statusPoint).toHaveAttribute('aria-pressed', 'false');
+  },
+};
+
+export const DatabaseEntry: Story = {
+  args: {
+    activeTab: 'database-entry',
+  },
+  render: renderDebugPage,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await expect(canvas.getByRole('heading', { name: /current shared list database entry/i })).toBeVisible();
+    await expect(canvas.getByText('"record"')).toBeVisible();
+    await expect(canvas.getByText('"Weekly shop"')).toBeVisible();
   },
 };

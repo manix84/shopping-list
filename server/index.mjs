@@ -4,19 +4,14 @@ import { createServer } from 'node:http';
 import { extname, join, resolve } from 'node:path';
 import {
   clearSharedList,
-  clearShoppingList,
   createSharedList,
   getDatabaseStatus,
-  getSettings,
   getSharedList,
-  getShoppingList,
   isSharedListId,
-  saveSettings,
   saveSharedList,
-  saveShoppingList,
 } from './database.mjs';
 import { callShoppingListService, getHomeAssistantStatus, pushRecordToHomeAssistant } from './homeAssistant.mjs';
-import { isSettingsRecord, isShoppingListRecord } from './validation.mjs';
+import { isShoppingListRecord } from './validation.mjs';
 
 const port = Number(process.env.PORT ?? 8787);
 const distDir = resolve('dist');
@@ -32,6 +27,85 @@ const contentTypes = {
   '.jpg': 'image/jpeg',
   '.svg': 'image/svg+xml',
   '.webmanifest': 'application/manifest+json; charset=utf-8',
+};
+
+const sharedListEventClients = new Map();
+
+const sendSharedListEvent = (response, event) => {
+  if (response.destroyed || response.writableEnded) { return false; }
+
+  try {
+    response.write(`event: ${event.type}\n`);
+    response.write(`data: ${JSON.stringify(event)}\n\n`);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+const sendSharedListComment = (response, comment) => {
+  if (response.destroyed || response.writableEnded) { return false; }
+
+  try {
+    response.write(`: ${comment}\n\n`);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+const addSharedListEventClient = (request, response, listId) => {
+  response.writeHead(200, {
+    'Content-Type': 'text/event-stream; charset=utf-8',
+    'Cache-Control': 'no-cache, no-transform',
+    Connection: 'keep-alive',
+    'X-Accel-Buffering': 'no',
+    'X-Clacks-Overhead': clacksOverhead,
+  });
+  response.write('retry: 5000\n\n');
+  if (!sendSharedListEvent(response, { type: 'connected', listId, updatedAt: new Date().toISOString() })) {
+    response.end();
+    return;
+  }
+
+  const clients = sharedListEventClients.get(listId) ?? new Set();
+  clients.add(response);
+  sharedListEventClients.set(listId, clients);
+
+  const keepAlive = setInterval(() => {
+    if (!sendSharedListComment(response, 'keep-alive')) {
+      clearInterval(keepAlive);
+      clients.delete(response);
+      if (clients.size === 0) {
+        sharedListEventClients.delete(listId);
+      }
+      response.end();
+    }
+  }, 25_000);
+
+  request.on('close', () => {
+    clearInterval(keepAlive);
+    clients.delete(response);
+    if (clients.size === 0) {
+      sharedListEventClients.delete(listId);
+    }
+    response.end();
+  });
+};
+
+const publishSharedListEvent = (listId, event) => {
+  const clients = sharedListEventClients.get(listId);
+  if (!clients) { return; }
+
+  for (const client of clients) {
+    if (!sendSharedListEvent(client, { ...event, listId })) {
+      clients.delete(client);
+    }
+  }
+
+  if (clients.size === 0) {
+    sharedListEventClients.delete(listId);
+  }
 };
 
 const sendJson = (response, statusCode, payload) => {
@@ -99,43 +173,6 @@ const handleApi = async (request, response, path) => {
     return;
   }
 
-  if (request.method === 'GET' && path === '/api/settings') {
-    sendJson(response, 200, await getSettings());
-    return;
-  }
-
-  if (request.method === 'PUT' && path === '/api/settings') {
-    const record = await readJsonBody(request);
-    if (!isSettingsRecord(record)) {
-      sendJson(response, 400, { error: 'Invalid settings record' });
-      return;
-    }
-
-    sendJson(response, 200, await saveSettings(record));
-    return;
-  }
-
-  if (request.method === 'GET' && path === '/api/shopping-list') {
-    sendJson(response, 200, await getShoppingList());
-    return;
-  }
-
-  if (request.method === 'PUT' && path === '/api/shopping-list') {
-    const record = await readJsonBody(request);
-    if (!isShoppingListRecord(record)) {
-      sendJson(response, 400, { error: 'Invalid shopping list record' });
-      return;
-    }
-
-    sendJson(response, 200, await saveShoppingList(record));
-    return;
-  }
-
-  if (request.method === 'DELETE' && path === '/api/shopping-list') {
-    sendJson(response, 200, await clearShoppingList());
-    return;
-  }
-
   if (request.method === 'POST' && path === '/api/shared-lists') {
     const body = await readJsonBody(request);
     if (!isShoppingListRecord(body.record)) {
@@ -144,6 +181,23 @@ const handleApi = async (request, response, path) => {
     }
 
     sendJson(response, 201, await createSharedList(body.record));
+    return;
+  }
+
+  const sharedListEventsMatch = path.match(/^\/api\/shared-lists\/([^/]+)\/events$/);
+  if (sharedListEventsMatch) {
+    const id = sharedListEventsMatch[1];
+    if (!isSharedListId(id)) {
+      sendJson(response, 400, { error: 'Invalid shared list id' });
+      return;
+    }
+
+    if (request.method !== 'GET') {
+      sendJson(response, 405, { error: 'Method not allowed' });
+      return;
+    }
+
+    addSharedListEventClient(request, response, id);
     return;
   }
 
@@ -167,12 +221,16 @@ const handleApi = async (request, response, path) => {
         return;
       }
 
-      sendJson(response, 200, await saveSharedList(id, record));
+      const payload = await saveSharedList(id, record);
+      publishSharedListEvent(id, { type: 'updated', updatedAt: payload.updatedAt ?? payload.record.updatedAt });
+      sendJson(response, 200, payload);
       return;
     }
 
     if (request.method === 'DELETE') {
-      sendJson(response, 200, await clearSharedList(id));
+      const payload = await clearSharedList(id);
+      publishSharedListEvent(id, { type: 'deleted', updatedAt: new Date().toISOString() });
+      sendJson(response, 200, payload);
       return;
     }
   }
@@ -190,7 +248,21 @@ const handleApi = async (request, response, path) => {
 
     if (request.method === 'POST' && path === '/api/home-assistant/sync') {
       const body = await readJsonBody(request);
-      const record = isShoppingListRecord(body.record) ? body.record : (await getShoppingList()).record;
+      const listId = typeof body.listId === 'string' ? body.listId : undefined;
+      const sharedListPayload =
+        !isShoppingListRecord(body.record) && isSharedListId(listId)
+          ? await getSharedList(listId)
+          : undefined;
+      const record = isShoppingListRecord(body.record)
+        ? body.record
+        : sharedListPayload?.exists && isShoppingListRecord(sharedListPayload.record)
+          ? sharedListPayload.record
+          : undefined;
+      if (!record) {
+        sendJson(response, 400, { error: 'A valid record or shared list id is required to sync Home Assistant' });
+        return;
+      }
+
       const actions = await pushRecordToHomeAssistant(record);
       sendJson(response, 200, { ok: true, actions });
       return;

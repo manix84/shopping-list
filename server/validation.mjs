@@ -31,9 +31,3 @@ export const isShoppingListRecord = (value, sharedListId) =>
   value.items.every(isShoppingListItem) &&
   isIsoTimestamp(value.updatedAt) &&
   COUNTRY_CODES.has(value.countryCode);
-
-export const isSettingsRecord = (value) =>
-  value &&
-  typeof value === 'object' &&
-  COUNTRY_CODES.has(value.countryCode) &&
-  isIsoTimestamp(value.updatedAt);
