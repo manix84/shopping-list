@@ -73,6 +73,7 @@ const BACKEND_HEARTBEAT_RETRY_MS = 1_500;
 const BACKEND_HEARTBEAT_HISTORY_LIMIT = 36;
 const SHARED_LIST_NOTIFICATION_POLL_MS = 30_000;
 const SHARED_LIST_SYNC_POLL_MS = 5_000;
+const SHARED_LIST_SYNC_SSE_FALLBACK_POLL_MS = 60_000;
 const SHARED_LIST_NOTIFICATION_GROUP_MS = 2 * 60_000;
 const SHARED_LIST_NOTIFICATION_PREVIEW_LIMIT = 3;
 const NOTIFICATION_SERVICE_WORKER_READY_TIMEOUT_MS = 3_000;
@@ -520,6 +521,8 @@ export default function App() {
       ? undefined
       : `${window.location.origin}${appBasePath}/list/${activeListId}/edit`;
   const currentSharedListDatabaseEntry = useMemo(() => {
+    if (!canUseBackend || !isServerBackedList || storageMode !== 'backend') { return undefined; }
+
     const persistedRecord = lastPersistedRecordRef.current;
     const persistedUpdatedAt = persistedRecord?.updatedAt;
     const record = recordMatchesCurrentState(persistedRecord, {
@@ -546,7 +549,7 @@ export default function App() {
       record,
       updatedAt: record.updatedAt,
     };
-  }, [activeListId, countryCode, input, isServerBackedList, items, listName]);
+  }, [activeListId, canUseBackend, countryCode, input, isServerBackedList, items, listName, storageMode]);
   const shareErrorMessage = shareError ? messages.sharing[shareError] : undefined;
 
   useEffect(() => {
@@ -1937,9 +1940,6 @@ export default function App() {
       }
     };
 
-    const intervalId = window.setInterval(() => {
-      void syncRemoteRecord();
-    }, SHARED_LIST_SYNC_POLL_MS);
     const requestSync = () => {
       void syncRemoteRecord();
     };
@@ -1952,6 +1952,9 @@ export default function App() {
       typeof EventSource === 'undefined'
         ? undefined
         : new EventSource(sharedShoppingListEventsUrl(activeListId));
+    const intervalId = window.setInterval(() => {
+      void syncRemoteRecord();
+    }, eventSource ? SHARED_LIST_SYNC_SSE_FALLBACK_POLL_MS : SHARED_LIST_SYNC_POLL_MS);
     const handleRemoteListEvent = () => {
       void syncRemoteRecord();
     };

@@ -214,12 +214,21 @@ const handleApi = async (request, response, path) => {
 
     if (request.method === 'POST' && path === '/api/home-assistant/sync') {
       const body = await readJsonBody(request);
-      if (!isShoppingListRecord(body.record)) {
-        sendJson(response, 400, { error: 'A valid record is required to sync Home Assistant' });
+      const listId = typeof body.listId === 'string' ? body.listId : undefined;
+      const sharedListPayload =
+        !isShoppingListRecord(body.record) && isSharedListId(listId)
+          ? await getSharedList(listId)
+          : undefined;
+      const record = isShoppingListRecord(body.record)
+        ? body.record
+        : sharedListPayload?.exists && isShoppingListRecord(sharedListPayload.record)
+          ? sharedListPayload.record
+          : undefined;
+      if (!record) {
+        sendJson(response, 400, { error: 'A valid record or shared list id is required to sync Home Assistant' });
         return;
       }
 
-      const record = body.record;
       const actions = await pushRecordToHomeAssistant(record);
       sendJson(response, 200, { ok: true, actions });
       return;

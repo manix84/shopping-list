@@ -135,11 +135,6 @@ const ensurePostgresSchema = async () => {
     );
   `);
 
-  await postgres.query(`
-    DROP TABLE IF EXISTS app_settings;
-    DROP TABLE IF EXISTS shopping_list;
-  `);
-
   await migrateJsonFallbackToPostgresIfEmpty(postgres);
 };
 
