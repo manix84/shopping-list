@@ -356,6 +356,19 @@ select {
   overflow-x: auto;
 }
 
+.heartbeat-status-history-wrap {
+  height: 350px;
+  overflow: auto;
+}
+
+.debug-table-title {
+  color: $text;
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 0 0 8px;
+  text-align: left;
+}
+
 .debug-table {
   border-collapse: collapse;
   min-width: 720px;
@@ -387,6 +400,56 @@ select {
   td {
     font-size: 0.88rem;
   }
+}
+
+.debug-table-row-active {
+  background: color-mix(in srgb, $primary 9%, transparent);
+  box-shadow: inset 3px 0 0 $primary;
+
+  th,
+  td {
+    border-bottom-color: color-mix(in srgb, $primary 38%, $border);
+  }
+}
+
+.debug-table-row-interactive {
+  cursor: pointer;
+  position: relative;
+
+  &:focus-within {
+    background: color-mix(in srgb, $primary 9%, transparent);
+    box-shadow: inset 3px 0 0 $primary;
+  }
+}
+
+.heartbeat-history-row-button {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  color: transparent;
+  cursor: pointer;
+  height: 100%;
+  inset: 0;
+  padding: 0;
+  position: absolute;
+  width: 100%;
+  z-index: 1;
+
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $primary;
+    outline-offset: -2px;
+  }
+}
+
+.heartbeat-status-history-wrap .debug-table thead th {
+  background: $panel;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 .debug-table-compact {
@@ -1031,7 +1094,7 @@ select {
   border-radius: 8px;
   display: grid;
   gap: 16px;
-  overflow: hidden;
+  overflow: visible;
   padding: 16px;
 }
 
@@ -1049,10 +1112,18 @@ select {
   height: 44px;
   justify-content: center;
   position: relative;
+  transition: color 1s ease;
   width: 44px;
+}
 
-  &::before,
-  &::after {
+.heartbeat-pulse-ring {
+  border-radius: inherit;
+  inset: 0;
+  position: absolute;
+}
+
+.heartbeat-pulse-ring::before,
+.heartbeat-pulse-ring::after {
     animation: heartbeat-ring 1.15s ease-out both;
     border: 2px solid currentColor;
     border-radius: inherit;
@@ -1060,24 +1131,31 @@ select {
     inset: 0;
     opacity: 0;
     position: absolute;
-  }
+    transition: border-color 1s ease;
+}
 
-  &::after {
-    animation-delay: 0.18s;
-  }
+.heartbeat-pulse-ring::after {
+  animation-delay: 0.18s;
+}
 
-  span {
-    background: currentColor;
-    border-radius: 999px;
-    box-shadow: 0 0 24px currentColor;
-    height: 16px;
-    width: 16px;
-  }
+.heartbeat-pulse-core {
+  background: currentColor;
+  border-radius: 999px;
+  box-shadow: 0 0 24px currentColor;
+  height: 16px;
+  transition:
+    background-color 1s ease,
+    box-shadow 1s ease;
+  width: 16px;
 }
 
 .heartbeat-pulse-connected,
 .heartbeat-card-connected .heartbeat-graph-line {
   color: $success-text;
+}
+
+.heartbeat-pulse-sample {
+  color: var(--heartbeat-tone-color);
 }
 
 .heartbeat-pulse-checking,
@@ -1127,6 +1205,11 @@ select {
   }
 }
 
+.heartbeat-chart-scroll {
+  overflow: visible;
+  padding: 0 0 2px;
+}
+
 .heartbeat-graph {
   background:
     linear-gradient(180deg, color-mix(in srgb, $panel-alt 84%, transparent), transparent),
@@ -1134,7 +1217,7 @@ select {
   border: 1px solid $border;
   border-radius: 6px;
   height: 150px;
-  overflow: hidden;
+  overflow: visible;
   position: relative;
 
   svg {
@@ -1153,6 +1236,27 @@ select {
   vector-effect: non-scaling-stroke;
 }
 
+.heartbeat-graph-axis {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 1;
+}
+
+.heartbeat-graph-axis-tick {
+  color: color-mix(in srgb, $muted 64%, transparent);
+  font-size: 0.64rem;
+  font-weight: 700;
+  left: 8px;
+  line-height: 1;
+  position: absolute;
+  text-shadow:
+    0 0 4px $panel-alt,
+    0 0 8px $panel-alt,
+    0 1px 0 $panel;
+  transform: translateY(-50%);
+}
+
 .heartbeat-graph-ghost-line {
   stroke: color-mix(in srgb, $muted 24%, transparent);
   stroke-linecap: round;
@@ -1168,93 +1272,270 @@ select {
   vector-effect: non-scaling-stroke;
 }
 
-.heartbeat-graph-line-good {
-  stroke: $success-text;
-}
-
-.heartbeat-graph-line-okay {
-  stroke: #d9a20b;
-}
-
-.heartbeat-graph-line-poor {
-  stroke: #e46f28;
-}
-
-.heartbeat-graph-line-offline {
-  stroke: $danger-text;
+.heartbeat-graph-line-active {
+  filter: drop-shadow(0 0 5px currentColor);
+  stroke-width: 4;
 }
 
 .heartbeat-graph-point {
-  fill: $panel;
-  background: currentColor;
-  border: 1px solid $panel;
+  background: transparent;
+  border: 0;
   border-radius: 999px;
-  box-shadow: 0 0 0 1px currentColor;
-  height: 5px;
+  box-shadow: none;
+  cursor: pointer;
+  height: 22px;
+  margin: 0;
+  padding: 0;
   position: absolute;
   transform: translate(-50%, -50%);
-  width: 5px;
+  width: 22px;
+  z-index: 2;
+
+  &::before {
+    background: currentColor;
+    border: 1px solid $panel;
+    border-radius: inherit;
+    box-shadow: 0 0 0 1px currentColor;
+    content: "";
+    height: 5px;
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 5px;
+  }
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+  }
 }
 
-.heartbeat-graph-point-good {
-  color: $success-text;
-}
-
-.heartbeat-graph-point-okay {
-  color: #d9a20b;
-}
-
-.heartbeat-graph-point-poor {
-  color: #e46f28;
-}
-
-.heartbeat-graph-point-offline {
-  color: $danger-text;
+.heartbeat-graph-point-sample {
+  color: var(--heartbeat-tone-color);
 }
 
 .heartbeat-graph-point-ghost {
-  background: color-mix(in srgb, $muted 22%, transparent);
-  border-color: color-mix(in srgb, $muted 16%, transparent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, $muted 20%, transparent);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
   color: $muted;
+
+  &::before {
+    background: color-mix(in srgb, $muted 22%, transparent);
+    border-color: color-mix(in srgb, $muted 16%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in srgb, $muted 20%, transparent);
+  }
+}
+
+.heartbeat-graph-point-active::before,
+.heartbeat-graph-point:hover::before,
+.heartbeat-graph-point:focus-visible::before {
+  height: 8px;
+  width: 8px;
+}
+
+.heartbeat-graph-tooltip {
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  bottom: calc(100% + 8px);
+  background: color-mix(in srgb, currentColor 13%, $panel);
+  box-shadow: $shadow;
+  color: inherit;
+  display: grid;
+  gap: 2px;
+  left: 50%;
+  min-width: 74px;
+  opacity: 0;
+  padding: 7px 9px;
+  pointer-events: none;
+  position: absolute;
+  text-align: center;
+  transform: translate(-50%, 4px);
+  transition:
+    opacity 0.14s ease,
+    transform 0.14s ease;
+  visibility: hidden;
+  z-index: 4;
+
+  &::after {
+    background: inherit;
+    border-bottom: 1px solid currentColor;
+    border-right: 1px solid currentColor;
+    bottom: -5px;
+    content: "";
+    height: 8px;
+    left: 50%;
+    position: absolute;
+    transform: translateX(-50%) rotate(45deg);
+    width: 8px;
+  }
+
+  strong,
+  span {
+    position: relative;
+    z-index: 1;
+  }
+
+  strong {
+    color: inherit;
+    font-size: 0.8rem;
+    line-height: 1.1;
+  }
+
+  span {
+    color: color-mix(in srgb, currentColor 72%, $panel);
+    font-size: 0.68rem;
+    line-height: 1.1;
+  }
+}
+
+.heartbeat-graph-point-tooltip-visible .heartbeat-graph-tooltip,
+.heartbeat-graph-point:hover .heartbeat-graph-tooltip,
+.heartbeat-graph-point:focus-visible .heartbeat-graph-tooltip {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  visibility: visible;
 }
 
 .heartbeat-status-strip {
-  align-items: center;
-  display: grid;
-  gap: 6px;
-  grid-template-columns: repeat(var(--heartbeat-slot-count), minmax(0, 1fr));
   min-height: 18px;
+  position: relative;
 }
 
 .heartbeat-status-dot {
   aspect-ratio: 1;
+  background: transparent;
+  border: 0;
   border-radius: 999px;
-  justify-self: center;
-  max-width: 10px;
-  min-width: 5px;
-  width: 100%;
+  cursor: pointer;
+  height: 28px;
+  left: var(--heartbeat-status-x);
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transform-origin: center;
+  width: 28px;
+
+  &::before {
+    background: currentColor;
+    border-radius: inherit;
+    content: "";
+    height: 8px;
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+  }
 }
 
 .heartbeat-status-dot-connected {
-  background: $success-text;
+  color: $success-text;
 }
 
 .heartbeat-status-dot-checking {
-  background: $primary;
+  color: $primary;
 }
 
 .heartbeat-status-dot-error {
-  background: $danger-text;
+  color: $danger-text;
 }
 
 .heartbeat-status-dot-offline {
-  background: $muted;
+  color: $muted;
 }
 
 .heartbeat-status-dot-ghost {
-  background: color-mix(in srgb, $muted 24%, transparent);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, $muted 18%, transparent);
+  cursor: default;
+
+  &::before {
+    background: color-mix(in srgb, $muted 24%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, $muted 18%, transparent);
+  }
+}
+
+.heartbeat-status-dot-active,
+.heartbeat-status-dot:not(.heartbeat-status-dot-ghost):hover,
+.heartbeat-status-dot:not(.heartbeat-status-dot-ghost):focus-visible {
+  transform: translate(-50%, -50%) scale(1.35);
+  z-index: 3;
+
+  &::before {
+    box-shadow:
+      0 0 0 2px $panel,
+      0 0 0 4px currentColor;
+  }
+}
+
+.heartbeat-status-dot:not(.heartbeat-status-dot-ghost):focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+}
+
+.heartbeat-status-tooltip {
+  background: color-mix(in srgb, $panel-alt 94%, $panel);
+  border: 1px solid color-mix(in srgb, currentColor 42%, $border);
+  border-radius: 6px;
+  bottom: calc(100% + 8px);
+  box-shadow: $shadow;
+  color: $text;
+  display: grid;
+  gap: 2px;
+  left: 50%;
+  min-width: 82px;
+  opacity: 0;
+  padding: 7px 9px;
+  pointer-events: none;
+  position: absolute;
+  text-align: center;
+  transform: translate(-50%, 4px);
+  transition:
+    opacity 0.14s ease,
+    transform 0.14s ease;
+  visibility: hidden;
+  z-index: 4;
+
+  &::after {
+    background: inherit;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 42%, $border);
+    border-right: 1px solid color-mix(in srgb, currentColor 42%, $border);
+    bottom: -5px;
+    content: "";
+    height: 8px;
+    left: 50%;
+    position: absolute;
+    transform: translateX(-50%) rotate(45deg);
+    width: 8px;
+  }
+
+  strong,
+  span {
+    position: relative;
+    z-index: 1;
+  }
+
+  strong {
+    color: inherit;
+    font-size: 0.76rem;
+    line-height: 1.1;
+  }
+
+  span {
+    color: color-mix(in srgb, currentColor 72%, $panel);
+    font-size: 0.66rem;
+    line-height: 1.1;
+  }
+}
+
+.heartbeat-status-dot-tooltip-visible .heartbeat-status-tooltip,
+.heartbeat-status-dot:not(.heartbeat-status-dot-ghost):hover .heartbeat-status-tooltip,
+.heartbeat-status-dot:not(.heartbeat-status-dot-ghost):focus-visible .heartbeat-status-tooltip {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  visibility: visible;
 }
 
 @keyframes heartbeat-ring {
@@ -1663,6 +1944,13 @@ select {
   }
 
   .button,
+  .heartbeat-pulse,
+  .heartbeat-pulse-ring,
+  .heartbeat-pulse-ring::before,
+  .heartbeat-pulse-ring::after,
+  .heartbeat-pulse-core,
+  .heartbeat-graph-tooltip,
+  .heartbeat-status-tooltip,
   .skip-link,
   .share-qr-card,
   .share-qr-frame,

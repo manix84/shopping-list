@@ -1,7 +1,7 @@
 {
   "name": "shopping-list",
   "private": true,
-  "version": "0.16.26",
+  "version": "0.16.44",
   "type": "module",
   "scripts": {
     "dev": "vite",

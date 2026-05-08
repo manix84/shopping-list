@@ -163,7 +163,7 @@ export function RoutePage({
         </div>
       }
     >
-      <div className={'scroll-region stack'}>
+      <div className={'stack'}>
         {!hasItems ? (
           <div className={'empty-state stack'}>
             <div>{messages.pages.route.emptyNoItems}</div>
