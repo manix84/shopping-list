@@ -314,6 +314,32 @@ const countryConfigForMeasurementDisplayMode = (
 
 const getSharedListPreview = (items: Item[]): string[] => items.slice(0, 6).map((item) => item.raw);
 
+const recordFromCurrentState = ({
+  input,
+  items,
+  countryCode,
+  listId,
+  serverBacked,
+  listName,
+  updatedAt,
+}: {
+  input: string;
+  items: Item[];
+  countryCode: CountryCode;
+  listId: string;
+  serverBacked: boolean;
+  listName: string;
+  updatedAt?: string;
+}): ShoppingListRecord => ({
+  listId,
+  serverBacked,
+  listName: listName.trim() || undefined,
+  input,
+  items,
+  updatedAt: updatedAt ?? new Date().toISOString(),
+  countryCode,
+});
+
 function updateItemTextInInput(input: string, previousDisplay: string, nextDisplay: string): string {
   const lines = input.split('\n');
   const index = lines.findIndex((line) => cleanLine(line) === cleanLine(previousDisplay));
@@ -372,6 +398,7 @@ export default function App() {
   const sharedListNotificationGroupRef = useRef<SharedListNotificationGroup>();
   const debugNotificationListIdRef = useRef(DEBUG_NOTIFICATION_LIST_ID);
   const saveRequestIdRef = useRef(0);
+  const lastPersistedRecordRef = useRef<ShoppingListRecord>();
   const suppressNextAutosaveStatusRef = useRef(true);
   const suppressNextAutosaveStatus = () => {
     suppressNextAutosaveStatusRef.current = true;
@@ -393,7 +420,24 @@ export default function App() {
       ? undefined
       : `${window.location.origin}${appBasePath}/list/${activeListId}/edit`;
   const currentSharedListDatabaseEntry = useMemo(() => {
-    const record = buildRecord(input, items, countryCode, activeListId, isServerBackedList, listName);
+    const persistedRecord = lastPersistedRecordRef.current;
+    const record =
+      persistedRecord &&
+      persistedRecord.listId === activeListId &&
+      persistedRecord.input === input &&
+      persistedRecord.countryCode === countryCode &&
+      persistedRecord.serverBacked === isServerBackedList &&
+      (persistedRecord.listName ?? '') === listName.trim()
+        ? { ...persistedRecord, items }
+        : recordFromCurrentState({
+            input,
+            items,
+            countryCode,
+            listId: activeListId,
+            serverBacked: isServerBackedList,
+            listName,
+            updatedAt: persistedRecord?.updatedAt,
+          });
     return {
       id: activeListId,
       exists: true,
@@ -968,6 +1012,7 @@ export default function App() {
       const record = { ...remotePayload.record, listId: nextListId, serverBacked: true };
       applyRecord(record);
       localStorageRepository.save(record);
+      lastPersistedRecordRef.current = record;
       rememberSharedList({
         listId: nextListId,
         listName: record.listName,
@@ -1075,6 +1120,7 @@ export default function App() {
 
           await saveSharedShoppingList(nextListId, selectedRecord);
           localStorageRepository.save(selectedRecord);
+          lastPersistedRecordRef.current = selectedRecord;
           if (remotePayload.exists) {
             rememberSharedList({
               listId: nextListId,
@@ -1240,6 +1286,7 @@ export default function App() {
 
         await saveSharedShoppingList(activeListId, selectedRecord);
         localStorageRepository.save(selectedRecord);
+        lastPersistedRecordRef.current = selectedRecord;
         if (remotePayload.exists) {
           rememberSharedList({
             listId: activeListId,
@@ -1371,6 +1418,7 @@ export default function App() {
 
     try {
       localStorageRepository.save(record);
+      lastPersistedRecordRef.current = record;
     } catch (error) {
       console.warn('Unable to save shopping list locally.', error);
       if (shouldReportSaveStatus && saveRequestIdRef.current === saveRequestId) {
@@ -1676,6 +1724,7 @@ export default function App() {
 
   const applyRecord = (record: ShoppingListRecord) => {
     suppressNextAutosaveStatus();
+    lastPersistedRecordRef.current = record;
     if (record.listId) {
       setActiveListId(record.listId);
     }
@@ -1704,6 +1753,7 @@ export default function App() {
       const record = buildRecord(input, items, countryCode, activeListId, true, listName);
       await saveSharedShoppingList(activeListId, record);
       localStorageRepository.save(record);
+      lastPersistedRecordRef.current = record;
       rememberSharedList({
         listId: activeListId,
         listName: record.listName,
@@ -1767,6 +1817,7 @@ export default function App() {
     }
 
     const initial = defaultRecord();
+    lastPersistedRecordRef.current = initial;
     setActiveListId(initial.listId ?? createUuidV7());
     setIsServerBackedList(false);
     setStorageMode('local');

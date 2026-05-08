@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
 import type {
   BackendStatus,
   BackendHeartbeatSample,
@@ -483,9 +483,13 @@ export function DebugPage({
   const heartbeatGraphMaxLatencyMs = heartbeatLatencyGraphMax(heartbeatSampleSlots.map((slot) => slot.sample));
   const heartbeatAxisTicks = heartbeatLatencyAxisTicks(heartbeatGraphMaxLatencyMs);
   const activeHeartbeatSampleKey = lockedHeartbeatSampleKey ?? hoveredHeartbeatSampleKey;
-  const currentSharedListJson = currentSharedListDatabaseEntry
-    ? JSON.stringify(currentSharedListDatabaseEntry, null, 2)
-    : undefined;
+  const currentSharedListJson = useMemo(
+    () =>
+      activeTab === 'database-entry' && currentSharedListDatabaseEntry
+        ? JSON.stringify(currentSharedListDatabaseEntry, null, 2)
+        : undefined,
+    [activeTab, currentSharedListDatabaseEntry],
+  );
   const heartbeatLineSegments = heartbeatSampleSlots.slice(1).map((slot, index) => {
     const previousSlot = heartbeatSampleSlots[index];
     const previousPoint = heartbeatPoint(previousSlot, heartbeatGraphMaxLatencyMs);

@@ -269,13 +269,14 @@ export const getSharedList = async (id) => {
 
   const result = await postgresQuery('SELECT id, record, created_at, updated_at FROM shared_lists WHERE id = $1::uuid', [id]);
   const row = result.rows[0];
+  const normalizedRecord = row ? normalizeRecord(row.record) : undefined;
   return row
     ? {
         id: row.id,
         exists: true,
-        record: normalizeRecord(row.record),
+        record: normalizedRecord,
         createdAt: isoString(row.created_at),
-        updatedAt: row.record?.updatedAt ?? isoString(row.updated_at),
+        updatedAt: normalizedRecord.updatedAt || isoString(row.updated_at),
       }
     : {
         id,
