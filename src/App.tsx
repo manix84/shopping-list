@@ -392,6 +392,15 @@ export default function App() {
     typeof window === 'undefined' || !canUseBackend || !isServerBackedList
       ? undefined
       : `${window.location.origin}${appBasePath}/list/${activeListId}/edit`;
+  const currentSharedListDatabaseEntry = useMemo(() => {
+    const record = buildRecord(input, items, countryCode, activeListId, isServerBackedList, listName);
+    return {
+      id: activeListId,
+      exists: true,
+      record,
+      updatedAt: record.updatedAt,
+    };
+  }, [activeListId, countryCode, input, isServerBackedList, items, listName]);
   const shareErrorMessage = shareError ? messages.sharing[shareError] : undefined;
 
   useEffect(() => {
@@ -1928,6 +1937,7 @@ export default function App() {
                 notificationsEnabled={notificationsEnabled}
                 notificationPermission={notificationPermission}
                 debugNotificationResult={debugNotificationResult}
+                currentSharedListDatabaseEntry={currentSharedListDatabaseEntry}
                 items={items}
                 config={config}
                 matcherTests={matcherTests}

@@ -228,6 +228,7 @@ export const nl: Messages = {
         'Backend antwoordde, maar een of meer controles zijn mislukt.',
       backendOffline:
         'Backend is offline; de app gebruikt alleen frontend-opslag.',
+      tabDatabaseEntry: 'Database-item',
       heartbeatTitle: 'Backend-heartbeat',
       heartbeatTitleWithQuality: '{title} - {quality}',
       heartbeatQualityWaiting: 'Wacht',
@@ -266,6 +267,11 @@ export const nl: Messages = {
       databaseTypePostgres: 'PostgreSQL',
       appStorageModeLabel: 'App-opslagmodus',
       backendAdapterLabel: 'Backendadapter',
+      databaseEntryTitle: 'Huidig database-item van gedeelde lijst',
+      databaseEntrySubtitle:
+        'De JSON-vorm die onder sharedLists voor de actieve lijst wordt opgeslagen.',
+      databaseEntryUnavailable:
+        'Er is nog geen huidig gedeeldelijst-item beschikbaar.',
       configTitle: 'Landprofiel-zelftests',
       configSubtitle:
         'Controleer profielstructuur, trefwoorddekking en de bijbehorende matcher-secties.',

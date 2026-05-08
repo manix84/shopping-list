@@ -19,6 +19,7 @@ import type {
   StorageTestResult,
   UnitQuantityTestResult,
   VariantTestResult,
+  ShoppingListRecord,
 } from '../types';
 import { Card } from '../components/Card';
 import { ParsedItemCard } from '../components/ParsedItemCard';
@@ -35,6 +36,12 @@ type DebugPageProps = {
   notificationsEnabled: boolean;
   notificationPermission: NotificationPermission | 'unsupported';
   debugNotificationResult?: DebugNotificationResult;
+  currentSharedListDatabaseEntry?: {
+    id: string;
+    exists: boolean;
+    record: ShoppingListRecord;
+    updatedAt: string;
+  };
   items: Item[];
   config: CountryConfig;
   matcherTests: MatcherTestResult[];
@@ -79,6 +86,39 @@ const HEARTBEAT_LATENCY_TONE_COUNT = 25;
 const HEARTBEAT_LATENCY_TONE_START_HUE = 142;
 const HEARTBEAT_LATENCY_TONE_END_HUE = 0;
 const HEARTBEAT_LATENCY_FAILURE_COLOR = '#dc2626';
+
+const JSON_TOKEN_PATTERN =
+  /("(?:\\.|[^"\\])*"(?=\s*:)|"(?:\\.|[^"\\])*"|true|false|null|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?|[{}[\],:])/g;
+
+const jsonTokenClass = (token: string, isKey = false) => {
+  if (/^"/.test(token)) { return isKey ? 'json-token-key' : 'json-token-string'; }
+  if (token === 'true' || token === 'false') { return 'json-token-boolean'; }
+  if (token === 'null') { return 'json-token-null'; }
+  if (/^-?\d/.test(token)) { return 'json-token-number'; }
+  return 'json-token-punctuation';
+};
+
+const highlightedJsonLine = (line: string) => {
+  const parts: Array<{ text: string; className?: string }> = [];
+  let lastIndex = 0;
+
+  for (const match of line.matchAll(JSON_TOKEN_PATTERN)) {
+    const token = match[0];
+    const index = match.index ?? 0;
+    if (index > lastIndex) {
+      parts.push({ text: line.slice(lastIndex, index) });
+    }
+    const isKey = /^"/.test(token) && line.slice(index + token.length).trimStart().startsWith(':');
+    parts.push({ text: token, className: jsonTokenClass(token, isKey) });
+    lastIndex = index + token.length;
+  }
+
+  if (lastIndex < line.length) {
+    parts.push({ text: line.slice(lastIndex) });
+  }
+
+  return parts;
+};
 
 const backendSummary = (status: BackendStatus, messages: Messages): string => {
   if (status.state === 'connected') { return messages.pages.debug.backendConnected; }
@@ -348,6 +388,7 @@ export function DebugPage({
   notificationsEnabled,
   notificationPermission,
   debugNotificationResult,
+  currentSharedListDatabaseEntry,
   items,
   config,
   matcherTests,
@@ -401,6 +442,7 @@ export function DebugPage({
     { key: 'parsed', label: messages.pages.debug.tabParsed },
     { key: 'state', label: messages.pages.debug.tabState },
     { key: 'backend', label: messages.pages.debug.tabBackend },
+    { key: 'database-entry', label: messages.pages.debug.tabDatabaseEntry },
     { key: 'config', label: messages.pages.debug.tabConfig },
     { key: 'matcher', label: messages.pages.debug.tabMatcher },
     { key: 'quantity', label: messages.pages.debug.tabQuantity },
@@ -441,6 +483,9 @@ export function DebugPage({
   const heartbeatGraphMaxLatencyMs = heartbeatLatencyGraphMax(heartbeatSampleSlots.map((slot) => slot.sample));
   const heartbeatAxisTicks = heartbeatLatencyAxisTicks(heartbeatGraphMaxLatencyMs);
   const activeHeartbeatSampleKey = lockedHeartbeatSampleKey ?? hoveredHeartbeatSampleKey;
+  const currentSharedListJson = currentSharedListDatabaseEntry
+    ? JSON.stringify(currentSharedListDatabaseEntry, null, 2)
+    : undefined;
   const heartbeatLineSegments = heartbeatSampleSlots.slice(1).map((slot, index) => {
     const previousSlot = heartbeatSampleSlots[index];
     const previousPoint = heartbeatPoint(previousSlot, heartbeatGraphMaxLatencyMs);
@@ -973,6 +1018,49 @@ export function DebugPage({
               </tbody>
             </table>
           </div>
+        </Card>
+      ) : null}
+
+      {activeTab === 'database-entry' ? (
+        <Card
+          id={'debug-panel-database-entry'}
+          role={'tabpanel'}
+          aria-labelledby={'debug-tab-database-entry'}
+          header={
+            <>
+              <h2 className={'title title-sm'}>{messages.pages.debug.databaseEntryTitle}</h2>
+              <p className={'subtitle'}>{messages.pages.debug.databaseEntrySubtitle}</p>
+            </>
+          }
+        >
+          {currentSharedListJson ? (
+            <div className={'json-viewer'} role={'region'} aria-label={messages.pages.debug.databaseEntryTitle}>
+              <pre>
+                <code>
+                  {currentSharedListJson.split('\n').map((line, lineIndex) => (
+                    <span key={lineIndex} className={'json-line'}>
+                      <span className={'json-line-number'} aria-hidden={'true'}>
+                        {lineIndex + 1}
+                      </span>
+                      <span className={'json-line-code'}>
+                        {highlightedJsonLine(line).map((part, partIndex) => (
+                          part.className ? (
+                            <span key={partIndex} className={part.className}>
+                              {part.text}
+                            </span>
+                          ) : (
+                            <span key={partIndex}>{part.text}</span>
+                          )
+                        ))}
+                      </span>
+                    </span>
+                  ))}
+                </code>
+              </pre>
+            </div>
+          ) : (
+            <div className={'empty-state'}>{messages.pages.debug.databaseEntryUnavailable}</div>
+          )}
         </Card>
       ) : null}
 

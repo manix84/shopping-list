@@ -226,6 +226,7 @@ export const pi: Messages = {
         'Backend answered, but one or more checks went to Davy Jones.',
       backendOffline:
         'Backend be offline; the app be using frontend stowage only.',
+      tabDatabaseEntry: 'Database entry',
       heartbeatTitle: 'Backend heartbeat',
       heartbeatTitleWithQuality: '{title} - {quality}',
       heartbeatQualityWaiting: 'Waitin’',
@@ -264,6 +265,11 @@ export const pi: Messages = {
       databaseTypePostgres: 'PostgreSQL',
       appStorageModeLabel: 'App stowage mode',
       backendAdapterLabel: 'Backend adapter',
+      databaseEntryTitle: 'Current shared list database entry',
+      databaseEntrySubtitle:
+        'The JSON shape stowed under sharedLists fer the active list.',
+      databaseEntryUnavailable:
+        'No current shared list entry be available yet.',
       configTitle: 'Waters profile self-checks',
       configSubtitle:
         'Check profile shape, keyword coverage, and matcher ownership.',

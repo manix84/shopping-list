@@ -227,6 +227,7 @@ export const ro: Messages = {
         'Backendul a răspuns, dar una sau mai multe verificări au eșuat.',
       backendOffline:
         'Backendul este offline; aplicația folosește doar stocare frontend.',
+      tabDatabaseEntry: 'Intrare bază de date',
       heartbeatTitle: 'Heartbeat backend',
       heartbeatTitleWithQuality: '{title} - {quality}',
       heartbeatQualityWaiting: 'În așteptare',
@@ -265,6 +266,11 @@ export const ro: Messages = {
       databaseTypePostgres: 'PostgreSQL',
       appStorageModeLabel: 'Mod stocare aplicație',
       backendAdapterLabel: 'Adaptor backend',
+      databaseEntryTitle: 'Intrarea curentă din baza de date pentru lista partajată',
+      databaseEntrySubtitle:
+        'Structura JSON salvată în sharedLists pentru lista activă.',
+      databaseEntryUnavailable:
+        'Nu există încă o intrare curentă pentru lista partajată.',
       configTitle: 'Autoverificări profil de țară',
       configSubtitle:
         'Validează structura profilului, acoperirea cuvintelor cheie și secțiunile lor proprietare.',

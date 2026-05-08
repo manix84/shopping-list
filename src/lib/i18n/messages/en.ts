@@ -219,6 +219,7 @@ export const en: Messages = {
       backendError: 'Backend responded, but one or more checks failed.',
       backendOffline:
         'Backend is offline; the app is using frontend-only storage.',
+      tabDatabaseEntry: 'Database entry',
       heartbeatTitle: 'Backend heartbeat',
       heartbeatTitleWithQuality: '{title} - {quality}',
       heartbeatQualityWaiting: 'Waiting',
@@ -257,6 +258,11 @@ export const en: Messages = {
       databaseTypePostgres: 'PostgreSQL',
       appStorageModeLabel: 'App storage mode',
       backendAdapterLabel: 'Backend adapter',
+      databaseEntryTitle: 'Current shared list database entry',
+      databaseEntrySubtitle:
+        'The JSON shape saved under sharedLists for the active list.',
+      databaseEntryUnavailable:
+        'No current shared list entry is available yet.',
       configTitle: 'Country config self-checks',
       configSubtitle:
         'Validate the selected country profile shape, keyword coverage, and matcher ownership.',

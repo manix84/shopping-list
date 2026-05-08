@@ -3,6 +3,7 @@ export type DebugTabKey =
   | 'parsed'
   | 'state'
   | 'backend'
+  | 'database-entry'
   | 'config'
   | 'matcher'
   | 'quantity'

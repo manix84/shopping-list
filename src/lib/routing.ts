@@ -19,6 +19,7 @@ const DEBUG_TAB_KEYS: DebugTabKey[] = [
   'parsed',
   'state',
   'backend',
+  'database-entry',
   'config',
   'matcher',
   'quantity',

@@ -229,6 +229,7 @@ export const fr: Messages = {
         'Le backend a répondu, mais une ou plusieurs vérifications ont échoué.',
       backendOffline:
         'Le backend est hors ligne ; l’application utilise uniquement le stockage frontend.',
+      tabDatabaseEntry: 'Entrée base de données',
       heartbeatTitle: 'Heartbeat backend',
       heartbeatTitleWithQuality: '{title} - {quality}',
       heartbeatQualityWaiting: 'En attente',
@@ -268,6 +269,11 @@ export const fr: Messages = {
       databaseTypePostgres: 'PostgreSQL',
       appStorageModeLabel: 'Mode de stockage de l’app',
       backendAdapterLabel: 'Adaptateur backend',
+      databaseEntryTitle: 'Entrée de base de données de la liste partagée active',
+      databaseEntrySubtitle:
+        'La structure JSON enregistrée sous sharedLists pour la liste active.',
+      databaseEntryUnavailable:
+        'Aucune entrée de liste partagée active n’est encore disponible.',
       configTitle: 'Auto-vérifications du profil pays',
       configSubtitle:
         'Validez la structure du profil, la couverture des mots-clés et leur section propriétaire.',

@@ -224,6 +224,7 @@ export const es: Messages = {
         'El backend respondió, pero una o más comprobaciones fallaron.',
       backendOffline:
         'El backend está sin conexión; la aplicación usa almacenamiento solo de frontend.',
+      tabDatabaseEntry: 'Entrada de base de datos',
       heartbeatTitle: 'Latido del backend',
       heartbeatTitleWithQuality: '{title} - {quality}',
       heartbeatQualityWaiting: 'En espera',
@@ -263,6 +264,11 @@ export const es: Messages = {
       databaseTypePostgres: 'PostgreSQL',
       appStorageModeLabel: 'Modo de almacenamiento de la app',
       backendAdapterLabel: 'Adaptador backend',
+      databaseEntryTitle: 'Entrada actual de la lista compartida',
+      databaseEntrySubtitle:
+        'La forma JSON guardada en sharedLists para la lista activa.',
+      databaseEntryUnavailable:
+        'Aún no hay una entrada de lista compartida actual disponible.',
       configTitle: 'Comprobaciones de configuración de país',
       configSubtitle:
         'Valida la estructura del perfil, la cobertura de palabras clave y su sección propietaria.',

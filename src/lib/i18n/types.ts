@@ -212,6 +212,7 @@ export type Messages = {
       backendChecking: string;
       backendError: string;
       backendOffline: string;
+      tabDatabaseEntry: string;
       heartbeatTitle: string;
       heartbeatTitleWithQuality: string;
       heartbeatQualityWaiting: string;
@@ -250,6 +251,9 @@ export type Messages = {
       databaseTypePostgres: string;
       appStorageModeLabel: string;
       backendAdapterLabel: string;
+      databaseEntryTitle: string;
+      databaseEntrySubtitle: string;
+      databaseEntryUnavailable: string;
       configTitle: string;
       configSubtitle: string;
       matcherTitle: string;

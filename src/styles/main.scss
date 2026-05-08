@@ -467,6 +467,70 @@ select {
   }
 }
 
+.json-viewer {
+  background: color-mix(in srgb, $panel-alt 72%, $panel);
+  border: 1px solid $border;
+  border-radius: 6px;
+  max-height: min(68vh, 720px);
+  overflow: auto;
+}
+
+.json-viewer pre {
+  margin: 0;
+  min-width: max-content;
+  padding: 14px 0;
+}
+
+.json-viewer code {
+  color: $text;
+  display: block;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.json-line {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  min-height: 1.55em;
+}
+
+.json-line-number {
+  color: color-mix(in srgb, $muted 62%, transparent);
+  padding: 0 12px 0 10px;
+  text-align: right;
+  user-select: none;
+}
+
+.json-line-code {
+  padding-right: 18px;
+  white-space: pre;
+}
+
+.json-token-key {
+  color: #2563eb;
+}
+
+.json-token-string {
+  color: #15803d;
+}
+
+.json-token-number {
+  color: #b45309;
+}
+
+.json-token-boolean {
+  color: #7c3aed;
+}
+
+.json-token-null {
+  color: $muted;
+}
+
+.json-token-punctuation {
+  color: color-mix(in srgb, $text 62%, $muted);
+}
+
 .debug-kv-list {
   display: grid;
   gap: 4px;

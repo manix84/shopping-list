@@ -229,6 +229,7 @@ export const de: Messages = {
         'Das Backend hat geantwortet, aber eine oder mehrere Prüfungen sind fehlgeschlagen.',
       backendOffline:
         'Das Backend ist offline; die App nutzt nur Frontend-Speicher.',
+      tabDatabaseEntry: 'Datenbankeintrag',
       heartbeatTitle: 'Backend-Heartbeat',
       heartbeatTitleWithQuality: '{title} - {quality}',
       heartbeatQualityWaiting: 'Wartet',
@@ -268,6 +269,11 @@ export const de: Messages = {
       databaseTypePostgres: 'PostgreSQL',
       appStorageModeLabel: 'App-Speichermodus',
       backendAdapterLabel: 'Backend-Adapter',
+      databaseEntryTitle: 'Aktueller Datenbankeintrag der freigegebenen Liste',
+      databaseEntrySubtitle:
+        'Die JSON-Struktur, die unter sharedLists für die aktive Liste gespeichert wird.',
+      databaseEntryUnavailable:
+        'Noch kein aktueller Eintrag für eine freigegebene Liste verfügbar.',
       configTitle: 'Länderprofil-Selbsttests',
       configSubtitle:
         'Prüft Profilstruktur, Keyword-Abdeckung und die zugehörigen Matcher-Bereiche.',
