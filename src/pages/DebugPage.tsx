@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
 import type {
   BackendStatus,
   BackendHeartbeatSample,
@@ -540,19 +540,23 @@ export function DebugPage({
     ? lockedHeartbeatSampleKey
     : hoveredHeartbeatSurface === 'status' ? hoveredHeartbeatSampleKey : null;
 
-  useEffect(() => {
-    if (!lockedHeartbeatSampleKey) { return; }
-
+  const scrollHeartbeatHistorySampleIntoView = useCallback((sampleKey: string, behavior: ScrollBehavior = 'smooth') => {
     const wrap = heartbeatHistoryWrapRef.current;
-    const row = heartbeatHistoryRowRefs.current.get(lockedHeartbeatSampleKey);
+    const row = heartbeatHistoryRowRefs.current.get(sampleKey);
     if (!wrap || !row) { return; }
 
     const nextScrollTop = row.offsetTop - (wrap.clientHeight / 2) + (row.clientHeight / 2);
     wrap.scrollTo({
       top: Math.max(0, nextScrollTop),
-      behavior: 'smooth',
+      behavior,
     });
-  }, [lockedHeartbeatSampleKey]);
+  }, []);
+
+  useEffect(() => {
+    if (!lockedHeartbeatSampleKey) { return; }
+
+    scrollHeartbeatHistorySampleIntoView(lockedHeartbeatSampleKey);
+  }, [lockedHeartbeatSampleKey, scrollHeartbeatHistorySampleIntoView]);
 
   useEffect(() => {
     if (typeof document === 'undefined') { return undefined; }
@@ -986,7 +990,10 @@ export function DebugPage({
                           className={'heartbeat-history-row-button'}
                           aria-pressed={sample.checkedAt === lockedHeartbeatSampleKey && lockedHeartbeatSurface === 'history'}
                           aria-label={`${messages.pages.debug.heartbeatLastChecked}: ${formatHeartbeatTime(sample.checkedAt)}, ${messages.labels.state}: ${backendStateLabel({ ...backendStatus, state: sample.state }, messages)}, ${messages.pages.debug.heartbeatLatency}: ${formatHeartbeatLatency(sample, messages)}`}
-                          onFocus={() => activateHeartbeatSample(sample, 'history')}
+                          onFocus={() => {
+                            activateHeartbeatSample(sample, 'history');
+                            scrollHeartbeatHistorySampleIntoView(sample.checkedAt);
+                          }}
                           onBlur={clearActiveHeartbeatSample}
                           onClick={() => lockHeartbeatSample(sample, 'history')}
                         />
