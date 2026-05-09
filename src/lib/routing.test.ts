@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { readRouteFromLocationParts, routeToUrl } from './routing';
+import { isDefaultLandingRoutePath, readRouteFromLocationParts, routeToUrl } from './routing';
 
 const LIST_ID = '019dbf30-56de-7b2b-aacc-a5ae59430d7f';
 
@@ -75,6 +75,16 @@ describe('routing', () => {
   it('keeps the root route on edit and sends unknown paths to not found', () => {
     expect(readRouteFromLocationParts({ pathname: '/' })).toEqual({ page: 'edit' });
     expect(readRouteFromLocationParts({ pathname: '/unknown' })).toEqual({ page: 'not-found' });
+  });
+
+  it('identifies default landing routes before the app chooses edit or route', () => {
+    expect(isDefaultLandingRoutePath({ pathname: '/' })).toBe(true);
+    expect(isDefaultLandingRoutePath({ pathname: `/${LIST_ID}` })).toBe(true);
+    expect(isDefaultLandingRoutePath({ pathname: `/list/${LIST_ID}` })).toBe(true);
+    expect(isDefaultLandingRoutePath({ pathname: `/shopping-list/list/${LIST_ID}`, basePath: '/shopping-list/' })).toBe(true);
+    expect(isDefaultLandingRoutePath({ pathname: '/edit' })).toBe(false);
+    expect(isDefaultLandingRoutePath({ pathname: `/list/${LIST_ID}/edit` })).toBe(false);
+    expect(isDefaultLandingRoutePath({ pathname: `/list/${LIST_ID}/route` })).toBe(false);
   });
 
   it('reads regular path routes', () => {

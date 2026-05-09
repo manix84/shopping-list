@@ -49,7 +49,7 @@ import {
 } from './lib/repository/localStorageRepository';
 import { sharedListHistoryRepository } from './lib/repository/sharedListHistoryRepository';
 import { chooseNewestRecord } from './lib/repository/recordMerge';
-import { readRouteFromLocationParts, routeToUrl } from './lib/routing';
+import { isDefaultLandingRoutePath, readRouteFromLocationParts, routeToUrl } from './lib/routing';
 import { getSectionMeta } from './lib/sections';
 import { extractSharedListId } from './lib/sharedLinks';
 import { cleanLine, stripDisplaySizeLabel } from './lib/stringUtils';
@@ -360,6 +360,15 @@ const readRouteFromLocation = (): AppRoute => {
   });
 };
 
+const isDefaultLandingLocation = (): boolean => {
+  if (typeof window === 'undefined') { return true; }
+
+  return isDefaultLandingRoutePath({
+    pathname: window.location.pathname,
+    basePath: appBasePath,
+  });
+};
+
 const routesMatch = (first: AppRoute, second: AppRoute): boolean =>
   first.page === second.page &&
   first.listId === second.listId &&
@@ -536,6 +545,7 @@ export default function App() {
   const pendingBackendSaveRecordRef = useRef<ShoppingListRecord>();
   const currentShoppingListStateRef = useRef<CurrentShoppingListState>();
   const nextRouteHistoryModeRef = useRef<RouteHistoryMode>('replace');
+  const shouldResolveDefaultLandingRef = useRef(isDefaultLandingLocation());
   const appVersionReloadRequestedRef = useRef(false);
   const pendingAppVersionReloadRef = useRef<string>();
   const skipNextAutosaveRef = useRef(false);
@@ -1380,22 +1390,25 @@ export default function App() {
       if (!backendOperationRecorded && nextStorageMode === 'local') {
         setBackendOperation(backendOperationStatus('local-fallback'));
       }
+      const nextItems = parseItems(
+        selectedRecord.input,
+        countryConfigForMeasurementDisplayMode(selectedRecord.countryCode, measurementDisplayMode),
+        selectedRecord.items,
+      );
+      const shouldResolveDefaultLanding = shouldResolveDefaultLandingRef.current;
+      shouldResolveDefaultLandingRef.current = false;
       setActiveListId(nextListId);
       setIsServerBackedList(nextServerBacked);
       const currentLocationDebugTab = readRouteFromLocation().debugTab;
       updateRoute((current) => ({
-        page: current.page,
+        page: shouldResolveDefaultLanding ? (nextItems.length > 0 ? 'route' : 'edit') : current.page,
         listId: nextServerBacked ? nextListId : undefined,
         debugTab: current.debugTab ?? currentLocationDebugTab,
       }), 'replace');
       setCountryCode(selectedRecord.countryCode);
       setListName(selectedRecord.listName ?? '');
       setInput(selectedRecord.input);
-      setItems(parseItems(
-        selectedRecord.input,
-        countryConfigForMeasurementDisplayMode(selectedRecord.countryCode, measurementDisplayMode),
-        selectedRecord.items,
-      ));
+      setItems(nextItems);
       lastLocalPersistedRecordRef.current = selectedRecord;
       if (nextStorageMode === 'backend') {
         lastBackendPersistedRecordRef.current = selectedRecord;
@@ -1587,7 +1600,11 @@ export default function App() {
     const handleLocationChange = () => {
       nextRouteHistoryModeRef.current = 'replace';
       setRoute((current) => {
-        const next = readRouteFromLocation();
+        const locationRoute = readRouteFromLocation();
+        const landingPage: PageKey = currentItemsRef.current.length > 0 ? 'route' : 'edit';
+        const next: AppRoute = isDefaultLandingLocation()
+          ? { ...locationRoute, page: landingPage, listId: locationRoute.listId ?? current.listId }
+          : locationRoute;
         return routesMatch(current, next) ? current : next;
       });
     };
