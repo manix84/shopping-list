@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, 
 import type {
   BackendStatus,
   BackendHeartbeatSample,
-  BackendOperationStatus,
   ConfigTestResult,
   CountQuantityTestResult,
   CountryConfig,
@@ -31,7 +30,6 @@ import { appVersion } from '../version';
 
 type DebugPageProps = {
   backendStatus: BackendStatus;
-  backendOperation: BackendOperationStatus;
   heartbeatSamples: BackendHeartbeatSample[];
   storageMode: 'local' | 'backend';
   notificationsEnabled: boolean;
@@ -492,12 +490,17 @@ export function DebugPage({
   const activeHeartbeatHealthVersion = activeHeartbeatSample
     ? activeHeartbeatSample.healthVersion ?? backendStatus.health.version ?? appVersion
     : undefined;
-  const activeHeartbeatDatabaseErrorDetail = [
-    activeHeartbeatSample?.databaseError ?? backendStatus.database.error,
-    activeHeartbeatSample?.databaseErrorCode ?? backendStatus.database.errorCode,
-  ].filter(Boolean).join(' ');
+  const activeHeartbeatDatabaseErrorDetail = activeHeartbeatSample
+    ? [
+        activeHeartbeatSample.databaseError,
+        activeHeartbeatSample.databaseErrorCode,
+      ].filter(Boolean).join(' ')
+    : [
+        backendStatus.database.error,
+        backendStatus.database.errorCode,
+      ].filter(Boolean).join(' ');
   const activeHeartbeatDatabaseDetail = activeHeartbeatSample
-    ? activeHeartbeatDatabaseErrorDetail || 'n/a'
+    ? activeHeartbeatDatabaseErrorDetail || messages.labels.notApplicable
     : '';
   const currentSharedListJson = useMemo(
     () =>
@@ -947,9 +950,9 @@ export function DebugPage({
                       </td>
                     </tr>
                     <tr>
-                      <th scope={'row'}>{messages.pages.debug.backendOperationDetail}</th>
+                      <th scope={'row'}>{messages.pages.debug.heartbeatDatabaseDetail}</th>
                       <td>
-                        {activeHeartbeatDatabaseDetail === 'n/a' ? (
+                        {activeHeartbeatDatabaseDetail === messages.labels.notApplicable ? (
                           <span className={'muted'}>{activeHeartbeatDatabaseDetail}</span>
                         ) : activeHeartbeatDatabaseDetail}
                       </td>

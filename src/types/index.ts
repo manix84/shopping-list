@@ -260,13 +260,6 @@ export type BackendHeartbeatSample = {
   databaseErrorCode?: string;
   latencyMs: number;
 };
-export type BackendOperationState = 'idle' | 'loading' | 'reconnecting' | 'backend' | 'local-fallback' | 'save-failed';
-export type BackendOperationStatus = {
-  state: BackendOperationState;
-  updatedAt?: string;
-  detail?: string;
-};
-
 export type SaveStatus = 'idle' | 'saving' | 'syncing' | 'saved' | 'error';
 
 export type DebugSettings = {

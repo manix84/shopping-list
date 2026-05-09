@@ -66,7 +66,6 @@ const meta = {
   },
   args: {
     backendStatus,
-    backendOperation: { state: 'backend', updatedAt: new Date(now).toISOString() },
     heartbeatSamples,
     storageMode: 'backend',
     notificationsEnabled: true,

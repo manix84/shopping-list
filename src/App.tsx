@@ -67,7 +67,7 @@ import { ErrorPage } from './pages/ErrorPage';
 import { RoutePage } from './pages/RoutePage';
 import { SectionsPage } from './pages/SectionsPage';
 import { SettingsPage } from './pages/SettingsPage';
-import type { AppRoute, BackendHeartbeatSample, BackendOperationStatus, BackendStatus, CountryCode, DebugEventTestKey, DebugNotificationDeliveryPath, DebugNotificationResult, DebugNotificationTestKey, DebugSettings, DebugTabKey, GroupedSectionView, Item, MeasurementDisplayMode, PageKey, RouteViewMode, SaveStatus, SectionKey, SharedListHistoryEntry, ShoppingListRecord, ThemeMode } from './types';
+import type { AppRoute, BackendHeartbeatSample, BackendStatus, CountryCode, DebugEventTestKey, DebugNotificationDeliveryPath, DebugNotificationResult, DebugNotificationTestKey, DebugSettings, DebugTabKey, GroupedSectionView, Item, MeasurementDisplayMode, PageKey, RouteViewMode, SaveStatus, SectionKey, SharedListHistoryEntry, ShoppingListRecord, ThemeMode } from './types';
 
 const DEFAULT_PAGE: PageKey = 'edit';
 const BACKEND_HEARTBEAT_CONNECTED_MS = 5_000;
@@ -147,19 +147,6 @@ const defaultBackendStatus = (): BackendStatus => ({
   health: { ok: false },
   database: { ok: false },
 });
-
-const backendOperationStatus = (
-  state: BackendOperationStatus['state'],
-  detail?: string,
-): BackendOperationStatus => ({
-  state,
-  detail,
-  updatedAt: new Date().toISOString(),
-});
-
-const errorMessage = (error: unknown): string => (
-  error instanceof Error ? error.message : String(error)
-);
 
 const appBasePath = import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_URL.replace(/\/$/, '');
 const currentOrigin = (): string | undefined => (typeof window === 'undefined' ? undefined : window.location.origin);
@@ -501,7 +488,6 @@ export default function App() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [storageMode, setStorageMode] = useState<StorageMode>('local');
   const [backendStatus, setBackendStatus] = useState<BackendStatus>(() => defaultBackendStatus());
-  const [backendOperation, setBackendOperation] = useState<BackendOperationStatus>(() => backendOperationStatus('idle'));
   const [backendHeartbeatSamples, setBackendHeartbeatSamples] = useState<BackendHeartbeatSample[]>([]);
   const [activeListId, setActiveListId] = useState<string>(() => readRouteFromLocation().listId ?? createUuidV7());
   const [isServerBackedList, setIsServerBackedList] = useState(false);
@@ -1321,7 +1307,6 @@ export default function App() {
     setShareError(undefined);
 
     const loadRecord = async () => {
-      setBackendOperation(backendOperationStatus('loading'));
       const localRecord = localStorageRepository.load();
       const hasLocalRecord = hasStoredShoppingListRecord();
       const nextListId = listId ?? localRecord.listId ?? createUuidV7();
@@ -1333,7 +1318,6 @@ export default function App() {
       let selectedRecord = localRecordWithIdentity;
       let nextStorageMode: StorageMode = 'local';
       let nextServerBacked = localRecordWithIdentity.serverBacked === true;
-      let backendOperationRecorded = false;
 
       const initialHeartbeatStartedAt = performance.now();
       const initialBackendStatus = await checkBackendStatus();
@@ -1380,21 +1364,14 @@ export default function App() {
           }
           nextStorageMode = 'backend';
           nextServerBacked = true;
-          setBackendOperation(backendOperationStatus('backend'));
-          backendOperationRecorded = true;
         } catch (error) {
           console.warn('Backend was detected but could not be loaded. Falling back to local storage.', error);
-          setBackendOperation(backendOperationStatus('local-fallback', errorMessage(error)));
-          backendOperationRecorded = true;
         }
       }
 
       if (cancelled) { return; }
 
       setStorageMode(nextStorageMode);
-      if (!backendOperationRecorded && nextStorageMode === 'local') {
-        setBackendOperation(backendOperationStatus('local-fallback'));
-      }
       const nextItems = parseItems(
         selectedRecord.input,
         countryConfigForMeasurementDisplayMode(selectedRecord.countryCode, measurementDisplayMode),
@@ -1538,7 +1515,6 @@ export default function App() {
     ) { return; }
 
     const connectBackend = async () => {
-      setBackendOperation(backendOperationStatus('reconnecting'));
       try {
         const localRecord = localStorageRepository.load();
         const remotePayload = await loadSharedShoppingList(activeListId);
@@ -1583,10 +1559,8 @@ export default function App() {
           countryConfigForMeasurementDisplayMode(selectedRecord.countryCode, measurementDisplayMode),
           selectedRecord.items,
         ));
-        setBackendOperation(backendOperationStatus('backend'));
       } catch (error) {
         console.warn('Backend reconnected but could not be merged. Staying in local storage mode.', error);
-        setBackendOperation(backendOperationStatus('local-fallback', errorMessage(error)));
       }
     };
 
@@ -1741,7 +1715,6 @@ export default function App() {
         .catch((error: unknown) => {
           console.warn('Unable to save shared shopping list to backend.', error);
           pendingBackendSaveRecordRef.current = backendRecord;
-          setBackendOperation(backendOperationStatus('save-failed', errorMessage(error)));
           if (shouldReportSaveStatus && saveRequestIdRef.current === saveRequestId) {
             setSaveStatus('error');
           }
@@ -1780,7 +1753,6 @@ export default function App() {
         if (cancelled) { return; }
 
         console.warn('Unable to retry shared shopping list backend save.', error);
-        setBackendOperation(backendOperationStatus('save-failed', errorMessage(error)));
         setSaveStatus('error');
         window.setTimeout(() => setBackendSaveRetryAttempt((current) => current + 1), SHARED_LIST_SYNC_POLL_MS);
       });
@@ -2452,7 +2424,6 @@ export default function App() {
             {visiblePage === 'debug' ? (
               <DebugPage
                 backendStatus={backendStatus}
-                backendOperation={backendOperation}
                 heartbeatSamples={backendHeartbeatSamples}
                 storageMode={storageMode}
                 notificationsEnabled={notificationsEnabled}
