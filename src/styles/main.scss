@@ -2502,7 +2502,7 @@ select {
 }
 
 .predator-easter-egg {
-  bottom: max(10px, env(safe-area-inset-bottom));
+  bottom: calc(max(10px, env(safe-area-inset-bottom)) + var(--predator-y-offset, 0px));
   height: 150px;
   pointer-events: none;
   position: fixed;
@@ -2513,27 +2513,28 @@ select {
 .predator-easter-egg-left-to-right {
   left: -190px;
   --predator-facing-direction: 1;
-  animation: predator-run-across 4.8s linear both;
+  animation: predator-run-across var(--predator-run-duration, 4.8s) linear both;
 }
 
 .predator-easter-egg-right-to-left {
   right: -190px;
   --predator-facing-direction: -1;
-  animation: predator-run-across-reverse 4.8s linear both;
+  animation: predator-run-across-reverse var(--predator-run-duration, 4.8s) linear both;
 
   .predator-puppet-facing {
-    transform: scaleX(-1);
+    transform: scaleX(-1) scale(var(--predator-scale, 1));
   }
 }
 
 .predator-puppet-facing {
   height: 150px;
+  transform: scale(var(--predator-scale, 1));
   transform-origin: 50% 100%;
   width: 190px;
 }
 
 .predator-puppet {
-  animation: predator-cartoon-hop 0.46s cubic-bezier(0.2, 0.7, 0.25, 1) infinite;
+  animation: predator-cartoon-hop var(--predator-hop-duration, 0.46s) cubic-bezier(0.2, 0.7, 0.25, 1) infinite;
   display: block;
   filter: drop-shadow(0 10px 14px color-mix(in srgb, $shadow 22%, transparent));
   height: 150px;
@@ -2543,7 +2544,7 @@ select {
 }
 
 .predator-shadow {
-  animation: predator-shadow-hop 0.46s cubic-bezier(0.2, 0.7, 0.25, 1) infinite;
+  animation: predator-shadow-hop var(--predator-hop-duration, 0.46s) cubic-bezier(0.2, 0.7, 0.25, 1) infinite;
   background: color-mix(in srgb, $shadow 18%, transparent);
   border-radius: 999px;
   bottom: 8px;
@@ -2661,12 +2662,12 @@ select {
 }
 
 .predator-leg-front {
-  animation: predator-leg-front 0.46s ease-in-out infinite;
+  animation: predator-leg-front var(--predator-hop-duration, 0.46s) ease-in-out infinite;
   transform-origin: 90px 108px;
 }
 
 .predator-leg-back {
-  animation: predator-leg-back 0.46s ease-in-out infinite;
+  animation: predator-leg-back var(--predator-hop-duration, 0.46s) ease-in-out infinite;
   transform-origin: 44px 108px;
 }
 
@@ -2764,12 +2765,12 @@ select {
   0%,
   100% {
     opacity: 0.34;
-    transform: scaleX(1);
+    transform: scaleX(var(--predator-shadow-scale, 1));
   }
 
   42% {
     opacity: 0.14;
-    transform: scaleX(0.72);
+    transform: scaleX(calc(0.72 * var(--predator-shadow-scale, 1)));
   }
 }
 
