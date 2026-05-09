@@ -7,6 +7,7 @@ type PredatorEasterEggProps = {
 
 type Predator = {
   className: string;
+  pitchMultiplier: number;
   render: () => ReactNode;
 };
 type PredatorDirection = 'left-to-right' | 'right-to-left';
@@ -25,6 +26,7 @@ const PREDATOR_ROAR_VOLUME = 0.9;
 const predators: Predator[] = [
   {
     className: 'predator-tiger',
+    pitchMultiplier: 0.92,
     render: () => (
       <>
         <path className={'predator-body'} d={'M18 70 C28 42 72 36 98 54 C118 68 124 94 106 108 C78 130 28 116 18 70 Z'} />
@@ -50,6 +52,7 @@ const predators: Predator[] = [
   },
   {
     className: 'predator-rex',
+    pitchMultiplier: 0.72,
     render: () => (
       <>
         <path className={'predator-body'} d={'M20 82 C42 44 94 38 116 70 C128 88 118 110 84 116 C48 122 12 108 20 82 Z'} />
@@ -74,6 +77,7 @@ const predators: Predator[] = [
   },
   {
     className: 'predator-shark',
+    pitchMultiplier: 0.84,
     render: () => (
       <>
         <path className={'predator-body'} d={'M12 82 C48 42 110 38 154 72 C112 112 54 126 12 82 Z'} />
@@ -94,6 +98,7 @@ const predators: Predator[] = [
   },
   {
     className: 'predator-croc',
+    pitchMultiplier: 0.78,
     render: () => (
       <>
         <path className={'predator-body'} d={'M18 86 C48 54 118 58 154 78 C124 106 52 118 18 86 Z'} />
@@ -118,6 +123,7 @@ const predators: Predator[] = [
   },
   {
     className: 'predator-raptor',
+    pitchMultiplier: 1.18,
     render: () => (
       <>
         <path className={'predator-body'} d={'M24 82 C46 42 92 44 112 78 C126 102 96 122 58 112 C30 104 14 96 24 82 Z'} />
@@ -141,6 +147,7 @@ const predators: Predator[] = [
   },
   {
     className: 'predator-wolf',
+    pitchMultiplier: 1.05,
     render: () => (
       <>
         <path className={'predator-body'} d={'M20 76 C34 46 82 40 112 58 C132 72 126 104 96 114 C58 126 22 108 20 76 Z'} />
@@ -165,6 +172,7 @@ const predators: Predator[] = [
   },
   {
     className: 'predator-bear',
+    pitchMultiplier: 0.68,
     render: () => (
       <>
         <path className={'predator-body'} d={'M16 82 C22 46 70 30 110 48 C146 64 146 104 110 120 C68 138 10 118 16 82 Z'} />
@@ -202,11 +210,20 @@ const predatorGrowlDelays = (): [number, number] => {
   return [first, second];
 };
 
-const playGrowl = () => {
+const playGrowl = (pitchMultiplier: number) => {
   const roar = new Audio(PREDATOR_ROAR_URL);
+  const pitchableRoar = roar as HTMLAudioElement & {
+    mozPreservesPitch?: boolean;
+    preservesPitch?: boolean;
+    webkitPreservesPitch?: boolean;
+  };
   roar.preload = 'auto';
+  roar.playbackRate = pitchMultiplier;
   roar.volume = PREDATOR_ROAR_VOLUME;
   roar.currentTime = 0;
+  pitchableRoar.preservesPitch = false;
+  pitchableRoar.mozPreservesPitch = false;
+  pitchableRoar.webkitPreservesPitch = false;
 
   void roar.play().catch(() => undefined);
 
@@ -232,7 +249,7 @@ export function PredatorEasterEgg({ onComplete }: PredatorEasterEggProps) {
       window.setTimeout(() => {
         if (isCancelled) { return; }
 
-        const stopGrowl = playGrowl();
+        const stopGrowl = playGrowl(predator.pitchMultiplier);
         if (stopGrowl) {
           stopGrowls.push(stopGrowl);
         }
@@ -256,7 +273,7 @@ export function PredatorEasterEgg({ onComplete }: PredatorEasterEggProps) {
         stopGrowl();
       }
     };
-  }, []);
+  }, [predator.pitchMultiplier]);
 
   return (
     <div className={`predator-easter-egg predator-easter-egg-${direction}`} aria-hidden={'true'}>
