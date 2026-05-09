@@ -110,11 +110,23 @@ const shouldUseSsl = () =>
   process.env.PGSSLMODE === 'require' ||
   databaseUrl?.includes('sslmode=require') === true;
 
+const databaseConnectionString = () => {
+  if (!databaseUrl || !shouldUseSsl()) { return databaseUrl; }
+
+  try {
+    const parsedUrl = new URL(databaseUrl);
+    parsedUrl.searchParams.delete('sslmode');
+    return parsedUrl.toString();
+  } catch {
+    return databaseUrl;
+  }
+};
+
 const getPool = () => {
   if (!databaseUrl) { return undefined; }
   if (!pool) {
     pool = new Pool({
-      connectionString: databaseUrl,
+      connectionString: databaseConnectionString(),
       ssl: shouldUseSsl() ? { rejectUnauthorized: false } : undefined,
     });
   }
