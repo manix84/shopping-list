@@ -375,6 +375,26 @@ select {
   text-align: left;
 }
 
+.debug-disclosure {
+  display: grid;
+  gap: 10px;
+}
+
+.debug-disclosure-trigger {
+  align-items: center;
+  background: $panel;
+  border: 1px solid $border;
+  border-radius: 8px;
+  color: $text;
+  cursor: pointer;
+  display: inline-flex;
+  font-weight: 700;
+  justify-content: space-between;
+  padding: 10px 12px;
+  text-align: left;
+  width: 100%;
+}
+
 .debug-table {
   border-collapse: collapse;
   min-width: 720px;
