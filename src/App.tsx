@@ -1446,10 +1446,18 @@ export default function App() {
     let timeoutId: number | undefined;
     let pendingCheck = false;
 
-    const scheduleHeartbeat = (delay: number) => {
+    const isHeartbeatVisible = () => document.visibilityState === 'visible';
+
+    const clearHeartbeatTimer = () => {
       if (timeoutId) {
         window.clearTimeout(timeoutId);
+        timeoutId = undefined;
       }
+    };
+
+    const scheduleHeartbeat = (delay: number) => {
+      clearHeartbeatTimer();
+      if (!isHeartbeatVisible()) { return; }
 
       timeoutId = window.setTimeout(() => {
         void runHeartbeat();
@@ -1457,7 +1465,7 @@ export default function App() {
     };
 
     const runHeartbeat = async () => {
-      if (cancelled) { return; }
+      if (cancelled || !isHeartbeatVisible()) { return; }
 
       if (inFlight) {
         pendingCheck = true;
@@ -1469,7 +1477,7 @@ export default function App() {
       try {
         const heartbeatStartedAt = performance.now();
         const nextBackendStatus = await checkBackendStatus();
-        if (cancelled) { return; }
+        if (cancelled || !isHeartbeatVisible()) { return; }
 
         setBackendStatus(nextBackendStatus);
         const sample = recordBackendHeartbeat(nextBackendStatus, heartbeatStartedAt);
@@ -1493,12 +1501,15 @@ export default function App() {
     };
 
     const requestImmediateHeartbeat = () => {
+      if (!isHeartbeatVisible()) { return; }
       scheduleHeartbeat(0);
     };
 
-    const requestVisibleHeartbeat = () => {
-      if (document.visibilityState === 'visible') {
+    const handleHeartbeatVisibilityChange = () => {
+      if (isHeartbeatVisible()) {
         requestImmediateHeartbeat();
+      } else {
+        clearHeartbeatTimer();
       }
     };
 
@@ -1506,17 +1517,15 @@ export default function App() {
     window.addEventListener('focus', requestImmediateHeartbeat);
     window.addEventListener('online', requestImmediateHeartbeat);
     window.addEventListener('offline', requestImmediateHeartbeat);
-    document.addEventListener('visibilitychange', requestVisibleHeartbeat);
+    document.addEventListener('visibilitychange', handleHeartbeatVisibilityChange);
 
     return () => {
       cancelled = true;
-      if (timeoutId) {
-        window.clearTimeout(timeoutId);
-      }
+      clearHeartbeatTimer();
       window.removeEventListener('focus', requestImmediateHeartbeat);
       window.removeEventListener('online', requestImmediateHeartbeat);
       window.removeEventListener('offline', requestImmediateHeartbeat);
-      document.removeEventListener('visibilitychange', requestVisibleHeartbeat);
+      document.removeEventListener('visibilitychange', handleHeartbeatVisibilityChange);
     };
   }, [debugSettings.pauseBackendHeartbeat, isLoaded, recordBackendHeartbeat, requestAppVersionReload, verboseDebugLog]);
 
