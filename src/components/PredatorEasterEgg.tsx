@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { useEffect, useMemo, useRef } from 'react';
 
 type PredatorEasterEggProps = {
@@ -7,23 +7,34 @@ type PredatorEasterEggProps = {
 
 type Predator = {
   className: string;
+  growlDelayRanges: Array<[number, number]>;
+  growlPitchVariance: number;
+  hopDurationMs: number;
+  pitchMultiplier: number;
+  runDurationMs: number;
+  scale: number;
+  shadowScale: number;
+  verticalOffsetPx: number;
+  volume: number;
   render: () => ReactNode;
 };
 type PredatorDirection = 'left-to-right' | 'right-to-left';
 
-const RUN_DURATION_MS = 4_800;
-const GROWL_DURATION_SECONDS = 1.65;
-const GROWL_DURATION_MS = GROWL_DURATION_SECONDS * 1_000;
-const GROWL_CLOSE_GRACE_MS = 350;
-const GROWL_MIN_GAP_MS = 300;
-const FIRST_GROWL_EARLIEST_MS = 280;
-const FIRST_GROWL_LATEST_MS = 620;
-const SECOND_GROWL_EARLIEST_MS = 2_520;
-const SECOND_GROWL_LATEST_MS = RUN_DURATION_MS - GROWL_DURATION_MS - 280;
+const appBasePath = import.meta.env.BASE_URL.endsWith('/') ? import.meta.env.BASE_URL : `${import.meta.env.BASE_URL}/`;
+const PREDATOR_ROAR_URL = `${appBasePath}audio/roar.mp3`;
 
 const predators: Predator[] = [
   {
     className: 'predator-tiger',
+    growlDelayRanges: [[320, 620], [2_360, 2_720]],
+    growlPitchVariance: 0.05,
+    hopDurationMs: 460,
+    pitchMultiplier: 0.92,
+    runDurationMs: 4_800,
+    scale: 1,
+    shadowScale: 1,
+    verticalOffsetPx: 0,
+    volume: 0.9,
     render: () => (
       <>
         <path className={'predator-body'} d={'M18 70 C28 42 72 36 98 54 C118 68 124 94 106 108 C78 130 28 116 18 70 Z'} />
@@ -49,6 +60,15 @@ const predators: Predator[] = [
   },
   {
     className: 'predator-rex',
+    growlDelayRanges: [[540, 820]],
+    growlPitchVariance: 0,
+    hopDurationMs: 560,
+    pitchMultiplier: 0.72,
+    runDurationMs: 5_400,
+    scale: 1.14,
+    shadowScale: 1.18,
+    verticalOffsetPx: -2,
+    volume: 1,
     render: () => (
       <>
         <path className={'predator-body'} d={'M20 82 C42 44 94 38 116 70 C128 88 118 110 84 116 C48 122 12 108 20 82 Z'} />
@@ -73,6 +93,15 @@ const predators: Predator[] = [
   },
   {
     className: 'predator-shark',
+    growlDelayRanges: [[1_180, 1_520]],
+    growlPitchVariance: 0,
+    hopDurationMs: 680,
+    pitchMultiplier: 0.84,
+    runDurationMs: 5_100,
+    scale: 0.98,
+    shadowScale: 0.88,
+    verticalOffsetPx: -8,
+    volume: 0.74,
     render: () => (
       <>
         <path className={'predator-body'} d={'M12 82 C48 42 110 38 154 72 C112 112 54 126 12 82 Z'} />
@@ -93,6 +122,15 @@ const predators: Predator[] = [
   },
   {
     className: 'predator-croc',
+    growlDelayRanges: [[600, 900], [2_780, 3_120]],
+    growlPitchVariance: 0.03,
+    hopDurationMs: 620,
+    pitchMultiplier: 0.78,
+    runDurationMs: 5_250,
+    scale: 1.04,
+    shadowScale: 1.1,
+    verticalOffsetPx: -1,
+    volume: 0.86,
     render: () => (
       <>
         <path className={'predator-body'} d={'M18 86 C48 54 118 58 154 78 C124 106 52 118 18 86 Z'} />
@@ -117,6 +155,15 @@ const predators: Predator[] = [
   },
   {
     className: 'predator-raptor',
+    growlDelayRanges: [[220, 380], [1_320, 1_560], [2_320, 2_560]],
+    growlPitchVariance: 0.1,
+    hopDurationMs: 340,
+    pitchMultiplier: 1.18,
+    runDurationMs: 4_150,
+    scale: 0.88,
+    shadowScale: 0.78,
+    verticalOffsetPx: 3,
+    volume: 0.76,
     render: () => (
       <>
         <path className={'predator-body'} d={'M24 82 C46 42 92 44 112 78 C126 102 96 122 58 112 C30 104 14 96 24 82 Z'} />
@@ -140,6 +187,15 @@ const predators: Predator[] = [
   },
   {
     className: 'predator-wolf',
+    growlDelayRanges: [[360, 560], [1_900, 2_180]],
+    growlPitchVariance: 0.07,
+    hopDurationMs: 420,
+    pitchMultiplier: 1.05,
+    runDurationMs: 4_550,
+    scale: 0.94,
+    shadowScale: 0.9,
+    verticalOffsetPx: 1,
+    volume: 0.82,
     render: () => (
       <>
         <path className={'predator-body'} d={'M20 76 C34 46 82 40 112 58 C132 72 126 104 96 114 C58 126 22 108 20 76 Z'} />
@@ -164,6 +220,15 @@ const predators: Predator[] = [
   },
   {
     className: 'predator-bear',
+    growlDelayRanges: [[760, 1_120]],
+    growlPitchVariance: 0,
+    hopDurationMs: 700,
+    pitchMultiplier: 0.68,
+    runDurationMs: 5_700,
+    scale: 1.18,
+    shadowScale: 1.22,
+    verticalOffsetPx: -4,
+    volume: 1,
     render: () => (
       <>
         <path className={'predator-body'} d={'M16 82 C22 46 70 30 110 48 C146 64 146 104 110 120 C68 138 10 118 16 82 Z'} />
@@ -188,153 +253,54 @@ const predators: Predator[] = [
   },
 ];
 
-const createGrowlContext = (): AudioContext | undefined => {
-  const AudioContextConstructor = window.AudioContext;
-  return AudioContextConstructor ? new AudioContextConstructor() : undefined;
-};
-
 const randomBetween = (min: number, max: number) =>
   min + Math.random() * (max - min);
 
-const predatorGrowlDelays = (): [number, number] => {
-  const first = randomBetween(FIRST_GROWL_EARLIEST_MS, FIRST_GROWL_LATEST_MS);
-  const secondEarliest = Math.max(
-    SECOND_GROWL_EARLIEST_MS,
-    first + GROWL_DURATION_MS + GROWL_MIN_GAP_MS,
-  );
-  const second = randomBetween(secondEarliest, SECOND_GROWL_LATEST_MS);
-  return [first, second];
-};
+const predatorGrowlDelays = (predator: Predator) =>
+  predator.growlDelayRanges.map(([earliest, latest]) => randomBetween(earliest, latest));
 
-const createDistortionCurve = (amount: number) => {
-  const samples = 256;
-  const curve = new Float32Array(samples);
-  const deg = Math.PI / 180;
-  for (let index = 0; index < samples; index += 1) {
-    const x = (index * 2) / samples - 1;
-    curve[index] = ((3 + amount) * x * 20 * deg) / (Math.PI + amount * Math.abs(x));
-  }
-  return curve;
-};
-
-const playGrowl = () => {
-  const audioContext = createGrowlContext();
-  if (!audioContext) { return undefined; }
-
-  void audioContext.resume();
-  const now = audioContext.currentTime;
-  const duration = GROWL_DURATION_SECONDS;
-  const noiseBuffer = audioContext.createBuffer(1, audioContext.sampleRate * duration, audioContext.sampleRate);
-  const samples = noiseBuffer.getChannelData(0);
-  let previousSample = 0;
-  for (let index = 0; index < samples.length; index += 1) {
-    const white = Math.random() * 2 - 1;
-    previousSample = previousSample * 0.68 + white * 0.32;
-    samples[index] = previousSample * (1 - index / samples.length);
+const growlPitch = (predator: Predator, growlIndex: number, growlCount: number) => {
+  if (growlCount <= 1 || predator.growlPitchVariance === 0) {
+    return predator.pitchMultiplier;
   }
 
-  const noise = audioContext.createBufferSource();
-  const chest = audioContext.createOscillator();
-  const throat = audioContext.createOscillator();
-  const snarl = audioContext.createOscillator();
-  const noiseFilter = audioContext.createBiquadFilter();
-  const throatFilter = audioContext.createBiquadFilter();
-  const distortion = audioContext.createWaveShaper();
-  const breathGain = audioContext.createGain();
-  const voiceGain = audioContext.createGain();
-  const chestGain = audioContext.createGain();
-  const snarlGain = audioContext.createGain();
-  const masterGain = audioContext.createGain();
-  const compressor = audioContext.createDynamicsCompressor();
+  const progress = growlIndex / (growlCount - 1);
+  return predator.pitchMultiplier * (1 - predator.growlPitchVariance + progress * predator.growlPitchVariance * 2);
+};
 
-  noise.buffer = noiseBuffer;
-  chest.type = 'sawtooth';
-  throat.type = 'sawtooth';
-  snarl.type = 'square';
-  chest.frequency.setValueAtTime(78, now);
-  chest.frequency.exponentialRampToValueAtTime(46, now + 0.5);
-  chest.frequency.exponentialRampToValueAtTime(64, now + 1.38);
-  throat.frequency.setValueAtTime(132, now);
-  throat.frequency.exponentialRampToValueAtTime(74, now + 0.42);
-  throat.frequency.exponentialRampToValueAtTime(112, now + 0.95);
-  throat.frequency.exponentialRampToValueAtTime(58, now + 1.48);
-  snarl.frequency.setValueAtTime(38, now);
-  snarl.frequency.exponentialRampToValueAtTime(32, now + 1.25);
-  noiseFilter.type = 'bandpass';
-  noiseFilter.frequency.setValueAtTime(1_200, now);
-  noiseFilter.frequency.exponentialRampToValueAtTime(430, now + 0.95);
-  noiseFilter.Q.setValueAtTime(0.85, now);
-  throatFilter.type = 'lowpass';
-  throatFilter.frequency.setValueAtTime(860, now);
-  throatFilter.frequency.exponentialRampToValueAtTime(320, now + 1.28);
-  distortion.curve = createDistortionCurve(260);
-  distortion.oversample = '4x';
-  compressor.threshold.setValueAtTime(-22, now);
-  compressor.knee.setValueAtTime(18, now);
-  compressor.ratio.setValueAtTime(5, now);
-  compressor.attack.setValueAtTime(0.01, now);
-  compressor.release.setValueAtTime(0.16, now);
+const playGrowl = (pitchMultiplier: number, volume: number) => {
+  const roar = new Audio(PREDATOR_ROAR_URL);
+  const pitchableRoar = roar as HTMLAudioElement & {
+    mozPreservesPitch?: boolean;
+    preservesPitch?: boolean;
+    webkitPreservesPitch?: boolean;
+  };
+  roar.preload = 'auto';
+  roar.playbackRate = pitchMultiplier;
+  roar.volume = volume;
+  roar.currentTime = 0;
+  pitchableRoar.preservesPitch = false;
+  pitchableRoar.mozPreservesPitch = false;
+  pitchableRoar.webkitPreservesPitch = false;
 
-  masterGain.gain.setValueAtTime(0.0001, now);
-  masterGain.gain.exponentialRampToValueAtTime(0.82, now + 0.035);
-  masterGain.gain.exponentialRampToValueAtTime(0.24, now + 0.44);
-  masterGain.gain.exponentialRampToValueAtTime(0.62, now + 0.66);
-  masterGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-  voiceGain.gain.setValueAtTime(0.0001, now);
-  voiceGain.gain.exponentialRampToValueAtTime(0.18, now + 0.05);
-  voiceGain.gain.exponentialRampToValueAtTime(0.06, now + 0.48);
-  voiceGain.gain.exponentialRampToValueAtTime(0.14, now + 0.72);
-  voiceGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-  breathGain.gain.setValueAtTime(0.0001, now);
-  breathGain.gain.exponentialRampToValueAtTime(0.11, now + 0.03);
-  breathGain.gain.exponentialRampToValueAtTime(0.035, now + 0.52);
-  breathGain.gain.exponentialRampToValueAtTime(0.085, now + 0.72);
-  breathGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-  chestGain.gain.setValueAtTime(0.0001, now);
-  chestGain.gain.exponentialRampToValueAtTime(0.13, now + 0.04);
-  chestGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-  snarlGain.gain.setValueAtTime(0.0001, now);
-  snarlGain.gain.exponentialRampToValueAtTime(0.028, now + 0.08);
-  snarlGain.gain.exponentialRampToValueAtTime(0.01, now + 0.55);
-  snarlGain.gain.exponentialRampToValueAtTime(0.025, now + 0.78);
-  snarlGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-
-  noise.connect(noiseFilter);
-  noiseFilter.connect(breathGain);
-  throat.connect(throatFilter);
-  throatFilter.connect(distortion);
-  distortion.connect(voiceGain);
-  chest.connect(chestGain);
-  snarl.connect(snarlGain);
-  breathGain.connect(masterGain);
-  voiceGain.connect(masterGain);
-  chestGain.connect(masterGain);
-  snarlGain.connect(masterGain);
-  masterGain.connect(compressor);
-  compressor.connect(audioContext.destination);
-
-  noise.start(now);
-  chest.start(now);
-  throat.start(now + 0.02);
-  snarl.start(now + 0.04);
-  noise.stop(now + duration);
-  chest.stop(now + duration);
-  throat.stop(now + duration);
-  snarl.stop(now + duration);
-
-  const closeTimer = window.setTimeout(() => {
-    void audioContext.close();
-  }, GROWL_DURATION_MS + GROWL_CLOSE_GRACE_MS);
+  void roar.play().catch(() => undefined);
 
   return () => {
-    window.clearTimeout(closeTimer);
-    void audioContext.close();
+    roar.pause();
+    roar.currentTime = 0;
   };
 };
 
 export function PredatorEasterEgg({ onComplete }: PredatorEasterEggProps) {
   const predator = useMemo(() => predators[Math.floor(Math.random() * predators.length)] ?? predators[0], []);
   const direction = useMemo<PredatorDirection>(() => Math.random() < 0.5 ? 'left-to-right' : 'right-to-left', []);
+  const predatorStyle = useMemo(() => ({
+    '--predator-hop-duration': `${predator.hopDurationMs}ms`,
+    '--predator-run-duration': `${predator.runDurationMs}ms`,
+    '--predator-scale': predator.scale,
+    '--predator-shadow-scale': predator.shadowScale,
+    '--predator-y-offset': `${predator.verticalOffsetPx}px`,
+  }) as CSSProperties, [predator]);
   const onCompleteRef = useRef(onComplete);
 
   useEffect(() => {
@@ -344,11 +310,12 @@ export function PredatorEasterEgg({ onComplete }: PredatorEasterEggProps) {
   useEffect(() => {
     let isCancelled = false;
     const stopGrowls: Array<() => void> = [];
-    const growlTimers = predatorGrowlDelays().map((delay) =>
+    const growlDelays = predatorGrowlDelays(predator);
+    const growlTimers = growlDelays.map((delay, growlIndex) =>
       window.setTimeout(() => {
         if (isCancelled) { return; }
 
-        const stopGrowl = playGrowl();
+        const stopGrowl = playGrowl(growlPitch(predator, growlIndex, growlDelays.length), predator.volume);
         if (stopGrowl) {
           stopGrowls.push(stopGrowl);
         }
@@ -360,7 +327,7 @@ export function PredatorEasterEgg({ onComplete }: PredatorEasterEggProps) {
         window.clearTimeout(growlTimer);
       }
       onCompleteRef.current();
-    }, RUN_DURATION_MS);
+    }, predator.runDurationMs);
 
     return () => {
       isCancelled = true;
@@ -372,10 +339,10 @@ export function PredatorEasterEgg({ onComplete }: PredatorEasterEggProps) {
         stopGrowl();
       }
     };
-  }, []);
+  }, [predator]);
 
   return (
-    <div className={`predator-easter-egg predator-easter-egg-${direction}`} aria-hidden={'true'}>
+    <div className={`predator-easter-egg predator-easter-egg-${direction}`} style={predatorStyle} aria-hidden={'true'}>
       <div className={'predator-shadow'} />
       <div className={'predator-puppet-facing'}>
         <svg

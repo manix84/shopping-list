@@ -43,7 +43,6 @@ const backendStatus: BackendStatus = {
   database: {
     ok: true,
     adapter: 'postgres',
-    sharedListCount: 2,
     updatedAt: new Date(now).toISOString(),
   },
 };
@@ -67,7 +66,6 @@ const meta = {
   },
   args: {
     backendStatus,
-    backendOperation: { state: 'backend', updatedAt: new Date(now).toISOString() },
     heartbeatSamples,
     storageMode: 'backend',
     notificationsEnabled: true,

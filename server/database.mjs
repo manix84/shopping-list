@@ -389,13 +389,12 @@ export const getDatabaseStatus = async () => {
       ok: true,
       adapter: 'json',
       updatedAt: sharedListUpdatedAt,
-      sharedListCount: Object.keys(database.sharedLists).length,
     };
   }
 
   let sharedLists;
   try {
-    sharedLists = await postgresQuery('SELECT COUNT(*)::integer AS count, MAX(updated_at) AS updated_at FROM shared_lists');
+    sharedLists = await postgresQuery('SELECT MAX(updated_at) AS updated_at FROM shared_lists');
   } catch (error) {
     return {
       ok: false,
@@ -409,7 +408,6 @@ export const getDatabaseStatus = async () => {
     ok: true,
     adapter: 'postgres',
     updatedAt: isoString(sharedLists.rows[0]?.updated_at),
-    sharedListCount: sharedLists.rows[0]?.count ?? 0,
   };
 };
 

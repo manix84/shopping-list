@@ -251,17 +251,15 @@ export type BackendHeartbeatSample = {
   checkedAt: string;
   state: BackendConnectionState;
   healthOk: boolean;
+  healthMode?: string;
+  healthVersion?: string;
   databaseOk: boolean;
   adapter?: BackendDatabaseAdapter;
+  databaseUpdatedAt?: string;
+  databaseError?: string;
+  databaseErrorCode?: string;
   latencyMs: number;
 };
-export type BackendOperationState = 'idle' | 'loading' | 'reconnecting' | 'backend' | 'local-fallback' | 'save-failed';
-export type BackendOperationStatus = {
-  state: BackendOperationState;
-  updatedAt?: string;
-  detail?: string;
-};
-
 export type SaveStatus = 'idle' | 'saving' | 'syncing' | 'saved' | 'error';
 
 export type DebugSettings = {
@@ -285,7 +283,6 @@ export type BackendStatus = {
     ok: boolean;
     adapter?: BackendDatabaseAdapter;
     updatedAt?: string;
-    sharedListCount?: number;
     error?: string;
     errorCode?: string;
   };

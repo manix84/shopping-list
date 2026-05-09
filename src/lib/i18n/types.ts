@@ -92,6 +92,7 @@ export type Messages = {
     state: string;
     storedLocally: string;
     theme: string;
+    notApplicable: string;
     unavailable: string;
     unknown: string;
     updated: string;
@@ -234,6 +235,8 @@ export type Messages = {
       heartbeatHealth: string;
       heartbeatDatabase: string;
       heartbeatAdapter: string;
+      heartbeatDatabaseDetail: string;
+      heartbeatDetailsTitle: string;
       backendOperationTitle: string;
       backendOperationDetail: string;
       backendOperationIdle: string;
