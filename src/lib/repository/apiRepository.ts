@@ -42,7 +42,6 @@ type ApiDatabaseStatusPayload = {
   adapter?: unknown;
   path?: unknown;
   updatedAt?: unknown;
-  sharedListCount?: unknown;
   error?: unknown;
   errorCode?: unknown;
 };
@@ -85,7 +84,6 @@ export const checkBackendStatus = async (): Promise<BackendStatus> => {
         ok: health.ok === true && database?.ok === true,
         adapter: backendDatabaseAdapter(database?.adapter, database?.path),
         updatedAt: typeof database?.updatedAt === 'string' ? database.updatedAt : undefined,
-        sharedListCount: typeof database?.sharedListCount === 'number' ? database.sharedListCount : undefined,
         error: typeof database?.error === 'string' ? database.error : undefined,
         errorCode: typeof database?.errorCode === 'string' ? database.errorCode : undefined,
       },

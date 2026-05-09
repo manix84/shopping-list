@@ -51,7 +51,6 @@ describe('apiRepository', () => {
         ok: true,
         adapter: 'postgres',
         updatedAt: '2026-04-22T01:00:00.000Z',
-        sharedListCount: 3,
       },
     });
   });

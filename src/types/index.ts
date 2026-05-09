@@ -256,7 +256,6 @@ export type BackendHeartbeatSample = {
   databaseOk: boolean;
   adapter?: BackendDatabaseAdapter;
   databaseUpdatedAt?: string;
-  databaseSharedListCount?: number;
   databaseError?: string;
   databaseErrorCode?: string;
   latencyMs: number;
@@ -291,7 +290,6 @@ export type BackendStatus = {
     ok: boolean;
     adapter?: BackendDatabaseAdapter;
     updatedAt?: string;
-    sharedListCount?: number;
     error?: string;
     errorCode?: string;
   };

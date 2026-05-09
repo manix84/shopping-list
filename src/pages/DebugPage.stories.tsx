@@ -43,7 +43,6 @@ const backendStatus: BackendStatus = {
   database: {
     ok: true,
     adapter: 'postgres',
-    sharedListCount: 2,
     updatedAt: new Date(now).toISOString(),
   },
 };

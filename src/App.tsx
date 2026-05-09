@@ -750,7 +750,6 @@ export default function App() {
       databaseOk: status.database.ok,
       adapter: status.database.adapter,
       databaseUpdatedAt: status.database.updatedAt,
-      databaseSharedListCount: status.database.sharedListCount,
       databaseError: status.database.error,
       databaseErrorCode: status.database.errorCode,
       latencyMs: Math.max(0, Math.round(performance.now() - startedAt)),

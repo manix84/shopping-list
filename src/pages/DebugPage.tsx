@@ -926,10 +926,6 @@ export function DebugPage({
                   <td>{activeHeartbeatAdapterLabel}</td>
                 </tr>
                 <tr>
-                  <th scope={'row'}>{messages.labels.sharedLists}</th>
-                  <td>{activeHeartbeatDetail(activeHeartbeatSample?.databaseSharedListCount)}</td>
-                </tr>
-                <tr>
                   <th scope={'row'}>{messages.labels.updated}</th>
                   <td>
                     {activeHeartbeatSample?.databaseUpdatedAt
@@ -1042,9 +1038,7 @@ export function DebugPage({
             expected={messages.pages.debug.databaseExpected}
             actual={
               backendStatus.database.ok
-                ? `${messages.labels.available}, ${messages.labels.sharedLists} ${
-                    backendStatus.database.sharedListCount ?? 0
-                  }, ${messages.labels.updated} ${backendStatus.database.updatedAt ?? messages.labels.unknown}`
+                ? `${messages.labels.available}, ${messages.labels.updated} ${backendStatus.database.updatedAt ?? messages.labels.unknown}`
                 : `${messages.labels.state} ${backendStateLabel(backendStatus, messages)}`
             }
             passed={backendStatus.database.ok}
@@ -1069,10 +1063,6 @@ export function DebugPage({
                 <tr>
                   <th scope={'row'}>{messages.pages.about.versionLabel}</th>
                   <td>{backendStatus.health.version ?? messages.pages.debug.unavailable}</td>
-                </tr>
-                <tr>
-                  <th scope={'row'}>{messages.labels.sharedLists}</th>
-                  <td>{backendStatus.database.sharedListCount ?? messages.pages.debug.unavailable}</td>
                 </tr>
                 <tr>
                   <th scope={'row'}>{messages.labels.updated}</th>
