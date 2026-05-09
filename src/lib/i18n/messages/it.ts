@@ -249,6 +249,7 @@ export const it: Messages = {
       heartbeatHealth: 'Salute',
       heartbeatDatabase: 'Database',
       heartbeatAdapter: 'Adattatore',
+      heartbeatDetailsTitle: 'Dettagli heartbeat selezionato',
       backendOperationTitle: 'Ultima operazione backend',
       backendOperationDetail: 'Dettagli',
       backendOperationIdle: 'Nessuna operazione backend ancora',

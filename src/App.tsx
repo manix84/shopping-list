@@ -745,8 +745,14 @@ export default function App() {
       checkedAt: new Date().toISOString(),
       state: status.state,
       healthOk: status.health.ok,
+      healthMode: status.health.mode,
+      healthVersion: status.health.version,
       databaseOk: status.database.ok,
       adapter: status.database.adapter,
+      databaseUpdatedAt: status.database.updatedAt,
+      databaseSharedListCount: status.database.sharedListCount,
+      databaseError: status.database.error,
+      databaseErrorCode: status.database.errorCode,
       latencyMs: Math.max(0, Math.round(performance.now() - startedAt)),
     };
 

@@ -234,6 +234,7 @@ export type Messages = {
       heartbeatHealth: string;
       heartbeatDatabase: string;
       heartbeatAdapter: string;
+      heartbeatDetailsTitle: string;
       backendOperationTitle: string;
       backendOperationDetail: string;
       backendOperationIdle: string;

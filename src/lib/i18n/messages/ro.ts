@@ -249,6 +249,7 @@ export const ro: Messages = {
       heartbeatHealth: 'Sănătate',
       heartbeatDatabase: 'Bază de date',
       heartbeatAdapter: 'Adaptor',
+      heartbeatDetailsTitle: 'Detalii heartbeat selectat',
       backendOperationTitle: 'Ultima operațiune backend',
       backendOperationDetail: 'Detalii',
       backendOperationIdle: 'Nicio operațiune backend încă',

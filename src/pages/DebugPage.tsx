@@ -27,6 +27,7 @@ import { TestResultCard } from '../components/TestResultCard';
 import { SectionsPage } from './SectionsPage';
 import { useI18n } from '../lib/i18n';
 import type { Messages } from '../lib/i18n';
+import { appVersion } from '../version';
 
 type DebugPageProps = {
   backendStatus: BackendStatus;
@@ -232,18 +233,6 @@ const currentDatabaseTypeLabel = (status: BackendStatus, storageMode: 'local' | 
   return databaseAdapterLabel(status, messages);
 };
 
-const backendOperationLabel = (operation: BackendOperationStatus, messages: Messages): string => {
-  const labels: Record<BackendOperationStatus['state'], string> = {
-    idle: messages.pages.debug.backendOperationIdle,
-    loading: messages.pages.debug.backendOperationLoading,
-    reconnecting: messages.pages.debug.backendOperationReconnecting,
-    backend: messages.pages.debug.backendOperationBackend,
-    'local-fallback': messages.pages.debug.backendOperationLocalFallback,
-    'save-failed': messages.pages.debug.backendOperationSaveFailed,
-  };
-  return labels[operation.state];
-};
-
 const isHeartbeatFailed = (sample: BackendHeartbeatSample) =>
   sample.state !== 'connected' || !sample.healthOk || !sample.databaseOk;
 
@@ -382,7 +371,6 @@ function DebugEventButton({
 
 export function DebugPage({
   backendStatus,
-  backendOperation,
   heartbeatSamples,
   storageMode,
   notificationsEnabled,
@@ -483,6 +471,32 @@ export function DebugPage({
   const heartbeatGraphMaxLatencyMs = heartbeatLatencyGraphMax(heartbeatSampleSlots.map((slot) => slot.sample));
   const heartbeatAxisTicks = heartbeatLatencyAxisTicks(heartbeatGraphMaxLatencyMs);
   const activeHeartbeatSampleKey = lockedHeartbeatSampleKey ?? hoveredHeartbeatSampleKey;
+  const activeHeartbeatSample = activeHeartbeatSampleKey
+    ? heartbeatSampleSlots.find((slot) => slot.sample.checkedAt === activeHeartbeatSampleKey)?.sample
+    : undefined;
+  const activeHeartbeatDetail = (value: string | number | undefined) =>
+    activeHeartbeatSample && value !== undefined && value !== '' ? String(value) : '';
+  const activeHeartbeatCheckLabel = (value: boolean | undefined) =>
+    activeHeartbeatSample && value !== undefined ? checkLabel(value, messages) : '';
+  const activeHeartbeatStateLabel = activeHeartbeatSample
+    ? backendStateLabel({ ...backendStatus, state: activeHeartbeatSample.state }, messages)
+    : '';
+  const activeHeartbeatAdapterLabel = activeHeartbeatSample?.adapter
+    ? databaseAdapterLabel({ ...backendStatus, database: { ...backendStatus.database, adapter: activeHeartbeatSample.adapter } }, messages)
+    : '';
+  const activeHeartbeatHealthMode = activeHeartbeatSample
+    ? activeHeartbeatSample.healthMode ?? backendStatus.health.mode
+    : undefined;
+  const activeHeartbeatHealthVersion = activeHeartbeatSample
+    ? activeHeartbeatSample.healthVersion ?? backendStatus.health.version ?? appVersion
+    : undefined;
+  const activeHeartbeatDatabaseErrorDetail = [
+    activeHeartbeatSample?.databaseError ?? backendStatus.database.error,
+    activeHeartbeatSample?.databaseErrorCode ?? backendStatus.database.errorCode,
+  ].filter(Boolean).join(' ');
+  const activeHeartbeatDatabaseDetail = activeHeartbeatSample
+    ? activeHeartbeatDatabaseErrorDetail || 'n/a'
+    : '';
   const currentSharedListJson = useMemo(
     () =>
       activeTab === 'database-entry' && currentSharedListDatabaseEntry
@@ -873,26 +887,60 @@ export function DebugPage({
           </div>
           <div className={'table-wrap'}>
             <table className={'debug-table debug-table-compact'}>
-              <caption>{messages.pages.debug.backendOperationTitle}</caption>
+              <caption>{messages.pages.debug.heartbeatDetailsTitle}</caption>
               <tbody>
                 <tr>
+                  <th scope={'row'}>{messages.pages.debug.heartbeatLastChecked}</th>
+                  <td>{activeHeartbeatSample ? formatHeartbeatTime(activeHeartbeatSample.checkedAt) : ''}</td>
+                </tr>
+                <tr>
                   <th scope={'row'}>{messages.labels.state}</th>
-                  <td>{backendOperationLabel(backendOperation, messages)}</td>
+                  <td>{activeHeartbeatStateLabel}</td>
+                </tr>
+                <tr>
+                  <th scope={'row'}>{messages.pages.debug.heartbeatLatency}</th>
+                  <td>{activeHeartbeatSample ? formatHeartbeatLatency(activeHeartbeatSample, messages) : ''}</td>
+                </tr>
+                <tr>
+                  <th scope={'row'}>{messages.pages.debug.heartbeatHealth}</th>
+                  <td>{activeHeartbeatCheckLabel(activeHeartbeatSample?.healthOk)}</td>
+                </tr>
+                <tr>
+                  <th scope={'row'}>{messages.labels.mode}</th>
+                  <td>{activeHeartbeatDetail(activeHeartbeatHealthMode)}</td>
+                </tr>
+                <tr>
+                  <th scope={'row'}>{messages.pages.about.versionLabel}</th>
+                  <td>{activeHeartbeatDetail(activeHeartbeatHealthVersion)}</td>
+                </tr>
+                <tr>
+                  <th scope={'row'}>{messages.pages.debug.heartbeatDatabase}</th>
+                  <td>{activeHeartbeatCheckLabel(activeHeartbeatSample?.databaseOk)}</td>
+                </tr>
+                <tr>
+                  <th scope={'row'}>{messages.pages.debug.heartbeatAdapter}</th>
+                  <td>{activeHeartbeatAdapterLabel}</td>
+                </tr>
+                <tr>
+                  <th scope={'row'}>{messages.labels.sharedLists}</th>
+                  <td>{activeHeartbeatDetail(activeHeartbeatSample?.databaseSharedListCount)}</td>
                 </tr>
                 <tr>
                   <th scope={'row'}>{messages.labels.updated}</th>
                   <td>
-                    {backendOperation.updatedAt
-                      ? formatHeartbeatTime(backendOperation.updatedAt)
-                      : messages.pages.debug.unavailable}
+                    {activeHeartbeatSample?.databaseUpdatedAt
+                      ? formatHeartbeatTime(activeHeartbeatSample.databaseUpdatedAt)
+                      : ''}
                   </td>
                 </tr>
-                {backendOperation.detail ? (
-                  <tr>
-                    <th scope={'row'}>{messages.pages.debug.backendOperationDetail}</th>
-                    <td>{backendOperation.detail}</td>
-                  </tr>
-                ) : null}
+                <tr>
+                  <th scope={'row'}>{messages.pages.debug.backendOperationDetail}</th>
+                  <td>
+                    {activeHeartbeatDatabaseDetail === 'n/a' ? (
+                      <span className={'muted'}>{activeHeartbeatDatabaseDetail}</span>
+                    ) : activeHeartbeatDatabaseDetail}
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>

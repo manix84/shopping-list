@@ -250,6 +250,7 @@ export const nl: Messages = {
       heartbeatHealth: 'Health',
       heartbeatDatabase: 'Database',
       heartbeatAdapter: 'Adapter',
+      heartbeatDetailsTitle: 'Details van geselecteerde heartbeat',
       backendOperationTitle: 'Laatste backendbewerking',
       backendOperationDetail: 'Details',
       backendOperationIdle: 'Nog geen backendbewerking',

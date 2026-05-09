@@ -248,6 +248,7 @@ export const pi: Messages = {
       heartbeatHealth: 'Health',
       heartbeatDatabase: 'Database',
       heartbeatAdapter: 'Adapter',
+      heartbeatDetailsTitle: 'Selected heartbeat details',
       backendOperationTitle: 'Last backend operation',
       backendOperationDetail: 'Details',
       backendOperationIdle: 'No backend operation yet',

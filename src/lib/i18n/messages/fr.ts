@@ -251,6 +251,7 @@ export const fr: Messages = {
       heartbeatHealth: 'Santé',
       heartbeatDatabase: 'Base de données',
       heartbeatAdapter: 'Adaptateur',
+      heartbeatDetailsTitle: 'Détails du heartbeat sélectionné',
       backendOperationTitle: 'Dernière opération backend',
       backendOperationDetail: 'Détails',
       backendOperationIdle: 'Aucune opération backend pour l’instant',
