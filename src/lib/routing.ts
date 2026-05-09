@@ -40,6 +40,28 @@ const isDebugTabKey = (value: string | undefined): value is DebugTabKey =>
 const debugTabFromPath = (page: PageKey, tab: string | undefined): DebugTabKey | undefined =>
   page === 'debug' && isDebugTabKey(tab) ? tab : undefined;
 
+const pathPartsFromLocation = (pathname: string, basePath = ''): string[] => {
+  const normalizedBasePath = normalizeBasePath(basePath);
+  return pathname
+    .slice(normalizedBasePath.length)
+    .toLowerCase()
+    .split('/')
+    .filter(Boolean);
+};
+
+export const isDefaultLandingRoutePath = ({
+  pathname,
+  basePath = '',
+}: {
+  pathname: string;
+  basePath?: string;
+}): boolean => {
+  const pathParts = pathPartsFromLocation(pathname, basePath);
+  return pathParts.length === 0 ||
+    (pathParts.length === 1 && isUuidV7(pathParts[0])) ||
+    (pathParts.length === 2 && pathParts[0] === 'list' && isUuidV7(pathParts[1]));
+};
+
 export const readRouteFromLocationParts = ({
   pathname,
   basePath = '',
@@ -47,12 +69,7 @@ export const readRouteFromLocationParts = ({
   pathname: string;
   basePath?: string;
 }): AppRoute => {
-  const normalizedBasePath = normalizeBasePath(basePath);
-  const pathParts = pathname
-    .slice(normalizedBasePath.length)
-    .toLowerCase()
-    .split('/')
-    .filter(Boolean);
+  const pathParts = pathPartsFromLocation(pathname, basePath);
 
   if (pathParts.length === 0) {
     return { page: DEFAULT_PAGE };

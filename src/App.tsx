@@ -49,7 +49,7 @@ import {
 } from './lib/repository/localStorageRepository';
 import { sharedListHistoryRepository } from './lib/repository/sharedListHistoryRepository';
 import { chooseNewestRecord } from './lib/repository/recordMerge';
-import { readRouteFromLocationParts, routeToUrl } from './lib/routing';
+import { isDefaultLandingRoutePath, readRouteFromLocationParts, routeToUrl } from './lib/routing';
 import { getSectionMeta } from './lib/sections';
 import { extractSharedListId } from './lib/sharedLinks';
 import { cleanLine, stripDisplaySizeLabel } from './lib/stringUtils';
@@ -103,6 +103,7 @@ const KONAMI_TOUCH_TAP_MAX_MS = 260;
 const KONAMI_TOUCH_LOCK_START_INDEX = 2;
 const KONAMI_TOUCH_SEQUENCE_TIMEOUT_MS = 1_600;
 type StorageMode = 'local' | 'backend';
+type RouteHistoryMode = 'push' | 'replace';
 type BeforeInstallPromptChoice = {
   outcome: 'accepted' | 'dismissed';
   platform: string;
@@ -359,13 +360,27 @@ const readRouteFromLocation = (): AppRoute => {
   });
 };
 
-const syncRouteToUrl = ({ page, listId, debugTab }: AppRoute): void => {
+const isDefaultLandingLocation = (): boolean => {
+  if (typeof window === 'undefined') { return true; }
+
+  return isDefaultLandingRoutePath({
+    pathname: window.location.pathname,
+    basePath: appBasePath,
+  });
+};
+
+const routesMatch = (first: AppRoute, second: AppRoute): boolean =>
+  first.page === second.page &&
+  first.listId === second.listId &&
+  first.debugTab === second.debugTab;
+
+const syncRouteToUrl = ({ page, listId, debugTab }: AppRoute, mode: RouteHistoryMode): void => {
   if (typeof window === 'undefined') { return; }
 
   const nextUrl = routeToUrl({ page, listId, debugTab }, appBasePath);
   const currentUrl = window.location.pathname;
   if (currentUrl !== nextUrl) {
-    window.history.replaceState(null, '', nextUrl);
+    window.history[mode === 'push' ? 'pushState' : 'replaceState'](null, '', nextUrl);
   }
 };
 
@@ -529,6 +544,8 @@ export default function App() {
   const lastBackendPersistedRecordRef = useRef<ShoppingListRecord>();
   const pendingBackendSaveRecordRef = useRef<ShoppingListRecord>();
   const currentShoppingListStateRef = useRef<CurrentShoppingListState>();
+  const nextRouteHistoryModeRef = useRef<RouteHistoryMode>('replace');
+  const shouldResolveDefaultLandingRef = useRef(isDefaultLandingLocation());
   const appVersionReloadRequestedRef = useRef(false);
   const pendingAppVersionReloadRef = useRef<string>();
   const skipNextAutosaveRef = useRef(false);
@@ -539,6 +556,21 @@ export default function App() {
     skipNextAutosaveRef.current = true;
     setSaveStatus('idle');
   };
+
+  const updateRoute = useCallback((
+    nextRoute: AppRoute | ((current: AppRoute) => AppRoute),
+    historyMode: RouteHistoryMode = 'push',
+  ) => {
+    setRoute((current) => {
+      const resolvedRoute = typeof nextRoute === 'function' ? nextRoute(current) : nextRoute;
+      if (routesMatch(current, resolvedRoute)) {
+        return current;
+      }
+
+      nextRouteHistoryModeRef.current = historyMode;
+      return resolvedRoute;
+    });
+  }, []);
 
   const config = useMemo(
     () => withMeasurementDisplayMode(COUNTRY_CONFIGS[countryCode], measurementDisplayMode),
@@ -656,7 +688,7 @@ export default function App() {
   }, []);
 
   const changePage = (nextPage: PageKey) => {
-    setRoute((current) => ({
+    updateRoute((current) => ({
       ...current,
       page: nextPage,
       debugTab: nextPage === 'debug' ? current.debugTab ?? 'parsed' : undefined,
@@ -664,7 +696,7 @@ export default function App() {
   };
 
   const changeDebugTab = (debugTab: DebugTabKey) => {
-    setRoute((current) => ({ ...current, page: 'debug', debugTab }));
+    updateRoute((current) => ({ ...current, page: 'debug', debugTab }));
   };
 
   const enableDebugMode = () => {
@@ -1231,7 +1263,7 @@ export default function App() {
       });
       setStorageMode('backend');
       setIsServerBackedList(true);
-      setRoute({ page: 'edit', listId: nextListId });
+      updateRoute({ page: 'edit', listId: nextListId });
       setShareError(undefined);
       verboseDebugLog('shared list loaded', { listId: nextListId });
       return true;
@@ -1358,22 +1390,25 @@ export default function App() {
       if (!backendOperationRecorded && nextStorageMode === 'local') {
         setBackendOperation(backendOperationStatus('local-fallback'));
       }
-      setActiveListId(nextListId);
-      setIsServerBackedList(nextServerBacked);
-      const currentLocationDebugTab = readRouteFromLocation().debugTab;
-      setRoute((current) => ({
-        page: current.page,
-        listId: nextServerBacked ? nextListId : undefined,
-        debugTab: current.debugTab ?? currentLocationDebugTab,
-      }));
-      setCountryCode(selectedRecord.countryCode);
-      setListName(selectedRecord.listName ?? '');
-      setInput(selectedRecord.input);
-      setItems(parseItems(
+      const nextItems = parseItems(
         selectedRecord.input,
         countryConfigForMeasurementDisplayMode(selectedRecord.countryCode, measurementDisplayMode),
         selectedRecord.items,
-      ));
+      );
+      const shouldResolveDefaultLanding = shouldResolveDefaultLandingRef.current;
+      shouldResolveDefaultLandingRef.current = false;
+      setActiveListId(nextListId);
+      setIsServerBackedList(nextServerBacked);
+      const currentLocationDebugTab = readRouteFromLocation().debugTab;
+      updateRoute((current) => ({
+        page: shouldResolveDefaultLanding ? (nextItems.length > 0 ? 'route' : 'edit') : current.page,
+        listId: nextServerBacked ? nextListId : undefined,
+        debugTab: current.debugTab ?? currentLocationDebugTab,
+      }), 'replace');
+      setCountryCode(selectedRecord.countryCode);
+      setListName(selectedRecord.listName ?? '');
+      setInput(selectedRecord.input);
+      setItems(nextItems);
       lastLocalPersistedRecordRef.current = selectedRecord;
       if (nextStorageMode === 'backend') {
         lastBackendPersistedRecordRef.current = selectedRecord;
@@ -1394,6 +1429,7 @@ export default function App() {
     listId,
     recordBackendHeartbeat,
     requestAppVersionReload,
+    updateRoute,
   ]);
 
   useEffect(() => {
@@ -1520,11 +1556,11 @@ export default function App() {
         setStorageMode('backend');
         setIsServerBackedList(true);
         const currentLocationDebugTab = readRouteFromLocation().debugTab;
-        setRoute((current) => ({
+        updateRoute((current) => ({
           page: current.page,
           listId: activeListId,
           debugTab: current.debugTab ?? currentLocationDebugTab,
-        }));
+        }), 'replace');
         setCountryCode(selectedRecord.countryCode);
         setListName(selectedRecord.listName ?? '');
         setInput(selectedRecord.input);
@@ -1548,6 +1584,7 @@ export default function App() {
     debugSettings.forceLocalStorage,
     isLoaded,
     storageMode,
+    updateRoute,
   ]);
 
   useEffect(() => {
@@ -1556,16 +1593,19 @@ export default function App() {
     verboseDebugLog('forcing local storage mode', { activeListId });
     setStorageMode('local');
     setIsServerBackedList(false);
-    setRoute((current) => ({ page: current.page, debugTab: current.debugTab, listId: current.listId }));
-  }, [activeListId, debugSettings.forceLocalStorage, isLoaded, storageMode, verboseDebugLog]);
+    updateRoute((current) => ({ page: current.page, debugTab: current.debugTab, listId: current.listId }), 'replace');
+  }, [activeListId, debugSettings.forceLocalStorage, isLoaded, storageMode, updateRoute, verboseDebugLog]);
 
   useEffect(() => {
     const handleLocationChange = () => {
+      nextRouteHistoryModeRef.current = 'replace';
       setRoute((current) => {
-        const next = readRouteFromLocation();
-        return current.page === next.page && current.listId === next.listId && current.debugTab === next.debugTab
-          ? current
-          : next;
+        const locationRoute = readRouteFromLocation();
+        const landingPage: PageKey = currentItemsRef.current.length > 0 ? 'route' : 'edit';
+        const next: AppRoute = isDefaultLandingLocation()
+          ? { ...locationRoute, page: landingPage, listId: locationRoute.listId ?? current.listId }
+          : locationRoute;
+        return routesMatch(current, next) ? current : next;
       });
     };
 
@@ -1798,14 +1838,16 @@ export default function App() {
   ]);
 
   useEffect(() => {
-    syncRouteToUrl(route);
+    const historyMode = nextRouteHistoryModeRef.current;
+    nextRouteHistoryModeRef.current = 'push';
+    syncRouteToUrl(route, historyMode);
   }, [route]);
 
   useEffect(() => {
     if (isLoaded && page === 'route' && items.length === 0) {
-      setRoute((current) => ({ ...current, page: 'edit' }));
+      updateRoute((current) => ({ ...current, page: 'edit' }), 'replace');
     }
-  }, [isLoaded, items.length, page]);
+  }, [isLoaded, items.length, page, updateRoute]);
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (event: Event) => {
@@ -2174,7 +2216,7 @@ export default function App() {
       });
       setStorageMode('backend');
       setIsServerBackedList(true);
-      setRoute({ page: 'edit', listId: activeListId });
+      updateRoute({ page: 'edit', listId: activeListId });
       verboseDebugLog('shared link created', { listId: activeListId });
     } catch (error) {
       console.warn('Unable to create shared link.', error);
@@ -2242,7 +2284,7 @@ export default function App() {
     ));
     setDraftItem('');
     setQuery('');
-    setRoute({ page: 'edit' });
+    updateRoute({ page: 'edit' });
   };
 
   const dismissPwaInstallNudge = () => {

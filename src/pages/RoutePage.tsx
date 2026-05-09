@@ -98,56 +98,65 @@ export function RoutePage({
           </div>
           <div className={'route-toolbar'}>
             <div className={'route-toolbar-row'}>
-              <div className={'route-view-controls'} role={'group'} aria-label={messages.pages.route.title}>
-                {viewOptions.map((option) => (
-                  <button
-                    key={option.mode}
-                    type={'button'}
-                    className={`button button-icon ${viewMode === option.mode ? 'button-active' : ''}`}
-                    onClick={() => onViewModeChange(option.mode)}
-                    aria-label={getRouteViewLabel(option.mode, messages)}
-                    aria-pressed={viewMode === option.mode}
-                    title={getRouteViewLabel(option.mode, messages)}
-                  >
-                    <svg aria-hidden={'true'} className={'button-icon-svg'} viewBox={'0 0 24 24'}>
-                      <path d={option.icon} fill={'currentColor'} />
-                    </svg>
-                  </button>
-                ))}
+              <div className={'route-toolbar-group'}>
+                <button type={'button'} className={'button route-edit-button'} onClick={onOpenEdit}>
+                  {messages.actions.backToEdit}
+                </button>
               </div>
-              <div className={'route-tools-divider'} aria-hidden={'true'} />
-              <div className={'measurement-mode-controls'} role={'group'} aria-label={messages.labels.measurementMode}>
-                {measurementOptions.map((option) => (
-                  <button
-                    key={option.mode}
-                    type={'button'}
-                    className={`button button-icon ${measurementDisplayMode === option.mode ? 'button-active' : ''}`}
-                    onClick={() => onMeasurementDisplayModeChange(option.mode)}
-                    aria-label={option.label}
-                    aria-pressed={measurementDisplayMode === option.mode}
-                    title={option.label}
-                  >
-                    <svg aria-hidden={'true'} className={'button-icon-svg'} viewBox={'0 0 24 24'}>
-                      <path d={option.icon} fill={'currentColor'} />
-                    </svg>
-                  </button>
-                ))}
+              <div className={'route-toolbar-group'}>
+                <div className={'route-view-controls'} role={'group'} aria-label={messages.pages.route.title}>
+                  {viewOptions.map((option) => (
+                    <button
+                      key={option.mode}
+                      type={'button'}
+                      className={`button button-icon ${viewMode === option.mode ? 'button-active' : ''}`}
+                      onClick={() => onViewModeChange(option.mode)}
+                      aria-label={getRouteViewLabel(option.mode, messages)}
+                      aria-pressed={viewMode === option.mode}
+                      title={getRouteViewLabel(option.mode, messages)}
+                    >
+                      <svg aria-hidden={'true'} className={'button-icon-svg'} viewBox={'0 0 24 24'}>
+                        <path d={option.icon} fill={'currentColor'} />
+                      </svg>
+                    </button>
+                  ))}
+                </div>
               </div>
-              <div className={'route-tools-divider'} aria-hidden={'true'} />
-              <button
-                type={'button'}
-                className={`button button-icon ${isFilterVisible ? 'button-active' : ''}`}
-                onClick={onToggleFilter}
-                aria-label={messages.actions.filterItems}
-                aria-pressed={isFilterVisible}
-                aria-expanded={isFilterVisible}
-                aria-controls={isFilterVisible ? 'route-filter-input' : undefined}
-                title={messages.actions.filterItems}
-              >
-                <svg aria-hidden={'true'} className={'button-icon-svg'} viewBox={'0 0 24 24'}>
-                  <path d={mdiMagnify} fill={'currentColor'} />
-                </svg>
-              </button>
+              <div className={'route-toolbar-group'}>
+                <div className={'measurement-mode-controls'} role={'group'} aria-label={messages.labels.measurementMode}>
+                  {measurementOptions.map((option) => (
+                    <button
+                      key={option.mode}
+                      type={'button'}
+                      className={`button button-icon ${measurementDisplayMode === option.mode ? 'button-active' : ''}`}
+                      onClick={() => onMeasurementDisplayModeChange(option.mode)}
+                      aria-label={option.label}
+                      aria-pressed={measurementDisplayMode === option.mode}
+                      title={option.label}
+                    >
+                      <svg aria-hidden={'true'} className={'button-icon-svg'} viewBox={'0 0 24 24'}>
+                        <path d={option.icon} fill={'currentColor'} />
+                      </svg>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className={'route-toolbar-group'}>
+                <button
+                  type={'button'}
+                  className={`button button-icon ${isFilterVisible ? 'button-active' : ''}`}
+                  onClick={onToggleFilter}
+                  aria-label={messages.actions.filterItems}
+                  aria-pressed={isFilterVisible}
+                  aria-expanded={isFilterVisible}
+                  aria-controls={isFilterVisible ? 'route-filter-input' : undefined}
+                  title={messages.actions.filterItems}
+                >
+                  <svg aria-hidden={'true'} className={'button-icon-svg'} viewBox={'0 0 24 24'}>
+                    <path d={mdiMagnify} fill={'currentColor'} />
+                  </svg>
+                </button>
+              </div>
             </div>
             {isFilterVisible ? (
               <input
