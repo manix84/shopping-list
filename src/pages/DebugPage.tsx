@@ -490,15 +490,10 @@ export function DebugPage({
   const activeHeartbeatHealthVersion = activeHeartbeatSample
     ? activeHeartbeatSample.healthVersion ?? backendStatus.health.version ?? appVersion
     : undefined;
-  const activeHeartbeatDatabaseErrorDetail = activeHeartbeatSample
-    ? [
-        activeHeartbeatSample.databaseError,
-        activeHeartbeatSample.databaseErrorCode,
-      ].filter(Boolean).join(' ')
-    : [
-        backendStatus.database.error,
-        backendStatus.database.errorCode,
-      ].filter(Boolean).join(' ');
+  const activeHeartbeatDatabaseErrorDetail = [
+    activeHeartbeatSample?.databaseError,
+    activeHeartbeatSample?.databaseErrorCode,
+  ].filter(Boolean).join(' ');
   const activeHeartbeatDatabaseDetail = activeHeartbeatSample
     ? activeHeartbeatDatabaseErrorDetail || messages.labels.notApplicable
     : '';
