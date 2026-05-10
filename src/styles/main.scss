@@ -2502,7 +2502,9 @@ select {
 }
 
 .predator-easter-egg {
-  bottom: calc(max(10px, env(safe-area-inset-bottom)) + var(--predator-y-offset, 0px));
+  bottom: calc(
+    max(10px, env(safe-area-inset-bottom)) + var(--predator-y-offset, 0px)
+  );
   height: 150px;
   pointer-events: none;
   position: fixed;
@@ -2519,7 +2521,8 @@ select {
 .predator-easter-egg-right-to-left {
   right: -190px;
   --predator-facing-direction: -1;
-  animation: predator-run-across-reverse var(--predator-run-duration, 4.8s) linear both;
+  animation: predator-run-across-reverse var(--predator-run-duration, 4.8s)
+    linear both;
 
   .predator-puppet-facing {
     transform: scaleX(-1) scale(var(--predator-scale, 1));
@@ -2534,7 +2537,8 @@ select {
 }
 
 .predator-puppet {
-  animation: predator-cartoon-hop var(--predator-hop-duration, 0.46s) cubic-bezier(0.2, 0.7, 0.25, 1) infinite;
+  animation: predator-cartoon-hop var(--predator-hop-duration, 0.46s)
+    cubic-bezier(0.2, 0.7, 0.25, 1) infinite;
   display: block;
   filter: drop-shadow(0 10px 14px color-mix(in srgb, $shadow 22%, transparent));
   height: 150px;
@@ -2544,7 +2548,8 @@ select {
 }
 
 .predator-shadow {
-  animation: predator-shadow-hop var(--predator-hop-duration, 0.46s) cubic-bezier(0.2, 0.7, 0.25, 1) infinite;
+  animation: predator-shadow-hop var(--predator-hop-duration, 0.46s)
+    cubic-bezier(0.2, 0.7, 0.25, 1) infinite;
   background: color-mix(in srgb, $shadow 18%, transparent);
   border-radius: 999px;
   bottom: 8px;
@@ -2662,12 +2667,14 @@ select {
 }
 
 .predator-leg-front {
-  animation: predator-leg-front var(--predator-hop-duration, 0.46s) ease-in-out infinite;
+  animation: predator-leg-front var(--predator-hop-duration, 0.46s) ease-in-out
+    infinite;
   transform-origin: 90px 108px;
 }
 
 .predator-leg-back {
-  animation: predator-leg-back var(--predator-hop-duration, 0.46s) ease-in-out infinite;
+  animation: predator-leg-back var(--predator-hop-duration, 0.46s) ease-in-out
+    infinite;
   transform-origin: 44px 108px;
 }
 
@@ -3351,6 +3358,25 @@ select {
     font-size: 13px;
     margin: 0;
     min-width: 0;
+  }
+}
+
+.about-version-value {
+  align-items: baseline;
+  column-gap: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: 2px;
+}
+
+.about-update-action {
+  align-items: baseline;
+  display: inline-flex;
+  gap: 4px;
+  white-space: nowrap;
+
+  .button-link {
+    padding: 0;
   }
 }
 
