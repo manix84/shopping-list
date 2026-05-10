@@ -1,7 +1,9 @@
 import { isCountryCode } from '../config/countries';
 import type { CountryCode } from '../types';
+import { readLocalStorageValue } from './storageKeys';
 
-export const DEFAULT_COUNTRY_STORAGE_KEY = 'smart-shopping-list-default-country-v1';
+export const DEFAULT_COUNTRY_STORAGE_KEY = 'shoppingList:defaultCountry';
+const LEGACY_DEFAULT_COUNTRY_STORAGE_KEYS = ['smart-shopping-list-default-country-v1'] as const;
 export const AUTO_DETECT_COUNTRY = 'auto';
 
 export type DefaultCountryPreference = CountryCode | typeof AUTO_DETECT_COUNTRY;
@@ -86,7 +88,7 @@ export const inferDefaultCountryCode = (): CountryCode => {
 export const loadDefaultCountryPreference = (): DefaultCountryPreference | undefined => {
   if (typeof window === 'undefined') { return undefined; }
 
-  const raw = window.localStorage.getItem(DEFAULT_COUNTRY_STORAGE_KEY);
+  const raw = readLocalStorageValue(DEFAULT_COUNTRY_STORAGE_KEY, LEGACY_DEFAULT_COUNTRY_STORAGE_KEYS);
   if (raw === AUTO_DETECT_COUNTRY) { return AUTO_DETECT_COUNTRY; }
   return isCountryCode(raw) ? raw : undefined;
 };

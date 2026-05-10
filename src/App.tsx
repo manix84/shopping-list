@@ -52,6 +52,7 @@ import { chooseNewestRecord } from './lib/repository/recordMerge';
 import { isDefaultLandingRoutePath, readRouteFromLocationParts, routeToUrl } from './lib/routing';
 import { getSectionMeta } from './lib/sections';
 import { extractSharedListId } from './lib/sharedLinks';
+import { readLocalStorageValue } from './lib/storageKeys';
 import { cleanLine, stripDisplaySizeLabel } from './lib/stringUtils';
 import { loadRouteViewMode, saveRouteViewMode } from './lib/routeViewPreference';
 import { getResolvedTheme, loadThemeMode, saveThemeMode } from './lib/themePreference';
@@ -87,7 +88,7 @@ const DEV_TITLE_SUFFIX = ' [Dev]';
 const DEV_MANIFEST_ID = 'smart-shopping-list-dev';
 const LAST_LIST_PAGE_KEY = 'shoppingList:lastListPage';
 const LAST_DEBUG_TAB_KEY = 'shoppingList:lastDebugTab';
-const APP_VERSION_RELOAD_SESSION_KEY = 'smart-shopping-list-version-reload-v1';
+const APP_VERSION_RELOAD_SESSION_KEY = 'shoppingList:versionReload';
 type NotificationDeliveryResult = DebugNotificationDeliveryPath;
 const debugNotificationStatusFromDelivery = (
   result: NotificationDeliveryResult,
@@ -96,7 +97,8 @@ const debugNotificationStatusFromDelivery = (
   if (result === 'blocked') { return 'blocked'; }
   return 'shown';
 };
-const PWA_INSTALL_NUDGE_DISMISSED_KEY = 'smart-shopping-list-pwa-install-nudge-dismissed-v1';
+const PWA_INSTALL_NUDGE_DISMISSED_KEY = 'shoppingList:pwaInstallNudgeDismissed';
+const LEGACY_PWA_INSTALL_NUDGE_DISMISSED_KEYS = ['smart-shopping-list-pwa-install-nudge-dismissed-v1'] as const;
 const PWA_INSTALL_PROMPT_SETTLE_MS = 1_200;
 const KONAMI_SEQUENCE = ['up', 'up', 'down', 'down', 'left', 'right', 'left', 'right', 'b', 'a'] as const;
 const KONAMI_TOUCH_SWIPE_MIN_PX = 42;
@@ -247,7 +249,10 @@ const nextKonamiIndex = (currentIndex: number, input: (typeof KONAMI_SEQUENCE)[n
 const hasDismissedPwaInstallNudge = (): boolean => {
   if (typeof window === 'undefined') { return false; }
 
-  return window.localStorage.getItem(PWA_INSTALL_NUDGE_DISMISSED_KEY) === 'true';
+  return readLocalStorageValue(
+    PWA_INSTALL_NUDGE_DISMISSED_KEY,
+    LEGACY_PWA_INSTALL_NUDGE_DISMISSED_KEYS,
+  ) === 'true';
 };
 
 const serviceWorkerReadyWithTimeout = async (): Promise<ServiceWorkerRegistration | undefined> => {
@@ -402,8 +407,8 @@ const readLastDebugTab = (): DebugTabKey | undefined => {
   if (typeof window === 'undefined') { return undefined; }
 
   try {
-    const storedTab = window.localStorage.getItem(LAST_DEBUG_TAB_KEY);
-    return isDebugTabKey(storedTab ?? undefined) ? storedTab : undefined;
+    const storedTab = window.localStorage.getItem(LAST_DEBUG_TAB_KEY) ?? undefined;
+    return isDebugTabKey(storedTab) ? storedTab : undefined;
   } catch {
     return undefined;
   }

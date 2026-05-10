@@ -1,13 +1,15 @@
 import type { ThemeMode } from '../types';
+import { readLocalStorageValue } from './storageKeys';
 
-export const THEME_STORAGE_KEY = 'smart-shopping-list-theme-v1';
+export const THEME_STORAGE_KEY = 'shoppingList:theme';
+const LEGACY_THEME_STORAGE_KEYS = ['smart-shopping-list-theme-v1'] as const;
 
 export const defaultThemeMode = (): ThemeMode => 'system';
 
 export const loadThemeMode = (): ThemeMode => {
   if (typeof window === 'undefined') { return defaultThemeMode(); }
 
-  const raw = window.localStorage.getItem(THEME_STORAGE_KEY);
+  const raw = readLocalStorageValue(THEME_STORAGE_KEY, LEGACY_THEME_STORAGE_KEYS);
   return raw === 'light' || raw === 'dark' || raw === 'system' ? raw : defaultThemeMode();
 };
 

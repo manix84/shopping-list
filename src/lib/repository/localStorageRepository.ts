@@ -2,11 +2,13 @@ import { COUNTRY_CONFIGS } from '../../config/countries';
 import type { ShoppingListRecord } from '../../types';
 import { defaultCountryCode } from '../defaultCountryPreference';
 import { parseItems } from '../parser';
+import { hasLocalStorageValue, readLocalStorageValue } from '../storageKeys';
 import { createUuidV7 } from '../uuid';
 import { decodeShoppingListRecord, encodeShoppingListRecord } from './recordCodec';
 import type { ShoppingListRepository } from './storage';
 
-export const STORAGE_KEY = 'smart-shopping-list-v1';
+export const STORAGE_KEY = 'shoppingList:record';
+const LEGACY_STORAGE_KEYS = ['smart-shopping-list-v1'] as const;
 
 export const defaultRecord = (): ShoppingListRecord => ({
   listId: createUuidV7(),
@@ -21,7 +23,7 @@ export const localStorageRepository = {
   load: () => {
     if (typeof window === 'undefined') { return defaultRecord(); }
 
-    const raw = window.localStorage.getItem(STORAGE_KEY);
+    const raw = readLocalStorageValue(STORAGE_KEY, LEGACY_STORAGE_KEYS);
     if (!raw) {
       const initial = defaultRecord();
       initial.items = parseItems(initial.input, COUNTRY_CONFIGS[initial.countryCode]);
@@ -49,5 +51,5 @@ export const localStorageRepository = {
 
 export const hasStoredShoppingListRecord = (): boolean => {
   if (typeof window === 'undefined') { return false; }
-  return window.localStorage.getItem(STORAGE_KEY) !== null;
+  return hasLocalStorageValue(STORAGE_KEY, LEGACY_STORAGE_KEYS);
 };

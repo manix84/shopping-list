@@ -1,6 +1,8 @@
 import type { SharedListHistoryEntry } from '../../types';
+import { readLocalStorageValue } from '../storageKeys';
 
-export const STORAGE_KEY = 'smart-shopping-list-shared-history-v1';
+export const STORAGE_KEY = 'shoppingList:sharedHistory';
+const LEGACY_STORAGE_KEYS = ['smart-shopping-list-shared-history-v1'] as const;
 const MAX_ENTRIES = 12;
 const MAX_PREVIEW_ITEMS = 6;
 
@@ -36,7 +38,7 @@ export const sharedListHistoryRepository = {
     if (typeof window === 'undefined') { return []; }
 
     try {
-      const raw = window.localStorage.getItem(STORAGE_KEY);
+      const raw = readLocalStorageValue(STORAGE_KEY, LEGACY_STORAGE_KEYS);
       return raw ? sanitizeEntries(JSON.parse(raw)) : [];
     } catch {
       return [];
