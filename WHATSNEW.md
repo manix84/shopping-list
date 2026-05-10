@@ -4,6 +4,12 @@ Keep this file updated when user-visible features, platform changes, major parse
 
 ## 0.16.x - Current - Backend Visibility, Notifications, and Sauce Routing
 
+- Added optional unknown-product reporting for items that fall into `Other`, including country profile and app language, with server-side GitHub issue logging when configured.
+- Changed backend-backed shared-list URLs to the shorter `/<uuidv7>/edit` and `/<uuidv7>/route` format while keeping legacy `/list/<uuidv7>/...` links supported and normalized.
+- Added persistent navigation memory for the last Edit/Route page and the last Debug tab, using the app's consistent `shoppingList:*` localStorage key style.
+- Standardized localStorage keys around the `shoppingList:*` namespace and migrated legacy `smart-shopping-list-*` values, including the measurement display mode enum.
+- Improved list-loading behavior so the spinner overlay appears for initial list routing and shared-list switches without covering normal background checks.
+- Reworked the Debug tab menu into a horizontally scrollable, icon-enhanced tab row that shows icon-only tabs on mobile while preserving accessible tab labels and keyboard navigation.
 - Added automatic PWA update checks so online app launches, resumes, and navigations refresh cached static assets, show a theme-aware translucent spinner overlay across update reloads, and move onto the latest built revision.
 - Added backend-version update detection from `/api/health`, with automatic refresh deferred until the app is hidden/unfocused and a manual About-page update link when versions differ.
 - Added shared-list server-sent events so open backend-backed lists can apply remote changes automatically, with slower polling kept as a fallback.

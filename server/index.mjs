@@ -11,6 +11,7 @@ import {
   saveSharedList,
 } from './database.mjs';
 import { callShoppingListService, getHomeAssistantStatus, pushRecordToHomeAssistant } from './homeAssistant.mjs';
+import { isUnknownProductsReport, submitUnknownProductsReport } from './unknownProducts.mjs';
 import { isShoppingListRecord } from './validation.mjs';
 
 const port = Number(process.env.PORT ?? 8787);
@@ -171,6 +172,17 @@ const handleApi = async (request, response, path) => {
 
   if (request.method === 'GET' && path === '/api/database/status') {
     sendJson(response, 200, await getDatabaseStatus());
+    return;
+  }
+
+  if (request.method === 'POST' && path === '/api/unknown-products') {
+    const body = await readJsonBody(request);
+    if (!isUnknownProductsReport(body)) {
+      sendJson(response, 400, { error: 'A valid unknown products report is required' });
+      return;
+    }
+
+    sendJson(response, 200, await submitUnknownProductsReport(body));
     return;
   }
 

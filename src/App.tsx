@@ -39,6 +39,7 @@ import {
   checkBackendStatus,
   clearSharedShoppingList,
   loadSharedShoppingList,
+  reportUnknownProducts,
   saveSharedShoppingList,
   sharedShoppingListEventsUrl,
 } from './lib/repository/apiRepository';
@@ -79,6 +80,8 @@ const SHARED_LIST_SYNC_POLL_MS = 5_000;
 const SHARED_LIST_SYNC_SSE_FALLBACK_POLL_MS = 60_000;
 const SHARED_LIST_NOTIFICATION_GROUP_MS = 2 * 60_000;
 const SHARED_LIST_NOTIFICATION_PREVIEW_LIMIT = 3;
+const UNKNOWN_PRODUCTS_REPORTED_STORAGE_KEY = 'shoppingList:reportedUnknownProducts';
+const UNKNOWN_PRODUCTS_REPORTED_LIMIT = 500;
 const NOTIFICATION_SERVICE_WORKER_READY_TIMEOUT_MS = 3_000;
 const NOTIFICATION_WORKER_SCOPE_PATH = 'notification-worker/';
 const NOTIFICATION_WORKER_SCRIPT_PATH = 'notification-sw.js';
@@ -548,6 +551,30 @@ const saveSessionValue = (key: string, value: string): void => {
   }
 };
 
+const loadReportedUnknownProductKeys = (): Set<string> => {
+  if (typeof window === 'undefined') { return new Set(); }
+
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(UNKNOWN_PRODUCTS_REPORTED_STORAGE_KEY) ?? '[]');
+    return new Set(Array.isArray(parsed) ? parsed.filter((value): value is string => typeof value === 'string') : []);
+  } catch {
+    return new Set();
+  }
+};
+
+const saveReportedUnknownProductKeys = (keys: Set<string>): void => {
+  if (typeof window === 'undefined') { return; }
+
+  try {
+    window.localStorage.setItem(
+      UNKNOWN_PRODUCTS_REPORTED_STORAGE_KEY,
+      JSON.stringify([...keys].slice(-UNKNOWN_PRODUCTS_REPORTED_LIMIT)),
+    );
+  } catch {
+    // Unknown-product reporting is best effort and should not affect list editing.
+  }
+};
+
 function updateItemTextInInput(input: string, previousDisplay: string, nextDisplay: string): string {
   const lines = input.split('\n');
   const index = lines.findIndex((line) => cleanLine(line) === cleanLine(previousDisplay));
@@ -617,6 +644,7 @@ export default function App() {
   const shouldUseNavigationMemoryRef = useRef(isDefaultLandingLocation() && readRouteFromLocation().listId === undefined);
   const appVersionReloadRequestedRef = useRef(false);
   const pendingAppVersionReloadRef = useRef<string>();
+  const isUnknownProductReportingDisabledRef = useRef(false);
   const skipNextAutosaveRef = useRef(false);
   const remoteSyncStatusTimerRef = useRef<number>();
   const suppressNextAutosaveStatusRef = useRef(true);
@@ -1755,6 +1783,42 @@ export default function App() {
   useEffect(() => {
     verboseDebugLog('storage mode changed', { storageMode, isServerBackedList, activeListId });
   }, [activeListId, isServerBackedList, storageMode, verboseDebugLog]);
+
+  useEffect(() => {
+    if (!isLoaded || !canUseBackend || isUnknownProductReportingDisabledRef.current) { return; }
+
+    const reportedKeys = loadReportedUnknownProductKeys();
+    const unknownItems = items
+      .filter((item) => item.matchedSection === 'other' && cleanLine(item.raw))
+      .filter((item, index, all) => all.findIndex((candidate) => candidate.normalized === item.normalized) === index)
+      .filter((item) => !reportedKeys.has(`${countryCode}|${locale}|${item.normalized}`));
+    if (unknownItems.length === 0) { return; }
+
+    void reportUnknownProducts({
+      countryCode,
+      locale,
+      items: unknownItems.slice(0, 20).map((item) => ({
+        raw: item.raw,
+        normalized: item.normalized,
+        cleaned: item.cleaned,
+      })),
+    })
+      .then(({ disabled }) => {
+        if (disabled) {
+          isUnknownProductReportingDisabledRef.current = true;
+          return;
+        }
+
+        const nextReportedKeys = loadReportedUnknownProductKeys();
+        for (const item of unknownItems) {
+          nextReportedKeys.add(`${countryCode}|${locale}|${item.normalized}`);
+        }
+        saveReportedUnknownProductKeys(nextReportedKeys);
+      })
+      .catch((error: unknown) => {
+        verboseDebugLog('unknown product report failed', { error: error instanceof Error ? error.message : String(error) });
+      });
+  }, [canUseBackend, countryCode, isLoaded, items, locale, verboseDebugLog]);
 
   useEffect(() => {
     if (!isLoaded) { return; }
