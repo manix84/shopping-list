@@ -2,6 +2,7 @@ import { COUNTRY_CODES } from './constants.mjs';
 
 const LOCALE_CODES = new Set(['en', 'es', 'fr', 'de', 'nl', 'it', 'ro', 'pi']);
 const DEFAULT_ISSUE_TITLE = 'Unknown products';
+const PRODUCT_TITLE_VALUE_MAX_LENGTH = 120;
 const githubToken = process.env.FOOD_GITHUB_TOKEN ?? process.env.UNKNOWN_PRODUCTS_GITHUB_TOKEN ?? process.env.GITHUB_TOKEN ?? process.env.GH_TOKEN;
 const githubRepo = process.env.FOOD_GITHUB_REPO ?? process.env.UNKNOWN_PRODUCTS_GITHUB_REPO ?? process.env.GITHUB_REPOSITORY;
 const githubParentIssueNumber = process.env.FOOD_GITHUB_ISSUE ?? process.env.UNKNOWN_PRODUCTS_GITHUB_ISSUE_NUMBER;
@@ -51,7 +52,13 @@ const githubFetch = async (path, init = {}) => {
 };
 
 const findUnknownProductsParentIssue = async () => {
-  if (githubParentIssueNumber) { return Number(githubParentIssueNumber); }
+  if (githubParentIssueNumber) {
+    const issueNumber = Number(githubParentIssueNumber);
+    if (!Number.isInteger(issueNumber) || issueNumber <= 0) {
+      throw new Error('FOOD_GITHUB_ISSUE must be a positive issue number');
+    }
+    return issueNumber;
+  }
 
   const query = new URLSearchParams({
     q: `repo:${githubRepo} is:issue is:open in:title ${JSON.stringify(githubParentIssueTitle)}`,
@@ -70,6 +77,10 @@ const findUnknownProductsParentIssue = async () => {
     }),
   });
 
+  if (typeof createdIssue?.number !== 'number') {
+    throw new Error('GitHub returned an invalid parent issue payload');
+  }
+
   return createdIssue.number;
 };
 
@@ -84,7 +95,12 @@ const escapeInlineCode = (value) => String(value ?? '')
   .replaceAll('\n', ' ')
   .trim();
 
-const productIssueTitle = (item) => `[PRODUCT] \`${escapeInlineCode(item.raw)}\` filed under \`other\``;
+const truncateTitleValue = (value) => {
+  if (value.length <= PRODUCT_TITLE_VALUE_MAX_LENGTH) { return value; }
+  return `${value.slice(0, PRODUCT_TITLE_VALUE_MAX_LENGTH - 1).trimEnd()}…`;
+};
+
+const productIssueTitle = (item) => `[PRODUCT] \`${truncateTitleValue(escapeInlineCode(item.raw))}\` filed under \`other\``;
 
 const unknownProductDetails = (item, report) => {
   const reportedAt = new Date().toISOString();

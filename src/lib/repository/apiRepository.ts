@@ -165,6 +165,10 @@ export const reportUnknownProducts = async (report: UnknownProductsReport): Prom
     2_000,
   );
 
+  if (response.status === 401) {
+    return { disabled: true };
+  }
+
   if (!response.ok) {
     throw new Error(`Unable to report unknown products: ${response.status}`);
   }

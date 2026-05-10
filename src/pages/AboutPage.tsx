@@ -87,9 +87,9 @@ export function AboutPage({
               <span onPointerUp={handleVersionTap}>
                 {appVersion}
               </span>
-              {!isUpdateAvailable ? (
+              {isUpdateAvailable ? (
                 <span className={'about-update-action'}>
-                  {'('}
+                  {' ('}
                   <button className={'button button-link'} type={'button'} onClick={onRefreshUpdate}>
                     {about.updateAvailableAction}
                   </button>

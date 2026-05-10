@@ -19,6 +19,18 @@ const distDir = resolve('dist');
 const appVersion = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')).version;
 const homeAssistantIntegrationEnabled = process.env.ENABLE_HOME_ASSISTANT_INTEGRATION === 'true';
 const clacksOverhead = 'GNU Terry Pratchett';
+const parsePositiveNumber = (value, fallback) => {
+  const numberValue = Number(value);
+  return Number.isFinite(numberValue) && numberValue > 0 ? numberValue : fallback;
+};
+const unknownProductsRateLimit = parsePositiveNumber(process.env.FOOD_REPORT_RATE_LIMIT, 30);
+const unknownProductsRateLimitWindowMs = parsePositiveNumber(process.env.FOOD_REPORT_RATE_LIMIT_WINDOW_MS, 15 * 60 * 1000);
+const trustedUnknownProductReportOrigins = new Set(
+  String(process.env.FOOD_REPORT_ALLOWED_ORIGINS ?? '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean),
+);
 
 const contentTypes = {
   '.css': 'text/css; charset=utf-8',
@@ -32,6 +44,65 @@ const contentTypes = {
 };
 
 const sharedListEventClients = new Map();
+const unknownProductsRequestBuckets = new Map();
+
+const requestRemoteAddress = (request) => {
+  const forwardedFor = request.headers['x-forwarded-for'];
+  if (typeof forwardedFor === 'string' && forwardedFor.trim()) {
+    return forwardedFor.split(',')[0]?.trim() || 'unknown';
+  }
+
+  return request.socket.remoteAddress ?? 'unknown';
+};
+
+const isUnknownProductsRateLimited = (request) => {
+  if (!Number.isFinite(unknownProductsRateLimit) || unknownProductsRateLimit <= 0) { return false; }
+
+  const now = Date.now();
+  const key = requestRemoteAddress(request);
+  const bucket = unknownProductsRequestBuckets.get(key) ?? { count: 0, resetAt: now + unknownProductsRateLimitWindowMs };
+  if (now >= bucket.resetAt) {
+    bucket.count = 0;
+    bucket.resetAt = now + unknownProductsRateLimitWindowMs;
+  }
+
+  bucket.count += 1;
+  unknownProductsRequestBuckets.set(key, bucket);
+  return bucket.count > unknownProductsRateLimit;
+};
+
+const firstHeaderValue = (value) => {
+  if (Array.isArray(value)) { return value[0]; }
+  return typeof value === 'string' ? value : undefined;
+};
+
+const requestExpectedOrigin = (request) => {
+  const host = firstHeaderValue(request.headers['x-forwarded-host']) ?? request.headers.host;
+  if (!host) { return undefined; }
+
+  const forwardedProto = firstHeaderValue(request.headers['x-forwarded-proto']);
+  const proto = forwardedProto?.split(',')[0]?.trim() || (request.socket.encrypted ? 'https' : 'http');
+  return `${proto}://${host}`;
+};
+
+const originFromHeader = (value) => {
+  if (!value) { return undefined; }
+
+  try {
+    return new URL(value).origin;
+  } catch {
+    return undefined;
+  }
+};
+
+const isSameOriginUnknownProductsRequest = (request) => {
+  const origin = originFromHeader(firstHeaderValue(request.headers.origin)) ??
+    originFromHeader(firstHeaderValue(request.headers.referer));
+  if (!origin) { return false; }
+
+  const expectedOrigin = requestExpectedOrigin(request);
+  return origin === expectedOrigin || trustedUnknownProductReportOrigins.has(origin);
+};
 
 const sendSharedListEvent = (response, event) => {
   if (response.destroyed || response.writableEnded) { return false; }
@@ -176,13 +247,29 @@ const handleApi = async (request, response, path) => {
   }
 
   if (request.method === 'POST' && path === '/api/unknown-products') {
+    if (!isSameOriginUnknownProductsRequest(request)) {
+      sendJson(response, 403, { error: 'Unknown product reports must come from the app origin' });
+      return;
+    }
+
+    if (isUnknownProductsRateLimited(request)) {
+      sendJson(response, 429, { error: 'Too many unknown product reports' });
+      return;
+    }
+
     const body = await readJsonBody(request);
     if (!isUnknownProductsReport(body)) {
       sendJson(response, 400, { error: 'A valid unknown products report is required' });
       return;
     }
 
-    sendJson(response, 200, await submitUnknownProductsReport(body));
+    const result = await submitUnknownProductsReport(body);
+    if (result.disabled) {
+      sendJson(response, 200, { disabled: true });
+      return;
+    }
+
+    sendJson(response, 200, result);
     return;
   }
 

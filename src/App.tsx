@@ -1788,10 +1788,19 @@ export default function App() {
     if (!isLoaded || !canUseBackend || isUnknownProductReportingDisabledRef.current) { return; }
 
     const reportedKeys = loadReportedUnknownProductKeys();
-    const unknownItems = items
-      .filter((item) => item.matchedSection === 'other' && cleanLine(item.raw))
-      .filter((item, index, all) => all.findIndex((candidate) => candidate.normalized === item.normalized) === index)
-      .filter((item) => !reportedKeys.has(`${countryCode}|${locale}|${item.normalized}`));
+    const seenUnknownItems = new Set<string>();
+    const unknownItems: Item[] = [];
+    for (const item of items) {
+      if (item.matchedSection !== 'other' || !cleanLine(item.raw) || seenUnknownItems.has(item.normalized)) {
+        continue;
+      }
+
+      seenUnknownItems.add(item.normalized);
+      if (!reportedKeys.has(`${countryCode}|${locale}|${item.normalized}`)) {
+        unknownItems.push(item);
+      }
+    }
+
     if (unknownItems.length === 0) { return; }
 
     void reportUnknownProducts({

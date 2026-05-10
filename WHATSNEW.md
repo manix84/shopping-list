@@ -4,7 +4,7 @@ Keep this file updated when user-visible features, platform changes, major parse
 
 ## 0.16.x - Current - Backend Visibility, Notifications, and Sauce Routing
 
-- Added optional unknown-product reporting for items that fall into `Other`, including country profile and app language, with server-side GitHub product sub-issues and duplicate `+1` comments when configured.
+- Added optional unknown-product reporting for items that fall into `Other`, including country profile and app language, with same-origin server-side GitHub product sub-issues and duplicate `+1` comments when configured.
 - Changed backend-backed shared-list URLs to the shorter `/<uuidv7>/edit` and `/<uuidv7>/route` format while keeping legacy `/list/<uuidv7>/...` links supported and normalized.
 - Added persistent navigation memory for the last Edit/Route page and the last Debug tab, using the app's consistent `shoppingList:*` localStorage key style.
 - Standardized localStorage keys around the `shoppingList:*` namespace and migrated legacy `smart-shopping-list-*` values, including the measurement display mode enum.
