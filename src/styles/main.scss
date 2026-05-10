@@ -105,6 +105,30 @@ body {
   letter-spacing: 0;
 }
 
+.app-loading-overlay {
+  align-items: center;
+  backdrop-filter: blur(1px);
+  background: color-mix(in srgb, $bg 72%, transparent);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 32px;
+  position: fixed;
+  z-index: 1400;
+}
+
+.app-loading-spinner {
+  animation: app-loading-spin 0.78s linear infinite;
+  background: $panel;
+  border: 4px solid $border;
+  border-radius: 999px;
+  border-top-color: $primary;
+  box-shadow: 0 12px 32px color-mix(in srgb, $shadow 28%, transparent);
+  display: block;
+  height: 44px;
+  width: 44px;
+}
+
 @keyframes pwa-splash-content-in {
   from {
     opacity: 0;
@@ -114,6 +138,12 @@ body {
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes app-loading-spin {
+  to {
+    transform: rotate(360deg);
   }
 }
 
@@ -2070,7 +2100,8 @@ select {
 
 @media (prefers-reduced-motion: reduce) {
   .pwa-splash,
-  .pwa-splash-content {
+  .pwa-splash-content,
+  .app-loading-spinner {
     animation: none;
   }
 

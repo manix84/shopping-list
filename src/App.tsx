@@ -2528,6 +2528,11 @@ export default function App() {
           onDismiss={dismissPwaInstallNudge}
           onInstall={promptPwaInstall}
         />
+        {!isLoaded ? (
+          <div className={'app-loading-overlay'} role={'status'} aria-live={'polite'} aria-label={messages.app.title}>
+            <span className={'app-loading-spinner'} aria-hidden={'true'} />
+          </div>
+        ) : null}
         {debugModeNotice ? (
           <ToastPopup key={debugModeNotice.id} {...debugModeNotice} />
         ) : null}
