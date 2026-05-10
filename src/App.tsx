@@ -601,6 +601,7 @@ export default function App() {
   const [debugNotificationResult, setDebugNotificationResult] = useState<DebugNotificationResult>();
   const [debugModeNotice, setDebugModeNotice] = useState<ToastPopupData>();
   const [backendSaveRetryAttempt, setBackendSaveRetryAttempt] = useState(0);
+  const [isListLoadingOverlayVisible, setIsListLoadingOverlayVisible] = useState(isDefaultLandingLocation);
   const currentItemsRef = useRef<Item[]>([]);
   const sharedListNotificationSeenUpdatedAtRef = useRef<Record<string, string>>({});
   const sharedListNotificationGroupRef = useRef<SharedListNotificationGroup>();
@@ -610,6 +611,7 @@ export default function App() {
   const lastBackendPersistedRecordRef = useRef<ShoppingListRecord>();
   const pendingBackendSaveRecordRef = useRef<ShoppingListRecord>();
   const currentShoppingListStateRef = useRef<CurrentShoppingListState>();
+  const activeListIdRef = useRef(activeListId);
   const nextRouteHistoryModeRef = useRef<RouteHistoryMode>('replace');
   const shouldResolveDefaultLandingRef = useRef(isDefaultLandingLocation());
   const shouldUseNavigationMemoryRef = useRef(isDefaultLandingLocation() && readRouteFromLocation().listId === undefined);
@@ -746,6 +748,10 @@ export default function App() {
       measurementDisplayMode,
     };
   }, [activeListId, countryCode, input, isServerBackedList, items, listName, measurementDisplayMode]);
+
+  useEffect(() => {
+    activeListIdRef.current = activeListId;
+  }, [activeListId]);
 
   useEffect(() => () => {
     if (remoteSyncStatusTimerRef.current) {
@@ -1311,6 +1317,7 @@ export default function App() {
       return false;
     }
 
+    setIsListLoadingOverlayVisible(true);
     setIsLoadingSharedList(true);
     setShareError(undefined);
 
@@ -1345,6 +1352,7 @@ export default function App() {
       return false;
     } finally {
       setIsLoadingSharedList(false);
+      setIsListLoadingOverlayVisible(false);
     }
   };
 
@@ -1384,16 +1392,19 @@ export default function App() {
   useEffect(() => {
     let cancelled = false;
     suppressNextAutosaveStatus();
+    const routeListId = listId;
+    const isChangingList = Boolean(routeListId) && routeListId !== activeListIdRef.current;
+    setIsListLoadingOverlayVisible(shouldResolveDefaultLandingRef.current || isChangingList);
     setIsLoaded(false);
     setShareError(undefined);
 
     const loadRecord = async () => {
       const localRecord = localStorageRepository.load();
       const hasLocalRecord = hasStoredShoppingListRecord();
-      const nextListId = listId ?? localRecord.listId ?? createUuidV7();
+      const resolvedListId = routeListId ?? localRecord.listId ?? createUuidV7();
       const localRecordWithIdentity = {
         ...localRecord,
-        listId: nextListId,
+        listId: resolvedListId,
         serverBacked: !debugSettings.forceLocalStorage && (localRecord.serverBacked === true || Boolean(listId)),
       };
       let selectedRecord = localRecordWithIdentity;
@@ -1418,25 +1429,25 @@ export default function App() {
         !debugSettings.disableAutoBackendReconnect
       ) {
         try {
-          const remotePayload = await loadSharedShoppingList(nextListId);
+          const remotePayload = await loadSharedShoppingList(resolvedListId);
           selectedRecord = {
             ...chooseNewestRecord({
               local: localRecordWithIdentity,
-              remote: { ...remotePayload.record, listId: nextListId, serverBacked: true },
+              remote: { ...remotePayload.record, listId: resolvedListId, serverBacked: true },
               hasLocalRecord,
               hasRemoteRecord: remotePayload.exists,
             }),
-            listId: nextListId,
+            listId: resolvedListId,
             serverBacked: true,
           };
 
-          await saveSharedShoppingList(nextListId, selectedRecord);
+          await saveSharedShoppingList(resolvedListId, selectedRecord);
           localStorageRepository.save(selectedRecord);
           lastLocalPersistedRecordRef.current = selectedRecord;
           lastBackendPersistedRecordRef.current = selectedRecord;
           if (remotePayload.exists) {
             rememberSharedList({
-              listId: nextListId,
+              listId: resolvedListId,
               listName: selectedRecord.listName,
               items: selectedRecord.items,
               createdAt: remotePayload.createdAt,
@@ -1462,7 +1473,8 @@ export default function App() {
       const shouldUseNavigationMemory = shouldUseNavigationMemoryRef.current;
       shouldResolveDefaultLandingRef.current = false;
       shouldUseNavigationMemoryRef.current = false;
-      setActiveListId(nextListId);
+      activeListIdRef.current = resolvedListId;
+      setActiveListId(resolvedListId);
       setIsServerBackedList(nextServerBacked);
       const currentLocationDebugTab = readRouteFromLocation().debugTab;
       updateRoute((current) => ({
@@ -1472,7 +1484,7 @@ export default function App() {
               useNavigationMemory: shouldUseNavigationMemory,
             })
           : current.page,
-        listId: nextServerBacked ? nextListId : undefined,
+        listId: nextServerBacked ? resolvedListId : undefined,
         debugTab: current.debugTab ?? currentLocationDebugTab,
       }), 'replace');
       setCountryCode(selectedRecord.countryCode);
@@ -1486,6 +1498,7 @@ export default function App() {
         lastBackendPersistedRecordRef.current = undefined;
       }
       setIsLoaded(true);
+      setIsListLoadingOverlayVisible(false);
     };
 
     void loadRecord();
@@ -2137,6 +2150,7 @@ export default function App() {
       lastBackendPersistedRecordRef.current = record;
     }
     if (record.listId) {
+      activeListIdRef.current = record.listId;
       setActiveListId(record.listId);
     }
     setIsServerBackedList(record.serverBacked === true);
@@ -2583,7 +2597,7 @@ export default function App() {
           onDismiss={dismissPwaInstallNudge}
           onInstall={promptPwaInstall}
         />
-        {!isLoaded ? (
+        {isListLoadingOverlayVisible ? (
           <div className={'app-loading-overlay'} role={'status'} aria-live={'polite'} aria-label={messages.app.title}>
             <span className={'app-loading-spinner'} aria-hidden={'true'} />
           </div>
