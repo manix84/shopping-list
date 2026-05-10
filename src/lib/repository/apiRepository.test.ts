@@ -5,6 +5,7 @@ import {
   checkBackendStatus,
   clearSharedShoppingList,
   loadSharedShoppingList,
+  reportUnknownProducts,
   saveSharedShoppingList,
 } from './apiRepository';
 
@@ -257,6 +258,31 @@ describe('apiRepository', () => {
     expect(fetchMock).toHaveBeenCalledWith(
       `/api/shared-lists/${sharedListId}`,
       expect.objectContaining({ method: 'DELETE' }),
+    );
+  });
+
+  it('prepares CSRF before reporting unknown products', async () => {
+    stubBrowserApi();
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(new Response(JSON.stringify({ ok: true }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(reportUnknownProducts({
+      countryCode: 'uk',
+      locale: 'en',
+      items: [{ raw: 'dragon fruit', normalized: 'dragon fruit', cleaned: 'dragon fruit' }],
+    })).resolves.toEqual({ disabled: false });
+
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      1,
+      '/api/unknown-products/csrf',
+      expect.objectContaining({ credentials: 'same-origin' }),
+    );
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      '/api/unknown-products',
+      expect.objectContaining({ credentials: 'same-origin', method: 'POST' }),
     );
   });
 });

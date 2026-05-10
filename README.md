@@ -211,7 +211,7 @@ FOOD_GITHUB_TOKEN=github_pat_...
 
 `FOOD_GITHUB_REPO` falls back to `GITHUB_REPOSITORY` when available. The GitHub token needs permission to read and write issues for that repository. The GitHub token is only read by the backend and is never exposed to the frontend. The older `UNKNOWN_PRODUCTS_GITHUB_*` names are still accepted for compatibility.
 
-Unknown product reports are accepted only from the same app origin before the backend creates or comments on GitHub issues. If your app sits behind a proxy that changes the public origin seen by the backend, configure the allowed origin explicitly:
+Unknown product reports are accepted only from the same app origin and require a backend-issued HttpOnly CSRF cookie before the backend creates or comments on GitHub issues. The CSRF cookie contains a random token and salt, is signed by the backend with `CSRF_SECRET`, and is not exposed to frontend JavaScript. If your app sits behind a proxy that changes the public origin seen by the backend, configure the allowed origin explicitly:
 
 ```text
 FOOD_REPORT_ALLOWED_ORIGINS=https://shopping.example.com
@@ -224,6 +224,7 @@ FOOD_GITHUB_ISSUE=123
 FOOD_GITHUB_TITLE=[Automated] Products Filed Under Other
 FOOD_REPORT_RATE_LIMIT=30
 FOOD_REPORT_RATE_LIMIT_WINDOW_MS=900000
+CSRF_SECRET=choose-a-long-random-server-only-secret
 ```
 
 `FOOD_GITHUB_ISSUE` is the parent issue number. If it is omitted, the backend finds or creates an open parent issue using `FOOD_GITHUB_TITLE`.

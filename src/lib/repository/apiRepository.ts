@@ -156,10 +156,21 @@ export type UnknownProductsReport = {
 };
 
 export const reportUnknownProducts = async (report: UnknownProductsReport): Promise<{ disabled: boolean }> => {
+  const csrfResponse = await fetchWithTimeout(
+    '/api/unknown-products/csrf',
+    { credentials: 'same-origin' },
+    2_000,
+  );
+
+  if (!csrfResponse.ok) {
+    throw new Error(`Unable to prepare unknown product report: ${csrfResponse.status}`);
+  }
+
   const response = await fetchWithTimeout(
     '/api/unknown-products',
     {
       method: 'POST',
+      credentials: 'same-origin',
       body: JSON.stringify(report),
     },
     2_000,
