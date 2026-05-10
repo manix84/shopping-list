@@ -86,6 +86,7 @@ const DEBUG_MODE_NOTICE_DURATION_MS = 4_000;
 const DEV_TITLE_SUFFIX = ' [Dev]';
 const DEV_MANIFEST_ID = 'smart-shopping-list-dev';
 const LAST_LIST_PAGE_KEY = 'shoppingList:lastListPage';
+const LAST_DEBUG_TAB_KEY = 'shoppingList:lastDebugTab';
 const APP_VERSION_RELOAD_SESSION_KEY = 'smart-shopping-list-version-reload-v1';
 type NotificationDeliveryResult = DebugNotificationDeliveryPath;
 const debugNotificationStatusFromDelivery = (
@@ -375,6 +376,46 @@ const saveLastListPage = (page: PageKey): void => {
     window.localStorage.setItem(LAST_LIST_PAGE_KEY, page);
   } catch {
     // Navigation memory is a convenience only; blocked storage should not affect routing.
+  }
+};
+
+const isDebugTabKey = (value: string | undefined): value is DebugTabKey => [
+  'parsed',
+  'state',
+  'backend',
+  'database-entry',
+  'config',
+  'matcher',
+  'quantity',
+  'measurements',
+  'weights',
+  'variants',
+  'layout',
+  'sections',
+  'storage',
+  'host',
+  'events',
+  'settings',
+].includes(value as DebugTabKey);
+
+const readLastDebugTab = (): DebugTabKey | undefined => {
+  if (typeof window === 'undefined') { return undefined; }
+
+  try {
+    const storedTab = window.localStorage.getItem(LAST_DEBUG_TAB_KEY);
+    return isDebugTabKey(storedTab ?? undefined) ? storedTab : undefined;
+  } catch {
+    return undefined;
+  }
+};
+
+const saveLastDebugTab = (debugTab: DebugTabKey): void => {
+  if (typeof window === 'undefined') { return; }
+
+  try {
+    window.localStorage.setItem(LAST_DEBUG_TAB_KEY, debugTab);
+  } catch {
+    // Debug tab memory is a convenience only; blocked storage should not affect routing.
   }
 };
 
@@ -712,7 +753,7 @@ export default function App() {
     updateRoute((current) => ({
       ...current,
       page: nextPage,
-      debugTab: nextPage === 'debug' ? current.debugTab ?? 'parsed' : undefined,
+      debugTab: nextPage === 'debug' ? current.debugTab ?? readLastDebugTab() ?? 'parsed' : undefined,
     }));
   };
 
@@ -1632,9 +1673,12 @@ export default function App() {
       setRoute((current) => {
         const locationRoute = readRouteFromLocation();
         const landingPage: PageKey = currentItemsRef.current.length > 0 ? 'route' : 'edit';
-        const next: AppRoute = isDefaultLandingLocation()
+        let next: AppRoute = isDefaultLandingLocation()
           ? { ...locationRoute, page: landingPage, listId: locationRoute.listId ?? current.listId }
           : locationRoute;
+        if (next.page === 'debug' && !next.debugTab) {
+          next = { ...next, debugTab: readLastDebugTab() ?? 'parsed' };
+        }
         return routesMatch(current, next) ? current : next;
       });
     };
@@ -1876,6 +1920,12 @@ export default function App() {
 
     saveLastListPage(page);
   }, [isLoaded, page]);
+
+  useEffect(() => {
+    if (!isLoaded || page !== 'debug') { return; }
+
+    saveLastDebugTab(activeDebugTab);
+  }, [activeDebugTab, isLoaded, page]);
 
   useEffect(() => {
     if (isLoaded && page === 'route' && items.length === 0) {
