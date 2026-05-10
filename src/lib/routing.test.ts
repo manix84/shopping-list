@@ -4,14 +4,14 @@ import { isDefaultLandingRoutePath, readRouteFromLocationParts, routeToUrl } fro
 const LIST_ID = '019dbf30-56de-7b2b-aacc-a5ae59430d7f';
 
 describe('routing', () => {
-  it('reads path-based shared list routes', () => {
-    expect(readRouteFromLocationParts({ pathname: `/list/${LIST_ID}/route` })).toEqual({
+  it('reads canonical UUID-prefixed shared list routes', () => {
+    expect(readRouteFromLocationParts({ pathname: `/${LIST_ID}/route` })).toEqual({
       page: 'route',
       listId: LIST_ID,
     });
   });
 
-  it('reads bare shared list routes', () => {
+  it('reads bare shared list routes and legacy list-prefixed routes', () => {
     expect(readRouteFromLocationParts({ pathname: `/${LIST_ID}` })).toEqual({
       page: 'edit',
       listId: LIST_ID,
@@ -23,8 +23,8 @@ describe('routing', () => {
   });
 
   it('reads shared list routes under a configured base path', () => {
-    expect(readRouteFromLocationParts({ pathname: `/shopping-list/list/${LIST_ID}/debug`, basePath: '/shopping-list/' })).toEqual({
-      page: 'debug',
+    expect(readRouteFromLocationParts({ pathname: `/shopping-list/${LIST_ID}/route`, basePath: '/shopping-list/' })).toEqual({
+      page: 'route',
       listId: LIST_ID,
     });
   });
@@ -38,6 +38,11 @@ describe('routing', () => {
       page: 'debug',
       debugTab: 'events',
     });
+    expect(readRouteFromLocationParts({ pathname: `/${LIST_ID}/debug/backend` })).toEqual({
+      page: 'debug',
+      listId: LIST_ID,
+      debugTab: 'backend',
+    });
     expect(readRouteFromLocationParts({ pathname: `/list/${LIST_ID}/debug/backend` })).toEqual({
       page: 'debug',
       listId: LIST_ID,
@@ -45,14 +50,14 @@ describe('routing', () => {
     });
   });
 
-  it('keeps compatibility with short shared-list URLs', () => {
+  it('uses the not-found page for unknown canonical shared-list pages', () => {
     expect(readRouteFromLocationParts({ pathname: `/${LIST_ID}/unknown` })).toEqual({
-      page: 'edit',
+      page: 'not-found',
       listId: LIST_ID,
     });
   });
 
-  it('uses the not-found page for unknown canonical shared-list pages', () => {
+  it('uses the not-found page for unknown legacy shared-list pages', () => {
     expect(readRouteFromLocationParts({ pathname: `/list/${LIST_ID}/unknown` })).toEqual({
       page: 'not-found',
       listId: LIST_ID,
@@ -62,11 +67,11 @@ describe('routing', () => {
   it('reads error pages', () => {
     expect(readRouteFromLocationParts({ pathname: '/404' })).toEqual({ page: 'not-found' });
     expect(readRouteFromLocationParts({ pathname: '/500' })).toEqual({ page: 'server-error' });
-    expect(readRouteFromLocationParts({ pathname: `/list/${LIST_ID}/404` })).toEqual({
+    expect(readRouteFromLocationParts({ pathname: `/${LIST_ID}/404` })).toEqual({
       page: 'not-found',
       listId: LIST_ID,
     });
-    expect(readRouteFromLocationParts({ pathname: `/list/${LIST_ID}/500` })).toEqual({
+    expect(readRouteFromLocationParts({ pathname: `/${LIST_ID}/500` })).toEqual({
       page: 'server-error',
       listId: LIST_ID,
     });
@@ -81,8 +86,11 @@ describe('routing', () => {
     expect(isDefaultLandingRoutePath({ pathname: '/' })).toBe(true);
     expect(isDefaultLandingRoutePath({ pathname: `/${LIST_ID}` })).toBe(true);
     expect(isDefaultLandingRoutePath({ pathname: `/list/${LIST_ID}` })).toBe(true);
+    expect(isDefaultLandingRoutePath({ pathname: `/shopping-list/${LIST_ID}`, basePath: '/shopping-list/' })).toBe(true);
     expect(isDefaultLandingRoutePath({ pathname: `/shopping-list/list/${LIST_ID}`, basePath: '/shopping-list/' })).toBe(true);
     expect(isDefaultLandingRoutePath({ pathname: '/edit' })).toBe(false);
+    expect(isDefaultLandingRoutePath({ pathname: `/${LIST_ID}/edit` })).toBe(false);
+    expect(isDefaultLandingRoutePath({ pathname: `/${LIST_ID}/route` })).toBe(false);
     expect(isDefaultLandingRoutePath({ pathname: `/list/${LIST_ID}/edit` })).toBe(false);
     expect(isDefaultLandingRoutePath({ pathname: `/list/${LIST_ID}/route` })).toBe(false);
   });
@@ -99,8 +107,8 @@ describe('routing', () => {
   });
 
   it('renders list-specific edit and route URLs', () => {
-    expect(routeToUrl({ page: 'edit', listId: LIST_ID })).toBe(`/list/${LIST_ID}/edit`);
-    expect(routeToUrl({ page: 'route', listId: LIST_ID })).toBe(`/list/${LIST_ID}/route`);
+    expect(routeToUrl({ page: 'edit', listId: LIST_ID })).toBe(`/${LIST_ID}/edit`);
+    expect(routeToUrl({ page: 'route', listId: LIST_ID })).toBe(`/${LIST_ID}/route`);
   });
 
   it('renders debug tab URLs', () => {
@@ -116,13 +124,13 @@ describe('routing', () => {
   it('renders error page URLs', () => {
     expect(routeToUrl({ page: 'not-found' })).toBe('/404');
     expect(routeToUrl({ page: 'server-error' })).toBe('/500');
-    expect(routeToUrl({ page: 'not-found', listId: LIST_ID })).toBe(`/list/${LIST_ID}/404`);
-    expect(routeToUrl({ page: 'server-error', listId: LIST_ID })).toBe(`/list/${LIST_ID}/500`);
+    expect(routeToUrl({ page: 'not-found', listId: LIST_ID })).toBe(`/${LIST_ID}/404`);
+    expect(routeToUrl({ page: 'server-error', listId: LIST_ID })).toBe(`/${LIST_ID}/500`);
   });
 
   it('renders URLs under a configured base path', () => {
     expect(routeToUrl({ page: 'route', listId: LIST_ID }, '/shopping-list/')).toBe(
-      `/shopping-list/list/${LIST_ID}/route`,
+      `/shopping-list/${LIST_ID}/route`,
     );
     expect(routeToUrl({ page: 'settings' }, '/shopping-list/')).toBe('/shopping-list/settings');
   });

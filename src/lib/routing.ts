@@ -82,8 +82,9 @@ export const readRouteFromLocationParts = ({
   }
 
   if (isUuidV7(pathParts[0])) {
-    const page = PATH_PAGE_MAP[pathParts[1] ?? ''] ?? DEFAULT_PAGE;
-    return { page, listId: pathParts[0] };
+    const page = pathParts[1] ? PATH_PAGE_MAP[pathParts[1]] ?? 'not-found' : DEFAULT_PAGE;
+    const debugTab = debugTabFromPath(page, pathParts[2]);
+    return debugTab ? { page, listId: pathParts[0], debugTab } : { page, listId: pathParts[0] };
   }
 
   const page = PATH_PAGE_MAP[pathParts[0]] ?? 'not-found';
@@ -97,6 +98,6 @@ export const routeToUrl = ({ page, listId, debugTab }: AppRoute, basePath = ''):
   const shouldShowListId = !APP_LEVEL_PAGES.includes(page) && Boolean(listId);
   const tabPath = page === 'debug' && debugTab ? `/${debugTab}` : '';
   return shouldShowListId
-    ? `${normalizedBasePath}/list/${listId}/${pathPage}${tabPath}`
+    ? `${normalizedBasePath}/${listId}/${pathPage}${tabPath}`
     : `${normalizedBasePath}/${pathPage}${tabPath}`;
 };

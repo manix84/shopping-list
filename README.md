@@ -63,10 +63,10 @@ The app uses normal path-based routing:
 
 Backend-backed shared lists use path routes:
 
-- `/list/<uuidv7>/edit` - shared list editor
-- `/list/<uuidv7>/route` - shared list route view
+- `/<uuidv7>/edit` - shared list editor
+- `/<uuidv7>/route` - shared list route view
 
-Debug tools are generated and normalized as app-level routes because they inspect the current browser/app runtime rather than a specific shared list. Older list-nested debug URLs such as `/list/<uuidv7>/debug/backend` may still be accepted for compatibility, but the canonical URL is `/debug/backend`.
+Legacy `/list/<uuidv7>/...` URLs are still accepted and normalized to the canonical `/<uuidv7>/...` structure. Debug tools are generated and normalized as app-level routes because they inspect the current browser/app runtime rather than a specific shared list. Older list-nested debug URLs such as `/list/<uuidv7>/debug/backend` may still be accepted for compatibility, but the canonical URL is `/debug/backend`.
 
 If a page needs data that is not available yet, it shows a warning and points you to the page that can populate it.
 
@@ -269,10 +269,10 @@ Disabled-by-default backend routes:
 Every browser session has an internal UUIDv7-style list id. When the backend is connected, that list id is migrated to the backend and shown in path-based URLs:
 
 ```text
-/list/<uuidv7>/edit
+/<uuidv7>/edit
 ```
 
-Anyone with the link can edit the same list. Changes are saved to the shared backend record after each completed app state change and cached locally as an offline backup. If the backend is offline, new offline-only lists keep their UUID hidden from the URL; lists that have already been backend-backed keep the `/list/<uuidv7>` URL and render from local storage until the backend comes back.
+Anyone with the link can edit the same list. Changes are saved to the shared backend record after each completed app state change and cached locally as an offline backup. If the backend is offline, new offline-only lists keep their UUID hidden from the URL; lists that have already been backend-backed keep the `/<uuidv7>` URL and render from local storage until the backend comes back.
 
 When supported by the browser and backend, open shared lists subscribe to server-sent events for remote changes. SSE updates trigger an immediate backend fetch and a short working indicator while incoming changes are applied. A slower fallback poll remains in place for missed events or browsers without `EventSource`.
 

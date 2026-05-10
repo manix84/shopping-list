@@ -654,7 +654,7 @@ export default function App() {
   const shareLink =
     typeof window === 'undefined' || !canUseBackend || !isServerBackedList
       ? undefined
-      : `${window.location.origin}${appBasePath}/list/${activeListId}/edit`;
+      : `${window.location.origin}${routeToUrl({ page: 'edit', listId: activeListId }, appBasePath)}`;
   const currentSharedListDatabaseEntry = useMemo(() => {
     if (!canUseBackend || !isServerBackedList || storageMode !== 'backend') { return undefined; }
 
@@ -957,7 +957,7 @@ export default function App() {
     const body = count === 1
       ? messages.notifications.sharedItemAddedBody.replace('{item}', nextGroup.itemNames[0] ?? '')
       : `${messages.notifications.sharedItemsAddedBody.replace('{count}', String(count))} ${preview}`;
-    const url = `${window.location.origin}${appBasePath}/list/${listId}/edit`;
+    const url = `${window.location.origin}${routeToUrl({ page: 'edit', listId }, appBasePath)}`;
     const options: NotificationOptions = {
       body,
       data: { url },
@@ -1372,7 +1372,7 @@ export default function App() {
       return { state: 'invalid' };
     }
 
-    const normalizedValue = `${currentOrigin() ?? ''}${appBasePath}/list/${nextListId}/edit`;
+    const normalizedValue = `${currentOrigin() ?? ''}${routeToUrl({ page: 'edit', listId: nextListId }, appBasePath)}`;
     if (!canUseBackend) {
       return { state: 'unavailable' };
     }
