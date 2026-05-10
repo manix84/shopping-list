@@ -1151,9 +1151,63 @@ select {
 }
 
 .debug-tablist {
+  -webkit-overflow-scrolling: touch;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
+  margin-inline: -4px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 2px 4px 8px;
+  scrollbar-gutter: stable;
+}
+
+.debug-tab-button {
+  align-items: center;
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 10px;
+  justify-content: center;
+  line-height: 1;
+  scroll-snap-align: start;
+  white-space: nowrap;
+}
+
+.debug-tab-icon {
+  display: block;
+  flex: 0 0 auto;
+  height: 20px;
+  width: 20px;
+}
+
+.debug-tab-label {
+  display: block;
+  line-height: 1;
+  min-width: 0;
+}
+
+@media (max-width: 720px) {
+  .debug-tablist {
+    gap: 6px;
+    padding-bottom: 10px;
+  }
+
+  .debug-tab-button {
+    aspect-ratio: 1;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0;
+    width: 44px;
+  }
+
+  .debug-tab-icon {
+    height: 20px;
+    width: 20px;
+  }
+
+  .debug-tab-label {
+    display: none;
+  }
 }
 
 .debug-setting-switch {

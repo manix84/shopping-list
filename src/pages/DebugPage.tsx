@@ -1,4 +1,22 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
+import {
+  mdiBellOutline,
+  mdiCalculatorVariantOutline,
+  mdiCogOutline,
+  mdiDatabaseOutline,
+  mdiFormatListBulleted,
+  mdiHarddisk,
+  mdiPackageVariantClosed,
+  mdiRuler,
+  mdiServerNetwork,
+  mdiStateMachine,
+  mdiStoreOutline,
+  mdiTextSearch,
+  mdiTune,
+  mdiViewGridOutline,
+  mdiWeb,
+  mdiWeight,
+} from '@mdi/js';
 import type {
   BackendStatus,
   BackendHeartbeatSample,
@@ -414,6 +432,7 @@ export function DebugPage({
   const [lockedHeartbeatSurface, setLockedHeartbeatSurface] = useState<HeartbeatInteractionSurface | null>(null);
   const [isHeartbeatDetailsOpen, setIsHeartbeatDetailsOpen] = useState(false);
   const [isHeartbeatHistoryOpen, setIsHeartbeatHistoryOpen] = useState(false);
+  const debugTabButtonRefs = useRef(new Map<DebugTabKey, HTMLButtonElement>());
   const heartbeatHistoryWrapRef = useRef<HTMLDivElement | null>(null);
   const heartbeatHistoryRowRefs = useRef(new Map<string, HTMLTableRowElement>());
   const runtimeLocation =
@@ -426,23 +445,23 @@ export function DebugPage({
           origin: window.location.origin,
           protocol: window.location.protocol,
         };
-  const debugTabs: Array<{ key: DebugTabKey; label: string }> = [
-    { key: 'parsed', label: messages.pages.debug.tabParsed },
-    { key: 'state', label: messages.pages.debug.tabState },
-    { key: 'backend', label: messages.pages.debug.tabBackend },
-    { key: 'database-entry', label: messages.pages.debug.tabDatabaseEntry },
-    { key: 'config', label: messages.pages.debug.tabConfig },
-    { key: 'matcher', label: messages.pages.debug.tabMatcher },
-    { key: 'quantity', label: messages.pages.debug.tabQuantity },
-    { key: 'measurements', label: messages.pages.debug.tabMeasurements },
-    { key: 'weights', label: messages.pages.debug.tabWeights },
-    { key: 'variants', label: messages.pages.debug.tabVariants },
-    { key: 'layout', label: messages.pages.debug.tabLayout },
-    { key: 'sections', label: messages.pages.debug.tabSections },
-    { key: 'storage', label: messages.pages.debug.tabStorage },
-    { key: 'host', label: messages.pages.debug.tabHost },
-    { key: 'events', label: messages.pages.debug.tabEvents },
-    { key: 'settings', label: messages.pages.debug.tabSettings },
+  const debugTabs: Array<{ key: DebugTabKey; label: string; icon: string }> = [
+    { key: 'parsed', label: messages.pages.debug.tabParsed, icon: mdiFormatListBulleted },
+    { key: 'state', label: messages.pages.debug.tabState, icon: mdiStateMachine },
+    { key: 'backend', label: messages.pages.debug.tabBackend, icon: mdiServerNetwork },
+    { key: 'database-entry', label: messages.pages.debug.tabDatabaseEntry, icon: mdiDatabaseOutline },
+    { key: 'config', label: messages.pages.debug.tabConfig, icon: mdiCogOutline },
+    { key: 'matcher', label: messages.pages.debug.tabMatcher, icon: mdiTextSearch },
+    { key: 'quantity', label: messages.pages.debug.tabQuantity, icon: mdiCalculatorVariantOutline },
+    { key: 'measurements', label: messages.pages.debug.tabMeasurements, icon: mdiRuler },
+    { key: 'weights', label: messages.pages.debug.tabWeights, icon: mdiWeight },
+    { key: 'variants', label: messages.pages.debug.tabVariants, icon: mdiPackageVariantClosed },
+    { key: 'layout', label: messages.pages.debug.tabLayout, icon: mdiViewGridOutline },
+    { key: 'sections', label: messages.pages.debug.tabSections, icon: mdiStoreOutline },
+    { key: 'storage', label: messages.pages.debug.tabStorage, icon: mdiHarddisk },
+    { key: 'host', label: messages.pages.debug.tabHost, icon: mdiWeb },
+    { key: 'events', label: messages.pages.debug.tabEvents, icon: mdiBellOutline },
+    { key: 'settings', label: messages.pages.debug.tabSettings, icon: mdiTune },
   ];
   const layoutRows = config.groups.flatMap((group) =>
     group.sections.map((section) => ({
@@ -559,6 +578,17 @@ export function DebugPage({
   }, [lockedHeartbeatSampleKey, scrollHeartbeatHistorySampleIntoView]);
 
   useEffect(() => {
+    const prefersReducedMotion = typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    debugTabButtonRefs.current.get(activeTab)?.scrollIntoView({
+      behavior: prefersReducedMotion ? 'auto' : 'smooth',
+      block: 'nearest',
+      inline: 'center',
+    });
+  }, [activeTab]);
+
+  useEffect(() => {
     if (typeof document === 'undefined') { return undefined; }
 
     const clearLockedHeartbeatSample = (event: PointerEvent) => {
@@ -627,14 +657,26 @@ export function DebugPage({
             id={`debug-tab-${tab.key}`}
             type={'button'}
             role={'tab'}
+            aria-label={tab.label}
             aria-selected={activeTab === tab.key}
             aria-controls={activeTab === tab.key ? `debug-panel-${tab.key}` : undefined}
             tabIndex={activeTab === tab.key ? 0 : -1}
-            className={`button ${activeTab === tab.key ? 'button-active' : ''}`}
+            className={`button debug-tab-button ${activeTab === tab.key ? 'button-active' : ''}`}
+            ref={(element) => {
+              if (element) {
+                debugTabButtonRefs.current.set(tab.key, element);
+              } else {
+                debugTabButtonRefs.current.delete(tab.key);
+              }
+            }}
             onClick={() => onDebugTabChange(tab.key)}
             onKeyDown={(event) => handleTabKeyDown(event, index)}
+            title={tab.label}
           >
-            {tab.label}
+            <svg className={'debug-tab-icon'} viewBox={'0 0 24 24'} aria-hidden={'true'} focusable={'false'}>
+              <path d={tab.icon} fill={'currentColor'} />
+            </svg>
+            <span className={'debug-tab-label'}>{tab.label}</span>
           </button>
         ))}
       </div>
