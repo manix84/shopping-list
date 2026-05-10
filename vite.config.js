@@ -15,16 +15,14 @@ export default defineConfig({
     server: {
         proxy: {
             '/api': 'http://localhost:8787'
-        },
-        host: '0.0.0.0',
-        open: true
+        }
     },
     test: {
         projects: [{
                 extends: true,
                 test: {
                     name: 'unit',
-                    include: ['src/**/*.test.ts']
+                    include: ['src/**/*.test.ts', 'server/**/*.test.mjs']
                 }
             }, {
                 extends: true,

@@ -11,6 +11,7 @@ import {
   saveSharedList,
 } from './database.mjs';
 import { callShoppingListService, getHomeAssistantStatus, pushRecordToHomeAssistant } from './homeAssistant.mjs';
+import { createUnknownProductSecurity } from './unknownProductSecurity.mjs';
 import { isUnknownProductsReport, submitUnknownProductsReport } from './unknownProducts.mjs';
 import { isShoppingListRecord } from './validation.mjs';
 
@@ -19,18 +20,12 @@ const distDir = resolve('dist');
 const appVersion = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')).version;
 const homeAssistantIntegrationEnabled = process.env.ENABLE_HOME_ASSISTANT_INTEGRATION === 'true';
 const clacksOverhead = 'GNU Terry Pratchett';
-const parsePositiveNumber = (value, fallback) => {
-  const numberValue = Number(value);
-  return Number.isFinite(numberValue) && numberValue > 0 ? numberValue : fallback;
-};
-const unknownProductsRateLimit = parsePositiveNumber(process.env.FOOD_REPORT_RATE_LIMIT, 30);
-const unknownProductsRateLimitWindowMs = parsePositiveNumber(process.env.FOOD_REPORT_RATE_LIMIT_WINDOW_MS, 15 * 60 * 1000);
-const trustedUnknownProductReportOrigins = new Set(
-  String(process.env.FOOD_REPORT_ALLOWED_ORIGINS ?? '')
-    .split(',')
-    .map((origin) => origin.trim())
-    .filter(Boolean),
-);
+const unknownProductSecurity = createUnknownProductSecurity({
+  allowedOrigins: process.env.FOOD_REPORT_ALLOWED_ORIGINS,
+  csrfSecret: process.env.CSRF_SECRET,
+  rateLimit: process.env.FOOD_REPORT_RATE_LIMIT,
+  rateLimitWindowMs: process.env.FOOD_REPORT_RATE_LIMIT_WINDOW_MS,
+});
 
 const contentTypes = {
   '.css': 'text/css; charset=utf-8',
@@ -44,65 +39,6 @@ const contentTypes = {
 };
 
 const sharedListEventClients = new Map();
-const unknownProductsRequestBuckets = new Map();
-
-const requestRemoteAddress = (request) => {
-  const forwardedFor = request.headers['x-forwarded-for'];
-  if (typeof forwardedFor === 'string' && forwardedFor.trim()) {
-    return forwardedFor.split(',')[0]?.trim() || 'unknown';
-  }
-
-  return request.socket.remoteAddress ?? 'unknown';
-};
-
-const isUnknownProductsRateLimited = (request) => {
-  if (!Number.isFinite(unknownProductsRateLimit) || unknownProductsRateLimit <= 0) { return false; }
-
-  const now = Date.now();
-  const key = requestRemoteAddress(request);
-  const bucket = unknownProductsRequestBuckets.get(key) ?? { count: 0, resetAt: now + unknownProductsRateLimitWindowMs };
-  if (now >= bucket.resetAt) {
-    bucket.count = 0;
-    bucket.resetAt = now + unknownProductsRateLimitWindowMs;
-  }
-
-  bucket.count += 1;
-  unknownProductsRequestBuckets.set(key, bucket);
-  return bucket.count > unknownProductsRateLimit;
-};
-
-const firstHeaderValue = (value) => {
-  if (Array.isArray(value)) { return value[0]; }
-  return typeof value === 'string' ? value : undefined;
-};
-
-const requestExpectedOrigin = (request) => {
-  const host = firstHeaderValue(request.headers['x-forwarded-host']) ?? request.headers.host;
-  if (!host) { return undefined; }
-
-  const forwardedProto = firstHeaderValue(request.headers['x-forwarded-proto']);
-  const proto = forwardedProto?.split(',')[0]?.trim() || (request.socket.encrypted ? 'https' : 'http');
-  return `${proto}://${host}`;
-};
-
-const originFromHeader = (value) => {
-  if (!value) { return undefined; }
-
-  try {
-    return new URL(value).origin;
-  } catch {
-    return undefined;
-  }
-};
-
-const isSameOriginUnknownProductsRequest = (request) => {
-  const origin = originFromHeader(firstHeaderValue(request.headers.origin)) ??
-    originFromHeader(firstHeaderValue(request.headers.referer));
-  if (!origin) { return false; }
-
-  const expectedOrigin = requestExpectedOrigin(request);
-  return origin === expectedOrigin || trustedUnknownProductReportOrigins.has(origin);
-};
 
 const sendSharedListEvent = (response, event) => {
   if (response.destroyed || response.writableEnded) { return false; }
@@ -181,10 +117,15 @@ const publishSharedListEvent = (listId, event) => {
   }
 };
 
-const sendJson = (response, statusCode, payload) => {
+const csrfCookieHeader = (request) => {
+  return unknownProductSecurity.csrfCookieHeader(request);
+};
+
+const sendJson = (response, statusCode, payload, headers = {}) => {
   response.writeHead(statusCode, {
     'Content-Type': 'application/json; charset=utf-8',
     'X-Clacks-Overhead': clacksOverhead,
+    ...headers,
   });
   response.end(JSON.stringify(payload));
 };
@@ -246,13 +187,23 @@ const handleApi = async (request, response, path) => {
     return;
   }
 
+  if (request.method === 'GET' && path === '/api/unknown-products/csrf') {
+    sendJson(response, 200, { ok: true }, { 'Set-Cookie': csrfCookieHeader(request) });
+    return;
+  }
+
   if (request.method === 'POST' && path === '/api/unknown-products') {
-    if (!isSameOriginUnknownProductsRequest(request)) {
+    if (!unknownProductSecurity.isSameOriginRequest(request)) {
       sendJson(response, 403, { error: 'Unknown product reports must come from the app origin' });
       return;
     }
 
-    if (isUnknownProductsRateLimited(request)) {
+    if (!unknownProductSecurity.hasValidCsrfCookie(request)) {
+      sendJson(response, 403, { error: 'A valid CSRF cookie is required' });
+      return;
+    }
+
+    if (unknownProductSecurity.isRateLimited(request)) {
       sendJson(response, 429, { error: 'Too many unknown product reports' });
       return;
     }
