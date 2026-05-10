@@ -2,10 +2,10 @@ import { COUNTRY_CODES } from './constants.mjs';
 
 const LOCALE_CODES = new Set(['en', 'es', 'fr', 'de', 'nl', 'it', 'ro', 'pi']);
 const DEFAULT_ISSUE_TITLE = 'Unknown products';
-const githubToken = process.env.UNKNOWN_PRODUCTS_GITHUB_TOKEN ?? process.env.GITHUB_TOKEN ?? process.env.GH_TOKEN;
-const githubRepo = process.env.UNKNOWN_PRODUCTS_GITHUB_REPO ?? process.env.GITHUB_REPOSITORY;
-const githubIssueNumber = process.env.UNKNOWN_PRODUCTS_GITHUB_ISSUE_NUMBER;
-const githubIssueTitle = process.env.UNKNOWN_PRODUCTS_GITHUB_ISSUE_TITLE ?? DEFAULT_ISSUE_TITLE;
+const githubToken = process.env.FOOD_GITHUB_TOKEN ?? process.env.UNKNOWN_PRODUCTS_GITHUB_TOKEN ?? process.env.GITHUB_TOKEN ?? process.env.GH_TOKEN;
+const githubRepo = process.env.FOOD_GITHUB_REPO ?? process.env.UNKNOWN_PRODUCTS_GITHUB_REPO ?? process.env.GITHUB_REPOSITORY;
+const githubParentIssueNumber = process.env.FOOD_GITHUB_ISSUE ?? process.env.UNKNOWN_PRODUCTS_GITHUB_ISSUE_NUMBER;
+const githubParentIssueTitle = process.env.FOOD_GITHUB_TITLE ?? process.env.UNKNOWN_PRODUCTS_GITHUB_ISSUE_TITLE ?? DEFAULT_ISSUE_TITLE;
 
 const isReportItem = (value) =>
   value &&
@@ -30,7 +30,7 @@ const githubHeaders = () => ({
   Authorization: `Bearer ${githubToken}`,
   'Content-Type': 'application/json',
   'User-Agent': 'smart-shopping-list',
-  'X-GitHub-Api-Version': '2022-11-28',
+  'X-GitHub-Api-Version': '2026-03-10',
 });
 
 const githubFetch = async (path, init = {}) => {
@@ -43,29 +43,30 @@ const githubFetch = async (path, init = {}) => {
   });
 
   if (!response.ok) {
-    throw new Error(`GitHub request failed: ${response.status}`);
+    const message = await response.text().catch(() => '');
+    throw new Error(`GitHub request failed: ${response.status}${message ? ` ${message}` : ''}`);
   }
 
   return response.status === 204 ? undefined : response.json();
 };
 
-const findUnknownProductsIssue = async () => {
-  if (githubIssueNumber) { return Number(githubIssueNumber); }
+const findUnknownProductsParentIssue = async () => {
+  if (githubParentIssueNumber) { return Number(githubParentIssueNumber); }
 
   const query = new URLSearchParams({
-    q: `repo:${githubRepo} is:issue is:open in:title ${JSON.stringify(githubIssueTitle)}`,
+    q: `repo:${githubRepo} is:issue is:open in:title ${JSON.stringify(githubParentIssueTitle)}`,
   });
   const result = await githubFetch(`/search/issues?${query.toString()}`);
   const existingIssue = Array.isArray(result?.items)
-    ? result.items.find((issue) => issue.title === githubIssueTitle && typeof issue.number === 'number')
+    ? result.items.find((issue) => issue.title === githubParentIssueTitle && typeof issue.number === 'number')
     : undefined;
   if (existingIssue) { return existingIssue.number; }
 
   const createdIssue = await githubFetch(`/repos/${githubRepo}/issues`, {
     method: 'POST',
     body: JSON.stringify({
-      title: githubIssueTitle,
-      body: 'Automatically collected shopping-list products that did not match a known store section.',
+      title: githubParentIssueTitle,
+      body: 'Parent issue for automatically collected shopping-list products that did not match a known store section.',
     }),
   });
 
@@ -78,23 +79,87 @@ const escapeMarkdownCell = (value) => String(value ?? '')
   .replaceAll('\n', ' ')
   .trim();
 
-const unknownProductsComment = (report) => {
+const escapeInlineCode = (value) => String(value ?? '')
+  .replaceAll('`', "'")
+  .replaceAll('\n', ' ')
+  .trim();
+
+const productIssueTitle = (item) => `[PRODUCT] \`${escapeInlineCode(item.raw)}\` filed under \`other\``;
+
+const unknownProductDetails = (item, report) => {
   const reportedAt = new Date().toISOString();
-  const rows = report.items.map((item) => [
-    escapeMarkdownCell(item.raw),
-    escapeMarkdownCell(item.normalized ?? item.cleaned ?? ''),
-    report.countryCode,
-    report.locale,
-    reportedAt,
-  ]);
 
   return [
-    '### Unknown product report',
+    'Automatically collected shopping-list products that did not match a known store section.',
     '',
     '| Item | Normalized | Country | Locale | Reported at |',
     '| --- | --- | --- | --- | --- |',
-    ...rows.map((row) => `| ${row.join(' | ')} |`),
+    `| ${[
+      escapeMarkdownCell(item.raw),
+      escapeMarkdownCell(item.normalized ?? item.cleaned ?? ''),
+      report.countryCode,
+      report.locale,
+      reportedAt,
+    ].join(' | ')} |`,
   ].join('\n');
+};
+
+const unknownProductDuplicateComment = (item, report) => [
+  '+1',
+  '',
+  unknownProductDetails(item, report),
+].join('\n');
+
+const findIssueByTitle = async (title) => {
+  const query = new URLSearchParams({
+    q: `repo:${githubRepo} is:issue is:open in:title ${JSON.stringify(title)}`,
+  });
+  const result = await githubFetch(`/search/issues?${query.toString()}`);
+  return Array.isArray(result?.items)
+    ? result.items.find((issue) => issue.title === title && typeof issue.id === 'number' && typeof issue.number === 'number')
+    : undefined;
+};
+
+const createUnknownProductIssue = async (item, report) => {
+  const createdIssue = await githubFetch(`/repos/${githubRepo}/issues`, {
+    method: 'POST',
+    body: JSON.stringify({
+      title: productIssueTitle(item),
+      body: unknownProductDetails(item, report),
+    }),
+  });
+
+  if (typeof createdIssue?.id !== 'number' || typeof createdIssue?.number !== 'number') {
+    throw new Error('GitHub returned an invalid issue payload');
+  }
+
+  return createdIssue;
+};
+
+const commentOnIssue = async (issueNumber, body) => {
+  await githubFetch(`/repos/${githubRepo}/issues/${issueNumber}/comments`, {
+    method: 'POST',
+    body: JSON.stringify({ body }),
+  });
+};
+
+const addSubIssue = async (parentIssueNumber, subIssueId) => {
+  await githubFetch(`/repos/${githubRepo}/issues/${parentIssueNumber}/sub_issues`, {
+    method: 'POST',
+    body: JSON.stringify({ sub_issue_id: subIssueId }),
+  });
+};
+
+const tryAddSubIssue = async (parentIssueNumber, subIssueId) => {
+  try {
+    await addSubIssue(parentIssueNumber, subIssueId);
+  } catch (error) {
+    // Existing sub-issue relationships can return validation errors; duplicate reports
+    // should still be logged as comments on the product issue.
+    if (!String(error?.message ?? '').includes('422')) {
+      throw error;
+    }
+  }
 };
 
 export const submitUnknownProductsReport = async (report) => {
@@ -102,11 +167,22 @@ export const submitUnknownProductsReport = async (report) => {
     return { ok: false, disabled: true };
   }
 
-  const issueNumber = await findUnknownProductsIssue();
-  await githubFetch(`/repos/${githubRepo}/issues/${issueNumber}/comments`, {
-    method: 'POST',
-    body: JSON.stringify({ body: unknownProductsComment(report) }),
-  });
+  const parentIssueNumber = await findUnknownProductsParentIssue();
+  const issues = [];
 
-  return { ok: true, issueNumber };
+  for (const item of report.items) {
+    const existingIssue = await findIssueByTitle(productIssueTitle(item));
+    if (existingIssue) {
+      await commentOnIssue(existingIssue.number, unknownProductDuplicateComment(item, report));
+      await tryAddSubIssue(parentIssueNumber, existingIssue.id);
+      issues.push({ number: existingIssue.number, duplicate: true });
+      continue;
+    }
+
+    const subIssue = await createUnknownProductIssue(item, report);
+    await addSubIssue(parentIssueNumber, subIssue.id);
+    issues.push({ number: subIssue.number, duplicate: false });
+  }
+
+  return { ok: true, issues, parentIssueNumber };
 };
