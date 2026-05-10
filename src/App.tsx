@@ -85,6 +85,7 @@ const DEBUG_NOTIFICATION_LIST_ID = 'debug-notifications';
 const DEBUG_MODE_NOTICE_DURATION_MS = 4_000;
 const DEV_TITLE_SUFFIX = ' [Dev]';
 const DEV_MANIFEST_ID = 'smart-shopping-list-dev';
+const LAST_LIST_PAGE_KEY = 'shoppingList:lastListPage';
 const APP_VERSION_RELOAD_SESSION_KEY = 'smart-shopping-list-version-reload-v1';
 type NotificationDeliveryResult = DebugNotificationDeliveryPath;
 const debugNotificationStatusFromDelivery = (
@@ -356,6 +357,39 @@ const isDefaultLandingLocation = (): boolean => {
   });
 };
 
+const readLastListPage = (): Extract<PageKey, 'edit' | 'route'> | undefined => {
+  if (typeof window === 'undefined') { return undefined; }
+
+  try {
+    const storedPage = window.localStorage.getItem(LAST_LIST_PAGE_KEY);
+    return storedPage === 'edit' || storedPage === 'route' ? storedPage : undefined;
+  } catch {
+    return undefined;
+  }
+};
+
+const saveLastListPage = (page: PageKey): void => {
+  if (typeof window === 'undefined' || (page !== 'edit' && page !== 'route')) { return; }
+
+  try {
+    window.localStorage.setItem(LAST_LIST_PAGE_KEY, page);
+  } catch {
+    // Navigation memory is a convenience only; blocked storage should not affect routing.
+  }
+};
+
+const defaultLandingPage = ({
+  itemCount,
+  useNavigationMemory,
+}: {
+  itemCount: number;
+  useNavigationMemory: boolean;
+}): PageKey => {
+  if (itemCount === 0) { return 'edit'; }
+
+  return useNavigationMemory ? readLastListPage() ?? 'route' : 'route';
+};
+
 const routesMatch = (first: AppRoute, second: AppRoute): boolean =>
   first.page === second.page &&
   first.listId === second.listId &&
@@ -532,6 +566,7 @@ export default function App() {
   const currentShoppingListStateRef = useRef<CurrentShoppingListState>();
   const nextRouteHistoryModeRef = useRef<RouteHistoryMode>('replace');
   const shouldResolveDefaultLandingRef = useRef(isDefaultLandingLocation());
+  const shouldUseNavigationMemoryRef = useRef(isDefaultLandingLocation() && readRouteFromLocation().listId === undefined);
   const appVersionReloadRequestedRef = useRef(false);
   const pendingAppVersionReloadRef = useRef<string>();
   const skipNextAutosaveRef = useRef(false);
@@ -1378,12 +1413,19 @@ export default function App() {
         selectedRecord.items,
       );
       const shouldResolveDefaultLanding = shouldResolveDefaultLandingRef.current;
+      const shouldUseNavigationMemory = shouldUseNavigationMemoryRef.current;
       shouldResolveDefaultLandingRef.current = false;
+      shouldUseNavigationMemoryRef.current = false;
       setActiveListId(nextListId);
       setIsServerBackedList(nextServerBacked);
       const currentLocationDebugTab = readRouteFromLocation().debugTab;
       updateRoute((current) => ({
-        page: shouldResolveDefaultLanding ? (nextItems.length > 0 ? 'route' : 'edit') : current.page,
+        page: shouldResolveDefaultLanding
+          ? defaultLandingPage({
+              itemCount: nextItems.length,
+              useNavigationMemory: shouldUseNavigationMemory,
+            })
+          : current.page,
         listId: nextServerBacked ? nextListId : undefined,
         debugTab: current.debugTab ?? currentLocationDebugTab,
       }), 'replace');
@@ -1828,6 +1870,12 @@ export default function App() {
     nextRouteHistoryModeRef.current = 'push';
     syncRouteToUrl(route, historyMode);
   }, [route]);
+
+  useEffect(() => {
+    if (!isLoaded) { return; }
+
+    saveLastListPage(page);
+  }, [isLoaded, page]);
 
   useEffect(() => {
     if (isLoaded && page === 'route' && items.length === 0) {
