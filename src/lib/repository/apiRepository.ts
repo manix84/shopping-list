@@ -1,4 +1,5 @@
-import type { BackendDatabaseAdapter, BackendStatus, ShoppingListRecord } from '../../types';
+import type { BackendDatabaseAdapter, CountryCode, Item, BackendStatus, ShoppingListRecord } from '../../types';
+import type { LocaleCode } from '../i18n/types';
 import { decodeShoppingListRecord, encodeShoppingListRecord } from './recordCodec';
 
 export type ApiShoppingListPayload = {
@@ -146,4 +147,32 @@ export const clearSharedShoppingList = async (listId: string): Promise<void> => 
   if (!response.ok) {
     throw new Error(`Unable to clear shared shopping list: ${response.status}`);
   }
+};
+
+export type UnknownProductsReport = {
+  countryCode: CountryCode;
+  locale: LocaleCode;
+  items: Pick<Item, 'raw' | 'normalized' | 'cleaned'>[];
+};
+
+export const reportUnknownProducts = async (report: UnknownProductsReport): Promise<{ disabled: boolean }> => {
+  const response = await fetchWithTimeout(
+    '/api/unknown-products',
+    {
+      method: 'POST',
+      body: JSON.stringify(report),
+    },
+    2_000,
+  );
+
+  if (response.status === 401) {
+    return { disabled: true };
+  }
+
+  if (!response.ok) {
+    throw new Error(`Unable to report unknown products: ${response.status}`);
+  }
+
+  const payload = (await response.json()) as { disabled?: unknown };
+  return { disabled: payload.disabled === true };
 };

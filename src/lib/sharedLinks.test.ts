@@ -9,6 +9,11 @@ describe('shared link parsing', () => {
   });
 
   it('accepts canonical shared list paths', () => {
+    expect(extractSharedListId(`http://localhost:5173/${LIST_ID}/edit`)).toBe(LIST_ID);
+    expect(extractSharedListId(`http://localhost:5173/${LIST_ID}/route`)).toBe(LIST_ID);
+  });
+
+  it('accepts legacy list-prefixed shared list paths', () => {
     expect(extractSharedListId(`http://localhost:5173/list/${LIST_ID}/edit`)).toBe(LIST_ID);
   });
 

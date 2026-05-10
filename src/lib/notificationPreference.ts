@@ -1,8 +1,11 @@
-export const NOTIFICATIONS_STORAGE_KEY = 'smart-shopping-list-notifications-v1';
+import { readLocalStorageValue } from './storageKeys';
+
+export const NOTIFICATIONS_STORAGE_KEY = 'shoppingList:notifications';
+const LEGACY_NOTIFICATIONS_STORAGE_KEYS = ['smart-shopping-list-notifications-v1'] as const;
 
 export const loadNotificationsEnabled = (): boolean => {
   if (typeof window === 'undefined') { return false; }
-  return window.localStorage.getItem(NOTIFICATIONS_STORAGE_KEY) === 'true';
+  return readLocalStorageValue(NOTIFICATIONS_STORAGE_KEY, LEGACY_NOTIFICATIONS_STORAGE_KEYS) === 'true';
 };
 
 export const saveNotificationsEnabled = (enabled: boolean): void => {

@@ -105,6 +105,30 @@ body {
   letter-spacing: 0;
 }
 
+.app-loading-overlay {
+  align-items: center;
+  backdrop-filter: blur(1px);
+  background: color-mix(in srgb, $bg 72%, transparent);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 32px;
+  position: fixed;
+  z-index: 1400;
+}
+
+.app-loading-spinner {
+  animation: app-loading-spin 0.78s linear infinite;
+  background: $panel;
+  border: 4px solid $border;
+  border-radius: 999px;
+  border-top-color: $primary;
+  box-shadow: 0 12px 32px color-mix(in srgb, $shadow 28%, transparent);
+  display: block;
+  height: 44px;
+  width: 44px;
+}
+
 @keyframes pwa-splash-content-in {
   from {
     opacity: 0;
@@ -114,6 +138,12 @@ body {
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes app-loading-spin {
+  to {
+    transform: rotate(360deg);
   }
 }
 
@@ -1121,9 +1151,63 @@ select {
 }
 
 .debug-tablist {
+  -webkit-overflow-scrolling: touch;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
+  margin-inline: -4px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 2px 4px 8px;
+  scrollbar-gutter: stable;
+}
+
+.debug-tab-button {
+  align-items: center;
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 10px;
+  justify-content: center;
+  line-height: 1;
+  scroll-snap-align: start;
+  white-space: nowrap;
+}
+
+.debug-tab-icon {
+  display: block;
+  flex: 0 0 auto;
+  height: 20px;
+  width: 20px;
+}
+
+.debug-tab-label {
+  display: block;
+  line-height: 1;
+  min-width: 0;
+}
+
+@media (max-width: 720px) {
+  .debug-tablist {
+    gap: 6px;
+    padding-bottom: 10px;
+  }
+
+  .debug-tab-button {
+    aspect-ratio: 1;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0;
+    width: 44px;
+  }
+
+  .debug-tab-icon {
+    height: 20px;
+    width: 20px;
+  }
+
+  .debug-tab-label {
+    display: none;
+  }
 }
 
 .debug-setting-switch {
@@ -2070,7 +2154,8 @@ select {
 
 @media (prefers-reduced-motion: reduce) {
   .pwa-splash,
-  .pwa-splash-content {
+  .pwa-splash-content,
+  .app-loading-spinner {
     animation: none;
   }
 
@@ -2502,7 +2587,9 @@ select {
 }
 
 .predator-easter-egg {
-  bottom: calc(max(10px, env(safe-area-inset-bottom)) + var(--predator-y-offset, 0px));
+  bottom: calc(
+    max(10px, env(safe-area-inset-bottom)) + var(--predator-y-offset, 0px)
+  );
   height: 150px;
   pointer-events: none;
   position: fixed;
@@ -2519,7 +2606,8 @@ select {
 .predator-easter-egg-right-to-left {
   right: -190px;
   --predator-facing-direction: -1;
-  animation: predator-run-across-reverse var(--predator-run-duration, 4.8s) linear both;
+  animation: predator-run-across-reverse var(--predator-run-duration, 4.8s)
+    linear both;
 
   .predator-puppet-facing {
     transform: scaleX(-1) scale(var(--predator-scale, 1));
@@ -2534,7 +2622,8 @@ select {
 }
 
 .predator-puppet {
-  animation: predator-cartoon-hop var(--predator-hop-duration, 0.46s) cubic-bezier(0.2, 0.7, 0.25, 1) infinite;
+  animation: predator-cartoon-hop var(--predator-hop-duration, 0.46s)
+    cubic-bezier(0.2, 0.7, 0.25, 1) infinite;
   display: block;
   filter: drop-shadow(0 10px 14px color-mix(in srgb, $shadow 22%, transparent));
   height: 150px;
@@ -2544,7 +2633,8 @@ select {
 }
 
 .predator-shadow {
-  animation: predator-shadow-hop var(--predator-hop-duration, 0.46s) cubic-bezier(0.2, 0.7, 0.25, 1) infinite;
+  animation: predator-shadow-hop var(--predator-hop-duration, 0.46s)
+    cubic-bezier(0.2, 0.7, 0.25, 1) infinite;
   background: color-mix(in srgb, $shadow 18%, transparent);
   border-radius: 999px;
   bottom: 8px;
@@ -2662,12 +2752,14 @@ select {
 }
 
 .predator-leg-front {
-  animation: predator-leg-front var(--predator-hop-duration, 0.46s) ease-in-out infinite;
+  animation: predator-leg-front var(--predator-hop-duration, 0.46s) ease-in-out
+    infinite;
   transform-origin: 90px 108px;
 }
 
 .predator-leg-back {
-  animation: predator-leg-back var(--predator-hop-duration, 0.46s) ease-in-out infinite;
+  animation: predator-leg-back var(--predator-hop-duration, 0.46s) ease-in-out
+    infinite;
   transform-origin: 44px 108px;
 }
 
@@ -3351,6 +3443,25 @@ select {
     font-size: 13px;
     margin: 0;
     min-width: 0;
+  }
+}
+
+.about-version-value {
+  align-items: baseline;
+  column-gap: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: 2px;
+}
+
+.about-update-action {
+  align-items: baseline;
+  display: inline-flex;
+  gap: 4px;
+  white-space: nowrap;
+
+  .button-link {
+    padding: 0;
   }
 }
 

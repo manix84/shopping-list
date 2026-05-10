@@ -1,13 +1,15 @@
 import type { RouteViewMode } from '../types';
+import { readLocalStorageValue } from './storageKeys';
 
-export const ROUTE_VIEW_STORAGE_KEY = 'smart-shopping-list-route-view-v1';
+export const ROUTE_VIEW_STORAGE_KEY = 'shoppingList:routeView';
+const LEGACY_ROUTE_VIEW_STORAGE_KEYS = ['smart-shopping-list-route-view-v1'] as const;
 
 export const defaultRouteViewMode = (): RouteViewMode => 'default';
 
 export const loadRouteViewMode = (): RouteViewMode => {
   if (typeof window === 'undefined') { return defaultRouteViewMode(); }
 
-  const raw = window.localStorage.getItem(ROUTE_VIEW_STORAGE_KEY);
+  const raw = readLocalStorageValue(ROUTE_VIEW_STORAGE_KEY, LEGACY_ROUTE_VIEW_STORAGE_KEYS);
   return raw === 'default' || raw === 'comfortable' || raw === 'compact' ? raw : defaultRouteViewMode();
 };
 

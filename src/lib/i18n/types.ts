@@ -12,7 +12,7 @@ export const SUPPORTED_LOCALES = [
 ] as const;
 export type LocaleCode = (typeof SUPPORTED_LOCALES)[number];
 
-export const LOCALE_STORAGE_KEY = 'smart-shopping-list-locale-v1';
+export const LOCALE_STORAGE_KEY = 'shoppingList:locale';
 
 export type Messages = {
   app: {

@@ -39,6 +39,7 @@ import {
   checkBackendStatus,
   clearSharedShoppingList,
   loadSharedShoppingList,
+  reportUnknownProducts,
   saveSharedShoppingList,
   sharedShoppingListEventsUrl,
 } from './lib/repository/apiRepository';
@@ -52,6 +53,7 @@ import { chooseNewestRecord } from './lib/repository/recordMerge';
 import { isDefaultLandingRoutePath, readRouteFromLocationParts, routeToUrl } from './lib/routing';
 import { getSectionMeta } from './lib/sections';
 import { extractSharedListId } from './lib/sharedLinks';
+import { readLocalStorageValue } from './lib/storageKeys';
 import { cleanLine, stripDisplaySizeLabel } from './lib/stringUtils';
 import { loadRouteViewMode, saveRouteViewMode } from './lib/routeViewPreference';
 import { getResolvedTheme, loadThemeMode, saveThemeMode } from './lib/themePreference';
@@ -78,6 +80,8 @@ const SHARED_LIST_SYNC_POLL_MS = 5_000;
 const SHARED_LIST_SYNC_SSE_FALLBACK_POLL_MS = 60_000;
 const SHARED_LIST_NOTIFICATION_GROUP_MS = 2 * 60_000;
 const SHARED_LIST_NOTIFICATION_PREVIEW_LIMIT = 3;
+const UNKNOWN_PRODUCTS_REPORTED_STORAGE_KEY = 'shoppingList:reportedUnknownProducts';
+const UNKNOWN_PRODUCTS_REPORTED_LIMIT = 500;
 const NOTIFICATION_SERVICE_WORKER_READY_TIMEOUT_MS = 3_000;
 const NOTIFICATION_WORKER_SCOPE_PATH = 'notification-worker/';
 const NOTIFICATION_WORKER_SCRIPT_PATH = 'notification-sw.js';
@@ -85,7 +89,9 @@ const DEBUG_NOTIFICATION_LIST_ID = 'debug-notifications';
 const DEBUG_MODE_NOTICE_DURATION_MS = 4_000;
 const DEV_TITLE_SUFFIX = ' [Dev]';
 const DEV_MANIFEST_ID = 'smart-shopping-list-dev';
-const APP_VERSION_RELOAD_SESSION_KEY = 'smart-shopping-list-version-reload-v1';
+const LAST_LIST_PAGE_KEY = 'shoppingList:lastListPage';
+const LAST_DEBUG_TAB_KEY = 'shoppingList:lastDebugTab';
+const APP_VERSION_RELOAD_SESSION_KEY = 'shoppingList:versionReload';
 type NotificationDeliveryResult = DebugNotificationDeliveryPath;
 const debugNotificationStatusFromDelivery = (
   result: NotificationDeliveryResult,
@@ -94,7 +100,8 @@ const debugNotificationStatusFromDelivery = (
   if (result === 'blocked') { return 'blocked'; }
   return 'shown';
 };
-const PWA_INSTALL_NUDGE_DISMISSED_KEY = 'smart-shopping-list-pwa-install-nudge-dismissed-v1';
+const PWA_INSTALL_NUDGE_DISMISSED_KEY = 'shoppingList:pwaInstallNudgeDismissed';
+const LEGACY_PWA_INSTALL_NUDGE_DISMISSED_KEYS = ['smart-shopping-list-pwa-install-nudge-dismissed-v1'] as const;
 const PWA_INSTALL_PROMPT_SETTLE_MS = 1_200;
 const KONAMI_SEQUENCE = ['up', 'up', 'down', 'down', 'left', 'right', 'left', 'right', 'b', 'a'] as const;
 const KONAMI_TOUCH_SWIPE_MIN_PX = 42;
@@ -245,7 +252,10 @@ const nextKonamiIndex = (currentIndex: number, input: (typeof KONAMI_SEQUENCE)[n
 const hasDismissedPwaInstallNudge = (): boolean => {
   if (typeof window === 'undefined') { return false; }
 
-  return window.localStorage.getItem(PWA_INSTALL_NUDGE_DISMISSED_KEY) === 'true';
+  return readLocalStorageValue(
+    PWA_INSTALL_NUDGE_DISMISSED_KEY,
+    LEGACY_PWA_INSTALL_NUDGE_DISMISSED_KEYS,
+  ) === 'true';
 };
 
 const serviceWorkerReadyWithTimeout = async (): Promise<ServiceWorkerRegistration | undefined> => {
@@ -354,6 +364,79 @@ const isDefaultLandingLocation = (): boolean => {
     pathname: window.location.pathname,
     basePath: appBasePath,
   });
+};
+
+const readLastListPage = (): Extract<PageKey, 'edit' | 'route'> | undefined => {
+  if (typeof window === 'undefined') { return undefined; }
+
+  try {
+    const storedPage = window.localStorage.getItem(LAST_LIST_PAGE_KEY);
+    return storedPage === 'edit' || storedPage === 'route' ? storedPage : undefined;
+  } catch {
+    return undefined;
+  }
+};
+
+const saveLastListPage = (page: PageKey): void => {
+  if (typeof window === 'undefined' || (page !== 'edit' && page !== 'route')) { return; }
+
+  try {
+    window.localStorage.setItem(LAST_LIST_PAGE_KEY, page);
+  } catch {
+    // Navigation memory is a convenience only; blocked storage should not affect routing.
+  }
+};
+
+const isDebugTabKey = (value: string | undefined): value is DebugTabKey => [
+  'parsed',
+  'state',
+  'backend',
+  'database-entry',
+  'config',
+  'matcher',
+  'quantity',
+  'measurements',
+  'weights',
+  'variants',
+  'layout',
+  'sections',
+  'storage',
+  'host',
+  'events',
+  'settings',
+].includes(value as DebugTabKey);
+
+const readLastDebugTab = (): DebugTabKey | undefined => {
+  if (typeof window === 'undefined') { return undefined; }
+
+  try {
+    const storedTab = window.localStorage.getItem(LAST_DEBUG_TAB_KEY) ?? undefined;
+    return isDebugTabKey(storedTab) ? storedTab : undefined;
+  } catch {
+    return undefined;
+  }
+};
+
+const saveLastDebugTab = (debugTab: DebugTabKey): void => {
+  if (typeof window === 'undefined') { return; }
+
+  try {
+    window.localStorage.setItem(LAST_DEBUG_TAB_KEY, debugTab);
+  } catch {
+    // Debug tab memory is a convenience only; blocked storage should not affect routing.
+  }
+};
+
+const defaultLandingPage = ({
+  itemCount,
+  useNavigationMemory,
+}: {
+  itemCount: number;
+  useNavigationMemory: boolean;
+}): PageKey => {
+  if (itemCount === 0) { return 'edit'; }
+
+  return useNavigationMemory ? readLastListPage() ?? 'route' : 'route';
 };
 
 const routesMatch = (first: AppRoute, second: AppRoute): boolean =>
@@ -468,6 +551,30 @@ const saveSessionValue = (key: string, value: string): void => {
   }
 };
 
+const loadReportedUnknownProductKeys = (): Set<string> => {
+  if (typeof window === 'undefined') { return new Set(); }
+
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(UNKNOWN_PRODUCTS_REPORTED_STORAGE_KEY) ?? '[]');
+    return new Set(Array.isArray(parsed) ? parsed.filter((value): value is string => typeof value === 'string') : []);
+  } catch {
+    return new Set();
+  }
+};
+
+const saveReportedUnknownProductKeys = (keys: Set<string>): void => {
+  if (typeof window === 'undefined') { return; }
+
+  try {
+    window.localStorage.setItem(
+      UNKNOWN_PRODUCTS_REPORTED_STORAGE_KEY,
+      JSON.stringify([...keys].slice(-UNKNOWN_PRODUCTS_REPORTED_LIMIT)),
+    );
+  } catch {
+    // Unknown-product reporting is best effort and should not affect list editing.
+  }
+};
+
 function updateItemTextInInput(input: string, previousDisplay: string, nextDisplay: string): string {
   const lines = input.split('\n');
   const index = lines.findIndex((line) => cleanLine(line) === cleanLine(previousDisplay));
@@ -521,6 +628,7 @@ export default function App() {
   const [debugNotificationResult, setDebugNotificationResult] = useState<DebugNotificationResult>();
   const [debugModeNotice, setDebugModeNotice] = useState<ToastPopupData>();
   const [backendSaveRetryAttempt, setBackendSaveRetryAttempt] = useState(0);
+  const [isListLoadingOverlayVisible, setIsListLoadingOverlayVisible] = useState(isDefaultLandingLocation);
   const currentItemsRef = useRef<Item[]>([]);
   const sharedListNotificationSeenUpdatedAtRef = useRef<Record<string, string>>({});
   const sharedListNotificationGroupRef = useRef<SharedListNotificationGroup>();
@@ -530,10 +638,13 @@ export default function App() {
   const lastBackendPersistedRecordRef = useRef<ShoppingListRecord>();
   const pendingBackendSaveRecordRef = useRef<ShoppingListRecord>();
   const currentShoppingListStateRef = useRef<CurrentShoppingListState>();
+  const activeListIdRef = useRef(activeListId);
   const nextRouteHistoryModeRef = useRef<RouteHistoryMode>('replace');
   const shouldResolveDefaultLandingRef = useRef(isDefaultLandingLocation());
+  const shouldUseNavigationMemoryRef = useRef(isDefaultLandingLocation() && readRouteFromLocation().listId === undefined);
   const appVersionReloadRequestedRef = useRef(false);
   const pendingAppVersionReloadRef = useRef<string>();
+  const isUnknownProductReportingDisabledRef = useRef(false);
   const skipNextAutosaveRef = useRef(false);
   const remoteSyncStatusTimerRef = useRef<number>();
   const suppressNextAutosaveStatusRef = useRef(true);
@@ -571,7 +682,7 @@ export default function App() {
   const shareLink =
     typeof window === 'undefined' || !canUseBackend || !isServerBackedList
       ? undefined
-      : `${window.location.origin}${appBasePath}/list/${activeListId}/edit`;
+      : `${window.location.origin}${routeToUrl({ page: 'edit', listId: activeListId }, appBasePath)}`;
   const currentSharedListDatabaseEntry = useMemo(() => {
     if (!canUseBackend || !isServerBackedList || storageMode !== 'backend') { return undefined; }
 
@@ -666,6 +777,10 @@ export default function App() {
     };
   }, [activeListId, countryCode, input, isServerBackedList, items, listName, measurementDisplayMode]);
 
+  useEffect(() => {
+    activeListIdRef.current = activeListId;
+  }, [activeListId]);
+
   useEffect(() => () => {
     if (remoteSyncStatusTimerRef.current) {
       window.clearTimeout(remoteSyncStatusTimerRef.current);
@@ -677,7 +792,7 @@ export default function App() {
     updateRoute((current) => ({
       ...current,
       page: nextPage,
-      debugTab: nextPage === 'debug' ? current.debugTab ?? 'parsed' : undefined,
+      debugTab: nextPage === 'debug' ? current.debugTab ?? readLastDebugTab() ?? 'parsed' : undefined,
     }));
   };
 
@@ -870,7 +985,7 @@ export default function App() {
     const body = count === 1
       ? messages.notifications.sharedItemAddedBody.replace('{item}', nextGroup.itemNames[0] ?? '')
       : `${messages.notifications.sharedItemsAddedBody.replace('{count}', String(count))} ${preview}`;
-    const url = `${window.location.origin}${appBasePath}/list/${listId}/edit`;
+    const url = `${window.location.origin}${routeToUrl({ page: 'edit', listId }, appBasePath)}`;
     const options: NotificationOptions = {
       body,
       data: { url },
@@ -1230,6 +1345,7 @@ export default function App() {
       return false;
     }
 
+    setIsListLoadingOverlayVisible(true);
     setIsLoadingSharedList(true);
     setShareError(undefined);
 
@@ -1264,6 +1380,7 @@ export default function App() {
       return false;
     } finally {
       setIsLoadingSharedList(false);
+      setIsListLoadingOverlayVisible(false);
     }
   };
 
@@ -1283,7 +1400,7 @@ export default function App() {
       return { state: 'invalid' };
     }
 
-    const normalizedValue = `${currentOrigin() ?? ''}${appBasePath}/list/${nextListId}/edit`;
+    const normalizedValue = `${currentOrigin() ?? ''}${routeToUrl({ page: 'edit', listId: nextListId }, appBasePath)}`;
     if (!canUseBackend) {
       return { state: 'unavailable' };
     }
@@ -1303,16 +1420,19 @@ export default function App() {
   useEffect(() => {
     let cancelled = false;
     suppressNextAutosaveStatus();
+    const routeListId = listId;
+    const isChangingList = Boolean(routeListId) && routeListId !== activeListIdRef.current;
+    setIsListLoadingOverlayVisible(shouldResolveDefaultLandingRef.current || isChangingList);
     setIsLoaded(false);
     setShareError(undefined);
 
     const loadRecord = async () => {
       const localRecord = localStorageRepository.load();
       const hasLocalRecord = hasStoredShoppingListRecord();
-      const nextListId = listId ?? localRecord.listId ?? createUuidV7();
+      const resolvedListId = routeListId ?? localRecord.listId ?? createUuidV7();
       const localRecordWithIdentity = {
         ...localRecord,
-        listId: nextListId,
+        listId: resolvedListId,
         serverBacked: !debugSettings.forceLocalStorage && (localRecord.serverBacked === true || Boolean(listId)),
       };
       let selectedRecord = localRecordWithIdentity;
@@ -1337,25 +1457,25 @@ export default function App() {
         !debugSettings.disableAutoBackendReconnect
       ) {
         try {
-          const remotePayload = await loadSharedShoppingList(nextListId);
+          const remotePayload = await loadSharedShoppingList(resolvedListId);
           selectedRecord = {
             ...chooseNewestRecord({
               local: localRecordWithIdentity,
-              remote: { ...remotePayload.record, listId: nextListId, serverBacked: true },
+              remote: { ...remotePayload.record, listId: resolvedListId, serverBacked: true },
               hasLocalRecord,
               hasRemoteRecord: remotePayload.exists,
             }),
-            listId: nextListId,
+            listId: resolvedListId,
             serverBacked: true,
           };
 
-          await saveSharedShoppingList(nextListId, selectedRecord);
+          await saveSharedShoppingList(resolvedListId, selectedRecord);
           localStorageRepository.save(selectedRecord);
           lastLocalPersistedRecordRef.current = selectedRecord;
           lastBackendPersistedRecordRef.current = selectedRecord;
           if (remotePayload.exists) {
             rememberSharedList({
-              listId: nextListId,
+              listId: resolvedListId,
               listName: selectedRecord.listName,
               items: selectedRecord.items,
               createdAt: remotePayload.createdAt,
@@ -1378,13 +1498,21 @@ export default function App() {
         selectedRecord.items,
       );
       const shouldResolveDefaultLanding = shouldResolveDefaultLandingRef.current;
+      const shouldUseNavigationMemory = shouldUseNavigationMemoryRef.current;
       shouldResolveDefaultLandingRef.current = false;
-      setActiveListId(nextListId);
+      shouldUseNavigationMemoryRef.current = false;
+      activeListIdRef.current = resolvedListId;
+      setActiveListId(resolvedListId);
       setIsServerBackedList(nextServerBacked);
       const currentLocationDebugTab = readRouteFromLocation().debugTab;
       updateRoute((current) => ({
-        page: shouldResolveDefaultLanding ? (nextItems.length > 0 ? 'route' : 'edit') : current.page,
-        listId: nextServerBacked ? nextListId : undefined,
+        page: shouldResolveDefaultLanding
+          ? defaultLandingPage({
+              itemCount: nextItems.length,
+              useNavigationMemory: shouldUseNavigationMemory,
+            })
+          : current.page,
+        listId: nextServerBacked ? resolvedListId : undefined,
         debugTab: current.debugTab ?? currentLocationDebugTab,
       }), 'replace');
       setCountryCode(selectedRecord.countryCode);
@@ -1398,6 +1526,7 @@ export default function App() {
         lastBackendPersistedRecordRef.current = undefined;
       }
       setIsLoaded(true);
+      setIsListLoadingOverlayVisible(false);
     };
 
     void loadRecord();
@@ -1590,9 +1719,12 @@ export default function App() {
       setRoute((current) => {
         const locationRoute = readRouteFromLocation();
         const landingPage: PageKey = currentItemsRef.current.length > 0 ? 'route' : 'edit';
-        const next: AppRoute = isDefaultLandingLocation()
+        let next: AppRoute = isDefaultLandingLocation()
           ? { ...locationRoute, page: landingPage, listId: locationRoute.listId ?? current.listId }
           : locationRoute;
+        if (next.page === 'debug' && !next.debugTab) {
+          next = { ...next, debugTab: readLastDebugTab() ?? 'parsed' };
+        }
         return routesMatch(current, next) ? current : next;
       });
     };
@@ -1651,6 +1783,51 @@ export default function App() {
   useEffect(() => {
     verboseDebugLog('storage mode changed', { storageMode, isServerBackedList, activeListId });
   }, [activeListId, isServerBackedList, storageMode, verboseDebugLog]);
+
+  useEffect(() => {
+    if (!isLoaded || !canUseBackend || isUnknownProductReportingDisabledRef.current) { return; }
+
+    const reportedKeys = loadReportedUnknownProductKeys();
+    const seenUnknownItems = new Set<string>();
+    const unknownItems: Item[] = [];
+    for (const item of items) {
+      if (item.matchedSection !== 'other' || !cleanLine(item.raw) || seenUnknownItems.has(item.normalized)) {
+        continue;
+      }
+
+      seenUnknownItems.add(item.normalized);
+      if (!reportedKeys.has(`${countryCode}|${locale}|${item.normalized}`)) {
+        unknownItems.push(item);
+      }
+    }
+
+    if (unknownItems.length === 0) { return; }
+
+    void reportUnknownProducts({
+      countryCode,
+      locale,
+      items: unknownItems.slice(0, 20).map((item) => ({
+        raw: item.raw,
+        normalized: item.normalized,
+        cleaned: item.cleaned,
+      })),
+    })
+      .then(({ disabled }) => {
+        if (disabled) {
+          isUnknownProductReportingDisabledRef.current = true;
+          return;
+        }
+
+        const nextReportedKeys = loadReportedUnknownProductKeys();
+        for (const item of unknownItems) {
+          nextReportedKeys.add(`${countryCode}|${locale}|${item.normalized}`);
+        }
+        saveReportedUnknownProductKeys(nextReportedKeys);
+      })
+      .catch((error: unknown) => {
+        verboseDebugLog('unknown product report failed', { error: error instanceof Error ? error.message : String(error) });
+      });
+  }, [canUseBackend, countryCode, isLoaded, items, locale, verboseDebugLog]);
 
   useEffect(() => {
     if (!isLoaded) { return; }
@@ -1828,6 +2005,18 @@ export default function App() {
     nextRouteHistoryModeRef.current = 'push';
     syncRouteToUrl(route, historyMode);
   }, [route]);
+
+  useEffect(() => {
+    if (!isLoaded) { return; }
+
+    saveLastListPage(page);
+  }, [isLoaded, page]);
+
+  useEffect(() => {
+    if (!isLoaded || page !== 'debug') { return; }
+
+    saveLastDebugTab(activeDebugTab);
+  }, [activeDebugTab, isLoaded, page]);
 
   useEffect(() => {
     if (isLoaded && page === 'route' && items.length === 0) {
@@ -2034,6 +2223,7 @@ export default function App() {
       lastBackendPersistedRecordRef.current = record;
     }
     if (record.listId) {
+      activeListIdRef.current = record.listId;
       setActiveListId(record.listId);
     }
     setIsServerBackedList(record.serverBacked === true);
@@ -2480,6 +2670,11 @@ export default function App() {
           onDismiss={dismissPwaInstallNudge}
           onInstall={promptPwaInstall}
         />
+        {isListLoadingOverlayVisible ? (
+          <div className={'app-loading-overlay'} role={'status'} aria-live={'polite'} aria-label={messages.app.title}>
+            <span className={'app-loading-spinner'} aria-hidden={'true'} />
+          </div>
+        ) : null}
         {debugModeNotice ? (
           <ToastPopup key={debugModeNotice.id} {...debugModeNotice} />
         ) : null}

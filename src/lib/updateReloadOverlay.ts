@@ -4,7 +4,7 @@ export const UPDATE_RELOAD_FADE_MS = 220;
 
 const UPDATE_RELOAD_OVERLAY_ID = 'pwa-update-reload-overlay';
 const UPDATE_RELOAD_OVERLAY_STYLE_ID = 'pwa-update-reload-overlay-style';
-const UPDATE_RELOAD_SESSION_KEY = 'smart-shopping-list-update-reload-overlay-v1';
+const UPDATE_RELOAD_SESSION_KEY = 'shoppingList:updateReloadOverlay';
 
 const readUpdateReloadSessionFlag = (): boolean => {
   try {

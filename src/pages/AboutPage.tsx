@@ -83,18 +83,18 @@ export function AboutPage({
         <dl className={'about-spec-list'}>
           <div>
             <dt>{about.versionLabel}</dt>
-            <dd>
+            <dd className={'about-version-value'}>
               <span onPointerUp={handleVersionTap}>
                 {appVersion}
               </span>
               {isUpdateAvailable ? (
-                <>
+                <span className={'about-update-action'}>
                   {' ('}
                   <button className={'button button-link'} type={'button'} onClick={onRefreshUpdate}>
                     {about.updateAvailableAction}
                   </button>
                   {')'}
-                </>
+                </span>
               ) : null}
             </dd>
           </div>

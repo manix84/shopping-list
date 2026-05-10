@@ -4,6 +4,12 @@ Keep this file updated when user-visible features, platform changes, major parse
 
 ## 0.16.x - Current - Backend Visibility, Notifications, and Sauce Routing
 
+- Added optional unknown-product reporting for items that fall into `Other`, including country profile and app language, with same-origin server-side GitHub product sub-issues and duplicate `+1` comments when configured.
+- Changed backend-backed shared-list URLs to the shorter `/<uuidv7>/edit` and `/<uuidv7>/route` format while keeping legacy `/list/<uuidv7>/...` links supported and normalized.
+- Added persistent navigation memory for the last Edit/Route page and the last Debug tab, using the app's consistent `shoppingList:*` localStorage key style.
+- Standardized localStorage keys around the `shoppingList:*` namespace and migrated legacy `smart-shopping-list-*` values, including the measurement display mode enum.
+- Improved list-loading behavior so the spinner overlay appears for initial list routing and shared-list switches without covering normal background checks.
+- Reworked the Debug tab menu into a horizontally scrollable, icon-enhanced tab row that shows icon-only tabs on mobile while preserving accessible tab labels and keyboard navigation.
 - Added automatic PWA update checks so online app launches, resumes, and navigations refresh cached static assets, show a theme-aware translucent spinner overlay across update reloads, and move onto the latest built revision.
 - Added backend-version update detection from `/api/health`, with automatic refresh deferred until the app is hidden/unfocused and a manual About-page update link when versions differ.
 - Added shared-list server-sent events so open backend-backed lists can apply remote changes automatically, with slower polling kept as a fallback.
@@ -11,8 +17,8 @@ Keep this file updated when user-visible features, platform changes, major parse
 - Added a Debug database-entry tab for the current backend-backed shared-list JSON and an Events trigger to preview the update reload overlay.
 - Added automatic git tags and GitHub Releases for every push to `main`.
 - Added a development-only `[Dev]` browser title suffix so local tabs are easier to distinguish from production.
-- Added backend operation status tracking so Debug tools can show when the app is loading, reconnecting, using backend storage, falling back to LocalStorage, or hitting a backend save failure.
-- Expanded the Backend debug tab with heartbeat history, status timeline bars, latency, health/database check results, adapter details, and recent operation details.
+- Replaced the old backend operation table with selected heartbeat details so database health errors, error codes, version, adapter, and latency diagnostics are shown against the selected sample.
+- Expanded the Backend debug tab with heartbeat history, status timeline bars, latency, health/database check results, adapter details, and collapsible diagnostic panels.
 - Fixed a live-site offline flicker caused by backend save validation rejecting the new `sauces` section.
 - Added a dedicated UK `Sauces` cupboard section, including ketchup, mayo, mustard, soya sauce, BBQ sauce, sriracha, dressings, and related condiments.
 - Expanded the France, Germany, Italy, Belgium, Spain, Romania, Mexico, and Netherlands item libraries with native-language food, frozen, sauces, pantry, household, baby, and personal-care terms.

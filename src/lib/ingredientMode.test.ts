@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { CA_CONFIG } from '../config/countries/ca';
 import { UK_CONFIG } from '../config/countries/uk';
 import {
-  INGREDIENT_MODE_STORAGE_KEY,
+  LEGACY_INGREDIENT_MODE_STORAGE_KEY,
   MEASUREMENT_DISPLAY_MODE_STORAGE_KEY,
   isMeasurementDisplayMode,
   loadIngredientMode,
@@ -76,46 +76,53 @@ describe('measurement display mode preference', () => {
   });
 
   it('ignores old ingredient mode storage when it is false', () => {
-    const storage = new Map<string, string>([[INGREDIENT_MODE_STORAGE_KEY, 'false']]);
+    const storage = new Map<string, string>([[LEGACY_INGREDIENT_MODE_STORAGE_KEY, 'false']]);
     vi.stubGlobal('window', {
       localStorage: {
         getItem: (key: string) => storage.get(key) ?? null,
         setItem: (key: string, value: string) => storage.set(key, value),
+        removeItem: (key: string) => storage.delete(key),
       },
     });
 
     expect(loadMeasurementDisplayMode()).toBe('metric');
+    expect(storage.get(MEASUREMENT_DISPLAY_MODE_STORAGE_KEY)).toBe('metric');
+    expect(storage.has(LEGACY_INGREDIENT_MODE_STORAGE_KEY)).toBe(false);
   });
 
   it('migrates the old ingredient mode toggle when no display mode is stored', () => {
-    const storage = new Map<string, string>([[INGREDIENT_MODE_STORAGE_KEY, 'true']]);
+    const storage = new Map<string, string>([[LEGACY_INGREDIENT_MODE_STORAGE_KEY, 'true']]);
     vi.stubGlobal('window', {
       localStorage: {
         getItem: (key: string) => storage.get(key) ?? null,
         setItem: (key: string, value: string) => storage.set(key, value),
+        removeItem: (key: string) => storage.delete(key),
       },
     });
 
     expect(loadMeasurementDisplayMode()).toBe('cooking');
+    expect(storage.get(MEASUREMENT_DISPLAY_MODE_STORAGE_KEY)).toBe('cooking');
+    expect(storage.has(LEGACY_INGREDIENT_MODE_STORAGE_KEY)).toBe(false);
   });
 
-  it('keeps the old boolean ingredient mode storage wrappers working', () => {
+  it('keeps the old boolean ingredient mode wrappers working without boolean storage', () => {
     const storage = new Map<string, string>();
     vi.stubGlobal('window', {
       localStorage: {
         getItem: (key: string) => storage.get(key) ?? null,
         setItem: (key: string, value: string) => storage.set(key, value),
+        removeItem: (key: string) => storage.delete(key),
       },
     });
 
     saveIngredientMode(true);
-    expect(storage.get(INGREDIENT_MODE_STORAGE_KEY)).toBe('true');
     expect(storage.get(MEASUREMENT_DISPLAY_MODE_STORAGE_KEY)).toBe('cooking');
+    expect(storage.has(LEGACY_INGREDIENT_MODE_STORAGE_KEY)).toBe(false);
     expect(loadIngredientMode()).toBe(true);
 
     saveIngredientMode(false);
-    expect(storage.get(INGREDIENT_MODE_STORAGE_KEY)).toBe('false');
     expect(storage.get(MEASUREMENT_DISPLAY_MODE_STORAGE_KEY)).toBe('metric');
+    expect(storage.has(LEGACY_INGREDIENT_MODE_STORAGE_KEY)).toBe(false);
     expect(loadIngredientMode()).toBe(false);
   });
 });

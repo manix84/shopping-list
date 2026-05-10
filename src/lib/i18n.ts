@@ -3,6 +3,7 @@ import type { RouteViewMode } from '../types';
 
 import type { Messages, LocaleCode } from './i18n/types';
 import { SUPPORTED_LOCALES, LOCALE_STORAGE_KEY } from './i18n/types';
+import { readLocalStorageValue } from './storageKeys';
 import { en } from './i18n/messages/en';
 import { es } from './i18n/messages/es';
 import { fr } from './i18n/messages/fr';
@@ -22,6 +23,7 @@ const MESSAGES: Record<LocaleCode, Messages> = {
   ro,
   pi,
 };
+const LEGACY_LOCALE_STORAGE_KEYS = ['smart-shopping-list-locale-v1'] as const;
 
 export const isLocaleCode = (value: unknown): value is LocaleCode =>
   typeof value === 'string' && SUPPORTED_LOCALES.includes(value as LocaleCode);
@@ -63,7 +65,7 @@ export const defaultLocale = (): LocaleCode => getBrowserLocale();
 export const loadLocale = (): LocaleCode => {
   if (typeof window === 'undefined') { return defaultLocale(); }
 
-  const raw = window.localStorage.getItem(LOCALE_STORAGE_KEY);
+  const raw = readLocalStorageValue(LOCALE_STORAGE_KEY, LEGACY_LOCALE_STORAGE_KEYS);
   return isLocaleCode(raw) ? raw : defaultLocale();
 };
 

@@ -27,6 +27,22 @@ The app does not add accounts, passwords, user tracking, or analytics around sha
 
 Open shared lists may keep a live backend connection for server-sent update events so changes from another device can appear automatically. Those events are scoped to the shared list id in the URL.
 
+## Unknown product reports
+
+Unknown product reporting is optional and disabled unless the backend operator configures GitHub issue reporting. When it is enabled, the app may report items that were filed under `Other` so the product matcher can be improved.
+
+Reports include only the product information needed for that matcher work:
+
+- the item text entered in the shopping list
+- normalized and cleaned parser text for that item
+- the selected country/store profile
+- the app language
+- a report timestamp created by the backend/GitHub issue
+
+Reports do not include the full shopping list, checked state, shared-list URL, user accounts, payment details, analytics identifiers, or advertising identifiers. The browser also keeps a small local `shoppingList:reportedUnknownProducts` record so it does not repeatedly report the same unknown product from the same country/language combination.
+
+When configured, reports are stored in the GitHub repository chosen by the backend operator as issues and sub-issues. Duplicate product sightings are added as `+1` comments to the existing product issue instead of creating duplicate issues.
+
 ## Home Assistant
 
 Home Assistant integration is currently disabled by default. The code is still present for future work, but the live app should not send shopping list actions to Home Assistant unless a backend operator explicitly enables the experimental integration.
@@ -53,6 +69,8 @@ You can clear local browser data using the app's reset flow or your browser's si
 If you run the backend with `DATABASE_URL` configured, the database is stored in that PostgreSQL database. Whoever runs the backend controls that database and can back it up, delete it, or rotate credentials using their hosting provider’s tools.
 
 If `DATABASE_URL` is not configured, the backend falls back to `data/shopping-list-db.json`. That file fallback is intended for quick local experiments and should not be treated as durable production storage.
+
+If unknown product reporting is enabled, those reports are stored in the configured GitHub repository. Whoever runs that repository controls the resulting issues, comments, and retention.
 
 ## Open source
 
