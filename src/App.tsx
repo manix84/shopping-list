@@ -80,6 +80,7 @@ const SHARED_LIST_SYNC_POLL_MS = 5_000;
 const SHARED_LIST_SYNC_SSE_FALLBACK_POLL_MS = 60_000;
 const SHARED_LIST_NOTIFICATION_GROUP_MS = 2 * 60_000;
 const SHARED_LIST_NOTIFICATION_PREVIEW_LIMIT = 3;
+const UNKNOWN_PRODUCT_REPORT_DEBOUNCE_MS = 2_000;
 const UNKNOWN_PRODUCTS_REPORTED_STORAGE_KEY = 'shoppingList:reportedUnknownProducts';
 const UNKNOWN_PRODUCTS_REPORTED_LIMIT = 500;
 const NOTIFICATION_SERVICE_WORKER_READY_TIMEOUT_MS = 3_000;
@@ -575,6 +576,11 @@ const saveReportedUnknownProductKeys = (keys: Set<string>): void => {
   }
 };
 
+const unknownProductReportName = (item: Item): string => cleanLine(item.cleaned || item.normalized || item.raw);
+
+const unknownProductReportedKey = (countryCode: CountryCode, locale: string, item: Item): string =>
+  `${countryCode}|${locale}|${unknownProductReportName(item)}`;
+
 function updateItemTextInInput(input: string, previousDisplay: string, nextDisplay: string): string {
   const lines = input.split('\n');
   const index = lines.findIndex((line) => cleanLine(line) === cleanLine(previousDisplay));
@@ -645,6 +651,7 @@ export default function App() {
   const appVersionReloadRequestedRef = useRef(false);
   const pendingAppVersionReloadRef = useRef<string>();
   const isUnknownProductReportingDisabledRef = useRef(false);
+  const unknownProductReportTimerRef = useRef<number>();
   const skipNextAutosaveRef = useRef(false);
   const remoteSyncStatusTimerRef = useRef<number>();
   const suppressNextAutosaveStatusRef = useRef(true);
@@ -1791,42 +1798,56 @@ export default function App() {
     const seenUnknownItems = new Set<string>();
     const unknownItems: Item[] = [];
     for (const item of items) {
-      if (item.matchedSection !== 'other' || !cleanLine(item.raw) || seenUnknownItems.has(item.normalized)) {
+      const reportName = unknownProductReportName(item);
+      if (item.matchedSection !== 'other' || !reportName || seenUnknownItems.has(reportName)) {
         continue;
       }
 
-      seenUnknownItems.add(item.normalized);
-      if (!reportedKeys.has(`${countryCode}|${locale}|${item.normalized}`)) {
+      seenUnknownItems.add(reportName);
+      if (!reportedKeys.has(unknownProductReportedKey(countryCode, locale, item))) {
         unknownItems.push(item);
       }
     }
 
     if (unknownItems.length === 0) { return; }
 
-    void reportUnknownProducts({
-      countryCode,
-      locale,
-      items: unknownItems.slice(0, 20).map((item) => ({
-        raw: item.raw,
-        normalized: item.normalized,
-        cleaned: item.cleaned,
-      })),
-    })
-      .then(({ disabled }) => {
-        if (disabled) {
-          isUnknownProductReportingDisabledRef.current = true;
-          return;
-        }
+    if (unknownProductReportTimerRef.current) {
+      window.clearTimeout(unknownProductReportTimerRef.current);
+    }
 
-        const nextReportedKeys = loadReportedUnknownProductKeys();
-        for (const item of unknownItems) {
-          nextReportedKeys.add(`${countryCode}|${locale}|${item.normalized}`);
-        }
-        saveReportedUnknownProductKeys(nextReportedKeys);
+    unknownProductReportTimerRef.current = window.setTimeout(() => {
+      void reportUnknownProducts({
+        countryCode,
+        locale,
+        items: unknownItems.slice(0, 20).map((item) => ({
+          raw: item.raw,
+          normalized: item.normalized,
+          cleaned: item.cleaned,
+        })),
       })
-      .catch((error: unknown) => {
-        verboseDebugLog('unknown product report failed', { error: error instanceof Error ? error.message : String(error) });
-      });
+        .then(({ disabled }) => {
+          if (disabled) {
+            isUnknownProductReportingDisabledRef.current = true;
+            return;
+          }
+
+          const nextReportedKeys = loadReportedUnknownProductKeys();
+          for (const item of unknownItems) {
+            nextReportedKeys.add(unknownProductReportedKey(countryCode, locale, item));
+          }
+          saveReportedUnknownProductKeys(nextReportedKeys);
+        })
+        .catch((error: unknown) => {
+          verboseDebugLog('unknown product report failed', { error: error instanceof Error ? error.message : String(error) });
+        });
+    }, UNKNOWN_PRODUCT_REPORT_DEBOUNCE_MS);
+
+    return () => {
+      if (unknownProductReportTimerRef.current) {
+        window.clearTimeout(unknownProductReportTimerRef.current);
+        unknownProductReportTimerRef.current = undefined;
+      }
+    };
   }, [canUseBackend, countryCode, isLoaded, items, locale, verboseDebugLog]);
 
   useEffect(() => {

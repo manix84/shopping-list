@@ -95,12 +95,16 @@ const escapeInlineCode = (value) => String(value ?? '')
   .replaceAll('\n', ' ')
   .trim();
 
+export const unknownProductReportName = (item) => String(item.cleaned || item.normalized || item.raw || '')
+  .replace(/\s+/g, ' ')
+  .trim();
+
 const truncateTitleValue = (value) => {
   if (value.length <= PRODUCT_TITLE_VALUE_MAX_LENGTH) { return value; }
   return `${value.slice(0, PRODUCT_TITLE_VALUE_MAX_LENGTH - 1).trimEnd()}…`;
 };
 
-const productIssueTitle = (item) => `[PRODUCT] \`${truncateTitleValue(escapeInlineCode(item.raw))}\` filed under \`other\``;
+export const productIssueTitle = (item) => `[PRODUCT] \`${truncateTitleValue(escapeInlineCode(unknownProductReportName(item)))}\` filed under \`other\``;
 
 const unknownProductDetails = (item, report) => {
   const reportedAt = new Date().toISOString();
@@ -108,11 +112,13 @@ const unknownProductDetails = (item, report) => {
   return [
     'Automatically collected shopping-list products that did not match a known store section.',
     '',
-    '| Item | Normalized | Country | Locale | Reported at |',
-    '| --- | --- | --- | --- | --- |',
+    '| Product | Item | Normalized | Cleaned | Country | Locale | Reported at |',
+    '| --- | --- | --- | --- | --- | --- | --- |',
     `| ${[
+      escapeMarkdownCell(unknownProductReportName(item)),
       escapeMarkdownCell(item.raw),
-      escapeMarkdownCell(item.normalized ?? item.cleaned ?? ''),
+      escapeMarkdownCell(item.normalized ?? ''),
+      escapeMarkdownCell(item.cleaned ?? ''),
       report.countryCode,
       report.locale,
       reportedAt,
@@ -185,9 +191,14 @@ export const submitUnknownProductsReport = async (report) => {
 
   const parentIssueNumber = await findUnknownProductsParentIssue();
   const issues = [];
+  const itemsByTitle = new Map();
 
   for (const item of report.items) {
-    const existingIssue = await findIssueByTitle(productIssueTitle(item));
+    itemsByTitle.set(productIssueTitle(item), item);
+  }
+
+  for (const [title, item] of itemsByTitle) {
+    const existingIssue = await findIssueByTitle(title);
     if (existingIssue) {
       await commentOnIssue(existingIssue.number, unknownProductDuplicateComment(item, report));
       await tryAddSubIssue(parentIssueNumber, existingIssue.id);
