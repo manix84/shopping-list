@@ -99,8 +99,6 @@ export const pi: Messages = {
       pastePlaceholder: 'milk\nbread\napples\ncoffee',
       countryProfileHint:
         'Choose the market layout rules used to sort aisles and decks fer these waters.',
-      quickAddLabel: 'Quick-add one bit o’ cargo',
-      quickAddPlaceholder: 'e.g. bananas x20',
       listNameLabel: 'List name (optional)',
       listNamePlaceholder: 'e.g. Weekly shop',
       listNameHint: 'Leave this blank to identify the list by its foods.',

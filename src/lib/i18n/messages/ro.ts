@@ -98,8 +98,6 @@ export const ro: Messages = {
       pastePlaceholder: 'lapte\npâine\nmere\ncafea',
       countryProfileHint:
         'Alege regulile de aranjare a magazinului folosite pentru sortarea raioanelor și secțiunilor din această țară.',
-      quickAddLabel: 'Adaugă rapid un articol',
-      quickAddPlaceholder: 'ex. banane x20',
       listNameLabel: 'List name (optional)',
       listNamePlaceholder: 'e.g. Weekly shop',
       listNameHint: 'Leave this blank to identify the list by its foods.',

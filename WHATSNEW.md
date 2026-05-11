@@ -6,6 +6,8 @@ Keep this file updated when user-visible features, platform changes, major parse
 
 - Added optional unknown-product reporting for items that fall into `Other`, including country profile and app language, with same-origin CSRF-protected server-side GitHub product sub-issues and duplicate `+1` comments when configured.
 - Improved unknown-product report deduping so cleaned product names are used for issue titles and local report keys, with a short idle delay to avoid filing partial words while the user is typing.
+- Added non-intrusive product autocomplete to the paste textarea, using the active country profile's product keywords with mouse, keyboard, and touch selection.
+- Reduced duplicate autocomplete suggestions by collapsing punctuation-only spelling variants such as `semi skimmed milk` and `semi-skimmed milk`.
 - Changed backend-backed shared-list URLs to the shorter `/<uuidv7>/edit` and `/<uuidv7>/route` format while keeping legacy `/list/<uuidv7>/...` links supported and normalized.
 - Added persistent navigation memory for the last Edit/Route page and the last Debug tab, using the app's consistent `shoppingList:*` localStorage key style.
 - Standardized localStorage keys around the `shoppingList:*` namespace and migrated legacy `smart-shopping-list-*` values, including the measurement display mode enum.

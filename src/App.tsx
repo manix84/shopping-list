@@ -35,6 +35,7 @@ import {
   saveNotificationsEnabled,
 } from './lib/notificationPreference';
 import { getDisplayValue, getStoredValue, parseItems } from './lib/parser';
+import { buildProductSuggestions } from './lib/productSuggestions';
 import {
   checkBackendStatus,
   clearSharedShoppingList,
@@ -597,7 +598,6 @@ export default function App() {
   const [items, setItems] = useState<Item[]>([]);
   const [query, setQuery] = useState('');
   const [isRouteFilterVisible, setIsRouteFilterVisible] = useState(false);
-  const [draftItem, setDraftItem] = useState('');
   const [isLoaded, setIsLoaded] = useState(false);
   const [storageMode, setStorageMode] = useState<StorageMode>('local');
   const [backendStatus, setBackendStatus] = useState<BackendStatus>(() => defaultBackendStatus());
@@ -635,6 +635,7 @@ export default function App() {
   const [debugModeNotice, setDebugModeNotice] = useState<ToastPopupData>();
   const [backendSaveRetryAttempt, setBackendSaveRetryAttempt] = useState(0);
   const [isListLoadingOverlayVisible, setIsListLoadingOverlayVisible] = useState(isDefaultLandingLocation);
+  const [isProductAutocompleteInteracting, setIsProductAutocompleteInteracting] = useState(false);
   const currentItemsRef = useRef<Item[]>([]);
   const sharedListNotificationSeenUpdatedAtRef = useRef<Record<string, string>>({});
   const sharedListNotificationGroupRef = useRef<SharedListNotificationGroup>();
@@ -680,6 +681,7 @@ export default function App() {
     () => withMeasurementDisplayMode(COUNTRY_CONFIGS[countryCode], measurementDisplayMode),
     [countryCode, measurementDisplayMode],
   );
+  const productSuggestions = useMemo(() => buildProductSuggestions(config), [config]);
   const messages = useMemo(() => createMessages(locale), [locale]);
   const { page, listId } = route;
   const visiblePage: PageKey = page === 'debug' && !isDebugMode ? 'not-found' : page;
@@ -1794,6 +1796,14 @@ export default function App() {
   useEffect(() => {
     if (!isLoaded || !canUseBackend || isUnknownProductReportingDisabledRef.current) { return; }
 
+    if (isProductAutocompleteInteracting) {
+      if (unknownProductReportTimerRef.current) {
+        window.clearTimeout(unknownProductReportTimerRef.current);
+        unknownProductReportTimerRef.current = undefined;
+      }
+      return;
+    }
+
     const reportedKeys = loadReportedUnknownProductKeys();
     const seenUnknownItems = new Set<string>();
     const unknownItems: Item[] = [];
@@ -1848,7 +1858,7 @@ export default function App() {
         unknownProductReportTimerRef.current = undefined;
       }
     };
-  }, [canUseBackend, countryCode, isLoaded, items, locale, verboseDebugLog]);
+  }, [canUseBackend, countryCode, isLoaded, isProductAutocompleteInteracting, items, locale, verboseDebugLog]);
 
   useEffect(() => {
     if (!isLoaded) { return; }
@@ -2151,16 +2161,6 @@ export default function App() {
     setItems((current) => parseItems(input, config, current));
     setQuery('');
     setIsRouteFilterVisible(false);
-  };
-
-  const handleAddSingleItem = () => {
-    const cleaned = cleanLine(draftItem);
-    if (!cleaned) { return; }
-
-    const nextInput = input.trim() ? `${input.trim()}\n${cleaned}` : cleaned;
-    setInput(nextInput);
-    setItems((current) => parseItems(nextInput, config, current));
-    setDraftItem('');
   };
 
   const handleDeleteItem = (itemId: string) => {
@@ -2479,7 +2479,6 @@ export default function App() {
       initial.input,
       countryConfigForMeasurementDisplayMode(initial.countryCode, measurementDisplayMode),
     ));
-    setDraftItem('');
     setQuery('');
     updateRoute({ page: 'edit' });
   };
@@ -2550,7 +2549,7 @@ export default function App() {
               <EditPage
                 input={input}
                 listName={listName}
-                draftItem={draftItem}
+                productSuggestions={productSuggestions}
                 total={total}
                 checkedTotal={checkedTotal}
                 progress={progress}
@@ -2558,12 +2557,11 @@ export default function App() {
                 saveStatus={saveStatus}
                 onInputChange={setInput}
                 onListNameChange={setListName}
-                onDraftItemChange={setDraftItem}
                 onCountryChange={handleCountryChange}
                 onParse={handleParse}
                 onSaveAndStay={handleSaveAndStay}
                 onResetAll={resetAll}
-                onAddSingleItem={handleAddSingleItem}
+                onAutocompleteInteractionChange={setIsProductAutocompleteInteracting}
                 onCreateSharedLink={handleCreateSharedLink}
                 onRefreshSharedList={handleRefreshSharedList}
                 canUseBackend={canUseBackend}

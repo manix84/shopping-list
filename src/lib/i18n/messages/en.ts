@@ -94,8 +94,6 @@ export const en: Messages = {
       pastePlaceholder: 'milk\nbread\napples\ncoffee',
       countryProfileHint:
         'Choose the store layout rules used to sort aisles and sections for this country.',
-      quickAddLabel: 'Quick add single item',
-      quickAddPlaceholder: 'e.g. bananas x20',
       listNameLabel: 'List name (optional)',
       listNamePlaceholder: 'e.g. Weekly shop',
       listNameHint: 'Leave this blank to identify the list by its foods.',

@@ -98,8 +98,6 @@ export const it: Messages = {
       pastePlaceholder: 'latte\npane\nmele\ncaffè',
       countryProfileHint:
         'Scegli le regole di disposizione del negozio usate per ordinare corsie e sezioni in questo paese.',
-      quickAddLabel: 'Aggiungi rapidamente un articolo',
-      quickAddPlaceholder: 'es. banane x20',
       listNameLabel: 'List name (optional)',
       listNamePlaceholder: 'e.g. Weekly shop',
       listNameHint: 'Leave this blank to identify the list by its foods.',
