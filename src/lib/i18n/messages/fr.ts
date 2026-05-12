@@ -99,8 +99,6 @@ export const fr: Messages = {
       pastePlaceholder: 'lait\npain\npommes\ncafé',
       countryProfileHint:
         'Choisissez les règles d’agencement utilisées pour trier les rayons et sections de ce pays.',
-      quickAddLabel: 'Ajout rapide d’un article',
-      quickAddPlaceholder: 'ex. bananes x20',
       listNameLabel: 'List name (optional)',
       listNamePlaceholder: 'e.g. Weekly shop',
       listNameHint: 'Leave this blank to identify the list by its foods.',

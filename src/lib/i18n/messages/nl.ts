@@ -99,8 +99,6 @@ export const nl: Messages = {
       pastePlaceholder: 'melk\nbrood\nappels\nkoffie',
       countryProfileHint:
         'Kies de winkelindelingsregels waarmee gangen en secties voor dit land worden gesorteerd.',
-      quickAddLabel: 'Snel één artikel toevoegen',
-      quickAddPlaceholder: 'bijv. bananen x20',
       listNameLabel: 'List name (optional)',
       listNamePlaceholder: 'e.g. Weekly shop',
       listNameHint: 'Leave this blank to identify the list by its foods.',

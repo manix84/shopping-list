@@ -35,6 +35,7 @@ import {
   saveNotificationsEnabled,
 } from './lib/notificationPreference';
 import { getDisplayValue, getStoredValue, parseItems } from './lib/parser';
+import { buildProductSuggestions } from './lib/productSuggestions';
 import {
   checkBackendStatus,
   clearSharedShoppingList,
@@ -80,6 +81,7 @@ const SHARED_LIST_SYNC_POLL_MS = 5_000;
 const SHARED_LIST_SYNC_SSE_FALLBACK_POLL_MS = 60_000;
 const SHARED_LIST_NOTIFICATION_GROUP_MS = 2 * 60_000;
 const SHARED_LIST_NOTIFICATION_PREVIEW_LIMIT = 3;
+const UNKNOWN_PRODUCT_REPORT_DEBOUNCE_MS = 2_000;
 const UNKNOWN_PRODUCTS_REPORTED_STORAGE_KEY = 'shoppingList:reportedUnknownProducts';
 const UNKNOWN_PRODUCTS_REPORTED_LIMIT = 500;
 const NOTIFICATION_SERVICE_WORKER_READY_TIMEOUT_MS = 3_000;
@@ -575,6 +577,11 @@ const saveReportedUnknownProductKeys = (keys: Set<string>): void => {
   }
 };
 
+const unknownProductReportName = (item: Item): string => cleanLine(item.cleaned || item.normalized || item.raw);
+
+const unknownProductReportedKey = (countryCode: CountryCode, locale: string, item: Item): string =>
+  `${countryCode}|${locale}|${unknownProductReportName(item)}`;
+
 function updateItemTextInInput(input: string, previousDisplay: string, nextDisplay: string): string {
   const lines = input.split('\n');
   const index = lines.findIndex((line) => cleanLine(line) === cleanLine(previousDisplay));
@@ -591,7 +598,6 @@ export default function App() {
   const [items, setItems] = useState<Item[]>([]);
   const [query, setQuery] = useState('');
   const [isRouteFilterVisible, setIsRouteFilterVisible] = useState(false);
-  const [draftItem, setDraftItem] = useState('');
   const [isLoaded, setIsLoaded] = useState(false);
   const [storageMode, setStorageMode] = useState<StorageMode>('local');
   const [backendStatus, setBackendStatus] = useState<BackendStatus>(() => defaultBackendStatus());
@@ -629,6 +635,7 @@ export default function App() {
   const [debugModeNotice, setDebugModeNotice] = useState<ToastPopupData>();
   const [backendSaveRetryAttempt, setBackendSaveRetryAttempt] = useState(0);
   const [isListLoadingOverlayVisible, setIsListLoadingOverlayVisible] = useState(isDefaultLandingLocation);
+  const [isProductAutocompleteInteracting, setIsProductAutocompleteInteracting] = useState(false);
   const currentItemsRef = useRef<Item[]>([]);
   const sharedListNotificationSeenUpdatedAtRef = useRef<Record<string, string>>({});
   const sharedListNotificationGroupRef = useRef<SharedListNotificationGroup>();
@@ -645,6 +652,7 @@ export default function App() {
   const appVersionReloadRequestedRef = useRef(false);
   const pendingAppVersionReloadRef = useRef<string>();
   const isUnknownProductReportingDisabledRef = useRef(false);
+  const unknownProductReportTimerRef = useRef<number>();
   const skipNextAutosaveRef = useRef(false);
   const remoteSyncStatusTimerRef = useRef<number>();
   const suppressNextAutosaveStatusRef = useRef(true);
@@ -673,6 +681,7 @@ export default function App() {
     () => withMeasurementDisplayMode(COUNTRY_CONFIGS[countryCode], measurementDisplayMode),
     [countryCode, measurementDisplayMode],
   );
+  const productSuggestions = useMemo(() => buildProductSuggestions(config), [config]);
   const messages = useMemo(() => createMessages(locale), [locale]);
   const { page, listId } = route;
   const visiblePage: PageKey = page === 'debug' && !isDebugMode ? 'not-found' : page;
@@ -1787,47 +1796,69 @@ export default function App() {
   useEffect(() => {
     if (!isLoaded || !canUseBackend || isUnknownProductReportingDisabledRef.current) { return; }
 
+    if (isProductAutocompleteInteracting) {
+      if (unknownProductReportTimerRef.current) {
+        window.clearTimeout(unknownProductReportTimerRef.current);
+        unknownProductReportTimerRef.current = undefined;
+      }
+      return;
+    }
+
     const reportedKeys = loadReportedUnknownProductKeys();
     const seenUnknownItems = new Set<string>();
     const unknownItems: Item[] = [];
     for (const item of items) {
-      if (item.matchedSection !== 'other' || !cleanLine(item.raw) || seenUnknownItems.has(item.normalized)) {
+      const reportName = unknownProductReportName(item);
+      if (item.matchedSection !== 'other' || !reportName || seenUnknownItems.has(reportName)) {
         continue;
       }
 
-      seenUnknownItems.add(item.normalized);
-      if (!reportedKeys.has(`${countryCode}|${locale}|${item.normalized}`)) {
+      seenUnknownItems.add(reportName);
+      if (!reportedKeys.has(unknownProductReportedKey(countryCode, locale, item))) {
         unknownItems.push(item);
       }
     }
 
     if (unknownItems.length === 0) { return; }
 
-    void reportUnknownProducts({
-      countryCode,
-      locale,
-      items: unknownItems.slice(0, 20).map((item) => ({
-        raw: item.raw,
-        normalized: item.normalized,
-        cleaned: item.cleaned,
-      })),
-    })
-      .then(({ disabled }) => {
-        if (disabled) {
-          isUnknownProductReportingDisabledRef.current = true;
-          return;
-        }
+    if (unknownProductReportTimerRef.current) {
+      window.clearTimeout(unknownProductReportTimerRef.current);
+    }
 
-        const nextReportedKeys = loadReportedUnknownProductKeys();
-        for (const item of unknownItems) {
-          nextReportedKeys.add(`${countryCode}|${locale}|${item.normalized}`);
-        }
-        saveReportedUnknownProductKeys(nextReportedKeys);
+    unknownProductReportTimerRef.current = window.setTimeout(() => {
+      void reportUnknownProducts({
+        countryCode,
+        locale,
+        items: unknownItems.slice(0, 20).map((item) => ({
+          raw: item.raw,
+          normalized: item.normalized,
+          cleaned: item.cleaned,
+        })),
       })
-      .catch((error: unknown) => {
-        verboseDebugLog('unknown product report failed', { error: error instanceof Error ? error.message : String(error) });
-      });
-  }, [canUseBackend, countryCode, isLoaded, items, locale, verboseDebugLog]);
+        .then(({ disabled }) => {
+          if (disabled) {
+            isUnknownProductReportingDisabledRef.current = true;
+            return;
+          }
+
+          const nextReportedKeys = loadReportedUnknownProductKeys();
+          for (const item of unknownItems) {
+            nextReportedKeys.add(unknownProductReportedKey(countryCode, locale, item));
+          }
+          saveReportedUnknownProductKeys(nextReportedKeys);
+        })
+        .catch((error: unknown) => {
+          verboseDebugLog('unknown product report failed', { error: error instanceof Error ? error.message : String(error) });
+        });
+    }, UNKNOWN_PRODUCT_REPORT_DEBOUNCE_MS);
+
+    return () => {
+      if (unknownProductReportTimerRef.current) {
+        window.clearTimeout(unknownProductReportTimerRef.current);
+        unknownProductReportTimerRef.current = undefined;
+      }
+    };
+  }, [canUseBackend, countryCode, isLoaded, isProductAutocompleteInteracting, items, locale, verboseDebugLog]);
 
   useEffect(() => {
     if (!isLoaded) { return; }
@@ -2130,16 +2161,6 @@ export default function App() {
     setItems((current) => parseItems(input, config, current));
     setQuery('');
     setIsRouteFilterVisible(false);
-  };
-
-  const handleAddSingleItem = () => {
-    const cleaned = cleanLine(draftItem);
-    if (!cleaned) { return; }
-
-    const nextInput = input.trim() ? `${input.trim()}\n${cleaned}` : cleaned;
-    setInput(nextInput);
-    setItems((current) => parseItems(nextInput, config, current));
-    setDraftItem('');
   };
 
   const handleDeleteItem = (itemId: string) => {
@@ -2458,7 +2479,6 @@ export default function App() {
       initial.input,
       countryConfigForMeasurementDisplayMode(initial.countryCode, measurementDisplayMode),
     ));
-    setDraftItem('');
     setQuery('');
     updateRoute({ page: 'edit' });
   };
@@ -2529,7 +2549,7 @@ export default function App() {
               <EditPage
                 input={input}
                 listName={listName}
-                draftItem={draftItem}
+                productSuggestions={productSuggestions}
                 total={total}
                 checkedTotal={checkedTotal}
                 progress={progress}
@@ -2537,12 +2557,11 @@ export default function App() {
                 saveStatus={saveStatus}
                 onInputChange={setInput}
                 onListNameChange={setListName}
-                onDraftItemChange={setDraftItem}
                 onCountryChange={handleCountryChange}
                 onParse={handleParse}
                 onSaveAndStay={handleSaveAndStay}
                 onResetAll={resetAll}
-                onAddSingleItem={handleAddSingleItem}
+                onAutocompleteInteractionChange={setIsProductAutocompleteInteracting}
                 onCreateSharedLink={handleCreateSharedLink}
                 onRefreshSharedList={handleRefreshSharedList}
                 canUseBackend={canUseBackend}

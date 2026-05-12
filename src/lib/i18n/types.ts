@@ -105,8 +105,6 @@ export type Messages = {
       pasteLabel: string;
       pastePlaceholder: string;
       countryProfileHint: string;
-      quickAddLabel: string;
-      quickAddPlaceholder: string;
       listNameLabel: string;
       listNamePlaceholder: string;
       listNameHint: string;

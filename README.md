@@ -237,6 +237,8 @@ Product issues use this title format:
 [PRODUCT] `<product name>` filed under `other`
 ```
 
+The product name is taken from the parser's cleaned item name first, then falls back to the normalized or raw item text. For example, `canned tuna 4` should be filed as `canned tuna` when the parser has cleaned the quantity away.
+
 Suggested parent issue description:
 
 ```md
@@ -250,6 +252,7 @@ Each reported product is tracked as a sub-issue. Duplicate sightings are added a
 
 Reports include only the data needed to improve matching:
 
+- `Product` - the cleaned product identity used for deduping and issue titles, for example `canned tuna`
 - `Item` - the product text entered in the shopping list, for example `baby corn`
 - `Normalized` - the parser-normalized form, for example `baby corn`
 - `Cleaned` - the cleaned display/search form when available
