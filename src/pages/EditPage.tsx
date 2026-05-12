@@ -155,7 +155,7 @@ export function EditPage({
   const textareaSuggestionListId = useId();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [textareaSuggestion, setTextareaSuggestion] = useState<TextareaSuggestionState>({
-    activeIndex: 0,
+    activeIndex: -1,
     isOpen: false,
     lineEnd: 0,
     lineStart: 0,
@@ -167,7 +167,9 @@ export function EditPage({
     [productSuggestions, textareaSuggestion.query],
   );
   const isTextareaSuggestionListVisible = textareaSuggestion.isOpen && visibleTextareaSuggestions.length > 0;
-  const activeTextareaSuggestion = visibleTextareaSuggestions[textareaSuggestion.activeIndex];
+  const activeTextareaSuggestion = textareaSuggestion.activeIndex >= 0
+    ? visibleTextareaSuggestions[textareaSuggestion.activeIndex]
+    : undefined;
   const activeTextareaSuggestionId = activeTextareaSuggestion
     ? `${textareaSuggestionListId}-option-${textareaSuggestion.activeIndex}`
     : undefined;
@@ -188,7 +190,7 @@ export function EditPage({
     const position = textareaCaretPosition(textarea, caretPosition);
     const maxLeft = Math.max(6, textarea.clientWidth - 286);
     setTextareaSuggestion({
-      activeIndex: 0,
+      activeIndex: -1,
       isOpen: true,
       lineEnd: line.lineEnd,
       lineStart: line.lineStart,
@@ -230,7 +232,7 @@ export function EditPage({
       event.preventDefault();
       setTextareaSuggestion((current) => ({
         ...current,
-        activeIndex: (current.activeIndex + 1) % visibleTextareaSuggestions.length,
+        activeIndex: current.activeIndex < 0 ? 0 : (current.activeIndex + 1) % visibleTextareaSuggestions.length,
         isOpen: true,
       }));
       return;
@@ -240,7 +242,9 @@ export function EditPage({
       event.preventDefault();
       setTextareaSuggestion((current) => ({
         ...current,
-        activeIndex: (current.activeIndex - 1 + visibleTextareaSuggestions.length) % visibleTextareaSuggestions.length,
+        activeIndex: current.activeIndex < 0
+          ? visibleTextareaSuggestions.length - 1
+          : (current.activeIndex - 1 + visibleTextareaSuggestions.length) % visibleTextareaSuggestions.length,
         isOpen: true,
       }));
       return;
