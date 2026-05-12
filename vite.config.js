@@ -13,6 +13,8 @@ export default defineConfig({
     plugins: [react()],
     base: base,
     server: {
+        host: '0.0.0.0',
+        open: true,
         proxy: {
             '/api': 'http://localhost:8787'
         }
