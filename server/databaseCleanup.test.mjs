@@ -34,6 +34,8 @@ const importDatabase = async () => {
 describe('database empty shared-list cleanup', () => {
   afterEach(() => {
     vi.unstubAllEnvs();
+    vi.doUnmock('pg');
+    vi.resetModules();
   });
 
   it('removes empty JSON shared lists and keeps non-empty shared lists', async () => {
@@ -60,5 +62,48 @@ describe('database empty shared-list cleanup', () => {
         items: [item],
       },
     });
+  });
+
+  it('removes empty Postgres shared lists with the expected DELETE criteria', async () => {
+    const query = vi.fn()
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [{ count: 1 }] })
+      .mockResolvedValueOnce({
+        rows: [
+          { id: '019dbf30-56de-7b2b-aacc-a5ae59430d7f' },
+          { id: '019dbf30-56de-7b2b-aacc-a5ae59430d80' },
+        ],
+    });
+    const end = vi.fn().mockResolvedValue(undefined);
+    const Pool = vi.fn(function MockPool() {
+      return { query, end };
+    });
+
+    vi.doMock('pg', () => ({ default: { Pool } }));
+    vi.stubEnv('DATABASE_URL', 'postgres://shopping-list.test/db');
+    vi.stubEnv('SHOPPING_LIST_DATABASE_URL', '');
+
+    const database = await importDatabase();
+    await expect(database.pruneEmptySharedLists()).resolves.toEqual({
+      deletedCount: 2,
+      deletedIds: [
+        '019dbf30-56de-7b2b-aacc-a5ae59430d7f',
+        '019dbf30-56de-7b2b-aacc-a5ae59430d80',
+      ],
+    });
+
+    expect(Pool).toHaveBeenCalledWith({
+      connectionString: 'postgres://shopping-list.test/db',
+      ssl: undefined,
+    });
+    const deleteQuery = query.mock.calls[2]?.[0];
+    expect(deleteQuery).toContain('DELETE FROM shared_lists');
+    expect(deleteQuery).toContain("btrim(coalesce(record->>'input', '')) = ''");
+    expect(deleteQuery).toContain("jsonb_typeof(record->'items') = 'array'");
+    expect(deleteQuery).toContain("jsonb_array_length(record->'items') = 0");
+    expect(deleteQuery).toContain('RETURNING id');
+
+    await database.closeDatabase();
+    expect(end).toHaveBeenCalled();
   });
 });

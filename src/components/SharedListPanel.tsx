@@ -599,12 +599,14 @@ export function SharedListHistoryPanel({
 }: SharedListHistoryPanelProps) {
   const { locale, messages } = useI18n();
   const historyPointerRef = useRef<{ listId: string; x: number; y: number; moved: boolean } | null>(null);
+  const isHistoryLoadDisabled = isLoadingSharedList || !canUseBackend;
   const localeCode = locale === 'en' ? 'en-GB' : locale;
   const historyTitle = (entry: SharedListHistoryEntry): string =>
     entry.listName?.trim() || entry.itemPreview.join(' · ') || messages.sharing.emptyList;
   const isActionTarget = (target: EventTarget | null): boolean =>
     target instanceof Element && target.closest('button') !== null;
   const handleHistoryPointerDown = (listId: string, event: PointerEvent<HTMLDivElement>) => {
+    if (isHistoryLoadDisabled) { return; }
     if (isActionTarget(event.target)) { return; }
     historyPointerRef.current = { listId, x: event.clientX, y: event.clientY, moved: false };
   };
@@ -619,6 +621,7 @@ export function SharedListHistoryPanel({
     }
   };
   const handleHistoryClick = (listId: string, event: MouseEvent<HTMLDivElement>) => {
+    if (isHistoryLoadDisabled) { return; }
     if (isActionTarget(event.target)) { return; }
     const activePointer = historyPointerRef.current;
     historyPointerRef.current = null;
@@ -638,8 +641,9 @@ export function SharedListHistoryPanel({
       {historyEntries.map((entry) => (
         <div
           key={entry.listId}
-          className={'shared-history-item'}
-          title={messages.actions.loadSharedList}
+          className={`shared-history-item ${isHistoryLoadDisabled ? 'shared-history-item-disabled' : ''}`.trim()}
+          title={isHistoryLoadDisabled ? undefined : messages.actions.loadSharedList}
+          aria-disabled={isHistoryLoadDisabled}
           onPointerDown={(event) => handleHistoryPointerDown(entry.listId, event)}
           onPointerMove={(event) => handleHistoryPointerMove(entry.listId, event)}
           onPointerCancel={handleHistoryPointerCancel}
@@ -660,9 +664,10 @@ export function SharedListHistoryPanel({
               className={'button button-icon'}
               onClick={(event) => {
                 event.stopPropagation();
+                if (isHistoryLoadDisabled) { return; }
                 void onLoadHistoryEntry(entry.listId);
               }}
-              disabled={isLoadingSharedList || !canUseBackend}
+              disabled={isHistoryLoadDisabled}
               aria-label={`${messages.actions.loadSharedList}: ${historyTitle(entry)}`}
               title={messages.actions.loadSharedList}
             >

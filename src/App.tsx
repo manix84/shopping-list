@@ -2286,6 +2286,31 @@ export default function App() {
     let inFlight = false;
     let isSseOpen = false;
     let lastFallbackPollAt = 0;
+    const moveDeletedSharedListToLocal = (currentState: CurrentShoppingListState) => {
+      const nextListId = createUuidV7();
+      const localRecord = recordFromCurrentState({
+        ...currentState,
+        listId: nextListId,
+        serverBacked: false,
+      });
+
+      suppressNextAutosaveStatusRef.current = true;
+      skipNextAutosaveRef.current = true;
+      pendingBackendSaveRecordRef.current = undefined;
+      lastBackendPersistedRecordRef.current = undefined;
+      lastLocalPersistedRecordRef.current = localRecord;
+      activeListIdRef.current = nextListId;
+      localStorageRepository.save(localRecord);
+      setShareError('loadMissing');
+      setStorageMode('local');
+      setIsServerBackedList(false);
+      setActiveListId(nextListId);
+      updateRoute((current) => ({
+        page: current.page,
+        debugTab: current.debugTab,
+      }), 'replace');
+      verboseDebugLog('shared list deleted; moved current state to local list', { previousListId: activeListId, nextListId });
+    };
     const syncRemoteRecord = async () => {
       if (cancelled || inFlight) { return; }
       const currentState = currentShoppingListStateRef.current;
@@ -2298,7 +2323,11 @@ export default function App() {
       inFlight = true;
       try {
         const remotePayload = await loadSharedShoppingList(activeListId);
-        if (cancelled || !remotePayload.exists) { return; }
+        if (cancelled) { return; }
+        if (!remotePayload.exists) {
+          moveDeletedSharedListToLocal(currentState);
+          return;
+        }
 
         const remoteUpdatedAt = remotePayload.updatedAt ?? remotePayload.record.updatedAt;
         const localUpdatedAt = lastBackendPersistedRecordRef.current?.updatedAt;
@@ -2372,6 +2401,11 @@ export default function App() {
     const handleRemoteListEvent = () => {
       void syncRemoteRecord();
     };
+    const handleDeletedListEvent = () => {
+      const currentState = currentShoppingListStateRef.current;
+      if (!currentState || currentState.listId !== activeListId || !currentState.serverBacked) { return; }
+      moveDeletedSharedListToLocal(currentState);
+    };
     const handleSharedListEvent = () => {
       const currentState = currentShoppingListStateRef.current;
       if (!currentState || currentState.listId !== activeListId || !currentState.serverBacked) { return; }
@@ -2403,7 +2437,7 @@ export default function App() {
     eventSource?.addEventListener('error', handleEventSourceError);
     eventSource?.addEventListener('shared', handleSharedListEvent);
     eventSource?.addEventListener('updated', handleRemoteListEvent);
-    eventSource?.addEventListener('deleted', handleRemoteListEvent);
+    eventSource?.addEventListener('deleted', handleDeletedListEvent);
     window.addEventListener('focus', requestSync);
     window.addEventListener('online', requestSync);
     document.addEventListener('visibilitychange', requestVisibleSync);
@@ -2416,7 +2450,7 @@ export default function App() {
       eventSource?.removeEventListener('error', handleEventSourceError);
       eventSource?.removeEventListener('shared', handleSharedListEvent);
       eventSource?.removeEventListener('updated', handleRemoteListEvent);
-      eventSource?.removeEventListener('deleted', handleRemoteListEvent);
+      eventSource?.removeEventListener('deleted', handleDeletedListEvent);
       window.removeEventListener('focus', requestSync);
       window.removeEventListener('online', requestSync);
       document.removeEventListener('visibilitychange', requestVisibleSync);
@@ -2427,6 +2461,7 @@ export default function App() {
     isLoaded,
     isServerBackedList,
     storageMode,
+    updateRoute,
     verboseDebugLog,
   ]);
 

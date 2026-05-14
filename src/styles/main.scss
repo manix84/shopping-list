@@ -2261,6 +2261,11 @@ select {
   }
 }
 
+.shared-history-item-disabled {
+  cursor: not-allowed;
+  opacity: 0.68;
+}
+
 .shared-history-list {
   height: 320px;
   overflow-y: auto;
