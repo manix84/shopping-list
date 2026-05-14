@@ -480,6 +480,9 @@ const countryConfigForMeasurementDisplayMode = (
 
 const getSharedListPreview = (items: Item[]): string[] => items.slice(0, 6).map((item) => item.raw);
 
+const isEmptyShoppingListRecord = (record: Pick<ShoppingListRecord, 'input' | 'items'>): boolean =>
+  record.input.trim() === '' && record.items.length === 0;
+
 const recordFromCurrentState = ({
   input,
   items,
@@ -1439,6 +1442,7 @@ export default function App() {
       const localRecord = localStorageRepository.load();
       const hasLocalRecord = hasStoredShoppingListRecord();
       const resolvedListId = routeListId ?? localRecord.listId ?? createUuidV7();
+      let nextActiveListId = resolvedListId;
       const localRecordWithIdentity = {
         ...localRecord,
         listId: resolvedListId,
@@ -1467,32 +1471,44 @@ export default function App() {
       ) {
         try {
           const remotePayload = await loadSharedShoppingList(resolvedListId);
-          selectedRecord = {
-            ...chooseNewestRecord({
-              local: localRecordWithIdentity,
-              remote: { ...remotePayload.record, listId: resolvedListId, serverBacked: true },
-              hasLocalRecord,
-              hasRemoteRecord: remotePayload.exists,
-            }),
-            listId: resolvedListId,
-            serverBacked: true,
-          };
-
-          await saveSharedShoppingList(resolvedListId, selectedRecord);
-          localStorageRepository.save(selectedRecord);
-          lastLocalPersistedRecordRef.current = selectedRecord;
-          lastBackendPersistedRecordRef.current = selectedRecord;
-          if (remotePayload.exists) {
-            rememberSharedList({
+          if (routeListId && !remotePayload.exists) {
+            nextActiveListId = localRecord.listId ?? createUuidV7();
+            setShareError('loadMissing');
+            selectedRecord = {
+              ...localRecord,
+              listId: nextActiveListId,
+              serverBacked: false,
+            };
+            nextStorageMode = 'local';
+            nextServerBacked = false;
+          } else {
+            selectedRecord = {
+              ...chooseNewestRecord({
+                local: localRecordWithIdentity,
+                remote: { ...remotePayload.record, listId: resolvedListId, serverBacked: true },
+                hasLocalRecord,
+                hasRemoteRecord: remotePayload.exists,
+              }),
               listId: resolvedListId,
-              listName: selectedRecord.listName,
-              items: selectedRecord.items,
-              createdAt: remotePayload.createdAt,
-              updatedAt: remotePayload.updatedAt ?? selectedRecord.updatedAt,
-            });
+              serverBacked: true,
+            };
+
+            await saveSharedShoppingList(resolvedListId, selectedRecord);
+            localStorageRepository.save(selectedRecord);
+            lastLocalPersistedRecordRef.current = selectedRecord;
+            lastBackendPersistedRecordRef.current = selectedRecord;
+            if (remotePayload.exists) {
+              rememberSharedList({
+                listId: resolvedListId,
+                listName: selectedRecord.listName,
+                items: selectedRecord.items,
+                createdAt: remotePayload.createdAt,
+                updatedAt: remotePayload.updatedAt ?? selectedRecord.updatedAt,
+              });
+            }
+            nextStorageMode = 'backend';
+            nextServerBacked = true;
           }
-          nextStorageMode = 'backend';
-          nextServerBacked = true;
         } catch (error) {
           console.warn('Backend was detected but could not be loaded. Falling back to local storage.', error);
         }
@@ -1510,8 +1526,8 @@ export default function App() {
       const shouldUseNavigationMemory = shouldUseNavigationMemoryRef.current;
       shouldResolveDefaultLandingRef.current = false;
       shouldUseNavigationMemoryRef.current = false;
-      activeListIdRef.current = resolvedListId;
-      setActiveListId(resolvedListId);
+      activeListIdRef.current = nextActiveListId;
+      setActiveListId(nextActiveListId);
       setIsServerBackedList(nextServerBacked);
       const currentLocationDebugTab = readRouteFromLocation().debugTab;
       updateRoute((current) => ({
@@ -1521,7 +1537,7 @@ export default function App() {
               useNavigationMemory: shouldUseNavigationMemory,
             })
           : current.page,
-        listId: nextServerBacked ? resolvedListId : undefined,
+        listId: nextServerBacked ? nextActiveListId : undefined,
         debugTab: current.debugTab ?? currentLocationDebugTab,
       }), 'replace');
       setCountryCode(selectedRecord.countryCode);
@@ -2163,6 +2179,11 @@ export default function App() {
     setIsRouteFilterVisible(false);
   };
 
+  const handleInputChange = (nextInput: string) => {
+    setInput(nextInput);
+    setItems((current) => parseItems(nextInput, config, current));
+  };
+
   const handleDeleteItem = (itemId: string) => {
     setItems((current) => {
       const target = current.find((item) => item.id === itemId);
@@ -2265,6 +2286,31 @@ export default function App() {
     let inFlight = false;
     let isSseOpen = false;
     let lastFallbackPollAt = 0;
+    const moveDeletedSharedListToLocal = (currentState: CurrentShoppingListState) => {
+      const nextListId = createUuidV7();
+      const localRecord = recordFromCurrentState({
+        ...currentState,
+        listId: nextListId,
+        serverBacked: false,
+      });
+
+      suppressNextAutosaveStatusRef.current = true;
+      skipNextAutosaveRef.current = true;
+      pendingBackendSaveRecordRef.current = undefined;
+      lastBackendPersistedRecordRef.current = undefined;
+      lastLocalPersistedRecordRef.current = localRecord;
+      activeListIdRef.current = nextListId;
+      localStorageRepository.save(localRecord);
+      setShareError('loadMissing');
+      setStorageMode('local');
+      setIsServerBackedList(false);
+      setActiveListId(nextListId);
+      updateRoute((current) => ({
+        page: current.page,
+        debugTab: current.debugTab,
+      }), 'replace');
+      verboseDebugLog('shared list deleted; moved current state to local list', { previousListId: activeListId, nextListId });
+    };
     const syncRemoteRecord = async () => {
       if (cancelled || inFlight) { return; }
       const currentState = currentShoppingListStateRef.current;
@@ -2277,7 +2323,11 @@ export default function App() {
       inFlight = true;
       try {
         const remotePayload = await loadSharedShoppingList(activeListId);
-        if (cancelled || !remotePayload.exists) { return; }
+        if (cancelled) { return; }
+        if (!remotePayload.exists) {
+          moveDeletedSharedListToLocal(currentState);
+          return;
+        }
 
         const remoteUpdatedAt = remotePayload.updatedAt ?? remotePayload.record.updatedAt;
         const localUpdatedAt = lastBackendPersistedRecordRef.current?.updatedAt;
@@ -2351,6 +2401,30 @@ export default function App() {
     const handleRemoteListEvent = () => {
       void syncRemoteRecord();
     };
+    const handleDeletedListEvent = () => {
+      const currentState = currentShoppingListStateRef.current;
+      if (!currentState || currentState.listId !== activeListId || !currentState.serverBacked) { return; }
+      moveDeletedSharedListToLocal(currentState);
+    };
+    const handleSharedListEvent = () => {
+      const currentState = currentShoppingListStateRef.current;
+      if (!currentState || currentState.listId !== activeListId || !currentState.serverBacked) { return; }
+      if (!isEmptyShoppingListRecord(currentState)) { return; }
+
+      const record = recordFromCurrentState({
+        ...currentState,
+        serverBacked: true,
+      });
+      void saveSharedShoppingList(activeListId, record)
+        .then(() => {
+          if (cancelled) { return; }
+          lastBackendPersistedRecordRef.current = record;
+          pendingBackendSaveRecordRef.current = undefined;
+        })
+        .catch((error: unknown) => {
+          verboseDebugLog('shared empty list save after second client failed', { listId: activeListId, error });
+        });
+    };
     const handleEventSourceOpen = () => {
       isSseOpen = true;
     };
@@ -2361,8 +2435,9 @@ export default function App() {
     void syncRemoteRecord();
     eventSource?.addEventListener('open', handleEventSourceOpen);
     eventSource?.addEventListener('error', handleEventSourceError);
+    eventSource?.addEventListener('shared', handleSharedListEvent);
     eventSource?.addEventListener('updated', handleRemoteListEvent);
-    eventSource?.addEventListener('deleted', handleRemoteListEvent);
+    eventSource?.addEventListener('deleted', handleDeletedListEvent);
     window.addEventListener('focus', requestSync);
     window.addEventListener('online', requestSync);
     document.addEventListener('visibilitychange', requestVisibleSync);
@@ -2373,8 +2448,9 @@ export default function App() {
       window.clearInterval(intervalId);
       eventSource?.removeEventListener('open', handleEventSourceOpen);
       eventSource?.removeEventListener('error', handleEventSourceError);
+      eventSource?.removeEventListener('shared', handleSharedListEvent);
       eventSource?.removeEventListener('updated', handleRemoteListEvent);
-      eventSource?.removeEventListener('deleted', handleRemoteListEvent);
+      eventSource?.removeEventListener('deleted', handleDeletedListEvent);
       window.removeEventListener('focus', requestSync);
       window.removeEventListener('online', requestSync);
       document.removeEventListener('visibilitychange', requestVisibleSync);
@@ -2385,6 +2461,7 @@ export default function App() {
     isLoaded,
     isServerBackedList,
     storageMode,
+    updateRoute,
     verboseDebugLog,
   ]);
 
@@ -2555,7 +2632,7 @@ export default function App() {
                 progress={progress}
                 countryCode={countryCode}
                 saveStatus={saveStatus}
-                onInputChange={setInput}
+                onInputChange={handleInputChange}
                 onListNameChange={setListName}
                 onCountryChange={handleCountryChange}
                 onParse={handleParse}

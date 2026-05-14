@@ -8,14 +8,17 @@ import {
   getDatabaseStatus,
   getSharedList,
   isSharedListId,
+  pruneEmptySharedLists,
   saveSharedList,
 } from './database.mjs';
 import { callShoppingListService, getHomeAssistantStatus, pushRecordToHomeAssistant } from './homeAssistant.mjs';
+import { canPersistSharedListRecord, isEmptyShoppingListRecord } from './sharedListPolicy.mjs';
 import { createUnknownProductSecurity } from './unknownProductSecurity.mjs';
 import { isUnknownProductsReport, submitUnknownProductsReport } from './unknownProducts.mjs';
 import { isShoppingListRecord } from './validation.mjs';
 
 const port = Number(process.env.PORT ?? 8787);
+const emptySharedListCleanupIntervalMs = Number(process.env.EMPTY_SHARED_LIST_CLEANUP_INTERVAL_MS ?? 60 * 60 * 1000);
 const distDir = resolve('dist');
 const appVersion = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')).version;
 const homeAssistantIntegrationEnabled = process.env.ENABLE_HOME_ASSISTANT_INTEGRATION === 'true';
@@ -39,6 +42,15 @@ const contentTypes = {
 };
 
 const sharedListEventClients = new Map();
+
+const sharedListEventClientCount = (listId) => sharedListEventClients.get(listId)?.size ?? 0;
+
+const publishDeletedSharedListEvents = (listIds) => {
+  const updatedAt = new Date().toISOString();
+  for (const listId of listIds) {
+    publishSharedListEvent(listId, { type: 'deleted', updatedAt });
+  }
+};
 
 const sendSharedListEvent = (response, event) => {
   if (response.destroyed || response.writableEnded) { return false; }
@@ -80,6 +92,13 @@ const addSharedListEventClient = (request, response, listId) => {
   const clients = sharedListEventClients.get(listId) ?? new Set();
   clients.add(response);
   sharedListEventClients.set(listId, clients);
+  if (clients.size > 1) {
+    publishSharedListEvent(listId, {
+      type: 'shared',
+      clientCount: clients.size,
+      updatedAt: new Date().toISOString(),
+    });
+  }
 
   const keepAlive = setInterval(() => {
     if (!sendSharedListComment(response, 'keep-alive')) {
@@ -171,6 +190,27 @@ const sendError = (response, error) => {
   });
 };
 
+const runEmptySharedListCleanup = async () => {
+  const result = await pruneEmptySharedLists();
+  if (result.deletedCount === 0) { return; }
+
+  publishDeletedSharedListEvents(result.deletedIds);
+  console.log(`Deleted ${result.deletedCount} empty shared list${result.deletedCount === 1 ? '' : 's'} from the database.`);
+};
+
+const startEmptySharedListCleanup = () => {
+  if (!Number.isFinite(emptySharedListCleanupIntervalMs) || emptySharedListCleanupIntervalMs <= 0) { return; }
+
+  void runEmptySharedListCleanup().catch((error) => {
+    console.warn('Unable to clean up empty shared lists.', error);
+  });
+  setInterval(() => {
+    void runEmptySharedListCleanup().catch((error) => {
+      console.warn('Unable to clean up empty shared lists.', error);
+    });
+  }, emptySharedListCleanupIntervalMs);
+};
+
 const handleApi = async (request, response, path) => {
   if (request.method === 'OPTIONS') {
     sendJson(response, 204, {});
@@ -231,6 +271,11 @@ const handleApi = async (request, response, path) => {
       return;
     }
 
+    if (!canPersistSharedListRecord(body.record)) {
+      sendJson(response, 400, { error: 'Empty shared lists are only persisted after another client connects' });
+      return;
+    }
+
     sendJson(response, 201, await createSharedList(body.record));
     return;
   }
@@ -270,6 +315,15 @@ const handleApi = async (request, response, path) => {
       if (!isShoppingListRecord(record, id)) {
         sendJson(response, 400, { error: 'Invalid shopping list record' });
         return;
+      }
+
+      const activeClientCount = sharedListEventClientCount(id);
+      if (isEmptyShoppingListRecord(record) && !canPersistSharedListRecord(record, activeClientCount)) {
+        const existingPayload = await getSharedList(id);
+        if (!existingPayload.exists) {
+          sendJson(response, 409, { error: 'Empty shared lists are only persisted after another client connects' });
+          return;
+        }
       }
 
       const payload = await saveSharedList(id, record);
@@ -389,4 +443,5 @@ const server = createServer((request, response) => {
 
 server.listen(port, () => {
   console.log(`Shopping list backend listening on http://localhost:${port}`);
+  startEmptySharedListCleanup();
 });

@@ -34,9 +34,12 @@ describe('US config', () => {
     expect(cereal?.keywords).toContain('pancake mix');
     expect(tinnedJarred?.label).toBe('Canned & Packaged Goods');
     expect(tinnedJarred?.keywords).toContain('black beans');
+    expect(tinnedJarred?.keywords).toContain('canned tuna');
     expect(tinnedJarred?.keywords).toContain('ketchup');
     expect(cookingIngredients?.label).toBe('Baking & Cooking Ingredients');
     expect(cookingIngredients?.keywords).toContain('cake mix');
+    expect(cookingIngredients?.keywords).toContain('rosemary');
+    expect(cookingIngredients?.keywords).toContain('garam masala');
     expect(cookingIngredients?.keywords).toContain('taco kit');
     expect(hotDrinks?.label).toBe('Coffee, Tea & Hot Drinks');
     expect(hotDrinks?.keywords).toContain('coffee pods');
@@ -65,6 +68,12 @@ describe('US config', () => {
 
   it('routes common US grocery items to the expected aisles', () => {
     expect(detectSection('black beans', US_CONFIG)).toBe('tinned_jarred');
+    expect(detectSection('chicken', US_CONFIG)).toBe('chilled_fresh_meat');
+    expect(detectSection('tuna', US_CONFIG)).toBe('tinned_jarred');
+    expect(detectSection('canned tuna', US_CONFIG)).toBe('tinned_jarred');
+    expect(detectSection('tuna steak', US_CONFIG)).toBe('seafood_counter');
+    expect(detectSection('nutella', US_CONFIG)).toBe('pantry');
+    expect(detectSection('rosemary', US_CONFIG)).toBe('cooking_ingredients');
     expect(detectSection('tomatoes', US_CONFIG)).toBe('produce');
     expect(detectSection('cake mix', US_CONFIG)).toBe('cooking_ingredients');
     expect(detectSection('coffee pods', US_CONFIG)).toBe('hot_drinks');

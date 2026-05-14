@@ -4,7 +4,7 @@ import { Card } from '../components/Card';
 import { CountrySelect } from '../components/CountrySelect';
 import { SaveStatusIndicator } from '../components/SaveStatusIndicator';
 import { StatsGrid } from '../components/StatsGrid';
-import { SharedListPanel } from '../components/SharedListPanel';
+import { SharedListHistoryPanel, SharedListPanel } from '../components/SharedListPanel';
 import { useI18n } from '../lib/i18n';
 import { filterProductSuggestions, type ProductSuggestion } from '../lib/productSuggestions';
 import type { CountryCode, SaveStatus, SharedListHistoryEntry } from '../types';
@@ -388,6 +388,19 @@ export function EditPage({
 
       <div className={'stack'}>
         <Card
+          header={<h2 className={'title title-sm'}>{messages.sharing.recentListsTitle}</h2>}
+          bodyClassName={'stack'}
+        >
+          <SharedListHistoryPanel
+            canUseBackend={canUseBackend}
+            isLoadingSharedList={isLoadingSharedList}
+            historyEntries={sharedListHistory}
+            onLoadHistoryEntry={onLoadSharedListFromHistory}
+            onDeleteHistoryEntry={onDeleteSharedListFromHistory}
+          />
+        </Card>
+
+        <Card
           header={
             <>
               <h2 className={'title title-sm'}>{messages.pages.edit.sharingTitle}</h2>
@@ -406,16 +419,12 @@ export function EditPage({
             isRefreshingSharedList={isRefreshingSharedList}
             isLoadingSharedList={isLoadingSharedList}
             shareError={shareError}
-            historyEntries={sharedListHistory}
             onCreateSharedLink={onCreateSharedLink}
             onRefreshSharedList={onRefreshSharedList}
             onLoadSharedInput={onLoadSharedInput}
             onValidateSharedInput={onValidateSharedInput}
-            onLoadHistoryEntry={onLoadSharedListFromHistory}
-            onDeleteHistoryEntry={onDeleteSharedListFromHistory}
           />
         </Card>
-
       </div>
     </div>
   );

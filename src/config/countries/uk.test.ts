@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { detectSection } from '../../lib/sections';
 import { UK_CONFIG } from './uk';
 
 describe('UK config', () => {
@@ -41,6 +42,8 @@ describe('UK config', () => {
     expect(tinnedJarred?.label).toBe('Tinned & Jarred Goods');
     expect(tinnedJarred?.keywords).toContain('baked beans');
     expect(tinnedJarred?.keywords).toContain('tinned tomatoes');
+    expect(tinnedJarred?.keywords).toContain('tinned tuna');
+    expect(tinnedJarred?.keywords).toContain('canned tuna');
     expect(tinnedJarred?.keywords).toContain('marmite');
     expect(homeBaking?.label).toBe('Home Baking');
     expect(homeBaking?.keywords).toContain('eggs');
@@ -51,8 +54,12 @@ describe('UK config', () => {
     expect(homeBaking?.keywords).toContain('edible glitter');
     expect(homeBaking?.keywords).toContain('sultanas');
     expect(homeBaking?.keywords).toContain('custard powder');
+    expect(homeBaking?.keywords).toContain('nutella');
     expect(cookingIngredients?.label).toBe('Cooking Ingredients & World Foods');
     expect(cookingIngredients?.keywords).toContain('liquid smoke');
+    expect(cookingIngredients?.keywords).toContain('rosemary');
+    expect(cookingIngredients?.keywords).toContain('thyme');
+    expect(cookingIngredients?.keywords).toContain('garam masala');
     expect(cookingIngredients?.keywords).toContain('soy sauce');
     expect(cookingIngredients?.keywords).toContain('fajita kit');
     expect(hotDrinks?.label).toBe('Tea, Coffee & Hot Drinks');
@@ -74,5 +81,14 @@ describe('UK config', () => {
     expect(frozenMeals?.keywords).toContain('frozen garlic bread');
     expect(baby?.label).toBe('Baby Supplies');
     expect(baby?.keywords).toContain('nappies');
+  });
+
+  it('routes common UK grocery dictionary additions to expected aisles', () => {
+    expect(detectSection('chicken', UK_CONFIG)).toBe('chilled_fresh_meat');
+    expect(detectSection('tuna', UK_CONFIG)).toBe('tinned_jarred');
+    expect(detectSection('canned tuna', UK_CONFIG)).toBe('tinned_jarred');
+    expect(detectSection('nutella', UK_CONFIG)).toBe('home_baking');
+    expect(detectSection('rosemary', UK_CONFIG)).toBe('cooking_ingredients');
+    expect(detectSection('ground coriander', UK_CONFIG)).toBe('cooking_ingredients');
   });
 });
