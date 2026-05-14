@@ -36,11 +36,16 @@ type SharedListPanelProps = {
   isRefreshingSharedList: boolean;
   isLoadingSharedList: boolean;
   shareError?: string;
-  historyEntries: SharedListHistoryEntry[];
   onCreateSharedLink: () => void;
   onRefreshSharedList: () => void;
   onLoadSharedInput: (value: string) => Promise<boolean>;
   onValidateSharedInput: (value: string) => Promise<SharedInputValidation>;
+};
+
+type SharedListHistoryPanelProps = {
+  canUseBackend: boolean;
+  isLoadingSharedList: boolean;
+  historyEntries: SharedListHistoryEntry[];
   onLoadHistoryEntry: (listId: string) => Promise<boolean>;
   onDeleteHistoryEntry: (listId: string) => void;
 };
@@ -93,15 +98,12 @@ export function SharedListPanel({
   isRefreshingSharedList,
   isLoadingSharedList,
   shareError,
-  historyEntries,
   onCreateSharedLink,
   onRefreshSharedList,
   onLoadSharedInput,
   onValidateSharedInput,
-  onLoadHistoryEntry,
-  onDeleteHistoryEntry,
 }: SharedListPanelProps) {
-  const { locale, messages } = useI18n();
+  const { messages } = useI18n();
   const [qrRender, setQrRender] = useState<QrRender>();
   const [qrRevealed, setQrRevealed] = useState(false);
   const [qrModalOpen, setQrModalOpen] = useState(false);
@@ -113,7 +115,6 @@ export function SharedListPanel({
   const [sharedInputStatus, setSharedInputStatus] = useState<SharedInputStatus>('idle');
   const videoRef = useRef<HTMLVideoElement>(null);
   const qrHideTimeoutRef = useRef<number>();
-  const historyPointerRef = useRef<{ listId: string; x: number; y: number; moved: boolean } | null>(null);
 
   useEffect(() => {
     if (qrHideTimeoutRef.current) {
@@ -367,10 +368,7 @@ export function SharedListPanel({
     }
   };
 
-  const localeCode = locale === 'en' ? 'en-GB' : locale;
   const displayListName = listName.trim();
-  const historyTitle = (entry: SharedListHistoryEntry): string =>
-    entry.listName?.trim() || entry.itemPreview.join(' · ') || messages.sharing.emptyList;
   const handleQrCardClick = () => {
     if (!qrRevealed) {
       setQrRevealed(true);
@@ -424,32 +422,6 @@ export function SharedListPanel({
           : sharedInputStatus === 'invalid'
             ? messages.sharing.invalidLink
             : '';
-  const isActionTarget = (target: EventTarget | null): boolean =>
-    target instanceof Element && target.closest('button') !== null;
-  const handleHistoryPointerDown = (listId: string, event: PointerEvent<HTMLDivElement>) => {
-    if (isActionTarget(event.target)) { return; }
-    historyPointerRef.current = { listId, x: event.clientX, y: event.clientY, moved: false };
-  };
-  const handleHistoryPointerMove = (listId: string, event: PointerEvent<HTMLDivElement>) => {
-    const activePointer = historyPointerRef.current;
-    if (!activePointer || activePointer.listId !== listId) { return; }
-
-    const deltaX = Math.abs(event.clientX - activePointer.x);
-    const deltaY = Math.abs(event.clientY - activePointer.y);
-    if (deltaX > HISTORY_CARD_TAP_THRESHOLD_PX || deltaY > HISTORY_CARD_TAP_THRESHOLD_PX) {
-      historyPointerRef.current = { ...activePointer, moved: true };
-    }
-  };
-  const handleHistoryClick = (listId: string, event: MouseEvent<HTMLDivElement>) => {
-    if (isActionTarget(event.target)) { return; }
-    const activePointer = historyPointerRef.current;
-    historyPointerRef.current = null;
-    if (activePointer?.listId === listId && activePointer.moved) { return; }
-    void onLoadHistoryEntry(listId);
-  };
-  const handleHistoryPointerCancel = () => {
-    historyPointerRef.current = null;
-  };
   const normalizeSharedInput = (value: string): string => {
     const normalized = extractSharedListId(value, appBasePath, window.location.origin);
     return normalized ?? value;
@@ -569,68 +541,6 @@ export function SharedListPanel({
         </div>
       ) : null}
 
-      <div className={'stack'}>
-        <h3 className={'title title-xs'}>{messages.sharing.recentListsTitle}</h3>
-        {historyEntries.length === 0 ? (
-          <div className={'empty-state'}>{messages.sharing.recentListsEmpty}</div>
-        ) : (
-          <div className={'stack'}>
-            {historyEntries.map((entry) => (
-              <div
-                key={entry.listId}
-                className={'shared-history-item'}
-                title={messages.actions.loadSharedList}
-                onPointerDown={(event) => handleHistoryPointerDown(entry.listId, event)}
-                onPointerMove={(event) => handleHistoryPointerMove(entry.listId, event)}
-                onPointerCancel={handleHistoryPointerCancel}
-                onClick={(event) => handleHistoryClick(entry.listId, event)}
-              >
-                <div className={'stack shared-history-content'}>
-                  <div className={'shared-history-title-wrap'}>
-                    <div className={'shared-history-title'}>{historyTitle(entry)}</div>
-                  </div>
-                  <div className={'small-text'}>
-                    {messages.labels.created} {formatTimestamp(entry.createdAt, localeCode)} · {messages.labels.updated}{' '}
-                    {formatTimestamp(entry.updatedAt, localeCode)}
-                  </div>
-                </div>
-                <div className={'shared-history-actions'}>
-                  <button
-                    type={'button'}
-                    className={'button button-icon'}
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      void onLoadHistoryEntry(entry.listId);
-                    }}
-                    disabled={isLoadingSharedList || !canUseBackend}
-                    aria-label={`${messages.actions.loadSharedList}: ${historyTitle(entry)}`}
-                    title={messages.actions.loadSharedList}
-                  >
-                    <svg aria-hidden={'true'} className={'button-icon-svg'} viewBox={'0 0 24 24'}>
-                      <path d={mdiDownloadOutline} fill={'currentColor'} />
-                    </svg>
-                  </button>
-                  <button
-                    type={'button'}
-                    className={'button button-icon'}
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      onDeleteHistoryEntry(entry.listId);
-                    }}
-                    aria-label={messages.actions.remove}
-                    title={messages.actions.remove}
-                  >
-                    <svg aria-hidden={'true'} className={'button-icon-svg'} viewBox={'0 0 24 24'}>
-                      <path d={mdiDeleteOutline} fill={'currentColor'} />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
       {scannerOpen ? (
         <div className={'share-scanner-modal'} onClick={closeScanner} role={'presentation'}>
           <div
@@ -676,6 +586,107 @@ export function SharedListPanel({
           </div>
         </div>
       ) : null}
+    </div>
+  );
+}
+
+export function SharedListHistoryPanel({
+  canUseBackend,
+  isLoadingSharedList,
+  historyEntries,
+  onLoadHistoryEntry,
+  onDeleteHistoryEntry,
+}: SharedListHistoryPanelProps) {
+  const { locale, messages } = useI18n();
+  const historyPointerRef = useRef<{ listId: string; x: number; y: number; moved: boolean } | null>(null);
+  const localeCode = locale === 'en' ? 'en-GB' : locale;
+  const historyTitle = (entry: SharedListHistoryEntry): string =>
+    entry.listName?.trim() || entry.itemPreview.join(' · ') || messages.sharing.emptyList;
+  const isActionTarget = (target: EventTarget | null): boolean =>
+    target instanceof Element && target.closest('button') !== null;
+  const handleHistoryPointerDown = (listId: string, event: PointerEvent<HTMLDivElement>) => {
+    if (isActionTarget(event.target)) { return; }
+    historyPointerRef.current = { listId, x: event.clientX, y: event.clientY, moved: false };
+  };
+  const handleHistoryPointerMove = (listId: string, event: PointerEvent<HTMLDivElement>) => {
+    const activePointer = historyPointerRef.current;
+    if (!activePointer || activePointer.listId !== listId) { return; }
+
+    const deltaX = Math.abs(event.clientX - activePointer.x);
+    const deltaY = Math.abs(event.clientY - activePointer.y);
+    if (deltaX > HISTORY_CARD_TAP_THRESHOLD_PX || deltaY > HISTORY_CARD_TAP_THRESHOLD_PX) {
+      historyPointerRef.current = { ...activePointer, moved: true };
+    }
+  };
+  const handleHistoryClick = (listId: string, event: MouseEvent<HTMLDivElement>) => {
+    if (isActionTarget(event.target)) { return; }
+    const activePointer = historyPointerRef.current;
+    historyPointerRef.current = null;
+    if (activePointer?.listId === listId && activePointer.moved) { return; }
+    void onLoadHistoryEntry(listId);
+  };
+  const handleHistoryPointerCancel = () => {
+    historyPointerRef.current = null;
+  };
+
+  if (historyEntries.length === 0) {
+    return <div className={'empty-state'}>{messages.sharing.recentListsEmpty}</div>;
+  }
+
+  return (
+    <div className={'stack shared-history-list'}>
+      {historyEntries.map((entry) => (
+        <div
+          key={entry.listId}
+          className={'shared-history-item'}
+          title={messages.actions.loadSharedList}
+          onPointerDown={(event) => handleHistoryPointerDown(entry.listId, event)}
+          onPointerMove={(event) => handleHistoryPointerMove(entry.listId, event)}
+          onPointerCancel={handleHistoryPointerCancel}
+          onClick={(event) => handleHistoryClick(entry.listId, event)}
+        >
+          <div className={'stack shared-history-content'}>
+            <div className={'shared-history-title-wrap'}>
+              <div className={'shared-history-title'}>{historyTitle(entry)}</div>
+            </div>
+            <div className={'small-text'}>
+              {messages.labels.created} {formatTimestamp(entry.createdAt, localeCode)} · {messages.labels.updated}{' '}
+              {formatTimestamp(entry.updatedAt, localeCode)}
+            </div>
+          </div>
+          <div className={'shared-history-actions'}>
+            <button
+              type={'button'}
+              className={'button button-icon'}
+              onClick={(event) => {
+                event.stopPropagation();
+                void onLoadHistoryEntry(entry.listId);
+              }}
+              disabled={isLoadingSharedList || !canUseBackend}
+              aria-label={`${messages.actions.loadSharedList}: ${historyTitle(entry)}`}
+              title={messages.actions.loadSharedList}
+            >
+              <svg aria-hidden={'true'} className={'button-icon-svg'} viewBox={'0 0 24 24'}>
+                <path d={mdiDownloadOutline} fill={'currentColor'} />
+              </svg>
+            </button>
+            <button
+              type={'button'}
+              className={'button button-icon'}
+              onClick={(event) => {
+                event.stopPropagation();
+                onDeleteHistoryEntry(entry.listId);
+              }}
+              aria-label={messages.actions.remove}
+              title={messages.actions.remove}
+            >
+              <svg aria-hidden={'true'} className={'button-icon-svg'} viewBox={'0 0 24 24'}>
+                <path d={mdiDeleteOutline} fill={'currentColor'} />
+              </svg>
+            </button>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
