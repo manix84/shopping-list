@@ -2166,6 +2166,11 @@ export default function App() {
     setIsRouteFilterVisible(false);
   };
 
+  const handleInputChange = (nextInput: string) => {
+    setInput(nextInput);
+    setItems((current) => parseItems(nextInput, config, current));
+  };
+
   const handleDeleteItem = (itemId: string) => {
     setItems((current) => {
       const target = current.find((item) => item.id === itemId);
@@ -2579,7 +2584,7 @@ export default function App() {
                 progress={progress}
                 countryCode={countryCode}
                 saveStatus={saveStatus}
-                onInputChange={setInput}
+                onInputChange={handleInputChange}
                 onListNameChange={setListName}
                 onCountryChange={handleCountryChange}
                 onParse={handleParse}
