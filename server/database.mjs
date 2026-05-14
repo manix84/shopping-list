@@ -4,6 +4,7 @@ import { dirname, resolve } from 'node:path';
 import pg from 'pg';
 import './env.mjs';
 import { COUNTRY_CODES } from './constants.mjs';
+import { isEmptyShoppingListRecord } from './sharedListPolicy.mjs';
 
 const { Pool } = pg;
 
@@ -369,6 +370,44 @@ export const clearSharedList = async (id) => {
     id,
     exists: false,
     record: defaultRecord(),
+  };
+};
+
+export const pruneEmptySharedLists = async () => {
+  if (!getPool()) {
+    return withJsonDatabaseWriteLock(async () => {
+      const database = await readJsonDatabase();
+      const deletedIds = [];
+
+      for (const [id, sharedList] of Object.entries(database.sharedLists)) {
+        if (!isEmptyShoppingListRecord(normalizeRecord(sharedList?.record))) { continue; }
+
+        delete database.sharedLists[id];
+        deletedIds.push(id);
+      }
+
+      if (deletedIds.length > 0) {
+        await writeJsonDatabase(database);
+      }
+
+      return {
+        deletedCount: deletedIds.length,
+        deletedIds,
+      };
+    });
+  }
+
+  const result = await postgresQuery(`
+    DELETE FROM shared_lists
+    WHERE btrim(coalesce(record->>'input', '')) = ''
+      AND jsonb_typeof(record->'items') = 'array'
+      AND jsonb_array_length(record->'items') = 0
+    RETURNING id
+  `);
+  const deletedIds = result.rows.map((row) => row.id);
+  return {
+    deletedCount: deletedIds.length,
+    deletedIds,
   };
 };
 

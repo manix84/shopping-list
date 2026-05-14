@@ -480,6 +480,9 @@ const countryConfigForMeasurementDisplayMode = (
 
 const getSharedListPreview = (items: Item[]): string[] => items.slice(0, 6).map((item) => item.raw);
 
+const isEmptyShoppingListRecord = (record: Pick<ShoppingListRecord, 'input' | 'items'>): boolean =>
+  record.input.trim() === '' && record.items.length === 0;
+
 const recordFromCurrentState = ({
   input,
   items,
@@ -2351,6 +2354,25 @@ export default function App() {
     const handleRemoteListEvent = () => {
       void syncRemoteRecord();
     };
+    const handleSharedListEvent = () => {
+      const currentState = currentShoppingListStateRef.current;
+      if (!currentState || currentState.listId !== activeListId || !currentState.serverBacked) { return; }
+      if (!isEmptyShoppingListRecord(currentState)) { return; }
+
+      const record = recordFromCurrentState({
+        ...currentState,
+        serverBacked: true,
+      });
+      void saveSharedShoppingList(activeListId, record)
+        .then(() => {
+          if (cancelled) { return; }
+          lastBackendPersistedRecordRef.current = record;
+          pendingBackendSaveRecordRef.current = undefined;
+        })
+        .catch((error: unknown) => {
+          verboseDebugLog('shared empty list save after second client failed', { listId: activeListId, error });
+        });
+    };
     const handleEventSourceOpen = () => {
       isSseOpen = true;
     };
@@ -2361,6 +2383,7 @@ export default function App() {
     void syncRemoteRecord();
     eventSource?.addEventListener('open', handleEventSourceOpen);
     eventSource?.addEventListener('error', handleEventSourceError);
+    eventSource?.addEventListener('shared', handleSharedListEvent);
     eventSource?.addEventListener('updated', handleRemoteListEvent);
     eventSource?.addEventListener('deleted', handleRemoteListEvent);
     window.addEventListener('focus', requestSync);
@@ -2373,6 +2396,7 @@ export default function App() {
       window.clearInterval(intervalId);
       eventSource?.removeEventListener('open', handleEventSourceOpen);
       eventSource?.removeEventListener('error', handleEventSourceError);
+      eventSource?.removeEventListener('shared', handleSharedListEvent);
       eventSource?.removeEventListener('updated', handleRemoteListEvent);
       eventSource?.removeEventListener('deleted', handleRemoteListEvent);
       window.removeEventListener('focus', requestSync);
