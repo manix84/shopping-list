@@ -1442,6 +1442,7 @@ export default function App() {
       const localRecord = localStorageRepository.load();
       const hasLocalRecord = hasStoredShoppingListRecord();
       const resolvedListId = routeListId ?? localRecord.listId ?? createUuidV7();
+      let nextActiveListId = resolvedListId;
       const localRecordWithIdentity = {
         ...localRecord,
         listId: resolvedListId,
@@ -1470,32 +1471,44 @@ export default function App() {
       ) {
         try {
           const remotePayload = await loadSharedShoppingList(resolvedListId);
-          selectedRecord = {
-            ...chooseNewestRecord({
-              local: localRecordWithIdentity,
-              remote: { ...remotePayload.record, listId: resolvedListId, serverBacked: true },
-              hasLocalRecord,
-              hasRemoteRecord: remotePayload.exists,
-            }),
-            listId: resolvedListId,
-            serverBacked: true,
-          };
-
-          await saveSharedShoppingList(resolvedListId, selectedRecord);
-          localStorageRepository.save(selectedRecord);
-          lastLocalPersistedRecordRef.current = selectedRecord;
-          lastBackendPersistedRecordRef.current = selectedRecord;
-          if (remotePayload.exists) {
-            rememberSharedList({
+          if (routeListId && !remotePayload.exists) {
+            nextActiveListId = localRecord.listId ?? createUuidV7();
+            setShareError('loadMissing');
+            selectedRecord = {
+              ...localRecord,
+              listId: nextActiveListId,
+              serverBacked: false,
+            };
+            nextStorageMode = 'local';
+            nextServerBacked = false;
+          } else {
+            selectedRecord = {
+              ...chooseNewestRecord({
+                local: localRecordWithIdentity,
+                remote: { ...remotePayload.record, listId: resolvedListId, serverBacked: true },
+                hasLocalRecord,
+                hasRemoteRecord: remotePayload.exists,
+              }),
               listId: resolvedListId,
-              listName: selectedRecord.listName,
-              items: selectedRecord.items,
-              createdAt: remotePayload.createdAt,
-              updatedAt: remotePayload.updatedAt ?? selectedRecord.updatedAt,
-            });
+              serverBacked: true,
+            };
+
+            await saveSharedShoppingList(resolvedListId, selectedRecord);
+            localStorageRepository.save(selectedRecord);
+            lastLocalPersistedRecordRef.current = selectedRecord;
+            lastBackendPersistedRecordRef.current = selectedRecord;
+            if (remotePayload.exists) {
+              rememberSharedList({
+                listId: resolvedListId,
+                listName: selectedRecord.listName,
+                items: selectedRecord.items,
+                createdAt: remotePayload.createdAt,
+                updatedAt: remotePayload.updatedAt ?? selectedRecord.updatedAt,
+              });
+            }
+            nextStorageMode = 'backend';
+            nextServerBacked = true;
           }
-          nextStorageMode = 'backend';
-          nextServerBacked = true;
         } catch (error) {
           console.warn('Backend was detected but could not be loaded. Falling back to local storage.', error);
         }
@@ -1513,8 +1526,8 @@ export default function App() {
       const shouldUseNavigationMemory = shouldUseNavigationMemoryRef.current;
       shouldResolveDefaultLandingRef.current = false;
       shouldUseNavigationMemoryRef.current = false;
-      activeListIdRef.current = resolvedListId;
-      setActiveListId(resolvedListId);
+      activeListIdRef.current = nextActiveListId;
+      setActiveListId(nextActiveListId);
       setIsServerBackedList(nextServerBacked);
       const currentLocationDebugTab = readRouteFromLocation().debugTab;
       updateRoute((current) => ({
@@ -1524,7 +1537,7 @@ export default function App() {
               useNavigationMemory: shouldUseNavigationMemory,
             })
           : current.page,
-        listId: nextServerBacked ? resolvedListId : undefined,
+        listId: nextServerBacked ? nextActiveListId : undefined,
         debugTab: current.debugTab ?? currentLocationDebugTab,
       }), 'replace');
       setCountryCode(selectedRecord.countryCode);

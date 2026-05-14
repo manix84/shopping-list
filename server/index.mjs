@@ -12,7 +12,7 @@ import {
   saveSharedList,
 } from './database.mjs';
 import { callShoppingListService, getHomeAssistantStatus, pushRecordToHomeAssistant } from './homeAssistant.mjs';
-import { canPersistSharedListRecord } from './sharedListPolicy.mjs';
+import { canPersistSharedListRecord, isEmptyShoppingListRecord } from './sharedListPolicy.mjs';
 import { createUnknownProductSecurity } from './unknownProductSecurity.mjs';
 import { isUnknownProductsReport, submitUnknownProductsReport } from './unknownProducts.mjs';
 import { isShoppingListRecord } from './validation.mjs';
@@ -317,10 +317,13 @@ const handleApi = async (request, response, path) => {
         return;
       }
 
-      if (!canPersistSharedListRecord(record, sharedListEventClientCount(id))) {
-        const payload = await clearSharedList(id);
-        sendJson(response, 200, payload);
-        return;
+      const activeClientCount = sharedListEventClientCount(id);
+      if (isEmptyShoppingListRecord(record) && !canPersistSharedListRecord(record, activeClientCount)) {
+        const existingPayload = await getSharedList(id);
+        if (!existingPayload.exists) {
+          sendJson(response, 409, { error: 'Empty shared lists are only persisted after another client connects' });
+          return;
+        }
       }
 
       const payload = await saveSharedList(id, record);
