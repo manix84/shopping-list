@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type MouseEvent, type PointerEvent } from 'react';
 import {
   mdiBellOutline,
   mdiCalculatorVariantOutline,
@@ -433,6 +433,20 @@ export function DebugPage({
   const [isHeartbeatDetailsOpen, setIsHeartbeatDetailsOpen] = useState(false);
   const [isHeartbeatHistoryOpen, setIsHeartbeatHistoryOpen] = useState(false);
   const debugTabButtonRefs = useRef(new Map<DebugTabKey, HTMLButtonElement>());
+  const debugTabDragRef = useRef<{
+    dragged: boolean;
+    pointerId: number | null;
+    scrollLeft: number;
+    startX: number;
+    suppressClick: boolean;
+  }>({
+    dragged: false,
+    pointerId: null,
+    scrollLeft: 0,
+    startX: 0,
+    suppressClick: false,
+  });
+  const [isDebugTabDragging, setIsDebugTabDragging] = useState(false);
   const heartbeatHistoryWrapRef = useRef<HTMLDivElement | null>(null);
   const heartbeatHistoryRowRefs = useRef(new Map<string, HTMLTableRowElement>());
   const runtimeLocation =
@@ -591,7 +605,7 @@ export function DebugPage({
   useEffect(() => {
     if (typeof document === 'undefined') { return undefined; }
 
-    const clearLockedHeartbeatSample = (event: PointerEvent) => {
+    const clearLockedHeartbeatSample = (event: globalThis.PointerEvent) => {
       const target = event.target;
       if (target instanceof Element && target.closest('.heartbeat-graph-point')) { return; }
 
@@ -629,6 +643,63 @@ export function DebugPage({
     onDebugTabChange(nextTab.key);
     document.getElementById(`debug-tab-${nextTab.key}`)?.focus();
   };
+  const handleDebugTabListPointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    if (!event.isPrimary || event.button !== 0) { return; }
+    const tabList = event.currentTarget;
+    if (tabList.scrollWidth <= tabList.clientWidth) { return; }
+
+    debugTabDragRef.current = {
+      dragged: false,
+      pointerId: event.pointerId,
+      scrollLeft: tabList.scrollLeft,
+      startX: event.clientX,
+      suppressClick: false,
+    };
+    tabList.setPointerCapture(event.pointerId);
+  };
+  const handleDebugTabListPointerMove = (event: PointerEvent<HTMLDivElement>) => {
+    const drag = debugTabDragRef.current;
+    if (drag.pointerId !== event.pointerId) { return; }
+
+    const deltaX = event.clientX - drag.startX;
+    if (Math.abs(deltaX) > 4) {
+      if (!drag.dragged) {
+        setIsDebugTabDragging(true);
+      }
+      drag.dragged = true;
+      drag.suppressClick = true;
+    }
+
+    if (!drag.dragged) { return; }
+    event.preventDefault();
+    event.currentTarget.scrollLeft = drag.scrollLeft - deltaX;
+  };
+  const endDebugTabListDrag = (event: PointerEvent<HTMLDivElement>) => {
+    const drag = debugTabDragRef.current;
+    if (drag.pointerId !== event.pointerId) { return; }
+
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    debugTabDragRef.current = { ...drag, pointerId: null };
+    setIsDebugTabDragging(false);
+
+    if (drag.suppressClick && typeof window !== 'undefined') {
+      window.setTimeout(() => {
+        debugTabDragRef.current = { ...debugTabDragRef.current, suppressClick: false };
+      }, 120);
+    }
+  };
+  const handleDebugTabClick = (event: MouseEvent<HTMLButtonElement>, tabKey: DebugTabKey) => {
+    if (debugTabDragRef.current.suppressClick) {
+      event.preventDefault();
+      event.stopPropagation();
+      debugTabDragRef.current = { ...debugTabDragRef.current, suppressClick: false };
+      return;
+    }
+
+    onDebugTabChange(tabKey);
+  };
 
   return (
     <Card
@@ -650,7 +721,15 @@ export function DebugPage({
       }
       bodyClassName={'stack'}
     >
-      <div className={'debug-tablist'} role={'tablist'} aria-label={messages.pages.debug.title}>
+      <div
+        className={`debug-tablist ${isDebugTabDragging ? 'debug-tablist-dragging' : ''}`.trim()}
+        role={'tablist'}
+        aria-label={messages.pages.debug.title}
+        onPointerDown={handleDebugTabListPointerDown}
+        onPointerMove={handleDebugTabListPointerMove}
+        onPointerUp={endDebugTabListDrag}
+        onPointerCancel={endDebugTabListDrag}
+      >
         {debugTabs.map((tab, index) => (
           <button
             key={tab.key}
@@ -669,7 +748,7 @@ export function DebugPage({
                 debugTabButtonRefs.current.delete(tab.key);
               }
             }}
-            onClick={() => onDebugTabChange(tab.key)}
+            onClick={(event) => handleDebugTabClick(event, tab.key)}
             onKeyDown={(event) => handleTabKeyDown(event, index)}
             title={tab.label}
           >
