@@ -1208,6 +1208,7 @@ select {
 
 .debug-tablist {
   -webkit-overflow-scrolling: touch;
+  cursor: grab;
   display: flex;
   flex-wrap: nowrap;
   gap: 8px;
@@ -1216,6 +1217,12 @@ select {
   overflow-y: hidden;
   padding: 2px 4px 8px;
   scrollbar-gutter: stable;
+  user-select: none;
+}
+
+.debug-tablist-dragging {
+  cursor: grabbing;
+  scroll-behavior: auto;
 }
 
 .debug-tab-button {
