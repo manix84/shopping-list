@@ -1,4 +1,4 @@
-const CACHE_NAME = 'smart-shopping-list-pwa-v8';
+const CACHE_NAME = 'smart-shopping-list-pwa-v9';
 
 const appShellUrl = () => new URL('index.html', self.registration.scope).href;
 const scopeUrl = () => new URL('.', self.registration.scope).href;
