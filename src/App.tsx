@@ -91,6 +91,7 @@ const DEBUG_NOTIFICATION_LIST_ID = 'debug-notifications';
 const DEBUG_MODE_NOTICE_DURATION_MS = 4_000;
 const DEV_TITLE_SUFFIX = ' [Dev]';
 const DEV_MANIFEST_ID = 'smart-shopping-list-dev';
+const MANIFEST_SOURCE_HREF_DATA_KEY = 'sourceHref';
 const LAST_LIST_PAGE_KEY = 'shoppingList:lastListPage';
 const LAST_DEBUG_TAB_KEY = 'shoppingList:lastDebugTab';
 const APP_VERSION_RELOAD_SESSION_KEY = 'shoppingList:versionReload';
@@ -183,15 +184,33 @@ const absoluteManifestImageResources = (value: unknown, manifestUrl: string): un
   });
 };
 
-const updateDevManifest = (appTitle: string): void => {
-  if (!import.meta.env.DEV || typeof document === 'undefined') { return; }
+const manifestShortcutIcon = (manifestUrl: string) => [{
+  src: absoluteManifestUrl('icon-192.png', manifestUrl),
+  sizes: '192x192',
+  type: 'image/png',
+}];
+
+const updateRuntimeManifest = ({
+  appTitle,
+  debugModeEnabled,
+  editLabel,
+  routeLabel,
+  debugLabel,
+}: {
+  appTitle: string;
+  debugModeEnabled: boolean;
+  editLabel: string;
+  routeLabel: string;
+  debugLabel: string;
+}): void => {
+  if (typeof document === 'undefined') { return; }
 
   const manifestLink = document.querySelector<HTMLLinkElement>('link[rel="manifest"]');
   if (!manifestLink) { return; }
 
-  const sourceManifestUrl = manifestLink.href.startsWith('blob:')
-    ? new URL('manifest.webmanifest', window.location.href).href
-    : manifestLink.href;
+  const sourceManifestUrl = manifestLink.dataset[MANIFEST_SOURCE_HREF_DATA_KEY] ?? manifestLink.href;
+  manifestLink.dataset[MANIFEST_SOURCE_HREF_DATA_KEY] = sourceManifestUrl;
+  const shortcutIcons = manifestShortcutIcon(sourceManifestUrl);
 
   fetch(sourceManifestUrl, { cache: 'no-store' })
     .then((response) => response.ok ? response.json() : undefined)
@@ -205,8 +224,35 @@ const updateDevManifest = (appTitle: string): void => {
         scope: absoluteManifestUrl((manifest as { scope?: unknown }).scope, sourceManifestUrl),
         icons: absoluteManifestImageResources((manifest as { icons?: unknown }).icons, sourceManifestUrl),
         screenshots: absoluteManifestImageResources((manifest as { screenshots?: unknown }).screenshots, sourceManifestUrl),
-        name: `${appTitle}${DEV_TITLE_SUFFIX}`,
-        short_name: `Shopping List${DEV_TITLE_SUFFIX}`,
+        shortcuts: [
+          {
+            name: editLabel,
+            short_name: editLabel,
+            url: absoluteManifestUrl(routeToUrl({ page: 'edit' }, appBasePath), window.location.origin),
+            icons: shortcutIcons,
+          },
+          {
+            name: routeLabel,
+            short_name: routeLabel,
+            url: absoluteManifestUrl(routeToUrl({ page: 'route' }, appBasePath), window.location.origin),
+            icons: shortcutIcons,
+          },
+          ...(debugModeEnabled
+            ? [{
+                name: debugLabel,
+                short_name: debugLabel,
+                url: absoluteManifestUrl(routeToUrl({ page: 'debug' }, appBasePath), window.location.origin),
+                icons: shortcutIcons,
+              }]
+            : []),
+        ],
+        ...(import.meta.env.DEV
+          ? {
+              id: DEV_MANIFEST_ID,
+              name: `${appTitle}${DEV_TITLE_SUFFIX}`,
+              short_name: `Shopping List${DEV_TITLE_SUFFIX}`,
+            }
+          : {}),
       };
       const manifestBlob = new Blob([JSON.stringify(devManifest)], { type: 'application/manifest+json' });
       const previousHref = manifestLink.href.startsWith('blob:') ? manifestLink.href : undefined;
@@ -1782,9 +1828,15 @@ export default function App() {
     applyDocumentLocale(locale);
     if (typeof document !== 'undefined') {
       document.title = import.meta.env.DEV ? `${messages.app.title}${DEV_TITLE_SUFFIX}` : messages.app.title;
-      updateDevManifest(messages.app.title);
+      updateRuntimeManifest({
+        appTitle: messages.app.title,
+        debugModeEnabled: isDebugMode,
+        editLabel: messages.nav.editList,
+        routeLabel: messages.nav.route,
+        debugLabel: messages.nav.debugTools,
+      });
     }
-  }, [locale, messages]);
+  }, [isDebugMode, locale, messages]);
 
   useEffect(() => {
     saveRouteViewMode(routeViewMode);
