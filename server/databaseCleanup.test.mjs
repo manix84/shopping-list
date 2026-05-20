@@ -67,6 +67,7 @@ describe('database empty shared-list cleanup', () => {
   it('removes empty Postgres shared lists with the expected DELETE criteria', async () => {
     const query = vi.fn()
       .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [] })
       .mockResolvedValueOnce({ rows: [{ count: 1 }] })
       .mockResolvedValueOnce({
         rows: [
@@ -96,7 +97,7 @@ describe('database empty shared-list cleanup', () => {
       connectionString: 'postgres://shopping-list.test/db',
       ssl: undefined,
     });
-    const deleteQuery = query.mock.calls[2]?.[0];
+    const deleteQuery = query.mock.calls[3]?.[0];
     expect(deleteQuery).toContain('DELETE FROM shared_lists');
     expect(deleteQuery).toContain("btrim(coalesce(record->>'input', '')) = ''");
     expect(deleteQuery).toContain("jsonb_typeof(record->'items') = 'array'");

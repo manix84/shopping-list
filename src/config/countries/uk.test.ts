@@ -81,6 +81,7 @@ describe('UK config', () => {
     expect(frozenMeals?.keywords).toContain('frozen garlic bread');
     expect(baby?.label).toBe('Baby Supplies');
     expect(baby?.keywords).toContain('nappies');
+    expect(baby?.keywords).not.toContain('wipes');
   });
 
   it('routes common UK grocery dictionary additions to expected aisles', () => {
@@ -90,5 +91,8 @@ describe('UK config', () => {
     expect(detectSection('nutella', UK_CONFIG)).toBe('home_baking');
     expect(detectSection('rosemary', UK_CONFIG)).toBe('cooking_ingredients');
     expect(detectSection('ground coriander', UK_CONFIG)).toBe('cooking_ingredients');
+    expect(detectSection('dettol', UK_CONFIG)).toBe('household');
+    expect(detectSection('dettol wipes', UK_CONFIG)).toBe('household');
+    expect(detectSection('baby wipes', UK_CONFIG)).toBe('baby');
   });
 });

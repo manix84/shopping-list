@@ -175,6 +175,26 @@ describe('unknown product security', () => {
     }))).toBe(true);
   });
 
+  it('accepts forwarded Vite dev-server origins', () => {
+    const security = createUnknownProductSecurity();
+
+    expect(security.requestExpectedOrigin(request({
+      headers: {
+        host: 'localhost:8787',
+        'x-forwarded-host': 'localhost:5175',
+        'x-forwarded-proto': 'http',
+      },
+    }))).toBe('http://localhost:5175');
+    expect(security.isSameOriginRequest(request({
+      headers: {
+        host: 'localhost:8787',
+        origin: 'http://localhost:5175',
+        'x-forwarded-host': 'localhost:5175',
+        'x-forwarded-proto': 'http',
+      },
+    }))).toBe(true);
+  });
+
   it('accepts explicitly trusted origins', () => {
     const security = createUnknownProductSecurity({ allowedOrigins: 'https://shopping.example.com, https://app.example.com' });
 

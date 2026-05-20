@@ -32,16 +32,21 @@ import type {
   Item,
   MatcherTestResult,
   MeasurementTestResult,
+  ProductSuggestion,
+  SectionKey,
   StateTestResult,
   StorageTestResult,
   UnitQuantityTestResult,
   VariantTestResult,
   ShoppingListRecord,
 } from '../types';
+import { Badge } from '../components/Badge';
 import { Card } from '../components/Card';
 import { ParsedItemCard } from '../components/ParsedItemCard';
 import { TestResultCard } from '../components/TestResultCard';
 import { SectionsPage } from './SectionsPage';
+import { getDisplayValue } from '../lib/parser';
+import { getSectionMeta } from '../lib/sections';
 import { useI18n } from '../lib/i18n';
 import type { Messages } from '../lib/i18n';
 import { appVersion } from '../version';
@@ -59,6 +64,8 @@ type DebugPageProps = {
     record: ShoppingListRecord;
     updatedAt: string;
   };
+  productSuggestions: ProductSuggestion[];
+  productSuggestionError?: string;
   items: Item[];
   config: CountryConfig;
   matcherTests: MatcherTestResult[];
@@ -87,12 +94,34 @@ type DebugPageProps = {
   onDebugSettingChange: (key: keyof DebugSettings, enabled: boolean) => void;
   onDebugNotificationTest: (key: DebugNotificationTestKey) => void;
   onDebugEventTest: (key: DebugEventTestKey) => void;
+  onRefreshProductSuggestions: () => void;
+  onApproveProductSuggestion: (
+    suggestion: ProductSuggestion,
+    updates: Pick<ProductSuggestion, 'product' | 'aliases' | 'section' | 'countryCode'>,
+  ) => void;
+  onRejectProductSuggestion: (suggestion: ProductSuggestion) => void;
+  onSuggestProductRecategorization: (item: Item, section: SectionKey) => void;
   onDebugTabChange: (tab: DebugTabKey) => void;
   onBackToEdit: () => void;
   onBackToSettings: () => void;
 };
 
 type HeartbeatInteractionSurface = 'graph' | 'history' | 'status';
+type ProductSuggestionReviewCardProps = {
+  suggestion: ProductSuggestion;
+  sectionOptions: Array<{ key: SectionKey; label: string; groupLabel: string }>;
+  onApprove: (
+    suggestion: ProductSuggestion,
+    updates: Pick<ProductSuggestion, 'product' | 'aliases' | 'section' | 'countryCode'>,
+  ) => void;
+  onReject: (suggestion: ProductSuggestion) => void;
+};
+type ProductRecategorizationCardProps = {
+  item: Item;
+  sectionOptions: Array<{ key: SectionKey; label: string; groupLabel: string }>;
+  config: CountryConfig;
+  onSuggest: (item: Item, section: SectionKey) => void;
+};
 
 const HEARTBEAT_HISTORY_SLOT_COUNT = 36;
 const HEARTBEAT_LATENCY_GRAPH_BASE_MAX_MS = 100;
@@ -114,6 +143,131 @@ const jsonTokenClass = (token: string, isKey = false) => {
   if (/^-?\d/.test(token)) { return 'json-token-number'; }
   return 'json-token-punctuation';
 };
+
+function ProductSuggestionReviewCard({
+  suggestion,
+  sectionOptions,
+  onApprove,
+  onReject,
+}: ProductSuggestionReviewCardProps) {
+  const [product, setProduct] = useState(suggestion.product);
+  const [aliases, setAliases] = useState(suggestion.aliases.join(', '));
+  const [section, setSection] = useState<SectionKey>(suggestion.section);
+
+  useEffect(() => {
+    setProduct(suggestion.product);
+    setAliases(suggestion.aliases.join(', '));
+    setSection(suggestion.section);
+  }, [suggestion]);
+
+  const aliasList = aliases
+    .split(',')
+    .map((alias) => alias.trim())
+    .filter(Boolean);
+
+  return (
+    <Card
+      bodyClassName={'stack'}
+      header={
+        <div className={'title-row'}>
+          <div>
+            <h3 className={'title title-xs'}>{suggestion.product}</h3>
+            <p className={'subtitle'}>
+              {suggestion.countryCode.toUpperCase()} · {suggestion.reportCount} report{suggestion.reportCount === 1 ? '' : 's'} · confidence {Math.round(suggestion.confidence * 100)}%
+            </p>
+          </div>
+          <div className={'button-row'}>
+            <button
+              type={'button'}
+              className={'button button-primary'}
+              onClick={() => onApprove(suggestion, {
+                product,
+                aliases: aliasList,
+                section,
+                countryCode: suggestion.countryCode,
+              })}
+            >
+              Approve
+            </button>
+            <button type={'button'} className={'button'} onClick={() => onReject(suggestion)}>
+              Reject
+            </button>
+          </div>
+        </div>
+      }
+    >
+      <div className={'form-grid'}>
+        <label className={'field'}>
+          <span>Product</span>
+          <input className={'input'} value={product} onChange={(event) => setProduct(event.target.value)} />
+        </label>
+        <label className={'field'}>
+          <span>Section</span>
+          <select className={'input'} value={section} onChange={(event) => setSection(event.target.value as SectionKey)}>
+            {sectionOptions.map((option) => (
+              <option key={option.key} value={option.key}>
+                {option.groupLabel} / {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className={'field field-full'}>
+          <span>Aliases</span>
+          <input className={'input'} value={aliases} onChange={(event) => setAliases(event.target.value)} />
+        </label>
+      </div>
+      {suggestion.latestRawItems.length > 0 ? (
+        <div className={'small-text'}>
+          Recent sightings: {suggestion.latestRawItems.join(', ')}
+        </div>
+      ) : null}
+    </Card>
+  );
+}
+
+function ProductRecategorizationCard({
+  item,
+  sectionOptions,
+  config,
+  onSuggest,
+}: ProductRecategorizationCardProps) {
+  const currentMeta = getSectionMeta(config, item.matchedSection);
+  const [section, setSection] = useState<SectionKey>(item.matchedSection);
+
+  useEffect(() => {
+    setSection(item.matchedSection);
+  }, [item]);
+
+  return (
+    <div className={'item-card'}>
+      <div className={'item-row'}>
+        <div className={'item-main'}>
+          <div className={'title title-xs'}>{getDisplayValue(item)}</div>
+          <div className={'badge-row'}>
+            <Badge>
+              Current: {currentMeta.groupLabel} / {currentMeta.label}
+            </Badge>
+            <Badge>
+              Cleaned: {item.cleaned}
+            </Badge>
+          </div>
+        </div>
+        <div className={'inline-row'}>
+          <select className={'input'} value={section} onChange={(event) => setSection(event.target.value as SectionKey)}>
+            {sectionOptions.map((option) => (
+              <option key={option.key} value={option.key}>
+                {option.groupLabel} / {option.label}
+              </option>
+            ))}
+          </select>
+          <button type={'button'} className={'button'} onClick={() => onSuggest(item, section)}>
+            Suggest
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const highlightedJsonLine = (line: string) => {
   const parts: Array<{ text: string; className?: string }> = [];
@@ -393,6 +547,8 @@ export function DebugPage({
   notificationPermission,
   debugNotificationResult,
   currentSharedListDatabaseEntry,
+  productSuggestions,
+  productSuggestionError,
   items,
   config,
   matcherTests,
@@ -421,6 +577,10 @@ export function DebugPage({
   onDebugSettingChange,
   onDebugNotificationTest,
   onDebugEventTest,
+  onRefreshProductSuggestions,
+  onApproveProductSuggestion,
+  onRejectProductSuggestion,
+  onSuggestProductRecategorization,
   onDebugTabChange,
   onBackToEdit,
   onBackToSettings,
@@ -471,6 +631,7 @@ export function DebugPage({
     { key: 'weights', label: messages.pages.debug.tabWeights, icon: mdiWeight },
     { key: 'variants', label: messages.pages.debug.tabVariants, icon: mdiPackageVariantClosed },
     { key: 'layout', label: messages.pages.debug.tabLayout, icon: mdiViewGridOutline },
+    { key: 'products', label: 'Products', icon: mdiPackageVariantClosed },
     { key: 'sections', label: messages.pages.debug.tabSections, icon: mdiStoreOutline },
     { key: 'storage', label: messages.pages.debug.tabStorage, icon: mdiHarddisk },
     { key: 'host', label: messages.pages.debug.tabHost, icon: mdiWeb },
@@ -483,6 +644,11 @@ export function DebugPage({
       section,
     })),
   );
+  const productSectionOptions = layoutRows.map(({ group, section }) => ({
+    key: section.key,
+    label: section.label,
+    groupLabel: group.label,
+  }));
   const layoutSectionCount = layoutRows.length;
   const layoutKeywordCount = layoutRows.reduce((total, row) => total + row.section.keywords.length, 0);
   const measurementModeLabels = {
@@ -655,7 +821,6 @@ export function DebugPage({
       startX: event.clientX,
       suppressClick: false,
     };
-    tabList.setPointerCapture(event.pointerId);
   };
   const handleDebugTabListPointerMove = (event: PointerEvent<HTMLDivElement>) => {
     const drag = debugTabDragRef.current;
@@ -664,6 +829,7 @@ export function DebugPage({
     const deltaX = event.clientX - drag.startX;
     if (Math.abs(deltaX) > 4) {
       if (!drag.dragged) {
+        event.currentTarget.setPointerCapture(event.pointerId);
         setIsDebugTabDragging(true);
       }
       drag.dragged = true;
@@ -1562,6 +1728,70 @@ export function DebugPage({
               </tbody>
             </table>
           </div>
+        </Card>
+      ) : null}
+
+      {activeTab === 'products' ? (
+        <Card
+          id={'debug-panel-products'}
+          role={'tabpanel'}
+          aria-labelledby={'debug-tab-products'}
+          header={
+            <div className={'title-row'}>
+              <div>
+                <h2 className={'title title-sm'}>Unknown product suggestions</h2>
+                <p className={'subtitle'}>
+                  Review products reported under Other, or suggest a better section for a current item.
+                </p>
+              </div>
+              <button type={'button'} className={'button'} onClick={onRefreshProductSuggestions}>
+                Refresh
+              </button>
+            </div>
+          }
+          bodyClassName={'stack'}
+        >
+          {productSuggestionError ? (
+            <div className={'notice notice-error'}>{productSuggestionError}</div>
+          ) : null}
+          <section className={'stack'}>
+            <div>
+              <h3 className={'title title-xs'}>Suggest from current list</h3>
+              <p className={'subtitle'}>Choose a better section for an item that parsed into the wrong place.</p>
+            </div>
+            {items.length === 0 ? (
+              <div className={'empty-state'}>No current list items to suggest from.</div>
+            ) : (
+              items.map((item) => (
+                <ProductRecategorizationCard
+                  key={item.id}
+                  item={item}
+                  sectionOptions={productSectionOptions}
+                  config={config}
+                  onSuggest={onSuggestProductRecategorization}
+                />
+              ))
+            )}
+          </section>
+          <section className={'stack'}>
+            <div>
+              <h3 className={'title title-xs'}>Pending review</h3>
+              <p className={'subtitle'}>Approve suggestions to add them as runtime matcher overrides.</p>
+            </div>
+          {productSuggestions.length === 0 ? (
+            <div className={'empty-state'}>No pending product suggestions.</div>
+          ) : (
+            productSuggestions.map((suggestion) => (
+              <ProductSuggestionReviewCard
+                key={suggestion.id}
+                suggestion={suggestion}
+                sectionOptions={productSectionOptions}
+                onApprove={onApproveProductSuggestion}
+                onReject={onRejectProductSuggestion}
+              />
+            ))
+          )}
+          </section>
         </Card>
       ) : null}
 

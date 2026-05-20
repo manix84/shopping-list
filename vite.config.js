@@ -17,7 +17,18 @@ export default defineConfig({
         open: true,
         port: 5175,
         proxy: {
-            '/api': 'http://localhost:8787'
+            '/api': {
+                target: 'http://localhost:8787',
+                configure: function (proxy) {
+                    proxy.on('proxyReq', function (proxyReq, request) {
+                        var host = request.headers.host;
+                        if (host) {
+                            proxyReq.setHeader('x-forwarded-host', host);
+                        }
+                        proxyReq.setHeader('x-forwarded-proto', 'http');
+                    });
+                }
+            }
         }
     },
     test: {

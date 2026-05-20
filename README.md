@@ -204,6 +204,8 @@ Do not use the local Docker database credentials in production. Use the credenti
 
 Unknown product reporting is optional. When enabled, items that parse into the `Other` section are reported from the frontend to the backend with only the item text, normalized/cleaned item text, country profile, and app language. The backend creates one GitHub issue per product, attaches it as a sub-issue under a parent tracking issue, and adds a `+1` comment instead of creating duplicates when the same product is reported again.
 
+For a future non-GitHub workflow, see [Unknown Product Automation](docs/unknown-product-automation.md).
+
 ```text
 FOOD_GITHUB_REPO=owner/repo
 FOOD_GITHUB_TOKEN=github_pat_...

@@ -1,4 +1,5 @@
-import { COUNTRY_CODES } from './constants.mjs';
+import { COUNTRY_CODES, SECTION_KEYS } from './constants.mjs';
+import { upsertUnknownProductSuggestion } from './database.mjs';
 
 const LOCALE_CODES = new Set(['en', 'es', 'fr', 'de', 'nl', 'it', 'ro', 'pi']);
 const DEFAULT_ISSUE_TITLE = 'Unknown products';
@@ -14,7 +15,9 @@ const isReportItem = (value) =>
   typeof value.raw === 'string' &&
   value.raw.trim().length > 0 &&
   (value.normalized === undefined || typeof value.normalized === 'string') &&
-  (value.cleaned === undefined || typeof value.cleaned === 'string');
+  (value.cleaned === undefined || typeof value.cleaned === 'string') &&
+  (value.matchedSection === undefined || SECTION_KEYS.has(value.matchedSection)) &&
+  (value.suggestedSection === undefined || SECTION_KEYS.has(value.suggestedSection));
 
 export const isUnknownProductsReport = (value) =>
   value &&
@@ -185,17 +188,38 @@ const tryAddSubIssue = async (parentIssueNumber, subIssueId) => {
 };
 
 export const submitUnknownProductsReport = async (report) => {
+  const uniqueItems = new Map();
+  for (const item of report.items) {
+    uniqueItems.set(unknownProductReportName(item), item);
+  }
+
+  const suggestions = [];
+  for (const item of uniqueItems.values()) {
+    const suggestion = await upsertUnknownProductSuggestion({
+      item,
+      report,
+      suggestion: {
+        section: item.suggestedSection,
+        source: item.suggestedSection ? 'recategorization' : 'unknown-report',
+        confidence: item.suggestedSection ? 0.75 : undefined,
+        evidence: {
+          currentSection: item.matchedSection,
+          suggestedSection: item.suggestedSection,
+        },
+      },
+    });
+    if (suggestion) {
+      suggestions.push(suggestion);
+    }
+  }
+
   if (!githubToken || !githubRepo) {
-    return { ok: false, disabled: true };
+    return { ok: true, disabled: false, githubDisabled: true, suggestions };
   }
 
   const parentIssueNumber = await findUnknownProductsParentIssue();
   const issues = [];
-  const itemsByTitle = new Map();
-
-  for (const item of report.items) {
-    itemsByTitle.set(productIssueTitle(item), item);
-  }
+  const itemsByTitle = new Map([...uniqueItems.values()].map((item) => [productIssueTitle(item), item]));
 
   for (const [title, item] of itemsByTitle) {
     const existingIssue = await findIssueByTitle(title);

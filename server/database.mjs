@@ -3,7 +3,7 @@ import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import pg from 'pg';
 import './env.mjs';
-import { COUNTRY_CODES } from './constants.mjs';
+import { COUNTRY_CODES, SECTION_KEYS } from './constants.mjs';
 import { isEmptyShoppingListRecord } from './sharedListPolicy.mjs';
 
 const { Pool } = pg;
@@ -54,7 +54,9 @@ const databaseErrorMessage = (error) => {
   return 'Unable to read database status';
 };
 
-const emptyDatabase = () => ({ sharedLists: {} });
+const PRODUCT_SUGGESTION_STATUSES = new Set(['pending', 'approved', 'rejected']);
+
+const emptyDatabase = () => ({ sharedLists: {}, productSuggestions: {} });
 
 const normalizeRecord = (record) => {
   const fallback = defaultRecord();
@@ -70,6 +72,9 @@ const normalizeDatabase = (database) => ({
   ...emptyDatabase(),
   ...database,
   sharedLists: database?.sharedLists && typeof database.sharedLists === 'object' ? database.sharedLists : {},
+  productSuggestions: database?.productSuggestions && typeof database.productSuggestions === 'object'
+    ? database.productSuggestions
+    : {},
 });
 
 const readJsonDatabase = async () => {
@@ -101,7 +106,10 @@ const writeJsonDatabase = async (database) => {
   await mkdir(dirname(databasePath), { recursive: true });
   const temporaryPath = `${databasePath}.tmp-${process.pid}-${Date.now()}`;
   const normalizedDatabase = normalizeDatabase(database);
-  const serializedDatabase = { sharedLists: normalizedDatabase.sharedLists };
+  const serializedDatabase = {
+    sharedLists: normalizedDatabase.sharedLists,
+    productSuggestions: normalizedDatabase.productSuggestions,
+  };
   await writeFile(temporaryPath, `${JSON.stringify(serializedDatabase, null, 2)}\n`, 'utf8');
   await rename(temporaryPath, databasePath);
 };
@@ -145,6 +153,28 @@ const ensurePostgresSchema = async () => {
       record jsonb NOT NULL,
       created_at timestamptz NOT NULL,
       updated_at timestamptz NOT NULL
+    );
+  `);
+
+  await postgres.query(`
+    CREATE TABLE IF NOT EXISTS product_suggestions (
+      id uuid PRIMARY KEY,
+      product text NOT NULL,
+      normalized_product text NOT NULL,
+      aliases jsonb NOT NULL DEFAULT '[]'::jsonb,
+      section text NOT NULL,
+      country_code text NOT NULL,
+      status text NOT NULL,
+      confidence numeric NOT NULL,
+      source text NOT NULL,
+      evidence jsonb NOT NULL DEFAULT '{}'::jsonb,
+      report_count integer NOT NULL DEFAULT 0,
+      latest_raw_items jsonb NOT NULL DEFAULT '[]'::jsonb,
+      created_at timestamptz NOT NULL,
+      updated_at timestamptz NOT NULL,
+      reviewed_at timestamptz,
+      reviewed_by text,
+      CONSTRAINT product_suggestions_unique_product_country UNIQUE (normalized_product, country_code)
     );
   `);
 
@@ -218,6 +248,94 @@ const uuidV7 = () => {
   const hex = [...bytes].map((byte) => byte.toString(16).padStart(2, '0')).join('');
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
 };
+
+const normalizeProductText = (value) => String(value ?? '')
+  .toLowerCase()
+  .replace(/[^\p{L}\p{N}\s'-]+/gu, ' ')
+  .replace(/\s+/g, ' ')
+  .trim();
+
+const productSuggestionKey = (countryCode, normalizedProduct) => `${countryCode}:${normalizedProduct}`;
+
+const uniqueStrings = (values) => [...new Set(
+  (Array.isArray(values) ? values : [])
+    .map((value) => String(value ?? '').replace(/\s+/g, ' ').trim())
+    .filter(Boolean),
+)];
+
+const latestRawItems = (currentItems, nextItem) => uniqueStrings([nextItem, ...(Array.isArray(currentItems) ? currentItems : [])]).slice(0, 5);
+
+const normalizeProductSuggestion = (suggestion) => {
+  const now = new Date().toISOString();
+  const product = String(suggestion?.product ?? '').replace(/\s+/g, ' ').trim();
+  const normalizedProduct = normalizeProductText(suggestion?.normalizedProduct ?? product);
+  const countryCode = COUNTRY_CODES.has(suggestion?.countryCode) ? suggestion.countryCode : 'uk';
+  const section = SECTION_KEYS.has(suggestion?.section) ? suggestion.section : 'other';
+  const status = PRODUCT_SUGGESTION_STATUSES.has(suggestion?.status) ? suggestion.status : 'pending';
+  const confidence = Number.isFinite(Number(suggestion?.confidence))
+    ? Math.min(1, Math.max(0, Number(suggestion.confidence)))
+    : 0.2;
+
+  return {
+    id: isSharedListId(suggestion?.id) ? suggestion.id : uuidV7(),
+    product: product || normalizedProduct,
+    normalizedProduct,
+    aliases: uniqueStrings(suggestion?.aliases),
+    section,
+    countries: [countryCode],
+    countryCode,
+    status,
+    confidence,
+    source: typeof suggestion?.source === 'string' && suggestion.source ? suggestion.source : 'unknown-report',
+    evidence: suggestion?.evidence && typeof suggestion.evidence === 'object' && !Array.isArray(suggestion.evidence)
+      ? suggestion.evidence
+      : {},
+    reportCount: Number.isInteger(suggestion?.reportCount) && suggestion.reportCount >= 0 ? suggestion.reportCount : 0,
+    latestRawItems: uniqueStrings(suggestion?.latestRawItems),
+    createdAt: timestampOrNow(suggestion?.createdAt ?? now),
+    updatedAt: timestampOrNow(suggestion?.updatedAt ?? now),
+    reviewedAt: suggestion?.reviewedAt ? timestampOrNow(suggestion.reviewedAt) : undefined,
+    reviewedBy: typeof suggestion?.reviewedBy === 'string' && suggestion.reviewedBy ? suggestion.reviewedBy : undefined,
+  };
+};
+
+const productSuggestionFromRow = (row) => normalizeProductSuggestion({
+  id: row.id,
+  product: row.product,
+  normalizedProduct: row.normalized_product,
+  aliases: row.aliases,
+  section: row.section,
+  countryCode: row.country_code,
+  status: row.status,
+  confidence: Number(row.confidence),
+  source: row.source,
+  evidence: row.evidence,
+  reportCount: row.report_count,
+  latestRawItems: row.latest_raw_items,
+  createdAt: isoString(row.created_at),
+  updatedAt: isoString(row.updated_at),
+  reviewedAt: isoString(row.reviewed_at),
+  reviewedBy: row.reviewed_by,
+});
+
+const productSuggestionRowSelect = `
+  id,
+  product,
+  normalized_product,
+  aliases,
+  section,
+  country_code,
+  status,
+  confidence,
+  source,
+  evidence,
+  report_count,
+  latest_raw_items,
+  created_at,
+  updated_at,
+  reviewed_at,
+  reviewed_by
+`;
 
 export const isSharedListId = (value) =>
   typeof value === 'string' &&
@@ -409,6 +527,241 @@ export const pruneEmptySharedLists = async () => {
     deletedCount: deletedIds.length,
     deletedIds,
   };
+};
+
+export const upsertUnknownProductSuggestion = async ({ item, report, suggestion = {} }) => {
+  const product = normalizeProductText(suggestion.product ?? item?.cleaned ?? item?.normalized ?? item?.raw);
+  if (!product || !COUNTRY_CODES.has(report?.countryCode)) {
+    return undefined;
+  }
+
+  const now = new Date().toISOString();
+  const aliases = uniqueStrings([
+    suggestion.product,
+    item?.cleaned,
+    item?.normalized,
+    item?.raw,
+    ...(Array.isArray(suggestion.aliases) ? suggestion.aliases : []),
+  ]).filter((alias) => normalizeProductText(alias) !== product);
+  const section = SECTION_KEYS.has(suggestion.section)
+    ? suggestion.section
+    : SECTION_KEYS.has(item?.suggestedSection)
+      ? item.suggestedSection
+      : 'other';
+  const confidence = Number.isFinite(Number(suggestion.confidence))
+    ? Math.min(1, Math.max(0, Number(suggestion.confidence)))
+    : 0.2;
+
+  if (!getPool()) {
+    return withJsonDatabaseWriteLock(async () => {
+      const database = await readJsonDatabase();
+      const key = productSuggestionKey(report.countryCode, product);
+      const existing = normalizeProductSuggestion(database.productSuggestions[key]);
+      const next = normalizeProductSuggestion({
+        ...existing,
+        id: database.productSuggestions[key]?.id ?? uuidV7(),
+        product: existing.product || product,
+        normalizedProduct: product,
+        aliases: uniqueStrings([...existing.aliases, ...aliases]),
+        section: existing.status === 'pending' ? section : existing.section,
+        countryCode: report.countryCode,
+        status: existing.status,
+        confidence: Math.max(existing.confidence, confidence),
+        source: suggestion.source ?? existing.source ?? 'unknown-report',
+        evidence: {
+          ...existing.evidence,
+          ...(suggestion.evidence && typeof suggestion.evidence === 'object' ? suggestion.evidence : {}),
+          locale: report.locale,
+          currentSection: item?.matchedSection,
+          suggestedSection: item?.suggestedSection,
+        },
+        reportCount: existing.reportCount + 1,
+        latestRawItems: latestRawItems(existing.latestRawItems, item?.raw),
+        createdAt: database.productSuggestions[key]?.createdAt ?? now,
+        updatedAt: now,
+      });
+      database.productSuggestions[key] = next;
+      await writeJsonDatabase(database);
+      return next;
+    });
+  }
+
+  const result = await postgresQuery(
+    `
+      INSERT INTO product_suggestions (
+        id,
+        product,
+        normalized_product,
+        aliases,
+        section,
+        country_code,
+        status,
+        confidence,
+        source,
+        evidence,
+        report_count,
+        latest_raw_items,
+        created_at,
+        updated_at
+      )
+      VALUES ($1::uuid, $2, $3, $4::jsonb, $5, $6, 'pending', $7, $8, $9::jsonb, 1, $10::jsonb, $11::timestamptz, $11::timestamptz)
+      ON CONFLICT (normalized_product, country_code) DO UPDATE SET
+        aliases = coalesce((
+          SELECT jsonb_agg(alias)
+          FROM (
+            SELECT DISTINCT jsonb_array_elements_text(product_suggestions.aliases || EXCLUDED.aliases) AS alias
+          ) aliases
+        ), '[]'::jsonb),
+        section = CASE WHEN product_suggestions.status = 'pending' THEN EXCLUDED.section ELSE product_suggestions.section END,
+        confidence = GREATEST(product_suggestions.confidence, EXCLUDED.confidence),
+        evidence = product_suggestions.evidence || EXCLUDED.evidence,
+        report_count = product_suggestions.report_count + 1,
+        latest_raw_items = (
+          SELECT jsonb_agg(raw_item)
+          FROM (
+            SELECT DISTINCT jsonb_array_elements_text(EXCLUDED.latest_raw_items || product_suggestions.latest_raw_items) AS raw_item
+            LIMIT 5
+          ) raw_items
+        ),
+        updated_at = EXCLUDED.updated_at
+      RETURNING ${productSuggestionRowSelect}
+    `,
+    [
+      uuidV7(),
+      product,
+      product,
+      JSON.stringify(aliases),
+      section,
+      report.countryCode,
+      confidence,
+      suggestion.source ?? 'unknown-report',
+      JSON.stringify({
+        ...(suggestion.evidence && typeof suggestion.evidence === 'object' ? suggestion.evidence : {}),
+        locale: report.locale,
+        currentSection: item?.matchedSection,
+        suggestedSection: item?.suggestedSection,
+      }),
+      JSON.stringify(latestRawItems([], item?.raw)),
+      now,
+    ],
+  );
+
+  return productSuggestionFromRow(result.rows[0]);
+};
+
+export const listProductSuggestions = async ({ status } = {}) => {
+  if (!getPool()) {
+    const database = await readJsonDatabase();
+    return Object.values(database.productSuggestions)
+      .map(normalizeProductSuggestion)
+      .filter((suggestion) => !status || suggestion.status === status)
+      .sort((left, right) => Date.parse(right.updatedAt) - Date.parse(left.updatedAt));
+  }
+
+  const params = [];
+  const where = PRODUCT_SUGGESTION_STATUSES.has(status) ? 'WHERE status = $1' : '';
+  if (where) { params.push(status); }
+  const result = await postgresQuery(
+    `
+      SELECT ${productSuggestionRowSelect}
+      FROM product_suggestions
+      ${where}
+      ORDER BY updated_at DESC
+    `,
+    params,
+  );
+  return result.rows.map(productSuggestionFromRow);
+};
+
+export const getProductOverrides = async ({ countryCode } = {}) => {
+  if (!COUNTRY_CODES.has(countryCode)) { return []; }
+  const suggestions = await listProductSuggestions({ status: 'approved' });
+  return suggestions
+    .filter((suggestion) => suggestion.countryCode === countryCode)
+    .map((suggestion) => ({
+      id: suggestion.id,
+      product: suggestion.product,
+      aliases: suggestion.aliases,
+      section: suggestion.section,
+      countryCode: suggestion.countryCode,
+      updatedAt: suggestion.updatedAt,
+    }));
+};
+
+export const updateProductSuggestion = async (id, updates = {}) => {
+  const allowedUpdates = {
+    product: typeof updates.product === 'string' && updates.product.trim() ? updates.product.trim() : undefined,
+    aliases: Array.isArray(updates.aliases) ? uniqueStrings(updates.aliases) : undefined,
+    section: SECTION_KEYS.has(updates.section) ? updates.section : undefined,
+    countryCode: COUNTRY_CODES.has(updates.countryCode) ? updates.countryCode : undefined,
+    status: PRODUCT_SUGGESTION_STATUSES.has(updates.status) ? updates.status : undefined,
+  };
+  const now = new Date().toISOString();
+
+  if (!getPool()) {
+    return withJsonDatabaseWriteLock(async () => {
+      const database = await readJsonDatabase();
+      const entry = Object.entries(database.productSuggestions).find(([, suggestion]) => suggestion?.id === id);
+      if (!entry) { return undefined; }
+
+      const [key, currentRaw] = entry;
+      const current = normalizeProductSuggestion(currentRaw);
+      const nextProduct = allowedUpdates.product ?? current.product;
+      const nextCountryCode = allowedUpdates.countryCode ?? current.countryCode;
+      const nextNormalizedProduct = normalizeProductText(nextProduct);
+      const next = normalizeProductSuggestion({
+        ...current,
+        product: nextProduct,
+        normalizedProduct: nextNormalizedProduct,
+        aliases: allowedUpdates.aliases ?? current.aliases,
+        section: allowedUpdates.section ?? current.section,
+        countryCode: nextCountryCode,
+        status: allowedUpdates.status ?? current.status,
+        updatedAt: now,
+        reviewedAt: allowedUpdates.status && allowedUpdates.status !== 'pending' ? now : current.reviewedAt,
+      });
+      const nextKey = productSuggestionKey(nextCountryCode, nextNormalizedProduct);
+      delete database.productSuggestions[key];
+      database.productSuggestions[nextKey] = next;
+      await writeJsonDatabase(database);
+      return next;
+    });
+  }
+
+  const currentResult = await postgresQuery(`SELECT ${productSuggestionRowSelect} FROM product_suggestions WHERE id = $1::uuid`, [id]);
+  const current = currentResult.rows[0] ? productSuggestionFromRow(currentResult.rows[0]) : undefined;
+  if (!current) { return undefined; }
+
+  const nextProduct = allowedUpdates.product ?? current.product;
+  const nextCountryCode = allowedUpdates.countryCode ?? current.countryCode;
+  const nextStatus = allowedUpdates.status ?? current.status;
+  const result = await postgresQuery(
+    `
+      UPDATE product_suggestions
+      SET
+        product = $2,
+        normalized_product = $3,
+        aliases = $4::jsonb,
+        section = $5,
+        country_code = $6,
+        status = $7,
+        updated_at = $8::timestamptz,
+        reviewed_at = CASE WHEN $7 != 'pending' THEN $8::timestamptz ELSE reviewed_at END
+      WHERE id = $1::uuid
+      RETURNING ${productSuggestionRowSelect}
+    `,
+    [
+      id,
+      nextProduct,
+      normalizeProductText(nextProduct),
+      JSON.stringify(allowedUpdates.aliases ?? current.aliases),
+      allowedUpdates.section ?? current.section,
+      nextCountryCode,
+      nextStatus,
+      now,
+    ],
+  );
+  return result.rows[0] ? productSuggestionFromRow(result.rows[0]) : undefined;
 };
 
 const latestSharedListUpdatedAt = (sharedLists) => {

@@ -412,6 +412,27 @@ describe('parser', () => {
     });
   });
 
+  it('recalculates matched sections while preserving checked state for saved items', () => {
+    const items = parseItems('dettol wipes', UK_CONFIG, [
+      {
+        id: 'previous-dettol-wipes',
+        raw: 'dettol wipes',
+        normalized: 'dettol wipes',
+        cleaned: 'dettol wipe',
+        checked: true,
+        matchedSection: 'baby',
+      },
+    ]);
+
+    expect(items).toHaveLength(1);
+    expect(items[0]).toMatchObject({
+      id: 'previous-dettol-wipes',
+      raw: 'dettol wipes',
+      checked: true,
+      matchedSection: 'household',
+    });
+  });
+
   it('strips pasted display size labels before reparsing saved text', () => {
     const items = parseItems('Milk (Size: S)', UK_CONFIG);
 

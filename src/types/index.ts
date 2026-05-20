@@ -11,6 +11,7 @@ export type DebugTabKey =
   | 'weights'
   | 'variants'
   | 'layout'
+  | 'products'
   | 'sections'
   | 'storage'
   | 'host'
@@ -142,6 +143,37 @@ export type CountryConfig = {
     displayMode: MeasurementDisplayMode;
   };
   groups: SectionGroup[];
+};
+
+export type ProductSuggestionStatus = 'pending' | 'approved' | 'rejected';
+
+export type ProductSuggestion = {
+  id: string;
+  product: string;
+  normalizedProduct: string;
+  aliases: string[];
+  section: SectionKey;
+  countries: CountryCode[];
+  countryCode: CountryCode;
+  status: ProductSuggestionStatus;
+  confidence: number;
+  source: string;
+  evidence: Record<string, unknown>;
+  reportCount: number;
+  latestRawItems: string[];
+  createdAt: string;
+  updatedAt: string;
+  reviewedAt?: string;
+  reviewedBy?: string;
+};
+
+export type ProductOverride = {
+  id: string;
+  product: string;
+  aliases: string[];
+  section: SectionKey;
+  countryCode: CountryCode;
+  updatedAt: string;
 };
 
 export type ConfigTestResult = {

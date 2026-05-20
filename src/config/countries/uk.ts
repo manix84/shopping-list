@@ -832,7 +832,8 @@ export const UK_CONFIG: CountryConfig = {
             'bleach', 'sponges', 'surface cleaner', 'disinfectant', 'laundry', 'dishwasher tablet', 'dishwasher tablets', 'rinse aid',
             'rubber gloves', 'cleaning spray', 'cleaning sprays', 'bathroom cleaner', 'kitchen cleaner', 'floor cleaner',
             'cloths', 'microfibre cloths', 'laundry detergent', 'washing powder', 'washing pods', 'bedding', 'pillow',
-            'duvet', 'plate', 'mug', 'pan', 'frying pan', 'storage box',
+            'duvet', 'plate', 'mug', 'pan', 'frying pan', 'storage box', 'cleaning wipes', 'disinfectant wipes',
+            'surface wipes', 'dettol', 'dettol wipes',
           ],
         },
         {
@@ -852,7 +853,6 @@ export const UK_CONFIG: CountryConfig = {
             'nappies',
             'diapers',
             'baby wipes',
-            'wipes',
             'formula',
             'baby formula',
             'follow on milk',

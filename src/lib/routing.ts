@@ -27,6 +27,7 @@ const DEBUG_TAB_KEYS: DebugTabKey[] = [
   'weights',
   'variants',
   'layout',
+  'products',
   'sections',
   'storage',
   'host',

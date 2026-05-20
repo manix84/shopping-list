@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { productIssueTitle, unknownProductReportName } from './unknownProducts.mjs';
+import { isUnknownProductsReport, productIssueTitle, unknownProductReportName } from './unknownProducts.mjs';
 
 describe('unknown products', () => {
   it('uses cleaned product names as the reporting identity', () => {
@@ -51,5 +51,19 @@ describe('unknown products', () => {
 
     expect(title).toMatch(/…` filed under `other`$/);
     expect(title.length).toBeLessThan(170);
+  });
+
+  it('accepts recategorization metadata in unknown product reports', () => {
+    expect(isUnknownProductsReport({
+      countryCode: 'uk',
+      locale: 'en',
+      items: [{
+        raw: 'dettol wipes',
+        normalized: 'dettol wipes',
+        cleaned: 'dettol wipes',
+        matchedSection: 'baby',
+        suggestedSection: 'household',
+      }],
+    })).toBe(true);
   });
 });

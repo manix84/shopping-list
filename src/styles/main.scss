@@ -981,6 +981,29 @@ select {
   max-width: 360px;
 }
 
+.form-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.field-full {
+  grid-column: 1 / -1;
+}
+
+.notice {
+  border: 1px solid $border;
+  border-radius: 8px;
+  background: $panel-alt;
+  padding: 12px 14px;
+}
+
+.notice-error {
+  border-color: $danger-border;
+  background: $danger-bg;
+  color: $danger-text;
+}
+
 .input,
 .textarea,
 .select {
