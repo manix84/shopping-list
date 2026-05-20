@@ -39,10 +39,14 @@ import { buildProductSuggestions } from './lib/productSuggestions';
 import {
   checkBackendStatus,
   clearSharedShoppingList,
+  approveProductSuggestion,
   loadSharedShoppingList,
+  loadProductOverrides,
+  loadProductSuggestions,
   reportUnknownProducts,
   saveSharedShoppingList,
   sharedShoppingListEventsUrl,
+  rejectProductSuggestion,
 } from './lib/repository/apiRepository';
 import {
   defaultRecord,
@@ -70,7 +74,7 @@ import { ErrorPage } from './pages/ErrorPage';
 import { RoutePage } from './pages/RoutePage';
 import { SectionsPage } from './pages/SectionsPage';
 import { SettingsPage } from './pages/SettingsPage';
-import type { AppRoute, BackendHeartbeatSample, BackendStatus, CountryCode, DebugEventTestKey, DebugNotificationDeliveryPath, DebugNotificationResult, DebugNotificationTestKey, DebugSettings, DebugTabKey, GroupedSectionView, Item, MeasurementDisplayMode, PageKey, RouteViewMode, SaveStatus, SectionKey, SharedListHistoryEntry, ShoppingListRecord, ThemeMode } from './types';
+import type { AppRoute, BackendHeartbeatSample, BackendStatus, CountryCode, DebugEventTestKey, DebugNotificationDeliveryPath, DebugNotificationResult, DebugNotificationTestKey, DebugSettings, DebugTabKey, GroupedSectionView, Item, MeasurementDisplayMode, PageKey, ProductOverride, ProductSuggestion, RouteViewMode, SaveStatus, SectionKey, SharedListHistoryEntry, ShoppingListRecord, ThemeMode } from './types';
 
 const DEFAULT_PAGE: PageKey = 'edit';
 const BACKEND_HEARTBEAT_CONNECTED_MS = 5_000;
@@ -160,6 +164,31 @@ const defaultBackendStatus = (): BackendStatus => ({
 
 const appBasePath = import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_URL.replace(/\/$/, '');
 const currentOrigin = (): string | undefined => (typeof window === 'undefined' ? undefined : window.location.origin);
+
+const uniqueKeywords = (values: string[]): string[] => [...new Set(values.map((value) => value.trim()).filter(Boolean))];
+
+const withProductOverrides = (config: ReturnType<typeof withMeasurementDisplayMode>, overrides: ProductOverride[]) => {
+  if (overrides.length === 0) { return config; }
+
+  return {
+    ...config,
+    groups: config.groups.map((group) => ({
+      ...group,
+      sections: group.sections.map((section) => {
+        const sectionOverrides = overrides.filter((override) => override.section === section.key);
+        if (sectionOverrides.length === 0) { return section; }
+
+        return {
+          ...section,
+          keywords: uniqueKeywords([
+            ...section.keywords,
+            ...sectionOverrides.flatMap((override) => [override.product, ...override.aliases]),
+          ]),
+        };
+      }),
+    })),
+  };
+};
 
 const isRunningInstalledPwa = (): boolean => {
   if (typeof window === 'undefined') { return false; }
@@ -447,6 +476,7 @@ const isDebugTabKey = (value: string | undefined): value is DebugTabKey => [
   'weights',
   'variants',
   'layout',
+  'products',
   'sections',
   'storage',
   'host',
@@ -682,6 +712,9 @@ export default function App() {
   const [predatorEasterEggRun, setPredatorEasterEggRun] = useState(0);
   const [debugNotificationResult, setDebugNotificationResult] = useState<DebugNotificationResult>();
   const [debugModeNotice, setDebugModeNotice] = useState<ToastPopupData>();
+  const [productOverrides, setProductOverrides] = useState<ProductOverride[]>([]);
+  const [unknownProductSuggestions, setUnknownProductSuggestions] = useState<ProductSuggestion[]>([]);
+  const [productSuggestionError, setProductSuggestionError] = useState<string>();
   const [backendSaveRetryAttempt, setBackendSaveRetryAttempt] = useState(0);
   const [isListLoadingOverlayVisible, setIsListLoadingOverlayVisible] = useState(isDefaultLandingLocation);
   const [isProductAutocompleteInteracting, setIsProductAutocompleteInteracting] = useState(false);
@@ -726,10 +759,11 @@ export default function App() {
     });
   }, []);
 
-  const config = useMemo(
+  const baseConfig = useMemo(
     () => withMeasurementDisplayMode(COUNTRY_CONFIGS[countryCode], measurementDisplayMode),
     [countryCode, measurementDisplayMode],
   );
+  const config = useMemo(() => withProductOverrides(baseConfig, productOverrides), [baseConfig, productOverrides]);
   const productSuggestions = useMemo(() => buildProductSuggestions(config), [config]);
   const messages = useMemo(() => createMessages(locale), [locale]);
   const { page, listId } = route;
@@ -929,6 +963,67 @@ export default function App() {
       return next;
     });
   };
+
+  const refreshProductOverrides = useCallback(async () => {
+    if (!canUseBackend) {
+      setProductOverrides([]);
+      return;
+    }
+
+    try {
+      setProductOverrides(await loadProductOverrides(countryCode));
+    } catch (error) {
+      verboseDebugLog('product overrides load failed', { countryCode, error: error instanceof Error ? error.message : String(error) });
+      setProductOverrides([]);
+    }
+  }, [canUseBackend, countryCode, verboseDebugLog]);
+
+  const refreshProductSuggestions = useCallback(async () => {
+    if (!canUseBackend || !isDebugMode) {
+      setUnknownProductSuggestions([]);
+      return;
+    }
+
+    try {
+      setProductSuggestionError(undefined);
+      setUnknownProductSuggestions(await loadProductSuggestions('pending'));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      setProductSuggestionError(message);
+      verboseDebugLog('product suggestions load failed', { error: message });
+    }
+  }, [canUseBackend, isDebugMode, verboseDebugLog]);
+
+  const handleApproveProductSuggestion = async (
+    suggestion: ProductSuggestion,
+    updates: Pick<ProductSuggestion, 'product' | 'aliases' | 'section' | 'countryCode'>,
+  ) => {
+    try {
+      setProductSuggestionError(undefined);
+      await approveProductSuggestion(suggestion.id, updates);
+      await Promise.all([refreshProductSuggestions(), refreshProductOverrides()]);
+    } catch (error) {
+      setProductSuggestionError(error instanceof Error ? error.message : String(error));
+    }
+  };
+
+  const handleRejectProductSuggestion = async (suggestion: ProductSuggestion) => {
+    try {
+      setProductSuggestionError(undefined);
+      await rejectProductSuggestion(suggestion.id);
+      await refreshProductSuggestions();
+    } catch (error) {
+      setProductSuggestionError(error instanceof Error ? error.message : String(error));
+    }
+  };
+
+  useEffect(() => {
+    void refreshProductOverrides();
+  }, [refreshProductOverrides]);
+
+  useEffect(() => {
+    void refreshProductSuggestions();
+  }, [refreshProductSuggestions]);
 
   const ensureNotificationPermission = useCallback(async () => {
     const currentPermission = browserNotificationPermission();
@@ -2768,6 +2863,8 @@ export default function App() {
                 notificationPermission={notificationPermission}
                 debugNotificationResult={debugNotificationResult}
                 currentSharedListDatabaseEntry={currentSharedListDatabaseEntry}
+                productSuggestions={unknownProductSuggestions}
+                productSuggestionError={productSuggestionError}
                 items={items}
                 config={config}
                 matcherTests={matcherTests}
@@ -2796,6 +2893,9 @@ export default function App() {
                 onDebugSettingChange={handleDebugSettingChange}
                 onDebugNotificationTest={handleDebugNotificationTest}
                 onDebugEventTest={handleDebugEventTest}
+                onRefreshProductSuggestions={refreshProductSuggestions}
+                onApproveProductSuggestion={handleApproveProductSuggestion}
+                onRejectProductSuggestion={handleRejectProductSuggestion}
                 onDebugTabChange={changeDebugTab}
                 onBackToEdit={() => changePage('edit')}
                 onBackToSettings={() => changePage('settings')}

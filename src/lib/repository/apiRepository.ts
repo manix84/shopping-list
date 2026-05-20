@@ -1,4 +1,4 @@
-import type { BackendDatabaseAdapter, CountryCode, Item, BackendStatus, ShoppingListRecord } from '../../types';
+import type { BackendDatabaseAdapter, CountryCode, Item, BackendStatus, ProductOverride, ProductSuggestion, SectionKey, ShoppingListRecord } from '../../types';
 import type { LocaleCode } from '../i18n/types';
 import { decodeShoppingListRecord, encodeShoppingListRecord } from './recordCodec';
 
@@ -186,4 +186,137 @@ export const reportUnknownProducts = async (report: UnknownProductsReport): Prom
 
   const payload = (await response.json()) as { disabled?: unknown };
   return { disabled: payload.disabled === true };
+};
+
+const isSectionKey = (value: unknown): value is SectionKey => typeof value === 'string';
+
+const isCountryCode = (value: unknown): value is CountryCode =>
+  ['be', 'ca', 'de', 'es', 'fr', 'it', 'mx', 'nl', 'ro', 'uk', 'us'].includes(String(value));
+
+const stringArray = (value: unknown): string[] =>
+  Array.isArray(value) ? value.filter((entry): entry is string => typeof entry === 'string') : [];
+
+const decodeProductSuggestion = (value: unknown): ProductSuggestion | undefined => {
+  if (!value || typeof value !== 'object') { return undefined; }
+  const suggestion = value as Record<string, unknown>;
+  if (
+    typeof suggestion.id !== 'string' ||
+    typeof suggestion.product !== 'string' ||
+    typeof suggestion.normalizedProduct !== 'string' ||
+    !isSectionKey(suggestion.section) ||
+    !isCountryCode(suggestion.countryCode) ||
+    (suggestion.status !== 'pending' && suggestion.status !== 'approved' && suggestion.status !== 'rejected')
+  ) {
+    return undefined;
+  }
+
+  return {
+    id: suggestion.id,
+    product: suggestion.product,
+    normalizedProduct: suggestion.normalizedProduct,
+    aliases: stringArray(suggestion.aliases),
+    section: suggestion.section,
+    countries: stringArray(suggestion.countries).filter(isCountryCode),
+    countryCode: suggestion.countryCode,
+    status: suggestion.status,
+    confidence: typeof suggestion.confidence === 'number' ? suggestion.confidence : Number(suggestion.confidence) || 0,
+    source: typeof suggestion.source === 'string' ? suggestion.source : 'unknown-report',
+    evidence: suggestion.evidence && typeof suggestion.evidence === 'object' && !Array.isArray(suggestion.evidence)
+      ? suggestion.evidence as Record<string, unknown>
+      : {},
+    reportCount: typeof suggestion.reportCount === 'number' ? suggestion.reportCount : Number(suggestion.reportCount) || 0,
+    latestRawItems: stringArray(suggestion.latestRawItems),
+    createdAt: typeof suggestion.createdAt === 'string' ? suggestion.createdAt : '',
+    updatedAt: typeof suggestion.updatedAt === 'string' ? suggestion.updatedAt : '',
+    reviewedAt: typeof suggestion.reviewedAt === 'string' ? suggestion.reviewedAt : undefined,
+    reviewedBy: typeof suggestion.reviewedBy === 'string' ? suggestion.reviewedBy : undefined,
+  };
+};
+
+const decodeProductOverride = (value: unknown): ProductOverride | undefined => {
+  if (!value || typeof value !== 'object') { return undefined; }
+  const override = value as Record<string, unknown>;
+  if (
+    typeof override.id !== 'string' ||
+    typeof override.product !== 'string' ||
+    !isSectionKey(override.section) ||
+    !isCountryCode(override.countryCode)
+  ) {
+    return undefined;
+  }
+
+  return {
+    id: override.id,
+    product: override.product,
+    aliases: stringArray(override.aliases),
+    section: override.section,
+    countryCode: override.countryCode,
+    updatedAt: typeof override.updatedAt === 'string' ? override.updatedAt : '',
+  };
+};
+
+export const loadProductOverrides = async (countryCode: CountryCode): Promise<ProductOverride[]> => {
+  const response = await fetchWithTimeout(`/api/product-overrides?country=${encodeURIComponent(countryCode)}`, {}, 2_000);
+  if (!response.ok) {
+    throw new Error(`Unable to load product overrides: ${response.status}`);
+  }
+
+  const payload = (await response.json()) as { overrides?: unknown };
+  return Array.isArray(payload.overrides)
+    ? payload.overrides.map(decodeProductOverride).filter((override): override is ProductOverride => Boolean(override))
+    : [];
+};
+
+export const loadProductSuggestions = async (status = 'pending'): Promise<ProductSuggestion[]> => {
+  const response = await fetchWithTimeout(`/api/unknown-products/suggestions?status=${encodeURIComponent(status)}`, {}, 2_000);
+  if (!response.ok) {
+    throw new Error(`Unable to load product suggestions: ${response.status}`);
+  }
+
+  const payload = (await response.json()) as { suggestions?: unknown };
+  return Array.isArray(payload.suggestions)
+    ? payload.suggestions.map(decodeProductSuggestion).filter((suggestion): suggestion is ProductSuggestion => Boolean(suggestion))
+    : [];
+};
+
+export const approveProductSuggestion = async (
+  id: string,
+  updates: Pick<ProductSuggestion, 'product' | 'aliases' | 'section' | 'countryCode'>,
+): Promise<ProductSuggestion> => {
+  const response = await fetchWithTimeout(
+    `/api/unknown-products/suggestions/${id}/approve`,
+    {
+      method: 'POST',
+      body: JSON.stringify(updates),
+    },
+    2_000,
+  );
+  if (!response.ok) {
+    throw new Error(`Unable to approve product suggestion: ${response.status}`);
+  }
+
+  const payload = (await response.json()) as { suggestion?: unknown };
+  const suggestion = decodeProductSuggestion(payload.suggestion);
+  if (!suggestion) {
+    throw new Error('Backend returned an invalid product suggestion');
+  }
+  return suggestion;
+};
+
+export const rejectProductSuggestion = async (id: string): Promise<ProductSuggestion> => {
+  const response = await fetchWithTimeout(
+    `/api/unknown-products/suggestions/${id}/reject`,
+    { method: 'POST' },
+    2_000,
+  );
+  if (!response.ok) {
+    throw new Error(`Unable to reject product suggestion: ${response.status}`);
+  }
+
+  const payload = (await response.json()) as { suggestion?: unknown };
+  const suggestion = decodeProductSuggestion(payload.suggestion);
+  if (!suggestion) {
+    throw new Error('Backend returned an invalid product suggestion');
+  }
+  return suggestion;
 };

@@ -32,6 +32,8 @@ import type {
   Item,
   MatcherTestResult,
   MeasurementTestResult,
+  ProductSuggestion,
+  SectionKey,
   StateTestResult,
   StorageTestResult,
   UnitQuantityTestResult,
@@ -59,6 +61,8 @@ type DebugPageProps = {
     record: ShoppingListRecord;
     updatedAt: string;
   };
+  productSuggestions: ProductSuggestion[];
+  productSuggestionError?: string;
   items: Item[];
   config: CountryConfig;
   matcherTests: MatcherTestResult[];
@@ -87,12 +91,27 @@ type DebugPageProps = {
   onDebugSettingChange: (key: keyof DebugSettings, enabled: boolean) => void;
   onDebugNotificationTest: (key: DebugNotificationTestKey) => void;
   onDebugEventTest: (key: DebugEventTestKey) => void;
+  onRefreshProductSuggestions: () => void;
+  onApproveProductSuggestion: (
+    suggestion: ProductSuggestion,
+    updates: Pick<ProductSuggestion, 'product' | 'aliases' | 'section' | 'countryCode'>,
+  ) => void;
+  onRejectProductSuggestion: (suggestion: ProductSuggestion) => void;
   onDebugTabChange: (tab: DebugTabKey) => void;
   onBackToEdit: () => void;
   onBackToSettings: () => void;
 };
 
 type HeartbeatInteractionSurface = 'graph' | 'history' | 'status';
+type ProductSuggestionReviewCardProps = {
+  suggestion: ProductSuggestion;
+  sectionOptions: Array<{ key: SectionKey; label: string; groupLabel: string }>;
+  onApprove: (
+    suggestion: ProductSuggestion,
+    updates: Pick<ProductSuggestion, 'product' | 'aliases' | 'section' | 'countryCode'>,
+  ) => void;
+  onReject: (suggestion: ProductSuggestion) => void;
+};
 
 const HEARTBEAT_HISTORY_SLOT_COUNT = 36;
 const HEARTBEAT_LATENCY_GRAPH_BASE_MAX_MS = 100;
@@ -114,6 +133,87 @@ const jsonTokenClass = (token: string, isKey = false) => {
   if (/^-?\d/.test(token)) { return 'json-token-number'; }
   return 'json-token-punctuation';
 };
+
+function ProductSuggestionReviewCard({
+  suggestion,
+  sectionOptions,
+  onApprove,
+  onReject,
+}: ProductSuggestionReviewCardProps) {
+  const [product, setProduct] = useState(suggestion.product);
+  const [aliases, setAliases] = useState(suggestion.aliases.join(', '));
+  const [section, setSection] = useState<SectionKey>(suggestion.section);
+
+  useEffect(() => {
+    setProduct(suggestion.product);
+    setAliases(suggestion.aliases.join(', '));
+    setSection(suggestion.section);
+  }, [suggestion]);
+
+  const aliasList = aliases
+    .split(',')
+    .map((alias) => alias.trim())
+    .filter(Boolean);
+
+  return (
+    <Card
+      bodyClassName={'stack'}
+      header={
+        <div className={'title-row'}>
+          <div>
+            <h3 className={'title title-xs'}>{suggestion.product}</h3>
+            <p className={'subtitle'}>
+              {suggestion.countryCode.toUpperCase()} · {suggestion.reportCount} report{suggestion.reportCount === 1 ? '' : 's'} · confidence {Math.round(suggestion.confidence * 100)}%
+            </p>
+          </div>
+          <div className={'button-row'}>
+            <button
+              type={'button'}
+              className={'button button-primary'}
+              onClick={() => onApprove(suggestion, {
+                product,
+                aliases: aliasList,
+                section,
+                countryCode: suggestion.countryCode,
+              })}
+            >
+              Approve
+            </button>
+            <button type={'button'} className={'button'} onClick={() => onReject(suggestion)}>
+              Reject
+            </button>
+          </div>
+        </div>
+      }
+    >
+      <div className={'form-grid'}>
+        <label className={'field'}>
+          <span>Product</span>
+          <input className={'input'} value={product} onChange={(event) => setProduct(event.target.value)} />
+        </label>
+        <label className={'field'}>
+          <span>Section</span>
+          <select className={'input'} value={section} onChange={(event) => setSection(event.target.value as SectionKey)}>
+            {sectionOptions.map((option) => (
+              <option key={option.key} value={option.key}>
+                {option.groupLabel} / {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className={'field field-full'}>
+          <span>Aliases</span>
+          <input className={'input'} value={aliases} onChange={(event) => setAliases(event.target.value)} />
+        </label>
+      </div>
+      {suggestion.latestRawItems.length > 0 ? (
+        <div className={'small-text'}>
+          Recent sightings: {suggestion.latestRawItems.join(', ')}
+        </div>
+      ) : null}
+    </Card>
+  );
+}
 
 const highlightedJsonLine = (line: string) => {
   const parts: Array<{ text: string; className?: string }> = [];
@@ -393,6 +493,8 @@ export function DebugPage({
   notificationPermission,
   debugNotificationResult,
   currentSharedListDatabaseEntry,
+  productSuggestions,
+  productSuggestionError,
   items,
   config,
   matcherTests,
@@ -421,6 +523,9 @@ export function DebugPage({
   onDebugSettingChange,
   onDebugNotificationTest,
   onDebugEventTest,
+  onRefreshProductSuggestions,
+  onApproveProductSuggestion,
+  onRejectProductSuggestion,
   onDebugTabChange,
   onBackToEdit,
   onBackToSettings,
@@ -471,6 +576,7 @@ export function DebugPage({
     { key: 'weights', label: messages.pages.debug.tabWeights, icon: mdiWeight },
     { key: 'variants', label: messages.pages.debug.tabVariants, icon: mdiPackageVariantClosed },
     { key: 'layout', label: messages.pages.debug.tabLayout, icon: mdiViewGridOutline },
+    { key: 'products', label: 'Products', icon: mdiPackageVariantClosed },
     { key: 'sections', label: messages.pages.debug.tabSections, icon: mdiStoreOutline },
     { key: 'storage', label: messages.pages.debug.tabStorage, icon: mdiHarddisk },
     { key: 'host', label: messages.pages.debug.tabHost, icon: mdiWeb },
@@ -483,6 +589,11 @@ export function DebugPage({
       section,
     })),
   );
+  const productSectionOptions = layoutRows.map(({ group, section }) => ({
+    key: section.key,
+    label: section.label,
+    groupLabel: group.label,
+  }));
   const layoutSectionCount = layoutRows.length;
   const layoutKeywordCount = layoutRows.reduce((total, row) => total + row.section.keywords.length, 0);
   const measurementModeLabels = {
@@ -1562,6 +1673,45 @@ export function DebugPage({
               </tbody>
             </table>
           </div>
+        </Card>
+      ) : null}
+
+      {activeTab === 'products' ? (
+        <Card
+          id={'debug-panel-products'}
+          role={'tabpanel'}
+          aria-labelledby={'debug-tab-products'}
+          header={
+            <div className={'title-row'}>
+              <div>
+                <h2 className={'title title-sm'}>Unknown product suggestions</h2>
+                <p className={'subtitle'}>
+                  Review products reported under Other and approve them as runtime matcher overrides.
+                </p>
+              </div>
+              <button type={'button'} className={'button'} onClick={onRefreshProductSuggestions}>
+                Refresh
+              </button>
+            </div>
+          }
+          bodyClassName={'stack'}
+        >
+          {productSuggestionError ? (
+            <div className={'notice notice-error'}>{productSuggestionError}</div>
+          ) : null}
+          {productSuggestions.length === 0 ? (
+            <div className={'empty-state'}>No pending product suggestions.</div>
+          ) : (
+            productSuggestions.map((suggestion) => (
+              <ProductSuggestionReviewCard
+                key={suggestion.id}
+                suggestion={suggestion}
+                sectionOptions={productSectionOptions}
+                onApprove={onApproveProductSuggestion}
+                onReject={onRejectProductSuggestion}
+              />
+            ))
+          )}
         </Card>
       ) : null}
 

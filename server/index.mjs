@@ -6,10 +6,13 @@ import {
   clearSharedList,
   createSharedList,
   getDatabaseStatus,
+  getProductOverrides,
   getSharedList,
   isSharedListId,
+  listProductSuggestions,
   pruneEmptySharedLists,
   saveSharedList,
+  updateProductSuggestion,
 } from './database.mjs';
 import { callShoppingListService, getHomeAssistantStatus, pushRecordToHomeAssistant } from './homeAssistant.mjs';
 import { canPersistSharedListRecord, isEmptyShoppingListRecord } from './sharedListPolicy.mjs';
@@ -261,6 +264,59 @@ const handleApi = async (request, response, path) => {
     }
 
     sendJson(response, 200, result);
+    return;
+  }
+
+  if (request.method === 'GET' && path === '/api/product-overrides') {
+    const url = new URL(request.url ?? '/', `http://${request.headers.host ?? 'localhost'}`);
+    sendJson(response, 200, { overrides: await getProductOverrides({ countryCode: url.searchParams.get('country') }) });
+    return;
+  }
+
+  if (request.method === 'GET' && path === '/api/unknown-products/suggestions') {
+    const url = new URL(request.url ?? '/', `http://${request.headers.host ?? 'localhost'}`);
+    const status = url.searchParams.get('status') ?? undefined;
+    sendJson(response, 200, { suggestions: await listProductSuggestions({ status }) });
+    return;
+  }
+
+  const unknownProductSuggestionActionMatch = path.match(/^\/api\/unknown-products\/suggestions\/([^/]+)\/(approve|reject)$/);
+  if (unknownProductSuggestionActionMatch && request.method === 'POST') {
+    const [, id, action] = unknownProductSuggestionActionMatch;
+    if (!isSharedListId(id)) {
+      sendJson(response, 400, { error: 'Invalid product suggestion id' });
+      return;
+    }
+
+    const body = await readJsonBody(request);
+    const suggestion = await updateProductSuggestion(id, {
+      ...body,
+      status: action === 'approve' ? 'approved' : 'rejected',
+    });
+    if (!suggestion) {
+      sendJson(response, 404, { error: 'Product suggestion not found' });
+      return;
+    }
+
+    sendJson(response, 200, { suggestion });
+    return;
+  }
+
+  const unknownProductSuggestionMatch = path.match(/^\/api\/unknown-products\/suggestions\/([^/]+)$/);
+  if (unknownProductSuggestionMatch && request.method === 'PATCH') {
+    const [, id] = unknownProductSuggestionMatch;
+    if (!isSharedListId(id)) {
+      sendJson(response, 400, { error: 'Invalid product suggestion id' });
+      return;
+    }
+
+    const suggestion = await updateProductSuggestion(id, await readJsonBody(request));
+    if (!suggestion) {
+      sendJson(response, 404, { error: 'Product suggestion not found' });
+      return;
+    }
+
+    sendJson(response, 200, { suggestion });
     return;
   }
 

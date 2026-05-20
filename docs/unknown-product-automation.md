@@ -49,7 +49,7 @@ Suggested database shape:
   "product": "canned tuna",
   "aliases": ["tuna", "tin of tuna"],
   "section": "canned",
-  "countries": ["GB", "US", "CA"],
+  "countries": ["uk", "us", "ca"],
   "confidence": 0.94,
   "source": "classifier",
   "evidence": {
@@ -105,7 +105,7 @@ The frontend should fetch approved product overlays from the backend and merge t
 Recommended API shape:
 
 ```text
-GET /api/product-overrides?country=GB
+GET /api/product-overrides?country=uk
 GET /api/unknown-products/suggestions
 PATCH /api/unknown-products/suggestions/:id
 POST /api/unknown-products/suggestions/:id/approve
