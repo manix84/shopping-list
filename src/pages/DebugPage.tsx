@@ -40,10 +40,13 @@ import type {
   VariantTestResult,
   ShoppingListRecord,
 } from '../types';
+import { Badge } from '../components/Badge';
 import { Card } from '../components/Card';
 import { ParsedItemCard } from '../components/ParsedItemCard';
 import { TestResultCard } from '../components/TestResultCard';
 import { SectionsPage } from './SectionsPage';
+import { getDisplayValue } from '../lib/parser';
+import { getSectionMeta } from '../lib/sections';
 import { useI18n } from '../lib/i18n';
 import type { Messages } from '../lib/i18n';
 import { appVersion } from '../version';
@@ -97,6 +100,7 @@ type DebugPageProps = {
     updates: Pick<ProductSuggestion, 'product' | 'aliases' | 'section' | 'countryCode'>,
   ) => void;
   onRejectProductSuggestion: (suggestion: ProductSuggestion) => void;
+  onSuggestProductRecategorization: (item: Item, section: SectionKey) => void;
   onDebugTabChange: (tab: DebugTabKey) => void;
   onBackToEdit: () => void;
   onBackToSettings: () => void;
@@ -111,6 +115,12 @@ type ProductSuggestionReviewCardProps = {
     updates: Pick<ProductSuggestion, 'product' | 'aliases' | 'section' | 'countryCode'>,
   ) => void;
   onReject: (suggestion: ProductSuggestion) => void;
+};
+type ProductRecategorizationCardProps = {
+  item: Item;
+  sectionOptions: Array<{ key: SectionKey; label: string; groupLabel: string }>;
+  config: CountryConfig;
+  onSuggest: (item: Item, section: SectionKey) => void;
 };
 
 const HEARTBEAT_HISTORY_SLOT_COUNT = 36;
@@ -212,6 +222,50 @@ function ProductSuggestionReviewCard({
         </div>
       ) : null}
     </Card>
+  );
+}
+
+function ProductRecategorizationCard({
+  item,
+  sectionOptions,
+  config,
+  onSuggest,
+}: ProductRecategorizationCardProps) {
+  const currentMeta = getSectionMeta(config, item.matchedSection);
+  const [section, setSection] = useState<SectionKey>(item.matchedSection);
+
+  useEffect(() => {
+    setSection(item.matchedSection);
+  }, [item]);
+
+  return (
+    <div className={'item-card'}>
+      <div className={'item-row'}>
+        <div className={'item-main'}>
+          <div className={'title title-xs'}>{getDisplayValue(item)}</div>
+          <div className={'badge-row'}>
+            <Badge>
+              Current: {currentMeta.groupLabel} / {currentMeta.label}
+            </Badge>
+            <Badge>
+              Cleaned: {item.cleaned}
+            </Badge>
+          </div>
+        </div>
+        <div className={'inline-row'}>
+          <select className={'input'} value={section} onChange={(event) => setSection(event.target.value as SectionKey)}>
+            {sectionOptions.map((option) => (
+              <option key={option.key} value={option.key}>
+                {option.groupLabel} / {option.label}
+              </option>
+            ))}
+          </select>
+          <button type={'button'} className={'button'} onClick={() => onSuggest(item, section)}>
+            Suggest
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -526,6 +580,7 @@ export function DebugPage({
   onRefreshProductSuggestions,
   onApproveProductSuggestion,
   onRejectProductSuggestion,
+  onSuggestProductRecategorization,
   onDebugTabChange,
   onBackToEdit,
   onBackToSettings,
@@ -1686,7 +1741,7 @@ export function DebugPage({
               <div>
                 <h2 className={'title title-sm'}>Unknown product suggestions</h2>
                 <p className={'subtitle'}>
-                  Review products reported under Other and approve them as runtime matcher overrides.
+                  Review products reported under Other, or suggest a better section for a current item.
                 </p>
               </div>
               <button type={'button'} className={'button'} onClick={onRefreshProductSuggestions}>
@@ -1699,6 +1754,30 @@ export function DebugPage({
           {productSuggestionError ? (
             <div className={'notice notice-error'}>{productSuggestionError}</div>
           ) : null}
+          <section className={'stack'}>
+            <div>
+              <h3 className={'title title-xs'}>Suggest from current list</h3>
+              <p className={'subtitle'}>Choose a better section for an item that parsed into the wrong place.</p>
+            </div>
+            {items.length === 0 ? (
+              <div className={'empty-state'}>No current list items to suggest from.</div>
+            ) : (
+              items.map((item) => (
+                <ProductRecategorizationCard
+                  key={item.id}
+                  item={item}
+                  sectionOptions={productSectionOptions}
+                  config={config}
+                  onSuggest={onSuggestProductRecategorization}
+                />
+              ))
+            )}
+          </section>
+          <section className={'stack'}>
+            <div>
+              <h3 className={'title title-xs'}>Pending review</h3>
+              <p className={'subtitle'}>Approve suggestions to add them as runtime matcher overrides.</p>
+            </div>
           {productSuggestions.length === 0 ? (
             <div className={'empty-state'}>No pending product suggestions.</div>
           ) : (
@@ -1712,6 +1791,7 @@ export function DebugPage({
               />
             ))
           )}
+          </section>
         </Card>
       ) : null}
 

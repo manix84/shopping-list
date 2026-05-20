@@ -116,6 +116,7 @@ const meta = {
     onRefreshProductSuggestions: fn(),
     onApproveProductSuggestion: fn(),
     onRejectProductSuggestion: fn(),
+    onSuggestProductRecategorization: fn(),
     onDebugTabChange: fn(),
     onBackToEdit: fn(),
     onBackToSettings: fn(),

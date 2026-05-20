@@ -152,7 +152,10 @@ export const clearSharedShoppingList = async (listId: string): Promise<void> => 
 export type UnknownProductsReport = {
   countryCode: CountryCode;
   locale: LocaleCode;
-  items: Pick<Item, 'raw' | 'normalized' | 'cleaned'>[];
+  items: Array<Pick<Item, 'raw' | 'normalized' | 'cleaned'> & {
+    matchedSection?: SectionKey;
+    suggestedSection?: SectionKey;
+  }>;
 };
 
 export const reportUnknownProducts = async (report: UnknownProductsReport): Promise<{ disabled: boolean }> => {

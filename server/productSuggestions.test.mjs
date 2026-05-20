@@ -77,4 +77,44 @@ describe('product suggestions', () => {
       }),
     ]);
   });
+
+  it('stores recategorization suggestions with current and suggested section evidence', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'shopping-list-products-'));
+    vi.stubEnv('SHOPPING_LIST_DB_PATH', join(directory, 'database.json'));
+    vi.stubEnv('DATABASE_URL', '');
+    vi.stubEnv('SHOPPING_LIST_DATABASE_URL', '');
+    const database = await importDatabase();
+
+    const suggestion = await database.upsertUnknownProductSuggestion({
+      item: {
+        raw: 'dettol wipes',
+        normalized: 'dettol wipes',
+        cleaned: 'dettol wipes',
+        matchedSection: 'baby',
+        suggestedSection: 'household',
+      },
+      report: {
+        countryCode: 'uk',
+        locale: 'en',
+      },
+      suggestion: {
+        section: 'household',
+        source: 'recategorization',
+        evidence: {
+          currentSection: 'baby',
+          suggestedSection: 'household',
+        },
+      },
+    });
+
+    expect(suggestion).toMatchObject({
+      product: 'dettol wipes',
+      section: 'household',
+      source: 'recategorization',
+      evidence: {
+        currentSection: 'baby',
+        suggestedSection: 'household',
+      },
+    });
+  });
 });

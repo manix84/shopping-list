@@ -86,7 +86,7 @@ const SHARED_LIST_SYNC_SSE_FALLBACK_POLL_MS = 60_000;
 const SHARED_LIST_NOTIFICATION_GROUP_MS = 2 * 60_000;
 const SHARED_LIST_NOTIFICATION_PREVIEW_LIMIT = 3;
 const UNKNOWN_PRODUCT_REPORT_DEBOUNCE_MS = 2_000;
-const UNKNOWN_PRODUCTS_REPORTED_STORAGE_KEY = 'shoppingList:reportedUnknownProducts';
+const UNKNOWN_PRODUCTS_REPORTED_STORAGE_KEY = 'shoppingList:reportedUnknownProducts:v2';
 const UNKNOWN_PRODUCTS_REPORTED_LIMIT = 500;
 const NOTIFICATION_SERVICE_WORKER_READY_TIMEOUT_MS = 3_000;
 const NOTIFICATION_WORKER_SCOPE_PATH = 'notification-worker/';
@@ -1011,6 +1011,31 @@ export default function App() {
     try {
       setProductSuggestionError(undefined);
       await rejectProductSuggestion(suggestion.id);
+      await refreshProductSuggestions();
+    } catch (error) {
+      setProductSuggestionError(error instanceof Error ? error.message : String(error));
+    }
+  };
+
+  const handleSuggestProductRecategorization = async (item: Item, suggestedSection: SectionKey) => {
+    try {
+      setProductSuggestionError(undefined);
+      const result = await reportUnknownProducts({
+        countryCode,
+        locale,
+        items: [{
+          raw: item.raw,
+          normalized: item.normalized,
+          cleaned: item.cleaned,
+          matchedSection: item.matchedSection,
+          suggestedSection,
+        }],
+      });
+      if (result.disabled) {
+        isUnknownProductReportingDisabledRef.current = true;
+        return;
+      }
+
       await refreshProductSuggestions();
     } catch (error) {
       setProductSuggestionError(error instanceof Error ? error.message : String(error));
@@ -2009,6 +2034,9 @@ export default function App() {
             nextReportedKeys.add(unknownProductReportedKey(countryCode, locale, item));
           }
           saveReportedUnknownProductKeys(nextReportedKeys);
+          if (isDebugMode) {
+            void refreshProductSuggestions();
+          }
         })
         .catch((error: unknown) => {
           verboseDebugLog('unknown product report failed', { error: error instanceof Error ? error.message : String(error) });
@@ -2021,7 +2049,17 @@ export default function App() {
         unknownProductReportTimerRef.current = undefined;
       }
     };
-  }, [canUseBackend, countryCode, isLoaded, isProductAutocompleteInteracting, items, locale, verboseDebugLog]);
+  }, [
+    canUseBackend,
+    countryCode,
+    isDebugMode,
+    isLoaded,
+    isProductAutocompleteInteracting,
+    items,
+    locale,
+    refreshProductSuggestions,
+    verboseDebugLog,
+  ]);
 
   useEffect(() => {
     if (!isLoaded) { return; }
@@ -2896,6 +2934,7 @@ export default function App() {
                 onRefreshProductSuggestions={refreshProductSuggestions}
                 onApproveProductSuggestion={handleApproveProductSuggestion}
                 onRejectProductSuggestion={handleRejectProductSuggestion}
+                onSuggestProductRecategorization={handleSuggestProductRecategorization}
                 onDebugTabChange={changeDebugTab}
                 onBackToEdit={() => changePage('edit')}
                 onBackToSettings={() => changePage('settings')}

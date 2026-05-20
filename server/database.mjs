@@ -543,7 +543,11 @@ export const upsertUnknownProductSuggestion = async ({ item, report, suggestion 
     item?.raw,
     ...(Array.isArray(suggestion.aliases) ? suggestion.aliases : []),
   ]).filter((alias) => normalizeProductText(alias) !== product);
-  const section = SECTION_KEYS.has(suggestion.section) ? suggestion.section : 'other';
+  const section = SECTION_KEYS.has(suggestion.section)
+    ? suggestion.section
+    : SECTION_KEYS.has(item?.suggestedSection)
+      ? item.suggestedSection
+      : 'other';
   const confidence = Number.isFinite(Number(suggestion.confidence))
     ? Math.min(1, Math.max(0, Number(suggestion.confidence)))
     : 0.2;
@@ -568,6 +572,8 @@ export const upsertUnknownProductSuggestion = async ({ item, report, suggestion 
           ...existing.evidence,
           ...(suggestion.evidence && typeof suggestion.evidence === 'object' ? suggestion.evidence : {}),
           locale: report.locale,
+          currentSection: item?.matchedSection,
+          suggestedSection: item?.suggestedSection,
         },
         reportCount: existing.reportCount + 1,
         latestRawItems: latestRawItems(existing.latestRawItems, item?.raw),
@@ -632,6 +638,8 @@ export const upsertUnknownProductSuggestion = async ({ item, report, suggestion 
       JSON.stringify({
         ...(suggestion.evidence && typeof suggestion.evidence === 'object' ? suggestion.evidence : {}),
         locale: report.locale,
+        currentSection: item?.matchedSection,
+        suggestedSection: item?.suggestedSection,
       }),
       JSON.stringify(latestRawItems([], item?.raw)),
       now,

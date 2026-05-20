@@ -1,4 +1,4 @@
-import { COUNTRY_CODES } from './constants.mjs';
+import { COUNTRY_CODES, SECTION_KEYS } from './constants.mjs';
 import { upsertUnknownProductSuggestion } from './database.mjs';
 
 const LOCALE_CODES = new Set(['en', 'es', 'fr', 'de', 'nl', 'it', 'ro', 'pi']);
@@ -15,7 +15,9 @@ const isReportItem = (value) =>
   typeof value.raw === 'string' &&
   value.raw.trim().length > 0 &&
   (value.normalized === undefined || typeof value.normalized === 'string') &&
-  (value.cleaned === undefined || typeof value.cleaned === 'string');
+  (value.cleaned === undefined || typeof value.cleaned === 'string') &&
+  (value.matchedSection === undefined || SECTION_KEYS.has(value.matchedSection)) &&
+  (value.suggestedSection === undefined || SECTION_KEYS.has(value.suggestedSection));
 
 export const isUnknownProductsReport = (value) =>
   value &&
@@ -193,7 +195,19 @@ export const submitUnknownProductsReport = async (report) => {
 
   const suggestions = [];
   for (const item of uniqueItems.values()) {
-    const suggestion = await upsertUnknownProductSuggestion({ item, report });
+    const suggestion = await upsertUnknownProductSuggestion({
+      item,
+      report,
+      suggestion: {
+        section: item.suggestedSection,
+        source: item.suggestedSection ? 'recategorization' : 'unknown-report',
+        confidence: item.suggestedSection ? 0.75 : undefined,
+        evidence: {
+          currentSection: item.matchedSection,
+          suggestedSection: item.suggestedSection,
+        },
+      },
+    });
     if (suggestion) {
       suggestions.push(suggestion);
     }
