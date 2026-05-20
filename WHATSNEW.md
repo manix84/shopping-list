@@ -4,6 +4,13 @@ Keep this file updated when user-visible features, platform changes, major parse
 
 ## 0.16.x - Current - Backend Visibility, Notifications, and Sauce Routing
 
+- Added backend-stored product suggestions so unknown `Other` items and manual recategorisation reports can be reviewed in Debug tools without relying on GitHub issues.
+- Added a Debug Products tab for approving/rejecting product suggestions, editing product names, aliases, and target sections, and suggesting a better section for any current list item.
+- Added runtime product overrides: approved suggestions are merged into the active country profile and current lists are reparsed so section fixes apply while preserving checked state.
+- Added product suggestion APIs and Postgres/JSON persistence for pending, approved, and rejected suggestions.
+- Added PWA app shortcuts for Edit list and Route, plus a Debug tools shortcut when debug mode is enabled.
+- Improved local dev API proxying so CSRF-protected unknown-product reports work through Vite, and local API health checks report the current package version after version bumps.
+- Improved UK household matching for Dettol and cleaning wipes while keeping baby wipes under Baby Supplies.
 - Added optional unknown-product reporting for items that fall into `Other`, including country profile and app language, with same-origin CSRF-protected server-side GitHub product sub-issues and duplicate `+1` comments when configured.
 - Improved unknown-product report deduping so cleaned product names are used for issue titles and local report keys, with a short idle delay to avoid filing partial words while the user is typing.
 - Added non-intrusive product autocomplete to the paste textarea, using the active country profile's product keywords with mouse, keyboard, and touch selection.
