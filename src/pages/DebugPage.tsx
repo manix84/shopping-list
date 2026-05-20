@@ -766,7 +766,6 @@ export function DebugPage({
       startX: event.clientX,
       suppressClick: false,
     };
-    tabList.setPointerCapture(event.pointerId);
   };
   const handleDebugTabListPointerMove = (event: PointerEvent<HTMLDivElement>) => {
     const drag = debugTabDragRef.current;
@@ -775,6 +774,7 @@ export function DebugPage({
     const deltaX = event.clientX - drag.startX;
     if (Math.abs(deltaX) > 4) {
       if (!drag.dragged) {
+        event.currentTarget.setPointerCapture(event.pointerId);
         setIsDebugTabDragging(true);
       }
       drag.dragged = true;
