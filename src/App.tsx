@@ -870,6 +870,15 @@ export default function App() {
   }, [activeListId, countryCode, input, isServerBackedList, items, listName, measurementDisplayMode]);
 
   useEffect(() => {
+    if (!isLoaded) { return; }
+
+    setItems((current) => {
+      const reparsed = parseItems(input, config, current);
+      return JSON.stringify(reparsed) === JSON.stringify(current) ? current : reparsed;
+    });
+  }, [config, input, isLoaded]);
+
+  useEffect(() => {
     activeListIdRef.current = activeListId;
   }, [activeListId]);
 
