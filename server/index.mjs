@@ -23,7 +23,17 @@ import { isShoppingListRecord } from './validation.mjs';
 const port = Number(process.env.PORT ?? 8787);
 const emptySharedListCleanupIntervalMs = Number(process.env.EMPTY_SHARED_LIST_CLEANUP_INTERVAL_MS ?? 60 * 60 * 1000);
 const distDir = resolve('dist');
-const appVersion = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')).version;
+const packageJsonUrl = new URL('../package.json', import.meta.url);
+const appVersion = JSON.parse(readFileSync(packageJsonUrl, 'utf8')).version;
+const currentAppVersion = () => {
+  if (process.env.NODE_ENV === 'production') { return appVersion; }
+
+  try {
+    return JSON.parse(readFileSync(packageJsonUrl, 'utf8')).version;
+  } catch {
+    return appVersion;
+  }
+};
 const homeAssistantIntegrationEnabled = process.env.ENABLE_HOME_ASSISTANT_INTEGRATION === 'true';
 const clacksOverhead = 'GNU Terry Pratchett';
 const unknownProductSecurity = createUnknownProductSecurity({
@@ -221,7 +231,7 @@ const handleApi = async (request, response, path) => {
   }
 
   if (request.method === 'GET' && path === '/api/health') {
-    sendJson(response, 200, { ok: true, mode: 'backend', version: appVersion, database: await getDatabaseStatus() });
+    sendJson(response, 200, { ok: true, mode: 'backend', version: currentAppVersion(), database: await getDatabaseStatus() });
     return;
   }
 
