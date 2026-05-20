@@ -536,6 +536,7 @@ export const upsertUnknownProductSuggestion = async ({ item, report, suggestion 
   }
 
   const now = new Date().toISOString();
+  const shouldReopenForReview = suggestion.source === 'recategorization' || SECTION_KEYS.has(item?.suggestedSection);
   const aliases = uniqueStrings([
     suggestion.product,
     item?.cleaned,
@@ -557,15 +558,16 @@ export const upsertUnknownProductSuggestion = async ({ item, report, suggestion 
       const database = await readJsonDatabase();
       const key = productSuggestionKey(report.countryCode, product);
       const existing = normalizeProductSuggestion(database.productSuggestions[key]);
+      const nextStatus = shouldReopenForReview ? 'pending' : existing.status;
       const next = normalizeProductSuggestion({
         ...existing,
         id: database.productSuggestions[key]?.id ?? uuidV7(),
         product: existing.product || product,
         normalizedProduct: product,
         aliases: uniqueStrings([...existing.aliases, ...aliases]),
-        section: existing.status === 'pending' ? section : existing.section,
+        section: nextStatus === 'pending' ? section : existing.section,
         countryCode: report.countryCode,
-        status: existing.status,
+        status: nextStatus,
         confidence: Math.max(existing.confidence, confidence),
         source: suggestion.source ?? existing.source ?? 'unknown-report',
         evidence: {
@@ -579,6 +581,8 @@ export const upsertUnknownProductSuggestion = async ({ item, report, suggestion 
         latestRawItems: latestRawItems(existing.latestRawItems, item?.raw),
         createdAt: database.productSuggestions[key]?.createdAt ?? now,
         updatedAt: now,
+        reviewedAt: nextStatus === 'pending' ? undefined : existing.reviewedAt,
+        reviewedBy: nextStatus === 'pending' ? undefined : existing.reviewedBy,
       });
       database.productSuggestions[key] = next;
       await writeJsonDatabase(database);
@@ -612,7 +616,8 @@ export const upsertUnknownProductSuggestion = async ({ item, report, suggestion 
             SELECT DISTINCT jsonb_array_elements_text(product_suggestions.aliases || EXCLUDED.aliases) AS alias
           ) aliases
         ), '[]'::jsonb),
-        section = CASE WHEN product_suggestions.status = 'pending' THEN EXCLUDED.section ELSE product_suggestions.section END,
+        section = CASE WHEN product_suggestions.status = 'pending' OR EXCLUDED.source = 'recategorization' THEN EXCLUDED.section ELSE product_suggestions.section END,
+        status = CASE WHEN EXCLUDED.source = 'recategorization' THEN 'pending' ELSE product_suggestions.status END,
         confidence = GREATEST(product_suggestions.confidence, EXCLUDED.confidence),
         evidence = product_suggestions.evidence || EXCLUDED.evidence,
         report_count = product_suggestions.report_count + 1,
@@ -623,7 +628,9 @@ export const upsertUnknownProductSuggestion = async ({ item, report, suggestion 
             LIMIT 5
           ) raw_items
         ),
-        updated_at = EXCLUDED.updated_at
+        updated_at = EXCLUDED.updated_at,
+        reviewed_at = CASE WHEN EXCLUDED.source = 'recategorization' THEN NULL ELSE product_suggestions.reviewed_at END,
+        reviewed_by = CASE WHEN EXCLUDED.source = 'recategorization' THEN NULL ELSE product_suggestions.reviewed_by END
       RETURNING ${productSuggestionRowSelect}
     `,
     [

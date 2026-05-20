@@ -117,4 +117,63 @@ describe('product suggestions', () => {
       },
     });
   });
+
+  it('reopens reviewed suggestions when a recategorization is submitted', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'shopping-list-products-'));
+    vi.stubEnv('SHOPPING_LIST_DB_PATH', join(directory, 'database.json'));
+    vi.stubEnv('DATABASE_URL', '');
+    vi.stubEnv('SHOPPING_LIST_DATABASE_URL', '');
+    const database = await importDatabase();
+
+    const suggestion = await database.upsertUnknownProductSuggestion({
+      item: {
+        raw: 'dettol wipes',
+        normalized: 'dettol wipes',
+        cleaned: 'dettol wipes',
+        matchedSection: 'baby',
+      },
+      report: {
+        countryCode: 'uk',
+        locale: 'en',
+      },
+    });
+
+    await database.updateProductSuggestion(suggestion.id, {
+      section: 'baby',
+      status: 'rejected',
+    });
+
+    const reopened = await database.upsertUnknownProductSuggestion({
+      item: {
+        raw: 'dettol wipes',
+        normalized: 'dettol wipes',
+        cleaned: 'dettol wipes',
+        matchedSection: 'baby',
+        suggestedSection: 'household',
+      },
+      report: {
+        countryCode: 'uk',
+        locale: 'en',
+      },
+      suggestion: {
+        section: 'household',
+        source: 'recategorization',
+      },
+    });
+
+    expect(reopened).toMatchObject({
+      id: suggestion.id,
+      status: 'pending',
+      section: 'household',
+      source: 'recategorization',
+    });
+    expect(reopened.reviewedAt).toBeUndefined();
+
+    await expect(database.listProductSuggestions({ status: 'pending' })).resolves.toEqual([
+      expect.objectContaining({
+        id: suggestion.id,
+        section: 'household',
+      }),
+    ]);
+  });
 });
