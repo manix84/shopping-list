@@ -1,6 +1,8 @@
 import { mdiAlertOctagonOutline, mdiBugOutline, mdiHomeOutline, mdiMapSearchOutline, mdiPencilOutline, mdiServerNetworkOff } from '@mdi/js';
 import { Card } from '../components/Card';
+import { classNames } from '../lib/classNames';
 import { useI18n } from '../lib/i18n';
+import st from './ErrorPage.module.scss';
 
 type ErrorPageVariant = 'not-found' | 'server-error';
 
@@ -43,35 +45,43 @@ export function ErrorPage({ variant, isDebugMode, onBackToEdit, onOpenDebug }: E
   const errorMessages = messages.pages.error;
 
   return (
-    <Card className={'error-card'} bodyClassName={'error-card-body'} aria-labelledby={'error-title'}>
-      <div className={'error-visual'} aria-hidden={'true'}>
-        <div className={'error-map'}>
-          <div className={'error-map-header'}>
+    <Card className={classNames(st.card, 'error-card')} bodyClassName={classNames(st.body, 'error-card-body')} aria-labelledby={'error-title'}>
+      <div className={classNames(st.visual, 'error-visual')} aria-hidden={'true'}>
+        <div className={classNames(st.map, 'error-map')}>
+          <div className={classNames(st.mapHeader, 'error-map-header')}>
             <span>{errorMessages[content.codeKey]}</span>
-            <svg className={'error-map-icon'} viewBox={'0 0 24 24'}>
+            <svg className={classNames(st.mapIcon, 'error-map-icon')} viewBox={'0 0 24 24'}>
               <path d={content.accentIcon} fill={'currentColor'} />
             </svg>
           </div>
-          <div className={'error-map-route'}>
+          <div className={classNames(st.mapRoute, 'error-map-route')}>
             {Array.from({ length: 5 }, (_, index) => (
-              <div key={index} className={`error-map-stop ${index === 2 ? 'error-map-stop-lost' : ''}`} />
+              <div
+                key={index}
+                className={classNames(
+                  st.mapStop,
+                  'error-map-stop',
+                  index === 2 ? st.lostStop : undefined,
+                  index === 2 ? 'error-map-stop-lost' : undefined,
+                )}
+              />
             ))}
           </div>
         </div>
-        <div className={'error-icon-badge'}>
+        <div className={classNames(st.iconBadge, 'error-icon-badge')}>
           <svg viewBox={'0 0 24 24'}>
             <path d={content.icon} fill={'currentColor'} />
           </svg>
         </div>
       </div>
 
-      <div className={'error-copy'}>
+      <div className={classNames(st.copy, 'error-copy')}>
         <p className={'section-group'}>{errorMessages[content.eyebrowKey]}</p>
         <h2 id={'error-title'} className={'title'}>{errorMessages[content.titleKey]}</h2>
         <p className={'subtitle'}>{errorMessages[content.subtitleKey]}</p>
       </div>
 
-      <div className={'error-actions'}>
+      <div className={classNames(st.actions, 'error-actions')}>
         <button type={'button'} className={'button button-primary'} onClick={onBackToEdit}>
           <svg aria-hidden={'true'} className={'button-icon-svg'} viewBox={'0 0 24 24'}>
             <path d={variant === 'not-found' ? mdiHomeOutline : mdiPencilOutline} fill={'currentColor'} />
