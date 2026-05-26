@@ -263,13 +263,13 @@ export function SettingsPage({
         : undefined;
 
   const installSetting = shouldShowInstallSetting ? (
-    <div className={'settings-install-row'}>
-      <div className={'settings-install-icon'} aria-hidden={'true'}>
+    <div className={classNames(st.installRow, 'settings-install-row')}>
+      <div className={classNames(st.installIcon, 'settings-install-icon')} aria-hidden={'true'}>
         <svg viewBox={'0 0 24 24'}>
           <path d={mdiDownload} fill={'currentColor'} />
         </svg>
       </div>
-      <div className={'settings-install-copy'}>
+      <div className={classNames(st.installCopy, 'settings-install-copy')}>
         <h3>{installTitle}</h3>
         <p>{installDescription}</p>
       </div>
@@ -416,7 +416,7 @@ export function SettingsPage({
           </button>
         </div>
 
-        <div className={'settings-footnote small-text'}>{messages.labels.storedLocally}</div>
+        <div className={classNames(st.footnote, 'settings-footnote', 'small-text')}>{messages.labels.storedLocally}</div>
       </Card>
       {installSetting}
     </>

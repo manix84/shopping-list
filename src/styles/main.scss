@@ -66,46 +66,11 @@ body {
     sans-serif;
 }
 
-.app-loading-overlay {
-  align-items: center;
-  backdrop-filter: blur(1px);
-  background: color-mix(in srgb, $bg 72%, transparent);
-  display: flex;
-  inset: 0;
-  justify-content: center;
-  padding: 32px;
-  position: fixed;
-  z-index: 1400;
-}
-
-.app-loading-spinner {
-  animation: app-loading-spin 0.78s linear infinite;
-  background: $panel;
-  border: 4px solid $border;
-  border-radius: 999px;
-  border-top-color: $primary;
-  box-shadow: 0 12px 32px color-mix(in srgb, $shadow 28%, transparent);
-  display: block;
-  height: 44px;
-  width: 44px;
-}
-
-@keyframes app-loading-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 button,
 input,
 textarea,
 select {
   font: inherit;
-}
-
-.shopping-app {
-  min-height: 100vh;
-  padding: 0 24px 24px;
 }
 
 .story-canvas {
@@ -122,49 +87,6 @@ select {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
-}
-
-.skip-link {
-  background: $panel;
-  border: 2px solid $primary;
-  border-radius: 8px;
-  color: $text;
-  font-weight: 700;
-  left: 24px;
-  padding: 10px 14px;
-  position: fixed;
-  top: 16px;
-  transform: translateY(-160%);
-  transition: transform 0.16s ease;
-  z-index: 1200;
-
-  &:focus {
-    transform: translateY(0);
-  }
-}
-
-.main-content {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-
-  &:focus {
-    outline: 2px solid $primary;
-    outline-offset: 6px;
-    border-radius: 10px;
-  }
-
-  &:focus:not(:focus-visible) {
-    outline: none;
-  }
-}
-
-.shopping-shell {
-  max-width: 1240px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
 }
 
 .color-token-section {
@@ -1553,10 +1475,6 @@ select {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .app-loading-spinner {
-    animation: none;
-  }
-
   .button,
   .heartbeat-pulse,
   .heartbeat-pulse-ring,
@@ -1565,12 +1483,6 @@ select {
   .heartbeat-pulse-core,
   .heartbeat-graph-tooltip,
   .heartbeat-status-tooltip,
-  .skip-link,
-  .settings-install-row {
-    animation: none;
-    transition: none;
-  }
-
   .button:hover {
     transform: none;
   }
@@ -2089,72 +2001,6 @@ select {
   justify-content: flex-end;
 }
 
-.settings-footnote {
-  border-top: 1px solid $border;
-  padding-top: 12px;
-  text-align: right;
-}
-
-.settings-install-row {
-  align-items: center;
-  animation: settings-install-row-in 0.2s ease-out both;
-  background: $panel-alt;
-  border: 1px solid $border;
-  border-radius: 18px;
-  display: grid;
-  gap: 14px;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  padding: 14px;
-}
-
-@keyframes settings-install-row-in {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.settings-install-icon {
-  align-items: center;
-  background: color-mix(in srgb, $primary 12%, $panel);
-  border: 1px solid color-mix(in srgb, $primary 28%, $border);
-  border-radius: 14px;
-  color: $primary;
-  display: inline-flex;
-  flex: 0 0 auto;
-  height: 42px;
-  justify-content: center;
-  width: 42px;
-
-  svg {
-    display: block;
-    height: 22px;
-    width: 22px;
-  }
-}
-
-.settings-install-copy {
-  min-width: 0;
-
-  h3 {
-    font-size: 14px;
-    line-height: 1.25;
-    margin: 0 0 4px;
-  }
-
-  p {
-    color: $muted;
-    font-size: 13px;
-    line-height: 1.4;
-    margin: 0;
-  }
-}
-
 .warning-actions {
   justify-content: center;
 }
@@ -2167,13 +2013,8 @@ select {
 }
 
 @media (max-width: 640px) {
-  .shopping-app,
   .story-canvas {
     padding: 0 10px 10px;
-  }
-
-  .shopping-shell {
-    gap: 18px;
   }
 
   .card-header {
@@ -2269,16 +2110,6 @@ select {
   .textarea,
   .select {
     padding: 11px 12px;
-  }
-
-  .settings-install-row {
-    align-items: stretch;
-    grid-template-columns: auto minmax(0, 1fr);
-
-    .button {
-      grid-column: 1 / -1;
-      justify-self: stretch;
-    }
   }
 
   .empty-state {

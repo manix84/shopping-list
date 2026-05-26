@@ -1,9 +1,11 @@
 import type { ReactNode } from 'react';
+import st from '../App.module.scss';
+import { classNames } from '../lib/classNames';
 
 export function DesignSystemStory({ children }: { children: ReactNode }) {
   return (
     <main>
-      <div className={'shopping-shell'} style={{ paddingBlock: 24 }}>
+      <div className={classNames(st.shell, 'shopping-shell')} style={{ paddingBlock: 24 }}>
         {children}
       </div>
     </main>

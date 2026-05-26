@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, userEvent, within } from 'storybook/test';
+import st from '../App.module.scss';
+import { classNames } from '../lib/classNames';
 import { DesignSystemStory, StorySection } from './DesignSystemStory';
 
 const checklist = [
@@ -82,7 +84,7 @@ export const Default: Story = {
       </StorySection>
 
       <StorySection title={'Keyboard and focus'}>
-        <a className={'skip-link'} href={'#storybook-accessibility-demo'}>
+        <a className={classNames(st.skipLink, 'skip-link')} href={'#storybook-accessibility-demo'}>
           Skip to demo content
         </a>
         <div className={'button-row'} role={'group'} aria-label={'Example controls'}>
