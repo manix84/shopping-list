@@ -1,4 +1,6 @@
 import { mdiAlertCircle, mdiAlertOctagon, mdiCheckCircle, mdiInformation } from '@mdi/js';
+import { classNames } from '../lib/classNames';
+import st from './ToastPopup.module.scss';
 
 export type ToastTone = 'success' | 'info' | 'warning' | 'error';
 
@@ -31,18 +33,27 @@ export function ToastPopup({
 
   return (
     <aside
-      className={`toast-popup toast-popup-${tone} ${showIcon ? '' : 'toast-popup-no-icon'} ${hasTitle ? '' : 'toast-popup-no-title'}`}
+      className={classNames(
+        st.root,
+        st[tone],
+        'toast-popup',
+        `toast-popup-${tone}`,
+        showIcon ? undefined : st.noIcon,
+        showIcon ? undefined : 'toast-popup-no-icon',
+        hasTitle ? undefined : st.noTitle,
+        hasTitle ? undefined : 'toast-popup-no-title',
+      )}
       role={roleForToastTone(tone)}
       aria-live={tone === 'error' ? 'assertive' : 'polite'}
     >
       {showIcon ? (
-        <span className={'toast-popup-icon'} aria-hidden={'true'}>
+        <span className={classNames(st.icon, 'toast-popup-icon')} aria-hidden={'true'}>
           <svg viewBox={'0 0 24 24'}>
             <path d={iconForToastTone[tone]} fill={'currentColor'} />
           </svg>
         </span>
       ) : null}
-      <span className={'toast-popup-copy'}>
+      <span className={classNames(st.copy, 'toast-popup-copy')}>
         {title ? <strong>{title}</strong> : null}
         <span>{message}</span>
       </span>
