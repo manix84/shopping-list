@@ -21,9 +21,6 @@
   display: flex;
   gap: 16px;
   flex-wrap: wrap;
-}
-
-.title-row {
   align-items: center;
   justify-content: space-between;
 }
@@ -65,10 +62,10 @@
   gap: 8px;
   min-height: 34px;
   min-width: 0;
-}
 
-.page-title-with-status .title {
-  min-width: 0;
+  .title {
+    min-width: 0;
+  }
 }
 
 .edit-page-header {
@@ -112,18 +109,27 @@
 .stack,
 .field {
   display: flex;
-}
-
-.button-row,
-.inline-row,
-.badge-row,
-.stack,
-.field {
   gap: 10px;
 }
 
-.stack,
 .field {
+  flex-direction: column;
+
+  label {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  &-compact {
+    max-width: 360px;
+  }
+
+  &-full {
+    grid-column: 1 / -1;
+  }
+}
+
+.stack {
   flex-direction: column;
 }
 
@@ -207,15 +213,11 @@
   width: 20px;
 }
 
-.button-full,
-.edit-save-actions .button {
+.button-full {
   align-items: center;
   display: inline-flex;
   gap: 8px;
   justify-content: center;
-}
-
-.button-full {
   width: 100%;
 }
 
@@ -223,6 +225,13 @@
   display: grid;
   gap: 10px;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  .button {
+    align-items: center;
+    display: inline-flex;
+    gap: 8px;
+    justify-content: center;
+  }
 }
 
 .paste-autocomplete-shell {
@@ -241,12 +250,12 @@
   padding: 6px;
   position: absolute;
   z-index: 20;
-}
 
-.product-suggestion-list-caret {
-  max-width: min(360px, calc(100vw - 48px));
-  min-width: min(280px, calc(100vw - 48px));
-  transform: translateY(calc(-100% - 8px));
+  &-caret {
+    max-width: min(360px, calc(100vw - 48px));
+    min-width: min(280px, calc(100vw - 48px));
+    transform: translateY(calc(-100% - 8px));
+  }
 }
 
 .product-suggestion-option {
@@ -275,18 +284,20 @@
   }
 }
 
-.product-suggestion-value {
-  font-weight: 700;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+.product-suggestion {
+  &-value {
+    font-weight: 700;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 
-.product-suggestion-section {
-  color: $muted;
-  font-size: 12px;
-  white-space: nowrap;
+  &-section {
+    color: $muted;
+    font-size: 12px;
+    white-space: nowrap;
+  }
 }
 
 .layout-split {
@@ -295,23 +306,10 @@
   gap: 24px;
 }
 
-.field label {
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.field-compact {
-  max-width: 360px;
-}
-
 .form-grid {
   display: grid;
   gap: 12px;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-}
-
-.field-full {
-  grid-column: 1 / -1;
 }
 
 .notice {
@@ -319,12 +317,12 @@
   border-radius: 8px;
   background: $panel-alt;
   padding: 12px 14px;
-}
 
-.notice-error {
-  border-color: $danger-border;
-  background: $danger-bg;
-  color: $danger-text;
+  &-error {
+    border-color: $danger-border;
+    background: $danger-bg;
+    color: $danger-text;
+  }
 }
 
 .input,
@@ -372,11 +370,11 @@
   align-items: flex-start;
   grid-template-columns: minmax(0, 1fr) auto;
   justify-content: initial;
-}
 
-.route-page-header-copy {
-  flex: 1 1 360px;
-  min-width: 0;
+  &-copy {
+    flex: 1 1 360px;
+    min-width: 0;
+  }
 }
 
 .route-toolbar {
@@ -386,23 +384,30 @@
   flex-direction: column;
   gap: 10px;
   max-width: 100%;
-}
 
-.route-toolbar-row {
-  align-items: center;
-  display: inline-flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 8px 0;
-  max-width: 100%;
-}
+  &-row {
+    align-items: center;
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px 0;
+    max-width: 100%;
+  }
 
-.route-toolbar-group {
-  align-items: center;
-  display: inline-flex;
-  flex: 0 0 auto;
-  gap: 8px;
-  min-height: 46px;
+  &-group {
+    align-items: center;
+    display: inline-flex;
+    flex: 0 0 auto;
+    gap: 8px;
+    min-height: 46px;
+  }
+
+  .button-icon {
+    @media (max-width: 640px) {
+      height: 42px;
+      width: 42px;
+    }
+  }
 }
 
 .route-toolbar-group + .route-toolbar-group {
@@ -567,11 +572,6 @@
   .route-view-controls,
   .measurement-mode-controls {
     flex: 0 0 auto;
-  }
-
-  .route-toolbar .button-icon {
-    height: 42px;
-    width: 42px;
   }
 
   .route-filter-input {

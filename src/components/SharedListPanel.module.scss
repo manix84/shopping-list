@@ -18,15 +18,26 @@
   width: min(100%, 280px);
 }
 
-.linkRow > :global(.input),
-.loadRow > .inputShell {
-  flex: 1 1 auto;
-  min-width: 0;
+.linkRow {
+  > :global(.input) {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  > :global(.button) {
+    flex: 0 0 auto;
+  }
 }
 
-.linkRow > :global(.button),
-.loadRow > :global(.button) {
-  flex: 0 0 auto;
+.loadRow {
+  > .inputShell {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  > :global(.button) {
+    flex: 0 0 auto;
+  }
 }
 
 .currentListName {
@@ -36,9 +47,11 @@
   line-height: 1.2;
 }
 
-.qrCardBlurred .qrFrame {
-  filter: blur(10px);
-  transform: scale(1.06);
+.qrCardBlurred {
+  .qrFrame {
+    filter: blur(10px);
+    transform: scale(1.06);
+  }
 }
 
 .qrFrame {
@@ -108,15 +121,17 @@
   flex: 1 1 auto;
   min-width: 0;
   position: relative;
+
+  .sharedInput {
+    padding-right: 42px;
+    width: 100%;
+  }
 }
 
-.sharedInput {
-  padding-right: 42px;
-  width: 100%;
-}
-
-.inputShellValid .sharedInput {
-  border-color: $success-border;
+.inputShellValid {
+  .sharedInput {
+    border-color: $success-border;
+  }
 }
 
 .inputTick {
@@ -247,11 +262,11 @@
     outline: 2px solid $primary;
     outline-offset: 2px;
   }
-}
 
-.historyItemDisabled {
-  cursor: not-allowed;
-  opacity: 0.68;
+  &Disabled {
+    cursor: not-allowed;
+    opacity: 0.68;
+  }
 }
 
 .historyList {
@@ -288,10 +303,10 @@
     position: absolute;
     width: 56px;
   }
-}
 
-:global(:root[data-theme="dark"]) .historyTitleWrap::after {
-  background: linear-gradient(90deg, rgba(18, 26, 43, 0), $panel-alt 70%);
+  :global(:root[data-theme="dark"]) &::after {
+    background: linear-gradient(90deg, rgba(18, 26, 43, 0), $panel-alt 70%);
+  }
 }
 
 .historyTitle {
@@ -377,13 +392,12 @@
   .loadRow {
     align-items: stretch;
     flex-direction: column;
-  }
 
-  .linkRow > :global(.button),
-  .loadRow > :global(.button),
-  .loadRow > .inputShell,
-  .linkRow > :global(.input) {
-    width: 100%;
+    > :global(.button),
+    > :global(.input),
+    > .inputShell {
+      width: 100%;
+    }
   }
 
   .historyItem {

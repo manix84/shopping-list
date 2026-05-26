@@ -8,6 +8,15 @@
 .heartbeat-status-history-wrap {
   height: 350px;
   overflow: auto;
+
+  .debug-table {
+    thead th {
+      background: $panel;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+  }
 }
 
 .debug-table-title {
@@ -114,13 +123,6 @@
   }
 }
 
-.heartbeat-status-history-wrap .debug-table thead th {
-  background: $panel;
-  position: sticky;
-  top: 0;
-  z-index: 1;
-}
-
 .debug-table-compact {
   min-width: 560px;
 
@@ -136,20 +138,20 @@
   border-radius: 6px;
   max-height: min(68vh, 720px);
   overflow: auto;
-}
 
-.json-viewer pre {
-  margin: 0;
-  min-width: max-content;
-  padding: 14px 0;
-}
+  pre {
+    margin: 0;
+    min-width: max-content;
+    padding: 14px 0;
+  }
 
-.json-viewer code {
-  color: $text;
-  display: block;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-  font-size: 0.82rem;
-  line-height: 1.55;
+  code {
+    color: $text;
+    display: block;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    font-size: 0.82rem;
+    line-height: 1.55;
+  }
 }
 
 .json-line {
@@ -170,28 +172,30 @@
   white-space: pre;
 }
 
-.json-token-key {
-  color: #2563eb;
-}
+.json-token {
+  &-key {
+    color: #2563eb;
+  }
 
-.json-token-string {
-  color: #15803d;
-}
+  &-string {
+    color: #15803d;
+  }
 
-.json-token-number {
-  color: #b45309;
-}
+  &-number {
+    color: #b45309;
+  }
 
-.json-token-boolean {
-  color: #7c3aed;
-}
+  &-boolean {
+    color: #7c3aed;
+  }
 
-.json-token-null {
-  color: $muted;
-}
+  &-null {
+    color: $muted;
+  }
 
-.json-token-punctuation {
-  color: color-mix(in srgb, $text 62%, $muted);
+  &-punctuation {
+    color: color-mix(in srgb, $text 62%, $muted);
+  }
 }
 
 .debug-kv-list {
@@ -226,11 +230,11 @@
   padding: 2px 4px 8px;
   scrollbar-gutter: stable;
   user-select: none;
-}
 
-.debug-tablist-dragging {
-  cursor: grabbing;
-  scroll-behavior: auto;
+  &-dragging {
+    cursor: grabbing;
+    scroll-behavior: auto;
+  }
 }
 
 .debug-tab-button {
@@ -281,21 +285,68 @@
   }
 }
 
-.debug-setting-switch {
-  align-items: center;
-  background: $panel-alt;
-  border: 1px solid $border;
-  border-radius: 12px;
-  display: flex;
-  gap: 16px;
-  justify-content: space-between;
-  padding: 14px;
-}
+.debug-setting {
+  &-switch {
+    align-items: center;
+    background: $panel-alt;
+    border: 1px solid $border;
+    border-radius: 12px;
+    display: flex;
+    gap: 16px;
+    justify-content: space-between;
+    padding: 14px;
+  }
 
-.debug-setting-label {
-  color: $text;
-  display: block;
-  font-weight: 700;
+  &-label {
+    color: $text;
+    display: block;
+    font-weight: 700;
+  }
+
+  &-switch-input {
+    appearance: none;
+    background: $border;
+    border: 0;
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, $text 10%, transparent);
+    cursor: pointer;
+    flex: 0 0 auto;
+    height: 30px;
+    margin: 0;
+    position: relative;
+    transition:
+      background-color 0.18s ease,
+      box-shadow 0.18s ease;
+    width: 52px;
+
+    &::before {
+      background: #ffffff;
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.22);
+      content: "";
+      height: 26px;
+      left: 2px;
+      position: absolute;
+      top: 2px;
+      transition: transform 0.18s ease;
+      width: 26px;
+    }
+
+    &:checked {
+      background: $success-text;
+    }
+
+    &:checked::before {
+      transform: translateX(22px);
+    }
+
+    &:focus-visible {
+      box-shadow:
+        0 0 0 3px color-mix(in srgb, $primary 22%, transparent),
+        inset 0 0 0 1px color-mix(in srgb, $text 10%, transparent);
+      outline: 0;
+    }
+  }
 }
 
 .debug-event-group {
@@ -310,51 +361,6 @@
   min-height: 190px;
   overflow: auto;
   padding: 12px;
-}
-
-.debug-setting-switch-input {
-  appearance: none;
-  background: $border;
-  border: 0;
-  border-radius: 999px;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, $text 10%, transparent);
-  cursor: pointer;
-  flex: 0 0 auto;
-  height: 30px;
-  margin: 0;
-  position: relative;
-  transition:
-    background-color 0.18s ease,
-    box-shadow 0.18s ease;
-  width: 52px;
-
-  &::before {
-    background: #ffffff;
-    border-radius: 50%;
-    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.22);
-    content: "";
-    height: 26px;
-    left: 2px;
-    position: absolute;
-    top: 2px;
-    transition: transform 0.18s ease;
-    width: 26px;
-  }
-
-  &:checked {
-    background: $success-text;
-  }
-
-  &:checked::before {
-    transform: translateX(22px);
-  }
-
-  &:focus-visible {
-    box-shadow:
-      0 0 0 3px color-mix(in srgb, $primary 22%, transparent),
-      inset 0 0 0 1px color-mix(in srgb, $text 10%, transparent);
-    outline: 0;
-  }
 }
 
 .heartbeat-card {
