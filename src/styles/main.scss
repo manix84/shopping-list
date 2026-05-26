@@ -558,9 +558,7 @@ select {
 .inline-row,
 .badge-row,
 .stack,
-.field,
-.section-heading,
-.section-items {
+.field {
   display: flex;
 }
 
@@ -568,16 +566,12 @@ select {
 .inline-row,
 .badge-row,
 .stack,
-.field,
-.section-heading,
-.section-items {
+.field {
   gap: 10px;
 }
 
 .stack,
-.field,
-.section-heading,
-.section-items {
+.field {
   flex-direction: column;
 }
 
@@ -1582,7 +1576,6 @@ select {
   }
 }
 
-.section-card,
 .empty-state {
   border-radius: 18px;
 }
@@ -1591,11 +1584,6 @@ select {
   max-height: 70vh;
   overflow: auto;
   padding-right: 4px;
-}
-
-.section-card {
-  border: 1px solid $border;
-  background: $panel;
 }
 
 .easter-egg-overlay {
@@ -2080,24 +2068,6 @@ select {
   .predator-leg-back {
     animation-duration: 0.01ms;
   }
-}
-
-.section-card {
-  padding: 20px;
-  position: relative;
-}
-
-.section-heading {
-  flex: 1;
-}
-
-.section-spacing {
-  margin-bottom: 12px;
-}
-
-.section-title {
-  margin: 0;
-  font-size: 20px;
 }
 
 .separator {
