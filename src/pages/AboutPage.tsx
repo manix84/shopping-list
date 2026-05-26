@@ -1,7 +1,9 @@
 import { useEffect, useRef } from 'react';
 import { Card } from '../components/Card';
+import { classNames } from '../lib/classNames';
 import { useI18n } from '../lib/i18n';
 import { appVersion } from '../version';
+import st from './AboutPage.module.scss';
 
 const logoHref = `${import.meta.env.BASE_URL}logo-animated-loop.svg`;
 const avatarHref = `${import.meta.env.BASE_URL}rob-avatar.png`;
@@ -58,37 +60,37 @@ export function AboutPage({
   }, []);
 
   return (
-    <div className={'about-page'}>
-      <Card className={'about-card'} bodyClassName={'about-card-body'} aria-labelledby={'about-title'}>
-        <div className={'about-hero'}>
-          <div className={'about-logo-lockup'}>
-            <img className={'about-app-logo'} src={logoHref} alt={''} width={'180'} height={'180'} />
+    <div className={classNames(st.page, 'about-page')}>
+      <Card className={classNames(st.card, 'about-card')} bodyClassName={classNames(st.body, 'about-card-body')} aria-labelledby={'about-title'}>
+        <div className={classNames(st.hero, 'about-hero')}>
+          <div className={classNames(st.logoLockup, 'about-logo-lockup')}>
+            <img className={classNames(st.appLogo, 'about-app-logo')} src={logoHref} alt={''} width={'180'} height={'180'} />
             <a
-              className={'about-avatar-link'}
+              className={classNames(st.avatarLink, 'about-avatar-link')}
               href={'https://github.com/manix84'}
               rel={'noopener noreferrer'}
               target={'_blank'}
               aria-label={about.authorProfileLabel}
             >
-              <img className={'about-avatar-badge'} src={avatarHref} alt={''} width={'64'} height={'64'} />
+              <img className={classNames(st.avatarBadge, 'about-avatar-badge')} src={avatarHref} alt={''} width={'64'} height={'64'} />
             </a>
           </div>
 
-          <div className={'about-heading'}>
+          <div className={classNames(st.heading, 'about-heading')}>
             <h2 id={'about-title'} className={'title title-md'}>{messages.app.title}</h2>
             <p className={'subtitle'}>{about.tagline}</p>
           </div>
         </div>
 
-        <dl className={'about-spec-list'}>
+        <dl className={classNames(st.specList, 'about-spec-list')}>
           <div>
             <dt>{about.versionLabel}</dt>
-            <dd className={'about-version-value'}>
+            <dd className={classNames(st.versionValue, 'about-version-value')}>
               <span onPointerUp={handleVersionTap}>
                 {appVersion}
               </span>
               {isUpdateAvailable ? (
-                <span className={'about-update-action'}>
+                <span className={classNames(st.updateAction, 'about-update-action')}>
                   {' ('}
                   <button className={'button button-link'} type={'button'} onClick={onRefreshUpdate}>
                     {about.updateAvailableAction}
@@ -120,13 +122,13 @@ export function AboutPage({
           </div>
         </dl>
 
-        <div className={'about-copy stack'}>
+        <div className={classNames(st.copy, 'about-copy', 'stack')}>
           <p>{about.bodyIntro}</p>
           <p>{about.bodyPrivacy}</p>
           <p>{about.bodyAuthor}</p>
         </div>
 
-        <div className={'about-actions'}>
+        <div className={classNames(st.actions, 'about-actions')}>
           <a className={'button button-primary'} href={'https://github.com/manix84/shopping-list'} rel={'noopener noreferrer'} target={'_blank'}>
             {about.sourceAction}
           </a>
@@ -135,7 +137,7 @@ export function AboutPage({
           </a>
         </div>
 
-        <p className={'about-footnote'}>{about.sponsorFootnote}</p>
+        <p className={classNames(st.footnote, 'about-footnote')}>{about.sponsorFootnote}</p>
       </Card>
     </div>
   );
