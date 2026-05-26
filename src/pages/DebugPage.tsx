@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type MouseEvent, type PointerEvent } from 'react';
+import './DebugPage.module.scss';
 import {
   mdiBellOutline,
   mdiCalculatorVariantOutline,
@@ -48,8 +49,10 @@ import { SectionsPage } from './SectionsPage';
 import { getDisplayValue } from '../lib/parser';
 import { getSectionMeta } from '../lib/sections';
 import { useI18n } from '../lib/i18n';
+import { classNames } from '../lib/classNames';
 import type { Messages } from '../lib/i18n';
 import { appVersion } from '../version';
+import st from '../components/ItemCard.module.scss';
 
 type DebugPageProps = {
   backendStatus: BackendStatus;
@@ -239,9 +242,9 @@ function ProductRecategorizationCard({
   }, [item]);
 
   return (
-    <div className={'item-card'}>
-      <div className={'item-row'}>
-        <div className={'item-main'}>
+    <div className={classNames(st.root, 'item-card')}>
+      <div className={classNames(st.row, 'item-row')}>
+        <div className={classNames(st.main, 'item-main')}>
           <div className={'title title-xs'}>{getDisplayValue(item)}</div>
           <div className={'badge-row'}>
             <Badge>

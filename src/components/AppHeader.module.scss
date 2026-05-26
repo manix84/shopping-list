@@ -1,0 +1,271 @@
+@use "../styles/variables" as *;
+
+.root {
+  backdrop-filter: blur(16px);
+  background: color-mix(in srgb, $bg 88%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, $border 72%, transparent);
+  margin: 0 -24px 24px;
+  padding: 16px 24px 18px;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.inner {
+  margin: 0 auto;
+  max-width: 1240px;
+}
+
+.card {
+  border-radius: 22px;
+  box-shadow: $shadow;
+
+  :global(.card-header) {
+    padding: 18px 24px;
+  }
+}
+
+.titleBlock {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  min-width: 0;
+
+  > div {
+    min-width: 0;
+  }
+}
+
+.actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.icon {
+  align-items: center;
+  background: $panel-alt;
+  border: 1px solid $border;
+  border-radius: 16px;
+  display: flex;
+  flex: 0 0 52px;
+  font-size: 24px;
+  height: 52px;
+  justify-content: center;
+  width: 52px;
+}
+
+.easterEggTrigger {
+  touch-action: manipulation;
+}
+
+.iconImage {
+  display: block;
+  height: 32px;
+  width: 32px;
+}
+
+.mobileMenuShell {
+  display: none;
+  position: relative;
+}
+
+.desktopMenuShell {
+  display: block;
+}
+
+.mobileMenuTrigger {
+  align-items: center;
+  display: inline-flex;
+  height: 44px;
+  justify-content: center;
+  padding: 0;
+  width: 44px;
+}
+
+.mobileMenuPanel {
+  background: $panel;
+  border: 1px solid $border;
+  border-radius: 18px;
+  box-shadow: $shadow;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  width: min(240px, calc(100vw - 20px));
+  z-index: 30;
+
+  :global(.button-row) {
+    flex-direction: column;
+  }
+
+  :global(.button) {
+    justify-content: flex-start;
+    width: 100%;
+  }
+}
+
+.connectionBadge {
+  animation: connection-badge-fade-in 0.25s ease-out both;
+  will-change: opacity;
+}
+
+.connectionShell {
+  position: relative;
+}
+
+.connectionButton {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+
+  &:disabled {
+    cursor: default;
+  }
+
+  &:focus-visible {
+    border-radius: 999px;
+    outline: 2px solid $primary;
+    outline-offset: 3px;
+  }
+}
+
+.connectionPopover {
+  background: $panel;
+  border: 1px solid $border;
+  border-radius: 8px;
+  box-shadow: $shadow;
+  color: $text;
+  font-size: 13px;
+  inline-size: min(280px, calc(100vw - 32px));
+  line-height: 1.45;
+  padding: 12px;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: 20;
+
+  p {
+    color: $muted;
+    margin: 6px 0 0;
+  }
+}
+
+.connectionLeaving {
+  animation: connection-badge-fade-out 0.25s ease-in both;
+}
+
+@keyframes connection-badge-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes connection-badge-fade-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .connectionBadge,
+  .connectionLeaving {
+    animation-duration: 0.01ms;
+  }
+}
+
+@media (max-width: 1080px) {
+  .root {
+    :global(.subtitle) {
+      display: none;
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .root {
+    margin: 0 -10px 18px;
+    padding: 12px 10px 14px;
+
+    :global(.title-row) {
+      align-items: flex-start;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      position: relative;
+    }
+
+    :global(.subtitle) {
+      display: none;
+    }
+
+    :global(.title) {
+      font-size: 18px;
+    }
+  }
+
+  .card {
+    border-radius: 18px;
+
+    :global(.card-header) {
+      padding: 16px;
+    }
+  }
+
+  .desktopMenuShell {
+    display: none;
+  }
+
+  .mobileMenuShell {
+    display: block;
+    margin-left: auto;
+  }
+
+  .titleBlock {
+    flex: 1 1 auto;
+    gap: 12px;
+    padding-right: 150px;
+  }
+
+  .icon {
+    border-radius: 12px;
+    flex-basis: 38px;
+    font-size: 18px;
+    height: 38px;
+    width: 38px;
+  }
+
+  .actions {
+    align-items: center;
+    flex-direction: row;
+    gap: 8px;
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+
+  .connectionBadge {
+    flex: 0 1 auto;
+    max-width: 94px;
+    overflow: hidden;
+    padding-inline: 8px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

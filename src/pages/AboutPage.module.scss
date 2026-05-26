@@ -1,0 +1,176 @@
+@use "../styles/variables" as *;
+
+.page {
+  display: block;
+}
+
+.card {
+  overflow: visible;
+}
+
+.body {
+  display: grid;
+  gap: 24px;
+  justify-items: center;
+  padding: 34px;
+}
+
+.hero {
+  display: grid;
+  gap: 18px;
+  justify-items: center;
+  max-width: 620px;
+  text-align: center;
+}
+
+.logoLockup {
+  height: 188px;
+  position: relative;
+  width: 188px;
+}
+
+.appLogo {
+  display: block;
+  height: 180px;
+  margin: 0 auto;
+  width: 180px;
+}
+
+.avatarLink {
+  border-radius: 50%;
+  bottom: 8px;
+  display: block;
+  height: 64px;
+  left: 8px;
+  position: absolute;
+  transform: translate(-25%, 25%);
+  width: 64px;
+
+  &:focus-visible {
+    outline: 2px solid $primary;
+    outline-offset: 4px;
+  }
+}
+
+.avatarBadge {
+  background: $panel;
+  border: 4px solid $panel;
+  border-radius: 50%;
+  box-shadow: 0 10px 24px
+    color-mix(in srgb, var(--shadow-color) 80%, transparent);
+  display: block;
+  height: 64px;
+  object-fit: cover;
+  width: 64px;
+}
+
+.heading {
+  text-align: center;
+}
+
+.specList {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  max-width: 420px;
+  width: min(100%, 420px);
+
+  > div {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: minmax(96px, 0.46fr) minmax(0, 1fr);
+  }
+
+  dt {
+    color: $text;
+    font-size: 13px;
+    text-align: right;
+  }
+
+  dd {
+    color: $muted;
+    font-size: 13px;
+    margin: 0;
+    min-width: 0;
+  }
+}
+
+.versionValue {
+  align-items: baseline;
+  column-gap: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: 2px;
+}
+
+.updateAction {
+  align-items: baseline;
+  display: inline-flex;
+  gap: 4px;
+  white-space: nowrap;
+
+  :global(.button-link) {
+    padding: 0;
+  }
+}
+
+.copy {
+  border-top: 1px solid $border;
+  color: $text;
+  font-size: 14px;
+  line-height: 1.55;
+  max-width: 760px;
+  padding-top: 18px;
+
+  p {
+    margin: 0;
+  }
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 2px;
+
+  :global(.button) {
+    text-decoration: none;
+  }
+}
+
+.footnote {
+  color: $muted;
+  font-size: 12px;
+  line-height: 1.45;
+  margin: -8px auto 0;
+  max-width: 300px;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .body {
+    padding: 24px 18px;
+  }
+
+  .logoLockup {
+    height: 168px;
+    width: 168px;
+  }
+
+  .appLogo {
+    height: 160px;
+    width: 160px;
+  }
+
+  .avatarLink,
+  .avatarBadge {
+    height: 58px;
+    width: 58px;
+  }
+
+  .specList > div {
+    gap: 10px;
+    grid-template-columns: minmax(84px, 0.44fr) minmax(0, 1fr);
+  }
+}

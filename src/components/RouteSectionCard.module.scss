@@ -1,0 +1,265 @@
+@use "../styles/variables" as *;
+
+.root {
+  background: $panel;
+  border: 1px solid $border;
+  border-radius: 18px;
+  padding: 20px;
+  position: relative;
+}
+
+.comfortable {
+  padding: 24px;
+
+  .items {
+    gap: 14px;
+  }
+
+  .checkRow {
+    padding: 16px 18px;
+  }
+
+  .title {
+    font-size: 22px;
+  }
+}
+
+.compact {
+  padding: 14px;
+
+  .header {
+    gap: 10px;
+    margin-bottom: 8px;
+    padding-right: 0;
+  }
+
+  .group {
+    font-size: 11px;
+    line-height: 1.1;
+  }
+
+  .title {
+    font-size: 18px;
+    line-height: 1.15;
+  }
+
+  :global(.badge) {
+    padding: 4px 8px;
+  }
+
+  :global(.badge-row),
+  .toggle,
+  .checkRow > :global(.badge) {
+    display: none;
+  }
+
+  .items {
+    gap: 6px;
+  }
+
+  .checkRow {
+    border-radius: 12px;
+    gap: 8px;
+    padding: 7px 10px;
+  }
+
+  .checkLabel {
+    gap: 8px;
+  }
+
+  .textLine {
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+
+  .textMain {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .quantity :global(.badge) {
+    padding: 3px 7px;
+  }
+}
+
+.header {
+  align-items: flex-start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding-right: 56px;
+}
+
+.heading {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.group {
+  color: $muted;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.title {
+  font-size: 20px;
+  margin: 0;
+}
+
+.toggle {
+  align-items: center;
+  background: $panel-alt;
+  border: 1px solid $border;
+  border-radius: 14px;
+  color: $text;
+  cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: 44px;
+  justify-content: center;
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  transition: 0.2s ease;
+  width: 44px;
+
+  svg {
+    fill: currentColor;
+    height: 22px;
+    width: 22px;
+  }
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $primary;
+    outline-offset: 2px;
+  }
+}
+
+.toggleChecked {
+  background: $success-bg;
+  border-color: $success-border;
+  color: $success-text;
+}
+
+.toggleMixed {
+  background: $panel;
+}
+
+.toggleUnchecked {
+  background: $panel-alt;
+}
+
+.items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.checkRow {
+  align-items: center;
+  background: $panel-alt;
+  border: 1px solid $border;
+  border-radius: 14px;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 12px 14px;
+}
+
+.checked {
+  opacity: 0.65;
+}
+
+.checkLabel {
+  align-items: center;
+  display: flex;
+  flex: 1;
+  gap: 12px;
+  min-width: 0;
+
+  input {
+    height: 18px;
+    width: 18px;
+  }
+}
+
+.text {
+  flex: 1;
+  min-width: 0;
+}
+
+.textLine {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-width: 0;
+}
+
+.textMain {
+  flex: 1 1 auto;
+  font-weight: 600;
+  min-width: 0;
+}
+
+.textMainChecked {
+  text-decoration: line-through;
+}
+
+.quantity {
+  flex: 0 0 auto;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toggle {
+    transition: none;
+
+    &:hover {
+      transform: none;
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .header {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 10px;
+    padding-right: 0;
+  }
+
+  .toggle {
+    right: 16px;
+    top: 16px;
+  }
+
+  .checkRow > :global(.badge) {
+    display: none;
+  }
+
+  .quantity {
+    margin-left: 0;
+  }
+
+  .root {
+    padding: 16px;
+  }
+
+  .checkRow {
+    gap: 10px;
+    padding: 10px 12px;
+  }
+}

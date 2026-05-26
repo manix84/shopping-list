@@ -1,0 +1,23 @@
+@use "../styles/variables" as *;
+
+.root {
+  background: $panel;
+  border: 1px solid $border;
+  border-radius: 18px;
+}
+
+.body {
+  padding: 24px;
+}
+
+.row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: space-between;
+}
+
+.smallText {
+  color: $muted;
+}

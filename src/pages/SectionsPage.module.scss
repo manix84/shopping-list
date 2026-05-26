@@ -1,0 +1,25 @@
+@use "../styles/variables" as *;
+
+.card {
+  background: $panel;
+  border: 1px solid $border;
+  border-radius: 18px;
+  padding: 20px;
+  position: relative;
+}
+
+.heading {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.spacing {
+  margin-bottom: 12px;
+}
+
+.title {
+  font-size: 20px;
+  margin: 0;
+}

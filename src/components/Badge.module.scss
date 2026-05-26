@@ -1,0 +1,29 @@
+@use "../styles/variables" as *;
+
+.root {
+  align-items: center;
+  background: $panel-alt;
+  border: 1px solid $border;
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: 12px;
+  padding: 6px 10px;
+}
+
+.success {
+  background: $success-bg;
+  border-color: $success-border;
+  color: $success-text;
+}
+
+.danger {
+  background: $danger-bg;
+  border-color: $danger-border;
+  color: $danger-text;
+}
+
+.muted {
+  background: var(--muted-bg);
+  border-color: var(--muted-border);
+  color: var(--muted-text);
+}

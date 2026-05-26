@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import { registerServiceWorker } from './registerServiceWorker';
 import './styles/main.scss';
+import './styles/primitives.module.scss';
 
 registerServiceWorker();
 

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import st from './App.module.scss';
 import { COUNTRY_CONFIGS } from './config/countries';
 import { AppHeader } from './components/AppHeader';
 import { PredatorEasterEgg } from './components/PredatorEasterEgg';
@@ -16,6 +17,7 @@ import {
   runUnitQuantityTests,
   runVariantTests,
 } from './lib/debugTests';
+import { classNames } from './lib/classNames';
 import { loadDebugMode, loadDebugSettings, saveDebugMode, saveDebugSettings } from './lib/debugModePreference';
 import {
   applyDocumentLocale,
@@ -2796,9 +2798,9 @@ export default function App() {
   return (
     <I18nProvider value={{ locale, messages, setLocale }}>
       <PwaSplashScreen disabled={debugSettings.disablePwaSplash} />
-      <div className={'shopping-app'}>
-        <div className={'shopping-shell'}>
-          <a className={'skip-link'} href={'#main-content'}>
+      <div className={classNames(st.app, 'shopping-app')}>
+        <div className={classNames(st.shell, 'shopping-shell')}>
+          <a className={classNames(st.skipLink, 'skip-link')} href={'#main-content'}>
             {messages.actions.skipToMainContent}
           </a>
           <AppHeader
@@ -2815,7 +2817,7 @@ export default function App() {
             }}
           />
 
-          <main id={'main-content'} className={'main-content'} tabIndex={-1}>
+          <main id={'main-content'} className={classNames(st.mainContent, 'main-content')} tabIndex={-1}>
             {visiblePage === 'edit' ? (
               <EditPage
                 input={input}
@@ -2967,8 +2969,13 @@ export default function App() {
           onInstall={promptPwaInstall}
         />
         {isListLoadingOverlayVisible ? (
-          <div className={'app-loading-overlay'} role={'status'} aria-live={'polite'} aria-label={messages.app.title}>
-            <span className={'app-loading-spinner'} aria-hidden={'true'} />
+          <div
+            className={classNames(st.loadingOverlay, 'app-loading-overlay')}
+            role={'status'}
+            aria-live={'polite'}
+            aria-label={messages.app.title}
+          >
+            <span className={classNames(st.loadingSpinner, 'app-loading-spinner')} aria-hidden={'true'} />
           </div>
         ) : null}
         {debugModeNotice ? (

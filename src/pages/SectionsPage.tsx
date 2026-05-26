@@ -1,7 +1,9 @@
 import type { CountryConfig } from '../types';
 import { Badge } from '../components/Badge';
 import { Card } from '../components/Card';
+import { classNames } from '../lib/classNames';
 import { useI18n } from '../lib/i18n';
+import st from './SectionsPage.module.scss';
 
 type SectionsPageProps = {
   config: CountryConfig;
@@ -22,12 +24,12 @@ export function SectionsPage({ config }: SectionsPageProps) {
     >
       <div className={'stack'}>
         {config.groups.map((group) => (
-          <div key={group.key} className={'section-card'}>
-            <div className={'section-heading section-spacing'}>
+          <div key={group.key} className={classNames(st.card, 'section-card')}>
+            <div className={classNames(st.heading, st.spacing, 'section-heading', 'section-spacing')}>
               <div className={'section-group'}>
                 {messages.labels.routeOrder} {group.order}
               </div>
-              <h3 className={'section-title'}>{group.label}</h3>
+              <h3 className={classNames(st.title, 'section-title')}>{group.label}</h3>
             </div>
             <div className={'badge-row'}>
               {group.sections.map((section) => (

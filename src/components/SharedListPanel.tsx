@@ -2,8 +2,10 @@ import { useEffect, useRef, useState, type MouseEvent, type PointerEvent } from 
 import { mdiDeleteOutline, mdiDownloadOutline } from '@mdi/js';
 import QRCode from 'qrcode';
 import type { SharedListHistoryEntry } from '../types';
+import { classNames } from '../lib/classNames';
 import { useI18n } from '../lib/i18n';
 import { extractSharedListId } from '../lib/sharedLinks';
+import st from './SharedListPanel.module.scss';
 
 type BarcodeDetectorResult = {
   rawValue?: string;
@@ -432,12 +434,12 @@ export function SharedListPanel({
       {shareLink ? (
         <>
           {displayListName ? (
-            <div className={'shared-current-list-name'}>{displayListName}</div>
+            <div className={classNames(st.currentListName, 'shared-current-list-name')}>{displayListName}</div>
           ) : null}
 
           <div className={'field'}>
             <label htmlFor={'shopping-share-link'}>{messages.labels.sharedLink}</label>
-            <div className={'inline-row share-link-row'}>
+            <div className={classNames('inline-row', st.linkRow, 'share-link-row')}>
               <input id={'shopping-share-link'} className={'input'} readOnly value={shareLink} />
               <button type={'button'} className={'button'} onClick={() => void navigator.clipboard?.writeText(shareLink)}>
                 {messages.actions.copy}
@@ -456,15 +458,15 @@ export function SharedListPanel({
           {qrRender ? (
             <button
               type={'button'}
-              className={`share-qr-card ${qrRevealed ? '' : 'share-qr-card-blurred'}`.trim()}
+              className={classNames(st.qrCard, 'share-qr-card', qrRevealed ? undefined : st.qrCardBlurred, qrRevealed ? undefined : 'share-qr-card-blurred')}
               onClick={handleQrCardClick}
               aria-label={qrRevealed ? messages.labels.sharedLink : messages.actions.revealQrCode}
             >
-              <span className={'share-qr-frame'}>
-                <img className={'share-qr-image'} src={qrRender.svgDataUrl} alt={messages.labels.sharedLink} />
-                <img className={'share-qr-logo'} src={qrRender.logoSrc} alt={''} aria-hidden={'true'} />
+              <span className={classNames(st.qrFrame, 'share-qr-frame')}>
+                <img className={classNames(st.qrImage, 'share-qr-image')} src={qrRender.svgDataUrl} alt={messages.labels.sharedLink} />
+                <img className={classNames(st.qrLogo, 'share-qr-logo')} src={qrRender.logoSrc} alt={''} aria-hidden={'true'} />
               </span>
-              {!qrRevealed ? <span className={'share-qr-overlay'}>{messages.actions.revealQrCode}</span> : null}
+              {!qrRevealed ? <span className={classNames(st.qrOverlay, 'share-qr-overlay')}>{messages.actions.revealQrCode}</span> : null}
             </button>
           ) : null}
         </>
@@ -487,11 +489,11 @@ export function SharedListPanel({
         <>
           <div className={'field'}>
             <label htmlFor={'shared-list-load-input'}>{messages.sharing.manualLinkLabel}</label>
-            <div className={'inline-row share-load-row'}>
-              <div className={`shared-input-shell ${showSharedInputTick ? 'shared-input-shell-valid' : ''}`.trim()}>
+            <div className={classNames('inline-row', st.loadRow, 'share-load-row')}>
+              <div className={classNames(st.inputShell, 'shared-input-shell', showSharedInputTick ? st.inputShellValid : undefined, showSharedInputTick ? 'shared-input-shell-valid' : undefined)}>
                 <input
                   id={'shared-list-load-input'}
-                  className={'input shared-input'}
+                  className={classNames('input', st.sharedInput, 'shared-input')}
                   value={sharedInput}
                   aria-describedby={sharedInputStatus !== 'idle' ? sharedInputStatusId : undefined}
                   aria-invalid={sharedInputStatus === 'missing' || sharedInputStatus === 'invalid'}
@@ -506,7 +508,7 @@ export function SharedListPanel({
                   placeholder={messages.sharing.manualLinkPlaceholder}
                 />
                 {showSharedInputTick ? (
-                  <span className={'shared-input-tick'} aria-hidden={'true'}>
+                  <span className={classNames(st.inputTick, 'shared-input-tick')} aria-hidden={'true'}>
                     ✓
                   </span>
                 ) : null}
@@ -542,35 +544,44 @@ export function SharedListPanel({
       ) : null}
 
       {scannerOpen ? (
-        <div className={'share-scanner-modal'} onClick={closeScanner} role={'presentation'}>
+        <div className={classNames(st.scannerModal, 'share-scanner-modal')} onClick={closeScanner} role={'presentation'}>
           <div
-            className={'share-scanner-dialog stack'}
+            className={classNames(st.scannerDialog, 'share-scanner-dialog', 'stack')}
             role={'dialog'}
             aria-modal={'true'}
             aria-labelledby={'share-scanner-title'}
             onClick={(event) => event.stopPropagation()}
           >
-            <div className={'share-scanner-toolbar'}>
+            <div className={classNames(st.scannerToolbar, 'share-scanner-toolbar')}>
               <h3 id={'share-scanner-title'} className={'title title-xs'}>{messages.actions.scanQrCode}</h3>
               <button type={'button'} className={'button'} onClick={closeScanner} autoFocus>
                 {messages.actions.stopScanning}
               </button>
             </div>
-            <div className={`share-scanner-frame share-scanner-frame-${scannerState}`}>
-              <video ref={videoRef} className={'share-scanner-video'} muted playsInline aria-label={messages.actions.scanQrCode} />
-              <div className={'share-scanner-overlay'}>
-                <div className={'share-scanner-target'} />
+            <div
+              className={classNames(
+                st.scannerFrame,
+                scannerState === 'scanning' ? st.scannerScanning : undefined,
+                scannerState === 'ready' ? st.scannerReady : undefined,
+                scannerState === 'missing' ? st.scannerMissing : undefined,
+                'share-scanner-frame',
+                `share-scanner-frame-${scannerState}`,
+              )}
+            >
+              <video ref={videoRef} className={classNames(st.scannerVideo, 'share-scanner-video')} muted playsInline aria-label={messages.actions.scanQrCode} />
+              <div className={classNames(st.scannerOverlay, 'share-scanner-overlay')}>
+                <div className={classNames(st.scannerTarget, 'share-scanner-target')} />
               </div>
             </div>
-            <div className={'share-scanner-status'} role={'status'} aria-live={'polite'}>{scannerStatusText}</div>
+            <div className={classNames(st.scannerStatus, 'share-scanner-status')} role={'status'} aria-live={'polite'}>{scannerStatusText}</div>
           </div>
         </div>
       ) : null}
 
       {qrModalOpen && qrRender ? (
-        <div className={'share-scanner-modal'} onClick={closeQrModal} role={'presentation'}>
+        <div className={classNames(st.scannerModal, 'share-scanner-modal')} onClick={closeQrModal} role={'presentation'}>
           <div
-            className={'share-qr-dialog'}
+            className={classNames(st.qrDialog, 'share-qr-dialog')}
             role={'dialog'}
             aria-modal={'true'}
             aria-label={messages.labels.sharedLink}
@@ -579,9 +590,9 @@ export function SharedListPanel({
             <button type={'button'} className={'button'} onClick={closeQrModal} autoFocus>
               {messages.actions.close}
             </button>
-            <span className={'share-qr-frame share-qr-frame-large'}>
-              <img className={'share-qr-image'} src={qrRender.svgDataUrl} alt={messages.labels.sharedLink} />
-              <img className={'share-qr-logo'} src={qrRender.logoSrc} alt={''} aria-hidden={'true'} />
+            <span className={classNames(st.qrFrame, st.qrFrameLarge, 'share-qr-frame', 'share-qr-frame-large')}>
+              <img className={classNames(st.qrImage, 'share-qr-image')} src={qrRender.svgDataUrl} alt={messages.labels.sharedLink} />
+              <img className={classNames(st.qrLogo, 'share-qr-logo')} src={qrRender.logoSrc} alt={''} aria-hidden={'true'} />
             </span>
           </div>
         </div>
@@ -637,11 +648,16 @@ export function SharedListHistoryPanel({
   }
 
   return (
-    <div className={'stack shared-history-list'}>
+    <div className={classNames('stack', st.historyList, 'shared-history-list')}>
       {historyEntries.map((entry) => (
         <div
           key={entry.listId}
-          className={`shared-history-item ${isHistoryLoadDisabled ? 'shared-history-item-disabled' : ''}`.trim()}
+          className={classNames(
+            st.historyItem,
+            'shared-history-item',
+            isHistoryLoadDisabled ? st.historyItemDisabled : undefined,
+            isHistoryLoadDisabled ? 'shared-history-item-disabled' : undefined,
+          )}
           title={isHistoryLoadDisabled ? undefined : messages.actions.loadSharedList}
           aria-disabled={isHistoryLoadDisabled}
           onPointerDown={(event) => handleHistoryPointerDown(entry.listId, event)}
@@ -649,16 +665,16 @@ export function SharedListHistoryPanel({
           onPointerCancel={handleHistoryPointerCancel}
           onClick={(event) => handleHistoryClick(entry.listId, event)}
         >
-          <div className={'stack shared-history-content'}>
-            <div className={'shared-history-title-wrap'}>
-              <div className={'shared-history-title'}>{historyTitle(entry)}</div>
+          <div className={classNames('stack', st.historyContent, 'shared-history-content')}>
+            <div className={classNames(st.historyTitleWrap, 'shared-history-title-wrap')}>
+              <div className={classNames(st.historyTitle, 'shared-history-title')}>{historyTitle(entry)}</div>
             </div>
             <div className={'small-text'}>
               {messages.labels.created} {formatTimestamp(entry.createdAt, localeCode)} · {messages.labels.updated}{' '}
               {formatTimestamp(entry.updatedAt, localeCode)}
             </div>
           </div>
-          <div className={'shared-history-actions'}>
+          <div className={classNames(st.historyActions, 'shared-history-actions')}>
             <button
               type={'button'}
               className={'button button-icon'}

@@ -1,4 +1,6 @@
 import type { ComponentPropsWithoutRef, PropsWithChildren, ReactNode } from 'react';
+import { classNames } from '../lib/classNames';
+import st from './Card.module.scss';
 
 type CardProps = PropsWithChildren<ComponentPropsWithoutRef<'section'> & {
   header?: ReactNode;
@@ -8,9 +10,9 @@ type CardProps = PropsWithChildren<ComponentPropsWithoutRef<'section'> & {
 
 export function Card({ header, className = '', bodyClassName = '', children, ...sectionProps }: CardProps) {
   return (
-    <section {...sectionProps} className={`card ${className}`.trim()}>
-      {header ? <div className={'card-header'}>{header}</div> : null}
-      {children ? <div className={`card-body ${bodyClassName}`.trim()}>{children}</div> : null}
+    <section {...sectionProps} className={classNames(st.root, 'card', className)}>
+      {header ? <div className={classNames(st.header, 'card-header')}>{header}</div> : null}
+      {children ? <div className={classNames(st.body, 'card-body', bodyClassName)}>{children}</div> : null}
     </section>
   );
 }

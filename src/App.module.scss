@@ -1,0 +1,99 @@
+@use "./styles/variables" as *;
+
+.app {
+  min-height: 100vh;
+  padding: 0 24px 24px;
+}
+
+.shell {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin: 0 auto;
+  max-width: 1240px;
+}
+
+.skipLink {
+  background: $panel;
+  border: 2px solid $primary;
+  border-radius: 8px;
+  color: $text;
+  font-weight: 700;
+  left: 24px;
+  padding: 10px 14px;
+  position: fixed;
+  top: 16px;
+  transform: translateY(-160%);
+  transition: transform 0.16s ease;
+  z-index: 1200;
+
+  &:focus {
+    transform: translateY(0);
+  }
+}
+
+.mainContent {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  &:focus {
+    border-radius: 10px;
+    outline: 2px solid $primary;
+    outline-offset: 6px;
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+}
+
+.loadingOverlay {
+  align-items: center;
+  backdrop-filter: blur(1px);
+  background: color-mix(in srgb, $bg 72%, transparent);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 32px;
+  position: fixed;
+  z-index: 1400;
+}
+
+.loadingSpinner {
+  animation: app-loading-spin 0.78s linear infinite;
+  background: $panel;
+  border: 4px solid $border;
+  border-radius: 999px;
+  border-top-color: $primary;
+  box-shadow: 0 12px 32px color-mix(in srgb, $shadow 28%, transparent);
+  display: block;
+  height: 44px;
+  width: 44px;
+}
+
+@keyframes app-loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loadingSpinner {
+    animation: none;
+  }
+
+  .skipLink {
+    transform: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .app {
+    padding: 0 10px 10px;
+  }
+
+  .shell {
+    gap: 18px;
+  }
+}

@@ -1,8 +1,10 @@
 import { mdiCloudAlert, mdiCloudCheck, mdiCloudSync } from '@mdi/js';
 import { useEffect, useState } from 'react';
+import { classNames } from '../lib/classNames';
 import type { Messages } from '../lib/i18n';
 import { useI18n } from '../lib/i18n';
 import type { SaveStatus } from '../types';
+import st from './SaveStatusIndicator.module.scss';
 
 export const SAVE_STATUS_FADE_DURATION_MS = 250;
 export const SAVE_CONFIRMATION_DURATION_MS = 1_000;
@@ -61,13 +63,20 @@ export function SaveStatusIndicator({ status }: SaveStatusIndicatorProps) {
 
   return (
     <div
-      className={`save-status save-status-${status} ${isLeaving ? 'save-status-leaving' : ''}`}
+      className={classNames(
+        st.root,
+        st[status],
+        'save-status',
+        `save-status-${status}`,
+        isLeaving ? st.leaving : undefined,
+        isLeaving ? 'save-status-leaving' : undefined,
+      )}
       role={'status'}
       aria-live={'polite'}
       aria-label={indicator.label}
       title={indicator.label}
     >
-      <svg aria-hidden={'true'} className={'save-status-svg'} viewBox={'0 0 24 24'}>
+      <svg aria-hidden={'true'} className={classNames(st.svg, 'save-status-svg')} viewBox={'0 0 24 24'}>
         <path d={indicator.icon} fill={'currentColor'} />
       </svg>
     </div>
