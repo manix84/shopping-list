@@ -289,21 +289,6 @@ select {
   gap: 24px;
 }
 
-.card {
-  background: $panel;
-  border: 1px solid $border;
-  border-radius: 24px;
-  box-shadow: $shadow;
-
-  &-header {
-    padding: 24px 24px 0;
-  }
-
-  &-body {
-    padding: 24px;
-  }
-}
-
 .color-token-section {
   margin-bottom: 2rem;
 }
@@ -2346,30 +2331,10 @@ select {
   background: linear-gradient(90deg, rgba(18, 26, 43, 0), $panel-alt 70%);
 }
 
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-}
-
-.stat-card,
 .item-card,
-.test-card,
 .section-card,
 .empty-state {
   border-radius: 18px;
-}
-
-.stat-card {
-  border: 1px solid $border;
-  padding: 16px;
-  background: $panel-alt;
-}
-
-.stat-value {
-  font-size: 28px;
-  font-weight: 700;
-  margin-top: 4px;
 }
 
 .scroll-region {
@@ -2379,7 +2344,6 @@ select {
 }
 
 .item-card,
-.test-card,
 .section-card {
   border: 1px solid $border;
   background: $panel;
@@ -2397,34 +2361,6 @@ select {
 .item-main {
   flex: 1;
   min-width: 0;
-}
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  border: 1px solid $border;
-  background: $panel-alt;
-  border-radius: 999px;
-  padding: 6px 10px;
-  font-size: 12px;
-
-  &-success {
-    background: $success-bg;
-    color: $success-text;
-    border-color: $success-border;
-  }
-
-  &-danger {
-    background: $danger-bg;
-    color: $danger-text;
-    border-color: $danger-border;
-  }
-
-  &-muted {
-    background: var(--muted-bg);
-    color: var(--muted-text);
-    border-color: var(--muted-border);
-  }
 }
 
 .connection-badge {

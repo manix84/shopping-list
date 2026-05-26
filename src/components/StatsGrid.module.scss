@@ -1,0 +1,30 @@
+@use "../styles/variables" as *;
+
+.root {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.card {
+  background: $panel-alt;
+  border: 1px solid $border;
+  border-radius: 18px;
+  padding: 16px;
+}
+
+.label {
+  color: $muted;
+}
+
+.value {
+  font-size: 28px;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+@media (max-width: 700px) {
+  .root {
+    grid-template-columns: 1fr;
+  }
+}

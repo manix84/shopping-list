@@ -1,4 +1,6 @@
 import type { PropsWithChildren } from 'react';
+import { classNames } from '../lib/classNames';
+import st from './Badge.module.scss';
 
 type BadgeProps = PropsWithChildren<{
   className?: string;
@@ -6,6 +8,17 @@ type BadgeProps = PropsWithChildren<{
 }>;
 
 export function Badge({ children, className, tone = 'default' }: BadgeProps) {
-  const toneClassName = tone === 'default' ? 'badge' : `badge badge-${tone}`;
-  return <span className={className ? `${toneClassName} ${className}` : toneClassName}>{children}</span>;
+  return (
+    <span
+      className={classNames(
+        st.root,
+        'badge',
+        tone !== 'default' ? st[tone] : undefined,
+        tone !== 'default' ? `badge-${tone}` : undefined,
+        className,
+      )}
+    >
+      {children}
+    </span>
+  );
 }
