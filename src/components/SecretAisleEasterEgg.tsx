@@ -1,6 +1,7 @@
 import { mdiClose, mdiStarFourPoints } from '@mdi/js';
 import type { CSSProperties, PointerEvent, KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { useEffect, useRef, useState } from 'react';
+import './SecretAisleEasterEgg.module.scss';
 import { useI18n } from '../lib/i18n';
 
 type SecretAisleEasterEggProps = {

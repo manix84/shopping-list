@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type MouseEvent, type PointerEvent } from 'react';
+import './DebugPage.module.scss';
 import {
   mdiBellOutline,
   mdiCalculatorVariantOutline,

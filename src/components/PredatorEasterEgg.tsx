@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { useEffect, useMemo, useRef } from 'react';
+import './PredatorEasterEgg.module.scss';
 
 type PredatorEasterEggProps = {
   onComplete: () => void;
