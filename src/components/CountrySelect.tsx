@@ -1,8 +1,10 @@
 import { mdiChevronDown } from '@mdi/js';
 import { useMemo, useState } from 'react';
 import { COUNTRY_CONFIGS } from '../config/countries';
+import { classNames } from '../lib/classNames';
 import { useI18n } from '../lib/i18n';
 import type { CountryCode } from '../types';
+import st from './SettingsSelect.module.scss';
 
 type CountrySelectProps = {
   id: string;
@@ -31,7 +33,7 @@ export function CountrySelect({ id, value, onChange }: CountrySelectProps) {
 
   return (
     <div
-      className={'settings-select country-select'}
+      className={classNames(st.root, 'settings-select', 'country-select')}
       onBlur={(event) => {
         if (!(event.relatedTarget instanceof Node) || !event.currentTarget.contains(event.relatedTarget)) {
           setOpen(false);
@@ -41,7 +43,7 @@ export function CountrySelect({ id, value, onChange }: CountrySelectProps) {
       <button
         id={id}
         type={'button'}
-        className={'select settings-select-button'}
+        className={classNames('select', st.button, 'settings-select-button')}
         aria-haspopup={'listbox'}
         aria-expanded={open}
         aria-controls={open ? menuId : undefined}
@@ -52,19 +54,19 @@ export function CountrySelect({ id, value, onChange }: CountrySelectProps) {
           }
         }}
       >
-        <span className={'settings-option-content'}>
-          <span className={'settings-option-icon-slot'}>
-            <span aria-hidden={'true'} className={'country-option-icon'}>{selectedCountry.flag}</span>
+        <span className={classNames(st.optionContent, 'settings-option-content')}>
+          <span className={classNames(st.optionIconSlot, 'settings-option-icon-slot')}>
+            <span aria-hidden={'true'} className={classNames(st.countryIcon, 'country-option-icon')}>{selectedCountry.flag}</span>
           </span>
           <span>{selectedCountryLabel}</span>
         </span>
-        <svg aria-hidden={'true'} className={'settings-select-chevron-svg'} viewBox={'0 0 24 24'}>
+        <svg aria-hidden={'true'} className={classNames(st.chevron, 'settings-select-chevron-svg')} viewBox={'0 0 24 24'}>
           <path d={mdiChevronDown} fill={'currentColor'} />
         </svg>
       </button>
 
       {open ? (
-        <div id={menuId} className={'settings-select-menu'} role={'listbox'} aria-labelledby={id}>
+        <div id={menuId} className={classNames(st.menu, 'settings-select-menu')} role={'listbox'} aria-labelledby={id}>
           {countryOptions.map((country) => {
             const countryLabel = messages.countryOptions[country.code] ?? country.label;
 
@@ -74,15 +76,20 @@ export function CountrySelect({ id, value, onChange }: CountrySelectProps) {
                 type={'button'}
                 role={'option'}
                 aria-selected={value === country.code}
-                className={`settings-select-option ${value === country.code ? 'settings-select-option-active' : ''}`}
+                className={classNames(
+                  st.option,
+                  'settings-select-option',
+                  value === country.code ? st.active : undefined,
+                  value === country.code ? 'settings-select-option-active' : undefined,
+                )}
                 onClick={() => {
                   onChange(country.code);
                   setOpen(false);
                 }}
               >
-                <span className={'settings-option-content'}>
-                  <span className={'settings-option-icon-slot'}>
-                    <span aria-hidden={'true'} className={'country-option-icon'}>{country.flag}</span>
+                <span className={classNames(st.optionContent, 'settings-option-content')}>
+                  <span className={classNames(st.optionIconSlot, 'settings-option-icon-slot')}>
+                    <span aria-hidden={'true'} className={classNames(st.countryIcon, 'country-option-icon')}>{country.flag}</span>
                   </span>
                   <span>{countryLabel}</span>
                 </span>

@@ -1,0 +1,71 @@
+@use "../styles/variables" as *;
+
+.root {
+  position: relative;
+}
+
+.button {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  text-align: left;
+}
+
+.optionContent {
+  align-items: center;
+  display: inline-flex;
+  gap: 10px;
+}
+
+.optionIconSlot {
+  align-items: center;
+  display: inline-flex;
+  flex: 0 0 24px;
+  justify-content: center;
+  width: 24px;
+}
+
+.chevron {
+  color: $muted;
+  display: block;
+  height: 18px;
+  margin-left: 12px;
+  width: 18px;
+}
+
+.menu {
+  background: $panel;
+  border: 1px solid $border;
+  border-radius: 14px;
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.14);
+  display: grid;
+  gap: 4px;
+  left: 0;
+  margin-top: 6px;
+  padding: 6px;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  z-index: 20;
+}
+
+.option {
+  background: transparent;
+  border: 0;
+  border-radius: 10px;
+  color: $text;
+  cursor: pointer;
+  padding: 10px;
+  text-align: left;
+
+  &:hover,
+  &.active {
+    background: $panel-alt;
+  }
+}
+
+.countryIcon {
+  font-size: 17px;
+  line-height: 1;
+}

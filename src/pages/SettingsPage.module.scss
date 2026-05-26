@@ -1,0 +1,124 @@
+@use "../styles/variables" as *;
+
+.countryIconAuto {
+  border: 1px dashed $muted;
+  border-radius: 3px;
+  display: inline-block;
+  height: 14px;
+  width: 19px;
+}
+
+.localeIcon {
+  align-items: center;
+  background: $panel-alt;
+  border: 1px solid $border;
+  border-radius: 6px;
+  color: $muted;
+  display: inline-flex;
+  font-size: 10px;
+  font-weight: 700;
+  height: 18px;
+  justify-content: center;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  width: 24px;
+}
+
+.themeIcon {
+  display: inline-block;
+  flex: 0 0 auto;
+  height: 18px;
+  position: relative;
+  width: 18px;
+}
+
+.themeLight {
+  background: #facc15;
+  border-radius: 999px;
+  box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.24);
+}
+
+.themeDark {
+  background: #6366f1;
+  border-radius: 999px;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.24);
+
+  &::after {
+    background: $panel;
+    border-radius: 999px;
+    content: "";
+    height: 18px;
+    left: 6px;
+    position: absolute;
+    top: -2px;
+    width: 18px;
+  }
+}
+
+.themeSystem {
+  background: linear-gradient(90deg, #facc15 0 50%, #6366f1 50% 100%);
+  border-radius: 999px;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.18);
+}
+
+.routeDensityPreview {
+  align-items: center;
+  display: inline-flex;
+  flex: 0 0 24px;
+  justify-content: center;
+  width: 24px;
+}
+
+.routeDensityShell {
+  background: $panel-alt;
+  border: 1px solid color-mix(in srgb, $border 88%, transparent);
+  border-radius: 6px;
+  display: grid;
+  min-width: 24px;
+  padding: 4px;
+}
+
+.routeDensityDefault .routeDensityShell {
+  gap: 3px;
+}
+
+.routeDensityComfortable .routeDensityShell {
+  gap: 5px;
+  padding-block: 4px;
+}
+
+.routeDensityCompact .routeDensityShell {
+  gap: 2px;
+  padding-block: 4px;
+}
+
+.routeDensityRow {
+  align-items: center;
+  display: grid;
+  gap: 3px;
+  grid-template-columns: 4px minmax(0, 1fr);
+}
+
+.routeDensityDot {
+  background: color-mix(in srgb, $muted 60%, $panel 40%);
+  border-radius: 2px;
+  display: block;
+  height: 4px;
+  width: 4px;
+}
+
+.routeDensityLine {
+  background: color-mix(in srgb, $border 74%, $panel 26%);
+  border-radius: 999px;
+  display: block;
+  height: 2px;
+  width: 100%;
+}
+
+.routeDensityLineTitle {
+  height: 3px;
+}
+
+.routeDensityLineShort {
+  width: 74%;
+}
