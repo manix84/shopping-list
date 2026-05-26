@@ -3,6 +3,8 @@ import { getDisplayValue, getQuantityValue, getSizeValue, getUnitQuantityDisplay
 import { getSectionMeta } from '../lib/sections';
 import { Badge } from './Badge';
 import { useI18n } from '../lib/i18n';
+import { classNames } from '../lib/classNames';
+import st from './ItemCard.module.scss';
 
 type ParsedItemCardProps = {
   item: Item;
@@ -19,9 +21,9 @@ export function ParsedItemCard({ item, config, onRename, onToggle, onDelete }: P
   const variantValue = getVariantValue(item);
 
   return (
-    <div className={'item-card'}>
-      <div className={'item-row'}>
-        <div className={'item-main'}>
+    <div className={classNames(st.root, 'item-card')}>
+      <div className={classNames(st.row, 'item-row')}>
+        <div className={classNames(st.main, 'item-main')}>
           <input
             className={'input'}
             defaultValue={displayValue}

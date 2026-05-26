@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
+import { classNames } from '../lib/classNames';
 import { useI18n } from '../lib/i18n';
+import st from './PwaSplashScreen.module.scss';
 
 const SPLASH_DURATION_MS = 2_350;
 const PWA_SPLASH_ENABLED = import.meta.env.VITE_ENABLE_PWA_SPLASH === 'true';
@@ -39,10 +41,10 @@ export function PwaSplashScreen({ disabled = false }: PwaSplashScreenProps) {
   const logoHref = `${import.meta.env.BASE_URL}logo-animated-once.svg`;
 
   return (
-    <div className={'pwa-splash'} role={'status'} aria-live={'polite'} aria-label={messages.app.title}>
-      <div className={'pwa-splash-content'}>
-        <img className={'pwa-splash-logo'} src={logoHref} alt={''} />
-        <div className={'pwa-splash-title'}>{messages.app.title}</div>
+    <div className={classNames(st.root, 'pwa-splash')} role={'status'} aria-live={'polite'} aria-label={messages.app.title}>
+      <div className={classNames(st.content, 'pwa-splash-content')}>
+        <img className={classNames(st.logo, 'pwa-splash-logo')} src={logoHref} alt={''} />
+        <div className={classNames(st.title, 'pwa-splash-title')}>{messages.app.title}</div>
       </div>
     </div>
   );
