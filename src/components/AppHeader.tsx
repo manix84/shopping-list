@@ -1,12 +1,14 @@
 import { mdiMenu } from '@mdi/js';
 import type { PointerEvent } from 'react';
 import { useEffect, useState } from 'react';
+import { classNames } from '../lib/classNames';
 import type { Messages } from '../lib/i18n';
 import { useI18n } from '../lib/i18n';
 import type { BackendStatus, PageKey } from '../types';
 import { Badge } from './Badge';
 import { Card } from './Card';
 import { PageTabs } from './PageTabs';
+import st from './AppHeader.module.scss';
 
 const ONLINE_BADGE_DURATION_MS = 6_000;
 const BADGE_FADE_DURATION_MS = 250;
@@ -116,19 +118,19 @@ export function AppHeader({
   const logoHref = `${import.meta.env.BASE_URL}logo-mark.png`;
 
   return (
-    <header className={'app-header'}>
-      <div className={'app-header-inner'}>
+    <header className={classNames(st.root, 'app-header')}>
+      <div className={classNames(st.inner, 'app-header-inner')}>
         <Card
-          className={'app-header-card'}
+          className={classNames(st.card, 'app-header-card')}
           header={
             <div className={'title-row'}>
-              <div className={'title-block'}>
+              <div className={classNames(st.titleBlock, 'title-block')}>
                 <span
-                  className={'app-icon app-icon-easter-egg-trigger'}
+                  className={classNames(st.icon, st.easterEggTrigger, 'app-icon', 'app-icon-easter-egg-trigger')}
                   aria-hidden={'true'}
                   onPointerDown={handleLogoPointerDown}
                 >
-                  <img className={'app-icon-image'} src={logoHref} alt={''} width={'48'} height={'48'} />
+                  <img className={classNames(st.iconImage, 'app-icon-image')} src={logoHref} alt={''} width={'48'} height={'48'} />
                 </span>
                 <div>
                   <h1 className={'title'}>{messages.app.title}</h1>
@@ -136,12 +138,12 @@ export function AppHeader({
                 </div>
               </div>
 
-              <div className={'header-actions'}>
+              <div className={classNames(st.actions, 'header-actions')}>
                 {badge && connectionBadgeVisible ? (
-                  <div className={'connection-badge-shell'} aria-live={'polite'}>
+                  <div className={classNames(st.connectionShell, 'connection-badge-shell')} aria-live={'polite'}>
                     <button
                       type={'button'}
-                      className={'connection-badge-button'}
+                      className={classNames(st.connectionButton, 'connection-badge-button')}
                       aria-expanded={canShowOfflineInfo ? offlineInfoOpen : undefined}
                       aria-describedby={canShowOfflineInfo && offlineInfoOpen ? 'offline-status-popover' : undefined}
                       disabled={!canShowOfflineInfo}
@@ -153,13 +155,18 @@ export function AppHeader({
                     >
                       <Badge
                         tone={badge.tone}
-                        className={`connection-badge ${connectionBadgeLeaving ? 'connection-badge-leaving' : ''}`}
+                        className={classNames(
+                          st.connectionBadge,
+                          'connection-badge',
+                          connectionBadgeLeaving ? st.connectionLeaving : undefined,
+                          connectionBadgeLeaving ? 'connection-badge-leaving' : undefined,
+                        )}
                       >
                         {badge.label}
                       </Badge>
                     </button>
                     {canShowOfflineInfo && offlineInfoOpen ? (
-                      <div id={'offline-status-popover'} className={'connection-popover'} role={'tooltip'}>
+                      <div id={'offline-status-popover'} className={classNames(st.connectionPopover, 'connection-popover')} role={'tooltip'}>
                         <strong>{messages.backendStatus.offlineTitle}</strong>
                         <p>{messages.backendStatus.offlineDescription}</p>
                         <p>{messages.backendStatus.offlineSyncDescription}</p>
@@ -167,14 +174,14 @@ export function AppHeader({
                     ) : null}
                   </div>
                 ) : null}
-                <div className={'desktop-menu-shell'}>
+                <div className={classNames(st.desktopMenuShell, 'desktop-menu-shell')}>
                   <PageTabs page={page} hasItems={hasItems} showDebugTools={isDebugMode} onChange={handleChangePage} />
                 </div>
 
-                <div className={'mobile-menu-shell'}>
+                <div className={classNames(st.mobileMenuShell, 'mobile-menu-shell')}>
                   <button
                     type={'button'}
-                    className={'button mobile-menu-trigger'}
+                    className={classNames('button', st.mobileMenuTrigger, 'mobile-menu-trigger')}
                     aria-label={mobileMenuLabel}
                     aria-expanded={mobileMenuOpen}
                     aria-controls={mobileMenuOpen ? 'mobile-menu-panel' : undefined}
@@ -188,7 +195,7 @@ export function AppHeader({
                   </button>
 
                   {mobileMenuOpen ? (
-                    <div id={'mobile-menu-panel'} className={'mobile-menu-panel'}>
+                    <div id={'mobile-menu-panel'} className={classNames(st.mobileMenuPanel, 'mobile-menu-panel')}>
                       <PageTabs page={page} hasItems={hasItems} showDebugTools={isDebugMode} onChange={handleChangePage} />
                     </div>
                   ) : null}
