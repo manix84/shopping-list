@@ -1,7 +1,9 @@
 import type { GroupedSectionView, RouteViewMode } from '../types';
 import { getQuantityDisplayValue, getSizeValue, getUnitQuantityDisplayValue, getVariantPrefixedDisplayValue } from '../lib/parser';
+import { classNames } from '../lib/classNames';
 import { Badge } from './Badge';
 import { useI18n } from '../lib/i18n';
+import st from './RouteSectionCard.module.scss';
 
 type RouteSectionCardProps = {
   section: GroupedSectionView;
@@ -19,13 +21,23 @@ export function RouteSectionCard({ section, viewMode, onToggleSection, onToggleI
   const state = allChecked ? 'checked' : noneChecked ? 'unchecked' : 'mixed';
   const actionLabel = allChecked ? messages.sectionToggle.untickAll : messages.sectionToggle.tickAll;
   const sectionTitleId = `route-section-${section.key}-title`;
+  const viewModeClassName = viewMode === 'comfortable'
+    ? st.comfortable
+    : viewMode === 'compact'
+      ? st.compact
+      : undefined;
+  const toggleStateClassName = state === 'checked'
+    ? st.toggleChecked
+    : state === 'mixed'
+      ? st.toggleMixed
+      : st.toggleUnchecked;
 
   return (
-    <section className={`section-card section-card-${viewMode}`} aria-labelledby={sectionTitleId}>
-      <div className={'section-header'}>
-        <div className={'section-heading'}>
-          <div className={'section-group'}>{section.groupLabel}</div>
-          <h3 id={sectionTitleId} className={'section-title'}>{section.label}</h3>
+    <section className={classNames(st.root, viewModeClassName, 'section-card', `section-card-${viewMode}`)} aria-labelledby={sectionTitleId}>
+      <div className={classNames(st.header, 'section-header')}>
+        <div className={classNames(st.heading, 'section-heading')}>
+          <div className={classNames(st.group, 'section-group')}>{section.groupLabel}</div>
+          <h3 id={sectionTitleId} className={classNames(st.title, 'section-title')}>{section.label}</h3>
           {!isCompact ? (
             <div className={'badge-row'}>
               <Badge>
@@ -38,7 +50,7 @@ export function RouteSectionCard({ section, viewMode, onToggleSection, onToggleI
         {!isCompact ? (
           <button
             type={'button'}
-            className={`section-toggle section-toggle-${state}`}
+            className={classNames(st.toggle, toggleStateClassName, 'section-toggle', `section-toggle-${state}`)}
             onClick={() => onToggleSection(section.key, toggleTarget)}
             aria-label={`${actionLabel}: ${section.label}`}
             title={actionLabel}
@@ -60,28 +72,28 @@ export function RouteSectionCard({ section, viewMode, onToggleSection, onToggleI
         ) : null}
       </div>
 
-      <div className={'section-items'}>
+      <div className={classNames(st.items, 'section-items')}>
         {section.items.map((item) => (
-          <label key={item.id} className={`check-row ${item.checked ? 'is-checked' : ''}`}>
-            <div className={'check-label'}>
+          <label key={item.id} className={classNames(st.checkRow, 'check-row', item.checked ? st.checked : undefined, item.checked ? 'is-checked' : undefined)}>
+            <div className={classNames(st.checkLabel, 'check-label')}>
               <input type={'checkbox'} checked={item.checked} onChange={() => onToggleItem(item.id)} />
-              <div className={'check-text'}>
-                <div className={'check-text-line'}>
-                  <div className={`check-text-main ${item.checked ? 'is-checked' : ''}`}>
+              <div className={classNames(st.text, 'check-text')}>
+                <div className={classNames(st.textLine, 'check-text-line')}>
+                  <div className={classNames(st.textMain, 'check-text-main', item.checked ? st.textMainChecked : undefined, item.checked ? 'is-checked' : undefined)}>
                     {getVariantPrefixedDisplayValue(item)}
                   </div>
                   {getSizeValue(item) ? (
-                    <div className={'check-text-quantity'}>
+                    <div className={classNames(st.quantity, 'check-text-quantity')}>
                       <Badge>{getSizeValue(item)}</Badge>
                     </div>
                   ) : null}
                   {getQuantityDisplayValue(item) ? (
-                    <div className={'check-text-quantity'}>
+                    <div className={classNames(st.quantity, 'check-text-quantity')}>
                       <Badge>{getQuantityDisplayValue(item)}</Badge>
                     </div>
                   ) : null}
                   {getUnitQuantityDisplayValue(item) ? (
-                    <div className={'check-text-quantity'}>
+                    <div className={classNames(st.quantity, 'check-text-quantity')}>
                       <Badge>{getUnitQuantityDisplayValue(item)}</Badge>
                     </div>
                   ) : null}
