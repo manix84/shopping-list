@@ -4,6 +4,10 @@
   position: relative;
 }
 
+.settingsSelect { --module-alias: 1; }
+
+.countrySelect { --module-alias: 1; }
+
 .button {
   align-items: center;
   cursor: pointer;
@@ -12,11 +16,15 @@
   text-align: left;
 }
 
+.settingsSelectButton { --module-alias: 1; }
+
 .optionContent {
   align-items: center;
   display: inline-flex;
   gap: 10px;
 }
+
+.settingsOptionContent { --module-alias: 1; }
 
 .optionIconSlot {
   align-items: center;
@@ -26,6 +34,8 @@
   width: 24px;
 }
 
+.settingsOptionIconSlot { --module-alias: 1; }
+
 .chevron {
   color: $muted;
   display: block;
@@ -33,6 +43,8 @@
   margin-left: 12px;
   width: 18px;
 }
+
+.settingsSelectChevronSvg { --module-alias: 1; }
 
 .menu {
   background: $panel;
@@ -50,6 +62,8 @@
   z-index: 20;
 }
 
+.settingsSelectMenu { --module-alias: 1; }
+
 .option {
   background: transparent;
   border: 0;
@@ -65,7 +79,13 @@
   }
 }
 
+.settingsSelectOption { --module-alias: 1; }
+
+.settingsSelectOptionActive { --module-alias: 1; }
+
 .countryIcon {
   font-size: 17px;
   line-height: 1;
 }
+
+.countryOptionIcon { --module-alias: 1; }

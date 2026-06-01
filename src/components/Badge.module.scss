@@ -10,10 +10,18 @@
   padding: 6px 10px;
 }
 
+.badge {
+  --module-alias: 1;
+}
+
 .success {
   background: $success-bg;
   border-color: $success-border;
   color: $success-text;
+}
+
+.badgeSuccess {
+  --module-alias: 1;
 }
 
 .danger {
@@ -22,8 +30,16 @@
   color: $danger-text;
 }
 
+.badgeDanger {
+  --module-alias: 1;
+}
+
 .muted {
   background: var(--muted-bg);
   border-color: var(--muted-border);
   color: var(--muted-text);
+}
+
+.badgeMuted {
+  --module-alias: 1;
 }

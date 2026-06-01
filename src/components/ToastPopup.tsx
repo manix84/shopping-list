@@ -36,24 +36,24 @@ export function ToastPopup({
       className={classNames(
         st.root,
         st[tone],
-        'toast-popup',
-        `toast-popup-${tone}`,
+        st.toastPopup,
+        st[`toastPopup${tone[0].toUpperCase()}${tone.slice(1)}`],
         showIcon ? undefined : st.noIcon,
-        showIcon ? undefined : 'toast-popup-no-icon',
+        showIcon ? undefined : st.toastPopupNoIcon,
         hasTitle ? undefined : st.noTitle,
-        hasTitle ? undefined : 'toast-popup-no-title',
+        hasTitle ? undefined : st.toastPopupNoTitle,
       )}
       role={roleForToastTone(tone)}
       aria-live={tone === 'error' ? 'assertive' : 'polite'}
     >
       {showIcon ? (
-        <span className={classNames(st.icon, 'toast-popup-icon')} aria-hidden={'true'}>
+        <span className={classNames(st.icon, st.toastPopupIcon)} aria-hidden={'true'}>
           <svg viewBox={'0 0 24 24'}>
             <path d={iconForToastTone[tone]} fill={'currentColor'} />
           </svg>
         </span>
       ) : null}
-      <span className={classNames(st.copy, 'toast-popup-copy')}>
+      <span className={classNames(st.copy, st.toastPopupCopy)}>
         {title ? <strong>{title}</strong> : null}
         <span>{message}</span>
       </span>

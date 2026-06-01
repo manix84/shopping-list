@@ -7,6 +7,8 @@
   padding: 16px;
 }
 
+.itemCard { --module-alias: 1; }
+
 .row {
   align-items: center;
   display: flex;
@@ -15,10 +17,14 @@
   justify-content: space-between;
 }
 
+.itemRow { --module-alias: 1; }
+
 .main {
   flex: 1;
   min-width: 0;
 }
+
+.itemMain { --module-alias: 1; }
 
 @media (max-width: 640px) {
   .root {

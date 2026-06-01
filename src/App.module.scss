@@ -5,6 +5,8 @@
   padding: 0 24px 24px;
 }
 
+.shoppingApp { --module-alias: 1; }
+
 .shell {
   display: flex;
   flex-direction: column;
@@ -12,6 +14,8 @@
   margin: 0 auto;
   max-width: 1240px;
 }
+
+.shoppingShell { --module-alias: 1; }
 
 .skipLink {
   background: $panel;
@@ -32,6 +36,8 @@
   }
 }
 
+.skipLinkAlias { --module-alias: 1; }
+
 .mainContent {
   display: flex;
   flex-direction: column;
@@ -48,6 +54,8 @@
   }
 }
 
+.mainContentAlias { --module-alias: 1; }
+
 .loadingOverlay {
   align-items: center;
   backdrop-filter: blur(1px);
@@ -60,6 +68,8 @@
   z-index: 1400;
 }
 
+.appLoadingOverlay { --module-alias: 1; }
+
 .loadingSpinner {
   animation: app-loading-spin 0.78s linear infinite;
   background: $panel;
@@ -71,6 +81,8 @@
   height: 44px;
   width: 44px;
 }
+
+.appLoadingSpinner { --module-alias: 1; }
 
 @keyframes app-loading-spin {
   to {

@@ -24,12 +24,12 @@ export function SectionsPage({ config }: SectionsPageProps) {
     >
       <div className={'stack'}>
         {config.groups.map((group) => (
-          <div key={group.key} className={classNames(st.card, 'section-card')}>
-            <div className={classNames(st.heading, st.spacing, 'section-heading', 'section-spacing')}>
+          <div key={group.key} className={classNames(st.card, st.sectionCard)}>
+            <div className={classNames(st.heading, st.spacing, st.sectionHeading, st.sectionSpacing)}>
               <div className={'section-group'}>
                 {messages.labels.routeOrder} {group.order}
               </div>
-              <h3 className={classNames(st.title, 'section-title')}>{group.label}</h3>
+              <h3 className={classNames(st.title, st.sectionTitle)}>{group.label}</h3>
             </div>
             <div className={'badge-row'}>
               {group.sections.map((section) => (

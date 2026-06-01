@@ -60,37 +60,37 @@ export function AboutPage({
   }, []);
 
   return (
-    <div className={classNames(st.page, 'about-page')}>
-      <Card className={classNames(st.card, 'about-card')} bodyClassName={classNames(st.body, 'about-card-body')} aria-labelledby={'about-title'}>
-        <div className={classNames(st.hero, 'about-hero')}>
-          <div className={classNames(st.logoLockup, 'about-logo-lockup')}>
-            <img className={classNames(st.appLogo, 'about-app-logo')} src={logoHref} alt={''} width={'180'} height={'180'} />
+    <div className={classNames(st.page, st.aboutPage)}>
+      <Card className={classNames(st.card, st.aboutCard)} bodyClassName={classNames(st.body, st.aboutCardBody)} aria-labelledby={'about-title'}>
+        <div className={classNames(st.hero, st.aboutHero)}>
+          <div className={classNames(st.logoLockup, st.aboutLogoLockup)}>
+            <img className={classNames(st.appLogo, st.aboutAppLogo)} src={logoHref} alt={''} width={'180'} height={'180'} />
             <a
-              className={classNames(st.avatarLink, 'about-avatar-link')}
+              className={classNames(st.avatarLink, st.aboutAvatarLink)}
               href={'https://github.com/manix84'}
               rel={'noopener noreferrer'}
               target={'_blank'}
               aria-label={about.authorProfileLabel}
             >
-              <img className={classNames(st.avatarBadge, 'about-avatar-badge')} src={avatarHref} alt={''} width={'64'} height={'64'} />
+              <img className={classNames(st.avatarBadge, st.aboutAvatarBadge)} src={avatarHref} alt={''} width={'64'} height={'64'} />
             </a>
           </div>
 
-          <div className={classNames(st.heading, 'about-heading')}>
+          <div className={classNames(st.heading, st.aboutHeading)}>
             <h2 id={'about-title'} className={'title title-md'}>{messages.app.title}</h2>
             <p className={'subtitle'}>{about.tagline}</p>
           </div>
         </div>
 
-        <dl className={classNames(st.specList, 'about-spec-list')}>
+        <dl className={classNames(st.specList, st.aboutSpecList)}>
           <div>
             <dt>{about.versionLabel}</dt>
-            <dd className={classNames(st.versionValue, 'about-version-value')}>
+            <dd className={classNames(st.versionValue, st.aboutVersionValue)}>
               <span onPointerUp={handleVersionTap}>
                 {appVersion}
               </span>
               {isUpdateAvailable ? (
-                <span className={classNames(st.updateAction, 'about-update-action')}>
+                <span className={classNames(st.updateAction, st.aboutUpdateAction)}>
                   {' ('}
                   <button className={'button button-link'} type={'button'} onClick={onRefreshUpdate}>
                     {about.updateAvailableAction}
@@ -122,13 +122,13 @@ export function AboutPage({
           </div>
         </dl>
 
-        <div className={classNames(st.copy, 'about-copy', 'stack')}>
+        <div className={classNames(st.copy, st.aboutCopy, 'stack')}>
           <p>{about.bodyIntro}</p>
           <p>{about.bodyPrivacy}</p>
           <p>{about.bodyAuthor}</p>
         </div>
 
-        <div className={classNames(st.actions, 'about-actions')}>
+        <div className={classNames(st.actions, st.aboutActions)}>
           <a className={'button button-primary'} href={'https://github.com/manix84/shopping-list'} rel={'noopener noreferrer'} target={'_blank'}>
             {about.sourceAction}
           </a>
@@ -137,7 +137,7 @@ export function AboutPage({
           </a>
         </div>
 
-        <p className={classNames(st.footnote, 'about-footnote')}>{about.sponsorFootnote}</p>
+        <p className={classNames(st.footnote, st.aboutFootnote)}>{about.sponsorFootnote}</p>
       </Card>
     </div>
   );

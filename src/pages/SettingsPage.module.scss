@@ -12,6 +12,8 @@
   padding: 14px;
 }
 
+.settingsInstallRow { --module-alias: 1; }
+
 .installIcon {
   align-items: center;
   background: color-mix(in srgb, $primary 12%, $panel);
@@ -31,6 +33,8 @@
   }
 }
 
+.settingsInstallIcon { --module-alias: 1; }
+
 .installCopy {
   min-width: 0;
 
@@ -48,11 +52,15 @@
   }
 }
 
+.settingsInstallCopy { --module-alias: 1; }
+
 .footnote {
   border-top: 1px solid $border;
   padding-top: 12px;
   text-align: right;
 }
+
+.settingsFootnote { --module-alias: 1; }
 
 .countryIconAuto {
   border: 1px dashed $muted;
@@ -61,6 +69,8 @@
   height: 14px;
   width: 19px;
 }
+
+.countryOptionIconAuto { --module-alias: 1; }
 
 .localeIcon {
   align-items: center;
@@ -78,6 +88,8 @@
   width: 24px;
 }
 
+.localeOptionIcon { --module-alias: 1; }
+
 .themeIcon {
   display: inline-block;
   flex: 0 0 auto;
@@ -86,11 +98,15 @@
   width: 18px;
 }
 
+.themeOptionIcon { --module-alias: 1; }
+
 .themeLight {
   background: #facc15;
   border-radius: 999px;
   box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.24);
 }
+
+.themeOptionIconLight { --module-alias: 1; }
 
 .themeDark {
   background: #6366f1;
@@ -109,11 +125,15 @@
   }
 }
 
+.themeOptionIconDark { --module-alias: 1; }
+
 .themeSystem {
   background: linear-gradient(90deg, #facc15 0 50%, #6366f1 50% 100%);
   border-radius: 999px;
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.18);
 }
+
+.themeOptionIconSystem { --module-alias: 1; }
 
 .routeDensityPreview {
   align-items: center;
@@ -122,6 +142,8 @@
   justify-content: center;
   width: 24px;
 }
+
+.routeDensityPreviewAlias { --module-alias: 1; }
 
 .routeDensityShell {
   background: $panel-alt;
@@ -132,19 +154,27 @@
   padding: 4px;
 }
 
+.routeDensityPreviewShell { --module-alias: 1; }
+
 .routeDensityDefault .routeDensityShell {
   gap: 3px;
 }
+
+.routeDensityPreviewDefault { --module-alias: 1; }
 
 .routeDensityComfortable .routeDensityShell {
   gap: 5px;
   padding-block: 4px;
 }
 
+.routeDensityPreviewComfortable { --module-alias: 1; }
+
 .routeDensityCompact .routeDensityShell {
   gap: 2px;
   padding-block: 4px;
 }
+
+.routeDensityPreviewCompact { --module-alias: 1; }
 
 .routeDensityRow {
   align-items: center;
@@ -152,6 +182,8 @@
   gap: 3px;
   grid-template-columns: 4px minmax(0, 1fr);
 }
+
+.routeDensityPreviewRow { --module-alias: 1; }
 
 .routeDensityDot {
   background: color-mix(in srgb, $muted 60%, $panel 40%);
@@ -161,6 +193,8 @@
   width: 4px;
 }
 
+.routeDensityPreviewDot { --module-alias: 1; }
+
 .routeDensityLine {
   background: color-mix(in srgb, $border 74%, $panel 26%);
   border-radius: 999px;
@@ -169,13 +203,19 @@
   width: 100%;
 }
 
+.routeDensityPreviewLine { --module-alias: 1; }
+
 .routeDensityLineTitle {
   height: 3px;
 }
 
+.routeDensityPreviewLineTitle { --module-alias: 1; }
+
 .routeDensityLineShort {
   width: 74%;
 }
+
+.routeDensityPreviewLineShort { --module-alias: 1; }
 
 @keyframes install-row-in {
   from {

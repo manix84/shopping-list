@@ -8,6 +8,8 @@
   position: relative;
 }
 
+.sectionCard { --module-alias: 1; }
+
 .comfortable {
   padding: 24px;
 
@@ -23,6 +25,8 @@
     font-size: 22px;
   }
 }
+
+.sectionCardComfortable { --module-alias: 1; }
 
 .compact {
   padding: 14px;
@@ -83,6 +87,8 @@
   }
 }
 
+.sectionCardCompact { --module-alias: 1; }
+
 .header {
   align-items: flex-start;
   display: flex;
@@ -93,12 +99,16 @@
   padding-right: 56px;
 }
 
+.sectionHeader { --module-alias: 1; }
+
 .heading {
   display: flex;
   flex: 1;
   flex-direction: column;
   gap: 10px;
 }
+
+.sectionHeading { --module-alias: 1; }
 
 .group {
   color: $muted;
@@ -107,10 +117,14 @@
   text-transform: uppercase;
 }
 
+.sectionGroup { --module-alias: 1; }
+
 .title {
   font-size: 20px;
   margin: 0;
 }
+
+.sectionTitle { --module-alias: 1; }
 
 .toggle {
   align-items: center;
@@ -145,25 +159,35 @@
   }
 }
 
+.sectionToggle { --module-alias: 1; }
+
 .toggleChecked {
   background: $success-bg;
   border-color: $success-border;
   color: $success-text;
 }
 
+.sectionToggleChecked { --module-alias: 1; }
+
 .toggleMixed {
   background: $panel;
 }
 
+.sectionToggleMixed { --module-alias: 1; }
+
 .toggleUnchecked {
   background: $panel-alt;
 }
+
+.sectionToggleUnchecked { --module-alias: 1; }
 
 .items {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
+
+.sectionItems { --module-alias: 1; }
 
 .checkRow {
   align-items: center;
@@ -176,9 +200,13 @@
   padding: 12px 14px;
 }
 
+.checkRowAlias { --module-alias: 1; }
+
 .checked {
   opacity: 0.65;
 }
+
+.isChecked { --module-alias: 1; }
 
 .checkLabel {
   align-items: center;
@@ -193,10 +221,14 @@
   }
 }
 
+.checkLabelAlias { --module-alias: 1; }
+
 .text {
   flex: 1;
   min-width: 0;
 }
+
+.checkText { --module-alias: 1; }
 
 .textLine {
   align-items: center;
@@ -206,11 +238,15 @@
   min-width: 0;
 }
 
+.checkTextLine { --module-alias: 1; }
+
 .textMain {
   flex: 1 1 auto;
   font-weight: 600;
   min-width: 0;
 }
+
+.checkTextMain { --module-alias: 1; }
 
 .textMainChecked {
   text-decoration: line-through;
@@ -221,6 +257,8 @@
   margin-left: auto;
   white-space: nowrap;
 }
+
+.checkTextQuantity { --module-alias: 1; }
 
 @media (prefers-reduced-motion: reduce) {
   .toggle {

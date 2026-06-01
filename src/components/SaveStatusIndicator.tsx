@@ -66,17 +66,17 @@ export function SaveStatusIndicator({ status }: SaveStatusIndicatorProps) {
       className={classNames(
         st.root,
         st[status],
-        'save-status',
-        `save-status-${status}`,
+        st.saveStatus,
+        st[`saveStatus${status[0].toUpperCase()}${status.slice(1)}`],
         isLeaving ? st.leaving : undefined,
-        isLeaving ? 'save-status-leaving' : undefined,
+        isLeaving ? st.saveStatusLeaving : undefined,
       )}
       role={'status'}
       aria-live={'polite'}
       aria-label={indicator.label}
       title={indicator.label}
     >
-      <svg aria-hidden={'true'} className={classNames(st.svg, 'save-status-svg')} viewBox={'0 0 24 24'}>
+      <svg aria-hidden={'true'} className={classNames(st.svg, st.saveStatusSvg)} viewBox={'0 0 24 24'}>
         <path d={indicator.icon} fill={'currentColor'} />
       </svg>
     </div>

@@ -63,7 +63,7 @@ export const offlineBackend: BackendStatus = {
 export function StoryCanvas({ children }: { children: ReactNode }) {
   return (
     <main className={'story-canvas'}>
-      <div className={classNames(st.shell, 'shopping-shell')} style={{ paddingBlock: 24 }}>
+      <div className={classNames(st.shell, st.shoppingShell)} style={{ paddingBlock: 24 }}>
         {children}
       </div>
     </main>

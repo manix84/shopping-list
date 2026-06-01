@@ -21,9 +21,9 @@ export function ParsedItemCard({ item, config, onRename, onToggle, onDelete }: P
   const variantValue = getVariantValue(item);
 
   return (
-    <div className={classNames(st.root, 'item-card')}>
-      <div className={classNames(st.row, 'item-row')}>
-        <div className={classNames(st.main, 'item-main')}>
+    <div className={classNames(st.root, st.itemCard)}>
+      <div className={classNames(st.row, st.itemRow)}>
+        <div className={classNames(st.main, st.itemMain)}>
           <input
             className={'input'}
             defaultValue={displayValue}
