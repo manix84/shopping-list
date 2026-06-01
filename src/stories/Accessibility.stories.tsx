@@ -3,6 +3,7 @@ import { expect, userEvent, within } from 'storybook/test';
 import st from '../App.module.scss';
 import { classNames } from '../lib/classNames';
 import { DesignSystemStory, StorySection } from './DesignSystemStory';
+import colorSt from './ColorTokens.module.scss';
 import { p } from '../styles/primitives';
 
 const checklist = [
@@ -119,7 +120,7 @@ export const Default: Story = {
           Storybook interaction tests catch role/name regressions. Lighthouse is the release gate for accessibility
           scoring, with the dedicated accessibility workflow requiring a full accessibility score.
         </p>
-        <pre className={'color-token-variable'} aria-label={'Accessibility release commands'}>
+        <pre className={colorSt['color-token-variable']} aria-label={'Accessibility release commands'}>
           npm run test:storybook{'\n'}npm run lighthouse
         </pre>
       </StorySection>

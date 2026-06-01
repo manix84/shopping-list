@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type MouseEvent, type PointerEvent } from 'react';
-import './DebugPage.module.scss';
+import d from './DebugPage.module.scss';
 import {
   mdiBellOutline,
   mdiCalculatorVariantOutline,
@@ -52,7 +52,7 @@ import { useI18n } from '../lib/i18n';
 import { classNames } from '../lib/classNames';
 import type { Messages } from '../lib/i18n';
 import { appVersion } from '../version';
-import st from '../components/ItemCard.module.scss';
+import itemSt from '../components/ItemCard.module.scss';
 import { p } from '../styles/primitives';
 
 type DebugPageProps = {
@@ -141,11 +141,11 @@ const JSON_TOKEN_PATTERN =
   /("(?:\\.|[^"\\])*"(?=\s*:)|"(?:\\.|[^"\\])*"|true|false|null|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?|[{}[\],:])/g;
 
 const jsonTokenClass = (token: string, isKey = false) => {
-  if (/^"/.test(token)) { return isKey ? 'json-token-key' : 'json-token-string'; }
-  if (token === 'true' || token === 'false') { return 'json-token-boolean'; }
-  if (token === 'null') { return 'json-token-null'; }
-  if (/^-?\d/.test(token)) { return 'json-token-number'; }
-  return 'json-token-punctuation';
+  if (/^"/.test(token)) { return isKey ? d['json-token-key'] : d['json-token-string']; }
+  if (token === 'true' || token === 'false') { return d['json-token-boolean']; }
+  if (token === 'null') { return d['json-token-null']; }
+  if (/^-?\d/.test(token)) { return d['json-token-number']; }
+  return d['json-token-punctuation'];
 };
 
 function ProductSuggestionReviewCard({
@@ -243,9 +243,9 @@ function ProductRecategorizationCard({
   }, [item]);
 
   return (
-    <div className={classNames(st.root, st.itemCard)}>
-      <div className={classNames(st.row, st.itemRow)}>
-        <div className={classNames(st.main, st.itemMain)}>
+    <div className={classNames(itemSt.root, itemSt.itemCard)}>
+      <div className={classNames(itemSt.row, itemSt.itemRow)}>
+        <div className={classNames(itemSt.main, itemSt.itemMain)}>
           <div className={p.titleXs}>{getDisplayValue(item)}</div>
           <div className={p.badgeRow}>
             <Badge>
@@ -340,7 +340,7 @@ const DebugNotificationResultView = ({
   if (!result) { return <>{messages.pages.debug.unavailable}</>; }
 
   return (
-    <dl className={'debug-kv-list'}>
+    <dl className={d['debug-kv-list']}>
       <div>
         <dt>{messages.pages.debug.eventNotificationStatusLabel}</dt>
         <dd>{debugNotificationStatusLabel(result, messages)}</dd>
@@ -503,13 +503,13 @@ function DebugSettingSwitch({
   onChange: (enabled: boolean) => void;
 }) {
   return (
-    <label className={'debug-setting-switch'}>
+    <label className={d['debug-setting-switch']}>
       <span>
-        <span className={'debug-setting-label'}>{label}</span>
+        <span className={d['debug-setting-label']}>{label}</span>
         <span className={p.smallText}>{hint}</span>
       </span>
       <input
-        className={'debug-setting-switch-input'}
+        className={d['debug-setting-switch-input']}
         type={'checkbox'}
         role={'switch'}
         checked={checked}
@@ -531,9 +531,9 @@ function DebugEventButton({
   const { messages } = useI18n();
 
   return (
-    <div className={'debug-setting-switch'}>
+    <div className={d['debug-setting-switch']}>
       <span>
-        <span className={'debug-setting-label'}>{label}</span>
+        <span className={d['debug-setting-label']}>{label}</span>
         <span className={p.smallText}>{hint}</span>
       </span>
       <button type={'button'} className={p.buttonSecondary} onClick={onClick}>
@@ -892,7 +892,7 @@ export function DebugPage({
       bodyClassName={p.stack}
     >
       <div
-        className={`debug-tablist ${isDebugTabDragging ? 'debug-tablist-dragging' : ''}`.trim()}
+        className={classNames(d['debug-tablist'], isDebugTabDragging ? d['debug-tablist-dragging'] : undefined)}
         role={'tablist'}
         aria-label={messages.pages.debug.title}
         onPointerDown={handleDebugTabListPointerDown}
@@ -910,7 +910,7 @@ export function DebugPage({
             aria-selected={activeTab === tab.key}
             aria-controls={activeTab === tab.key ? `debug-panel-${tab.key}` : undefined}
             tabIndex={activeTab === tab.key ? 0 : -1}
-            className={classNames(p.button, 'debug-tab-button', activeTab === tab.key ? p.buttonActive : undefined)}
+            className={classNames(p.button, d['debug-tab-button'], activeTab === tab.key ? p.buttonActive : undefined)}
             ref={(element) => {
               if (element) {
                 debugTabButtonRefs.current.set(tab.key, element);
@@ -922,10 +922,10 @@ export function DebugPage({
             onKeyDown={(event) => handleTabKeyDown(event, index)}
             title={tab.label}
           >
-            <svg className={'debug-tab-icon'} viewBox={'0 0 24 24'} aria-hidden={'true'} focusable={'false'}>
+            <svg className={d['debug-tab-icon']} viewBox={'0 0 24 24'} aria-hidden={'true'} focusable={'false'}>
               <path d={tab.icon} fill={'currentColor'} />
             </svg>
-            <span className={'debug-tab-label'}>{tab.label}</span>
+            <span className={d['debug-tab-label']}>{tab.label}</span>
           </button>
         ))}
       </div>
@@ -942,7 +942,7 @@ export function DebugPage({
             </>
           }
         >
-          <div className={classNames('scroll-region', p.stack)}>
+          <div className={p.stack}>
             {items.length === 0 ? (
               <div className={p.emptyState}>{messages.pages.edit.parsedEmpty}</div>
             ) : (
@@ -1000,22 +1000,22 @@ export function DebugPage({
           }
           bodyClassName={p.stack}
         >
-          <div className={`heartbeat-card heartbeat-card-${heartbeatTone}`}>
-            <div className={'heartbeat-summary'}>
+          <div className={classNames(d['heartbeat-card'], d[`heartbeat-card-${heartbeatTone}`])}>
+            <div className={d['heartbeat-summary']}>
               <div
-                className={`heartbeat-pulse heartbeat-pulse-${heartbeatPulseColor ? 'sample' : backendStatus.state}`}
+                className={classNames(d['heartbeat-pulse'], d[`heartbeat-pulse-${heartbeatPulseColor ? 'sample' : backendStatus.state}`])}
                 style={heartbeatPulseColor ? { '--heartbeat-tone-color': heartbeatPulseColor } as CSSProperties : undefined}
                 aria-hidden={'true'}
               >
-                <span key={latestHeartbeat?.checkedAt ?? 'waiting'} className={'heartbeat-pulse-ring'} />
-                <span className={'heartbeat-pulse-core'} />
+                <span key={latestHeartbeat?.checkedAt ?? 'waiting'} className={d['heartbeat-pulse-ring']} />
+                <span className={d['heartbeat-pulse-core']} />
               </div>
               <div>
                 <h3 className={p.titleXs}>{heartbeatTitle}</h3>
                 <p className={p.smallText}>{messages.pages.debug.heartbeatSubtitle}</p>
               </div>
             </div>
-            <div className={'heartbeat-metrics'} aria-label={heartbeatTitle}>
+            <div className={d['heartbeat-metrics']} aria-label={heartbeatTitle}>
               <div>
                 <span>{messages.pages.debug.heartbeatLastChecked}</span>
                 <strong>
@@ -1041,13 +1041,13 @@ export function DebugPage({
                 </div>
               ) : null}
             </div>
-            <div className={'heartbeat-chart-scroll'} role={'group'} aria-label={heartbeatTitle}>
-              <div className={'heartbeat-graph'}>
-                <div className={'heartbeat-graph-axis'} aria-hidden={'true'}>
+            <div className={d['heartbeat-chart-scroll']} role={'group'} aria-label={heartbeatTitle}>
+              <div className={d['heartbeat-graph']}>
+                <div className={d['heartbeat-graph-axis']} aria-hidden={'true'}>
                   {heartbeatAxisTicks.map((latencyMs) => (
                     <span
                       key={latencyMs}
-                      className={'heartbeat-graph-axis-tick'}
+                      className={d['heartbeat-graph-axis-tick']}
                       style={{ top: `${heartbeatLatencyY(latencyMs, heartbeatGraphMaxLatencyMs)}%` }}
                     >
                       {formatHeartbeatAxisTick(latencyMs)}
@@ -1071,11 +1071,11 @@ export function DebugPage({
                       </linearGradient>
                     ))}
                   </defs>
-                  <path className={'heartbeat-graph-grid'} d={'M0 25 H100 M0 50 H100 M0 75 H100'} />
-                  <line className={'heartbeat-graph-ghost-line'} x1={'0'} y1={'50'} x2={'100'} y2={'50'} />
+                  <path className={d['heartbeat-graph-grid']} d={'M0 25 H100 M0 50 H100 M0 75 H100'} />
+                  <line className={d['heartbeat-graph-ghost-line']} x1={'0'} y1={'50'} x2={'100'} y2={'50'} />
                   {firstHeartbeatSampleSlot && firstHeartbeatSampleSlot.index > 0 ? (
                     <line
-                      className={'heartbeat-graph-ghost-line'}
+                      className={d['heartbeat-graph-ghost-line']}
                       x1={heartbeatPoint({ index: firstHeartbeatSampleSlot.index - 1 }, heartbeatGraphMaxLatencyMs).x}
                       y1={'50'}
                       x2={heartbeatPoint(firstHeartbeatSampleSlot, heartbeatGraphMaxLatencyMs).x}
@@ -1085,7 +1085,7 @@ export function DebugPage({
                   {heartbeatLineSegments.map((segment) => (
                     <line
                       key={segment.key}
-                      className={`heartbeat-graph-line ${segment.isActive ? 'heartbeat-graph-line-active' : ''}`}
+                      className={classNames(d['heartbeat-graph-line'], segment.isActive ? d['heartbeat-graph-line-active'] : undefined)}
                       style={{ color: segment.nextColor }}
                       stroke={`url(#${segment.gradientId})`}
                       x1={segment.previousPoint.x}
@@ -1104,7 +1104,7 @@ export function DebugPage({
                     return (
                       <span
                         key={`heartbeat-ghost-${slot.index}`}
-                        className={'heartbeat-graph-point heartbeat-graph-point-ghost'}
+                        className={classNames(d['heartbeat-graph-point'], d['heartbeat-graph-point-ghost'])}
                         style={{ left: `${x}%`, top: `${y}%` }}
                         aria-hidden={'true'}
                       />
@@ -1116,7 +1116,7 @@ export function DebugPage({
                     <button
                       key={`${sample.checkedAt}-${slot.index}`}
                       type={'button'}
-                      className={`heartbeat-graph-point heartbeat-graph-point-sample ${isActive ? 'heartbeat-graph-point-active' : ''} ${isTooltipVisible ? 'heartbeat-graph-point-tooltip-visible' : ''}`}
+                      className={classNames(d['heartbeat-graph-point'], d['heartbeat-graph-point-sample'], isActive ? d['heartbeat-graph-point-active'] : undefined, isTooltipVisible ? d['heartbeat-graph-point-tooltip-visible'] : undefined)}
                       style={{ '--heartbeat-tone-color': toneColor, left: `${x}%`, top: `${y}%` } as CSSProperties}
                       aria-label={`${messages.pages.debug.heartbeatLatency}: ${formatHeartbeatLatency(sample, messages)}, ${messages.pages.debug.heartbeatLastChecked}: ${formatHeartbeatTime(sample.checkedAt)}`}
                       aria-pressed={sample.checkedAt === lockedHeartbeatSampleKey && lockedHeartbeatSurface === 'graph'}
@@ -1126,7 +1126,7 @@ export function DebugPage({
                       onBlur={clearActiveHeartbeatSample}
                       onClick={() => lockHeartbeatSample(sample, 'graph')}
                     >
-                      <span className={'heartbeat-graph-tooltip'} role={'tooltip'}>
+                      <span className={d['heartbeat-graph-tooltip']} role={'tooltip'}>
                         <strong>{formatHeartbeatLatency(sample, messages)}</strong>
                         <span>{formatHeartbeatTime(sample.checkedAt)}</span>
                       </span>
@@ -1135,7 +1135,7 @@ export function DebugPage({
                 })}
               </div>
               <div
-                className={'heartbeat-status-strip'}
+                className={d['heartbeat-status-strip']}
                 role={'group'}
                 aria-label={messages.pages.debug.heartbeatStatusHistory}
               >
@@ -1145,7 +1145,7 @@ export function DebugPage({
                     return (
                       <span
                         key={`heartbeat-status-ghost-${slot.index}`}
-                        className={'heartbeat-status-dot heartbeat-status-dot-ghost'}
+                        className={classNames(d['heartbeat-status-dot'], d['heartbeat-status-dot-ghost'])}
                         style={{ '--heartbeat-status-x': `${x}%` } as CSSProperties}
                         aria-hidden={'true'}
                       />
@@ -1160,7 +1160,7 @@ export function DebugPage({
                     <button
                       key={`${sample.checkedAt}-status-${slot.index}`}
                       type={'button'}
-                      className={`heartbeat-status-dot heartbeat-status-dot-${sample.state} ${isActive ? 'heartbeat-status-dot-active' : ''} ${isTooltipVisible ? 'heartbeat-status-dot-tooltip-visible' : ''}`}
+                      className={classNames(d['heartbeat-status-dot'], d[`heartbeat-status-dot-${sample.state}`], isActive ? d['heartbeat-status-dot-active'] : undefined, isTooltipVisible ? d['heartbeat-status-dot-tooltip-visible'] : undefined)}
                       style={{ '--heartbeat-status-x': `${x}%` } as CSSProperties}
                       aria-label={`${messages.labels.state}: ${stateLabel}, ${messages.pages.debug.heartbeatLastChecked}: ${formatHeartbeatTime(sample.checkedAt)}`}
                       aria-pressed={sample.checkedAt === lockedHeartbeatSampleKey && lockedHeartbeatSurface === 'status'}
@@ -1170,7 +1170,7 @@ export function DebugPage({
                       onBlur={clearActiveHeartbeatSample}
                       onClick={() => lockHeartbeatSample(sample, 'status')}
                     >
-                      <span className={'heartbeat-status-tooltip'} role={'tooltip'}>
+                      <span className={d['heartbeat-status-tooltip']} role={'tooltip'}>
                         <strong>{stateLabel}</strong>
                         <span>{formatHeartbeatTime(sample.checkedAt)}</span>
                       </span>
@@ -1180,10 +1180,10 @@ export function DebugPage({
               </div>
             </div>
           </div>
-          <section className={'debug-disclosure'}>
+          <section className={d['debug-disclosure']}>
             <button
               type={'button'}
-              className={'debug-disclosure-trigger'}
+              className={d['debug-disclosure-trigger']}
               aria-expanded={isHeartbeatDetailsOpen}
               aria-controls={'selected-heartbeat-details'}
               onClick={() => setIsHeartbeatDetailsOpen((current) => !current)}
@@ -1193,7 +1193,7 @@ export function DebugPage({
             </button>
             {isHeartbeatDetailsOpen ? (
               <div className={p.tableWrap} id={'selected-heartbeat-details'}>
-                <table className={p.debugTableCompact}>
+                <table className={classNames(p.debugTableCompact, d['debug-table'], d['debug-table-compact'])}>
                   <tbody>
                     <tr>
                       <th scope={'row'}>{messages.pages.debug.heartbeatLastChecked}</th>
@@ -1248,10 +1248,10 @@ export function DebugPage({
               </div>
             ) : null}
           </section>
-          <section className={'debug-disclosure heartbeat-status-history'}>
+          <section className={d['debug-disclosure']}>
             <button
               type={'button'}
-              className={'debug-disclosure-trigger'}
+              className={d['debug-disclosure-trigger']}
               aria-expanded={isHeartbeatHistoryOpen}
               aria-controls={'heartbeat-status-history-panel'}
               onClick={() => setIsHeartbeatHistoryOpen((current) => !current)}
@@ -1261,11 +1261,11 @@ export function DebugPage({
             </button>
             {isHeartbeatHistoryOpen ? (
               <div
-                className={classNames(p.tableWrap, 'heartbeat-status-history-wrap')}
+                className={classNames(p.tableWrap, d['heartbeat-status-history-wrap'])}
                 id={'heartbeat-status-history-panel'}
                 ref={heartbeatHistoryWrapRef}
               >
-                <table className={p.debugTableCompact} aria-label={messages.pages.debug.heartbeatStatusHistory}>
+                <table className={classNames(p.debugTableCompact, d['debug-table'], d['debug-table-compact'])} aria-label={messages.pages.debug.heartbeatStatusHistory}>
                 <thead>
                   <tr>
                     <th scope={'col'}>{messages.pages.debug.heartbeatLastChecked}</th>
@@ -1292,14 +1292,14 @@ export function DebugPage({
                             heartbeatHistoryRowRefs.current.delete(sample.checkedAt);
                           }
                         }}
-                        className={`debug-table-row-interactive ${sample.checkedAt === activeHeartbeatSampleKey ? 'debug-table-row-active' : ''}`}
+                        className={classNames(d['debug-table-row-interactive'], sample.checkedAt === activeHeartbeatSampleKey ? d['debug-table-row-active'] : undefined)}
                         onMouseEnter={() => activateHeartbeatSample(sample, 'history')}
                         onMouseLeave={clearActiveHeartbeatSample}
                       >
                         <td>
                           <button
                             type={'button'}
-                            className={'heartbeat-history-row-button'}
+                            className={d['heartbeat-history-row-button']}
                             aria-pressed={sample.checkedAt === lockedHeartbeatSampleKey && lockedHeartbeatSurface === 'history'}
                             aria-label={`${messages.pages.debug.heartbeatLastChecked}: ${formatHeartbeatTime(sample.checkedAt)}, ${messages.labels.state}: ${backendStateLabel({ ...backendStatus, state: sample.state }, messages)}, ${messages.pages.debug.heartbeatLatency}: ${formatHeartbeatLatency(sample, messages)}`}
                             onFocus={() => {
@@ -1363,7 +1363,7 @@ export function DebugPage({
             label={checkLabel(backendStatus.database.ok, messages)}
           />
           <div className={p.tableWrap}>
-            <table className={p.debugTable}>
+            <table className={classNames(p.debugTable, d['debug-table'])}>
               <tbody>
                 <tr>
                   <th scope={'row'}>{messages.pages.debug.appStorageModeLabel}</th>
@@ -1404,15 +1404,15 @@ export function DebugPage({
           }
         >
           {currentSharedListJson ? (
-            <div className={'json-viewer'} role={'region'} aria-label={messages.pages.debug.databaseEntryTitle}>
+            <div className={d['json-viewer']} role={'region'} aria-label={messages.pages.debug.databaseEntryTitle}>
               <pre>
                 <code>
                   {currentSharedListJson.split('\n').map((line, lineIndex) => (
-                    <span key={lineIndex} className={'json-line'}>
-                      <span className={'json-line-number'} aria-hidden={'true'}>
+                    <span key={lineIndex} className={d['json-line']}>
+                      <span className={d['json-line-number']} aria-hidden={'true'}>
                         {lineIndex + 1}
                       </span>
-                      <span className={'json-line-code'}>
+                      <span className={d['json-line-code']}>
                         {highlightedJsonLine(line).map((part, partIndex) => (
                           part.className ? (
                             <span key={partIndex} className={part.className}>
@@ -1670,7 +1670,7 @@ export function DebugPage({
           bodyClassName={p.stack}
         >
           <div className={p.tableWrap}>
-            <table className={p.debugTable}>
+            <table className={classNames(p.debugTable, d['debug-table'])}>
               <tbody>
                 <tr>
                   <th scope={'row'}>{messages.labels.countryProfile}</th>
@@ -1700,7 +1700,7 @@ export function DebugPage({
             </table>
           </div>
           <div className={p.tableWrap}>
-            <table className={p.debugTable}>
+            <table className={classNames(p.debugTable, d['debug-table'])}>
               <thead>
                 <tr>
                   <th scope={'col'}>{messages.labels.order}</th>
@@ -1819,7 +1819,7 @@ export function DebugPage({
           bodyClassName={p.stack}
         >
           <div className={p.tableWrap}>
-            <table className={p.debugTable}>
+            <table className={classNames(p.debugTable, d['debug-table'])}>
               <tbody>
                 <tr>
                   <th scope={'row'}>{messages.pages.debug.eventNotificationPermissionLabel}</th>
@@ -1833,7 +1833,7 @@ export function DebugPage({
             </table>
           </div>
           <div
-            className={'debug-notification-result-panel'}
+            className={d['debug-notification-result-panel']}
             aria-live={'polite'}
             aria-label={messages.pages.debug.eventNotificationLastTestLabel}
           >
@@ -1842,7 +1842,7 @@ export function DebugPage({
               messages={messages}
             />
           </div>
-          <section className={classNames('debug-event-group', p.stack)}>
+          <section className={classNames(d['debug-event-group'], p.stack)}>
             <div>
               <h3 className={p.titleXs}>{messages.pages.debug.eventsNotificationGroupTitle}</h3>
               <p className={p.subtitle}>{messages.pages.debug.eventsNotificationGroupSubtitle}</p>
@@ -1873,7 +1873,7 @@ export function DebugPage({
               onClick={() => onDebugNotificationTest('silent-follow-up')}
             />
           </section>
-          <section className={classNames('debug-event-group', p.stack)}>
+          <section className={classNames(d['debug-event-group'], p.stack)}>
             <div>
               <h3 className={p.titleXs}>{messages.pages.debug.eventsToastGroupTitle}</h3>
               <p className={p.subtitle}>{messages.pages.debug.eventsToastGroupSubtitle}</p>
@@ -1904,7 +1904,7 @@ export function DebugPage({
               onClick={() => onDebugEventTest('toast-plain')}
             />
           </section>
-          <section className={classNames('debug-event-group', p.stack)}>
+          <section className={classNames(d['debug-event-group'], p.stack)}>
             <div>
               <h3 className={p.titleXs}>{messages.pages.debug.eventsOtherGroupTitle}</h3>
               <p className={p.subtitle}>{messages.pages.debug.eventsOtherGroupSubtitle}</p>
@@ -2011,7 +2011,7 @@ export function DebugPage({
         >
           <div className={p.stack}>
             <div className={p.tableWrap}>
-              <table className={p.debugTable}>
+              <table className={classNames(p.debugTable, d['debug-table'])}>
                 <tbody>
                   <tr>
                     <th scope={'row'}>{messages.pages.debug.runtimeHostnameLabel}</th>

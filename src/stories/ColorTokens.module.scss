@@ -1,6 +1,5 @@
 @use "../styles/variables" as *;
 
-:global {
 .color-token {
   &-section {
     margin-bottom: 2rem;
@@ -85,5 +84,4 @@
     padding: 6px 8px;
     text-align: left !important;
   }
-}
 }

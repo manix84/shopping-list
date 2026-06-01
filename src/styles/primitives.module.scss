@@ -309,6 +309,52 @@
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
+.table-wrap {
+  overflow-x: auto;
+}
+
+.debug-table {
+  border-collapse: collapse;
+  min-width: 720px;
+  width: 100%;
+
+  caption {
+    color: $text;
+    font-size: 0.9rem;
+    font-weight: 700;
+    padding: 0 0 8px;
+    text-align: left;
+  }
+
+  th,
+  td {
+    border-bottom: 1px solid $border;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    color: $muted;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  td {
+    font-size: 0.88rem;
+  }
+}
+
+.debug-table-compact {
+  min-width: 560px;
+
+  th,
+  td {
+    padding: 8px 10px;
+  }
+}
+
 .notice {
   border: 1px solid $border;
   border-radius: 8px;
@@ -592,34 +638,4 @@
     padding: 20px;
   }
 
-  .easter-egg-overlay {
-    padding: 12px;
-  }
-
-  .easter-egg-dialog {
-    border-radius: 18px;
-    padding: 18px;
-  }
-
-  .easter-egg-visual {
-    min-height: 180px;
-  }
-
-  .easter-egg-star {
-    height: 44px;
-    left: 20px;
-    top: 28px;
-    width: 44px;
-  }
-
-  .easter-egg-harp {
-    height: 132px;
-    left: 70px;
-    top: 24px;
-    width: calc(100% - 88px);
-  }
-
-  .easter-egg-copy {
-    padding-right: 0;
-  }
 }
