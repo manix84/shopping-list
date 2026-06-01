@@ -15,7 +15,7 @@ export function DesignSystemStory({ children }: { children: ReactNode }) {
 
 export function StorySection({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <Card header={<h2 className={'title title-sm'}>{title}</h2>} bodyClassName={'stack'}>
+    <Card header={<h2 className={p.titleSm}>{title}</h2>} bodyClassName={'stack'}>
       {children}
     </Card>
   );

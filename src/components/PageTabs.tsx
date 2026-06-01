@@ -12,7 +12,7 @@ export function PageTabs({ page, hasItems, showDebugTools = false, onChange }: P
   const { messages } = useI18n();
 
   return (
-    <nav className={'button-row'} aria-label={messages.app.title}>
+    <nav className={p.buttonRow} aria-label={messages.app.title}>
       <button
         type={'button'}
         className={`button ${page === 'edit' ? 'button-active' : ''}`}

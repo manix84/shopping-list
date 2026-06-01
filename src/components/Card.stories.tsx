@@ -51,15 +51,15 @@ function CardExample({ heading, subtitle, body, showHeader, bodyClassName }: Car
         header={
           showHeader ? (
             <>
-              <h2 className={'title title-md'}>{heading}</h2>
-              <p className={'subtitle'}>{subtitle}</p>
+              <h2 className={p.titleMd}>{heading}</h2>
+              <p className={p.subtitle}>{subtitle}</p>
             </>
           ) : undefined
         }
         bodyClassName={bodyClassName}
       >
         <p>{body}</p>
-        <div className={'badge-row'}>
+        <div className={p.badgeRow}>
           <Badge>Default badge</Badge>
           <Badge tone={'success'}>Ready</Badge>
         </div>

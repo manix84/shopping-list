@@ -44,7 +44,7 @@ function CountrySelectExample({ value }: { value: CountryCode }) {
   return (
     <StoryCanvas>
       <Card bodyClassName={'stack'}>
-        <div className={'field field-compact'}>
+        <div className={p.fieldCompact}>
           <label htmlFor={'storybook-country'}>Store layout profile</label>
           <CountrySelect id={'storybook-country'} value={countryCode} onChange={setCountryCode} />
         </div>

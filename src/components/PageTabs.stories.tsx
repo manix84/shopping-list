@@ -49,7 +49,7 @@ function PageTabsExample({ page: initialPage, hasItems }: { page: PageKey; hasIt
     <StoryCanvas>
       <Card bodyClassName={'stack'}>
         <PageTabs page={page} hasItems={hasItems} onChange={setPage} />
-        <div className={'small-text'}>Current page: {page}</div>
+        <div className={p.smallText}>Current page: {page}</div>
       </Card>
     </StoryCanvas>
   );

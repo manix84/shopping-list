@@ -21,14 +21,14 @@ export const Default: Story = {
   render: () => (
     <DesignSystemStory>
       <StorySection title={'Forms'}>
-        <div className={'field field-compact'}>
+        <div className={p.fieldCompact}>
           <label htmlFor={'storybook-input'}>Field label</label>
-          <div className={'small-text'}>Helper text explains the expected input.</div>
-          <input id={'storybook-input'} className={'input'} placeholder={'Input text'} />
+          <div className={p.smallText}>Helper text explains the expected input.</div>
+          <input id={'storybook-input'} className={p.input} placeholder={'Input text'} />
         </div>
-        <div className={'field field-compact'}>
+        <div className={p.fieldCompact}>
           <label htmlFor={'storybook-select'}>Select label</label>
-          <select id={'storybook-select'} className={'select'} defaultValue={'one'}>
+          <select id={'storybook-select'} className={p.select} defaultValue={'one'}>
             <option value={'one'}>One option</option>
             <option value={'two'}>Another option</option>
           </select>

@@ -90,11 +90,11 @@ export function RoutePage({
       header={
         <div className={'title-row route-page-header'}>
           <div className={'route-page-header-copy'}>
-            <div className={'page-title-with-status'}>
-              <h2 className={'title title-md'}>{routeTitle}</h2>
+            <div className={p.pageTitleWithStatus}>
+              <h2 className={p.titleMd}>{routeTitle}</h2>
               <SaveStatusIndicator status={saveStatus} />
             </div>
-            {showDefaultSubtitle ? <p className={'subtitle'}>{messages.pages.route.subtitle}</p> : null}
+            {showDefaultSubtitle ? <p className={p.subtitle}>{messages.pages.route.subtitle}</p> : null}
           </div>
           <div className={'route-toolbar'}>
             <div className={'route-toolbar-row'}>
@@ -115,7 +115,7 @@ export function RoutePage({
                       aria-pressed={viewMode === option.mode}
                       title={getRouteViewLabel(option.mode, messages)}
                     >
-                      <svg aria-hidden={'true'} className={'button-icon-svg'} viewBox={'0 0 24 24'}>
+                      <svg aria-hidden={'true'} className={p.buttonIconSvg} viewBox={'0 0 24 24'}>
                         <path d={option.icon} fill={'currentColor'} />
                       </svg>
                     </button>
@@ -134,7 +134,7 @@ export function RoutePage({
                       aria-pressed={measurementDisplayMode === option.mode}
                       title={option.label}
                     >
-                      <svg aria-hidden={'true'} className={'button-icon-svg'} viewBox={'0 0 24 24'}>
+                      <svg aria-hidden={'true'} className={p.buttonIconSvg} viewBox={'0 0 24 24'}>
                         <path d={option.icon} fill={'currentColor'} />
                       </svg>
                     </button>
@@ -152,7 +152,7 @@ export function RoutePage({
                   aria-controls={isFilterVisible ? 'route-filter-input' : undefined}
                   title={messages.actions.filterItems}
                 >
-                  <svg aria-hidden={'true'} className={'button-icon-svg'} viewBox={'0 0 24 24'}>
+                  <svg aria-hidden={'true'} className={p.buttonIconSvg} viewBox={'0 0 24 24'}>
                     <path d={mdiMagnify} fill={'currentColor'} />
                   </svg>
                 </button>
@@ -172,18 +172,18 @@ export function RoutePage({
         </div>
       }
     >
-      <div className={'stack'}>
+      <div className={p.stack}>
         {!hasItems ? (
           <div className={'empty-state stack'}>
             <div>{messages.pages.route.emptyNoItems}</div>
             <div className={'button-row warning-actions'}>
-              <button type={'button'} className={'button button-primary'} onClick={onOpenEdit}>
+              <button type={'button'} className={p.buttonPrimary} onClick={onOpenEdit}>
                 {messages.actions.goToEditList}
               </button>
             </div>
           </div>
         ) : grouped.length === 0 ? (
-          <div className={'empty-state'}>{messages.pages.route.emptyNoResults}</div>
+          <div className={p.emptyState}>{messages.pages.route.emptyNoResults}</div>
         ) : (
           <>
             {grouped.map((section) => (
@@ -199,7 +199,7 @@ export function RoutePage({
         )}
         {hasItems ? (
           <div className={'route-reset-actions'}>
-            <button type={'button'} className={'button'} onClick={() => setIsResetTicksModalOpen(true)}>
+            <button type={'button'} className={p.button} onClick={() => setIsResetTicksModalOpen(true)}>
               {messages.actions.resetTicks}
             </button>
           </div>
@@ -214,15 +214,15 @@ export function RoutePage({
             aria-labelledby={'reset-ticks-title'}
             onClick={(event) => event.stopPropagation()}
           >
-            <div className={'stack'}>
-              <h3 id={'reset-ticks-title'} className={'title title-xs'}>{messages.pages.route.resetTicksConfirmTitle}</h3>
-              <p className={'subtitle'}>{messages.pages.route.resetTicksConfirmBody}</p>
+            <div className={p.stack}>
+              <h3 id={'reset-ticks-title'} className={p.titleXs}>{messages.pages.route.resetTicksConfirmTitle}</h3>
+              <p className={p.subtitle}>{messages.pages.route.resetTicksConfirmBody}</p>
             </div>
             <div className={'button-row warning-actions'}>
-              <button type={'button'} className={'button'} onClick={() => setIsResetTicksModalOpen(false)} autoFocus>
+              <button type={'button'} className={p.button} onClick={() => setIsResetTicksModalOpen(false)} autoFocus>
                 {messages.actions.close}
               </button>
-              <button type={'button'} className={'button button-danger'} onClick={confirmResetTicks}>
+              <button type={'button'} className={p.buttonDanger} onClick={confirmResetTicks}>
                 {messages.pages.route.resetTicksConfirmAction}
               </button>
             </div>

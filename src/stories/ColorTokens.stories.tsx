@@ -133,7 +133,7 @@ function ColorSwatch({ groupTitle, name, value }: { groupTitle: string; name: st
           </div>
         </dl>
       </div>
-      <span className={'sr-only'}>{groupTitle}</span>
+      <span className={p.srOnly}>{groupTitle}</span>
     </article>
   );
 }
@@ -141,10 +141,10 @@ function ColorSwatch({ groupTitle, name, value }: { groupTitle: string; name: st
 function ColorSection({ title, subtitle, colors }: ColorGroup) {
   return (
     <section className={'color-token-section'}>
-      <h3 className={'title title-xs'} style={{ margin: '0 0 0.25rem' }}>
+      <h3 className={p.titleXs} style={{ margin: '0 0 0.25rem' }}>
         {title}
       </h3>
-      {subtitle && <p className={'subtitle'}>{subtitle}</p>}
+      {subtitle && <p className={p.subtitle}>{subtitle}</p>}
       <div className={'color-token-grid'}>
         {Object.entries(colors).map(([name, value]) => (
           <ColorSwatch key={`${title}-${name}`} groupTitle={title} name={name} value={value} />
@@ -158,7 +158,7 @@ export const Default: Story = {
   render: () => (
     <DesignSystemStory>
       <StorySection title={'Color Tokens'}>
-        <p className={'subtitle'} style={{ marginTop: 0 }}>
+        <p className={p.subtitle} style={{ marginTop: 0 }}>
           CSS color variables defined in src/styles/main.scss.
         </p>
         {colorGroups.map((group) => (

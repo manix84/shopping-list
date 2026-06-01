@@ -72,12 +72,12 @@ export const Default: Story = {
   render: () => (
     <DesignSystemStory>
       <StorySection title={'Measurements'}>
-        <p className={'subtitle'} style={{ marginTop: 0 }}>
+        <p className={p.subtitle} style={{ marginTop: 0 }}>
           Parsed measurements are normalized to metric storage. Measurement display mode can show metric, imperial,
           or cooking units without changing the stored value.
         </p>
-        <div className={'table-wrap'}>
-          <table className={'debug-table'}>
+        <div className={p.tableWrap}>
+          <table className={p.debugTable}>
             <thead>
               <tr>
                 <th>Country</th>
@@ -109,12 +109,12 @@ export const Default: Story = {
       </StorySection>
 
       <StorySection title={'Conversions'}>
-        <p className={'subtitle'} style={{ marginTop: 0 }}>
+        <p className={p.subtitle} style={{ marginTop: 0 }}>
           The stored value remains metric. The display columns show how the same source input is rendered in each
           measurement mode.
         </p>
-        <div className={'table-wrap'}>
-          <table className={'debug-table'}>
+        <div className={p.tableWrap}>
+          <table className={p.debugTable}>
             <thead>
               <tr>
                 <th>Input</th>

@@ -57,12 +57,12 @@ export const Default: Story = {
   render: () => (
     <DesignSystemStory>
       <StorySection title={'Accessibility'}>
-        <p className={'subtitle'} style={{ marginTop: 0 }}>
+        <p className={p.subtitle} style={{ marginTop: 0 }}>
           Accessibility is treated as part of the component contract. New UI should preserve keyboard access,
           meaningful names, visible focus, announced state changes, and readable translated text.
         </p>
-        <div className={'table-wrap'}>
-          <table className={'debug-table'}>
+        <div className={p.tableWrap}>
+          <table className={p.debugTable}>
             <thead>
               <tr>
                 <th>Area</th>
@@ -87,34 +87,34 @@ export const Default: Story = {
         <a className={classNames(st.skipLink, st.skipLinkAlias)} href={'#storybook-accessibility-demo'}>
           Skip to demo content
         </a>
-        <div className={'button-row'} role={'group'} aria-label={'Example controls'}>
-          <button type={'button'} className={'button button-primary'}>
+        <div className={p.buttonRow} role={'group'} aria-label={'Example controls'}>
+          <button type={'button'} className={p.buttonPrimary}>
             Primary action
           </button>
-          <button type={'button'} className={'button'}>
+          <button type={'button'} className={p.button}>
             Secondary action
           </button>
-          <button type={'button'} className={'button button-danger'}>
+          <button type={'button'} className={p.buttonDanger}>
             Dangerous action
           </button>
         </div>
-        <div id={'storybook-accessibility-demo'} className={'empty-state'} tabIndex={-1}>
+        <div id={'storybook-accessibility-demo'} className={p.emptyState} tabIndex={-1}>
           Focus should remain visible on controls, and skip links should become visible only when focused.
         </div>
       </StorySection>
 
       <StorySection title={'Announcements'}>
-        <div className={'small-text'} role={'status'} aria-live={'polite'}>
+        <div className={p.smallText} role={'status'} aria-live={'polite'}>
           Polite status updates announce save, sync, scan, install, and validation changes without interrupting the
           current task.
         </div>
-        <div className={'small-text'} role={'alert'}>
+        <div className={p.smallText} role={'alert'}>
           Alerts are reserved for errors that need attention before the user can continue.
         </div>
       </StorySection>
 
       <StorySection title={'Release checks'}>
-        <p className={'subtitle'} style={{ marginTop: 0 }}>
+        <p className={p.subtitle} style={{ marginTop: 0 }}>
           Storybook interaction tests catch role/name regressions. Lighthouse is the release gate for accessibility
           scoring, with the dedicated accessibility workflow requiring a full accessibility score.
         </p>

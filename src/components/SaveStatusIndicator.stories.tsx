@@ -57,14 +57,14 @@ function SaveStatusIndicatorExample({ status }: SaveStatusIndicatorStoryArgs) {
     <StoryCanvas>
       <Card
         header={
-          <div className={'page-title-with-status'}>
-            <h2 className={'title title-sm'}>List editor</h2>
+          <div className={p.pageTitleWithStatus}>
+            <h2 className={p.titleSm}>List editor</h2>
             <SaveStatusIndicator status={status} />
           </div>
         }
         bodyClassName={'stack'}
       >
-        <p className={'small-text'}>{status === 'idle' ? 'No visible save status' : `Current status: ${status}`}</p>
+        <p className={p.smallText}>{status === 'idle' ? 'No visible save status' : `Current status: ${status}`}</p>
       </Card>
     </StoryCanvas>
   );

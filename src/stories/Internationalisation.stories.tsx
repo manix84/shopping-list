@@ -79,12 +79,12 @@ export const Default: Story = {
   render: () => (
     <DesignSystemStory>
       <StorySection title={'Internationalisation'}>
-        <p className={'subtitle'} style={{ marginTop: 0 }}>
+        <p className={p.subtitle} style={{ marginTop: 0 }}>
           Runtime locale bundles are compared against English by unit tests. This page is for visual checks:
           labels, common navigation copy, document language codes, and strings that may wrap awkwardly.
         </p>
-        <div className={'table-wrap'}>
-          <table className={'debug-table'}>
+        <div className={p.tableWrap}>
+          <table className={p.debugTable}>
             <thead>
               <tr>
                 <th>Locale</th>
@@ -112,8 +112,8 @@ export const Default: Story = {
       </StorySection>
 
       <StorySection title={'Common UI copy'}>
-        <div className={'table-wrap'}>
-          <table className={'debug-table'}>
+        <div className={p.tableWrap}>
+          <table className={p.debugTable}>
             <thead>
               <tr>
                 <th>Key</th>
@@ -137,8 +137,8 @@ export const Default: Story = {
       </StorySection>
 
       <StorySection title={'Bundle health'}>
-        <div className={'table-wrap'}>
-          <table className={'debug-table'}>
+        <div className={p.tableWrap}>
+          <table className={p.debugTable}>
             <thead>
               <tr>
                 <th>Locale</th>

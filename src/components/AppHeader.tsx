@@ -134,8 +134,8 @@ export function AppHeader({
                   <img className={classNames(st.iconImage, st.appIconImage)} src={logoHref} alt={''} width={'48'} height={'48'} />
                 </span>
                 <div>
-                  <h1 className={'title'}>{messages.app.title}</h1>
-                  <p className={'subtitle'}>{messages.app.subtitle}</p>
+                  <h1 className={p.title}>{messages.app.title}</h1>
+                  <p className={p.subtitle}>{messages.app.subtitle}</p>
                 </div>
               </div>
 
@@ -189,8 +189,8 @@ export function AppHeader({
                     title={mobileMenuLabel}
                     onClick={() => setMobileMenuOpen((current) => !current)}
                   >
-                    <span className={'sr-only'}>{mobileMenuLabel}</span>
-                    <svg aria-hidden={'true'} className={'button-icon-svg'} viewBox={'0 0 24 24'}>
+                    <span className={p.srOnly}>{mobileMenuLabel}</span>
+                    <svg aria-hidden={'true'} className={p.buttonIconSvg} viewBox={'0 0 24 24'}>
                       <path d={mdiMenu} fill={'currentColor'} />
                     </svg>
                   </button>

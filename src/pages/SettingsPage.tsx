@@ -274,7 +274,7 @@ export function SettingsPage({
         <p>{installDescription}</p>
       </div>
       {canPromptInstall && !isInstalled ? (
-        <button type={'button'} className={'button button-primary'} onClick={onInstall}>
+        <button type={'button'} className={p.buttonPrimary} onClick={onInstall}>
           {messages.pwaInstall.installAction}
         </button>
       ) : null}
@@ -342,19 +342,19 @@ export function SettingsPage({
       <Card
         header={
           <>
-            <div className={'page-title-with-status'}>
-              <h2 className={'title title-md'}>{messages.pages.settings.title}</h2>
+            <div className={p.pageTitleWithStatus}>
+              <h2 className={p.titleMd}>{messages.pages.settings.title}</h2>
               <SaveStatusIndicator status={settingsSaveStatus} />
             </div>
-            <p className={'subtitle'}>{messages.pages.settings.subtitle}</p>
+            <p className={p.subtitle}>{messages.pages.settings.subtitle}</p>
           </>
         }
         bodyClassName={'stack'}
       >
-        <div className={'field field-compact'}>
+        <div className={p.fieldCompact}>
           <div>
             <label htmlFor={'locale-select'}>{messages.pages.settings.localeLabel}</label>
-            <div className={'small-text'}>{messages.pages.settings.localeSubtitle}</div>
+            <div className={p.smallText}>{messages.pages.settings.localeSubtitle}</div>
           </div>
           <SettingsSelect
             id={'locale-select'}
@@ -364,10 +364,10 @@ export function SettingsPage({
           />
         </div>
 
-        <div className={'field field-compact'}>
+        <div className={p.fieldCompact}>
           <div>
             <label htmlFor={'default-country-select'}>{messages.pages.settings.defaultCountryLabel}</label>
-            <div className={'small-text'}>{messages.pages.settings.defaultCountrySubtitle}</div>
+            <div className={p.smallText}>{messages.pages.settings.defaultCountrySubtitle}</div>
           </div>
           <SettingsSelect
             id={'default-country-select'}
@@ -377,18 +377,18 @@ export function SettingsPage({
           />
         </div>
 
-        <div className={'field field-compact'}>
+        <div className={p.fieldCompact}>
           <div>
             <label htmlFor={'theme-select'}>{messages.pages.settings.themeLabel}</label>
-            <div className={'small-text'}>{messages.pages.settings.themeSubtitle}</div>
+            <div className={p.smallText}>{messages.pages.settings.themeSubtitle}</div>
           </div>
           <SettingsSelect id={'theme-select'} value={themeMode} options={themeOptions} onChange={handleThemeChange} />
         </div>
 
-        <div className={'field field-compact'}>
+        <div className={p.fieldCompact}>
           <div>
             <label htmlFor={'route-density-select'}>{messages.pages.settings.routeDensityLabel}</label>
-            <div className={'small-text'}>{messages.pages.settings.routeDensitySubtitle}</div>
+            <div className={p.smallText}>{messages.pages.settings.routeDensitySubtitle}</div>
           </div>
           <SettingsSelect
             id={'route-density-select'}
@@ -398,17 +398,17 @@ export function SettingsPage({
           />
         </div>
 
-        <div className={'field field-compact'}>
+        <div className={p.fieldCompact}>
           <div>
             <label htmlFor={'notifications-toggle'}>{messages.pages.settings.notificationsLabel}</label>
-            <div className={'small-text'}>
+            <div className={p.smallText}>
               {notificationsUnavailableMessage ?? messages.pages.settings.notificationsSubtitle}
             </div>
           </div>
           <button
             id={'notifications-toggle'}
             type={'button'}
-            className={'button button-secondary'}
+            className={p.buttonSecondary}
             disabled={Boolean(notificationsUnavailableMessage)}
             onClick={handleNotificationsClick}
           >

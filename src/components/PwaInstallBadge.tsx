@@ -37,7 +37,7 @@ export function PwaInstallBadge({
       </div>
       <div className={classNames(st.actions, st.pwaInstallBadgeActions)}>
         {canPromptInstall ? (
-          <button type={'button'} className={'button button-primary button-sm'} onClick={onInstall}>
+          <button type={'button'} className={p.buttonPrimarySm} onClick={onInstall}>
             {messages.pwaInstall.installAction}
           </button>
         ) : null}

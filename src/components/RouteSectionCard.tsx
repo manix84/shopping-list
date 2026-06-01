@@ -39,7 +39,7 @@ export function RouteSectionCard({ section, viewMode, onToggleSection, onToggleI
           <div className={classNames(st.group, st.sectionGroup)}>{section.groupLabel}</div>
           <h3 id={sectionTitleId} className={classNames(st.title, st.sectionTitle)}>{section.label}</h3>
           {!isCompact ? (
-            <div className={'badge-row'}>
+            <div className={p.badgeRow}>
               <Badge>
                 {section.checkedCount}/{section.items.length}
               </Badge>

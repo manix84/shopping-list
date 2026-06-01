@@ -1,6 +1,5 @@
 @use "./variables" as *;
 
-:global {
 .story-canvas {
   padding: 0 24px 24px;
 }
@@ -625,5 +624,4 @@
   .easter-egg-copy {
     padding-right: 0;
   }
-}
 }

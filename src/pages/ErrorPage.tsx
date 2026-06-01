@@ -76,21 +76,21 @@ export function ErrorPage({ variant, isDebugMode, onBackToEdit, onOpenDebug }: E
       </div>
 
       <div className={classNames(st.copy, st.errorCopy)}>
-        <p className={'section-group'}>{errorMessages[content.eyebrowKey]}</p>
-        <h2 id={'error-title'} className={'title'}>{errorMessages[content.titleKey]}</h2>
-        <p className={'subtitle'}>{errorMessages[content.subtitleKey]}</p>
+        <p className={p.sectionGroup}>{errorMessages[content.eyebrowKey]}</p>
+        <h2 id={'error-title'} className={p.title}>{errorMessages[content.titleKey]}</h2>
+        <p className={p.subtitle}>{errorMessages[content.subtitleKey]}</p>
       </div>
 
       <div className={classNames(st.actions, st.errorActions)}>
-        <button type={'button'} className={'button button-primary'} onClick={onBackToEdit}>
-          <svg aria-hidden={'true'} className={'button-icon-svg'} viewBox={'0 0 24 24'}>
+        <button type={'button'} className={p.buttonPrimary} onClick={onBackToEdit}>
+          <svg aria-hidden={'true'} className={p.buttonIconSvg} viewBox={'0 0 24 24'}>
             <path d={variant === 'not-found' ? mdiHomeOutline : mdiPencilOutline} fill={'currentColor'} />
           </svg>
           {messages.actions.backToEdit}
         </button>
         {isDebugMode ? (
-          <button type={'button'} className={'button'} onClick={onOpenDebug}>
-            <svg aria-hidden={'true'} className={'button-icon-svg'} viewBox={'0 0 24 24'}>
+          <button type={'button'} className={p.button} onClick={onOpenDebug}>
+            <svg aria-hidden={'true'} className={p.buttonIconSvg} viewBox={'0 0 24 24'}>
               <path d={mdiBugOutline} fill={'currentColor'} />
             </svg>
             {messages.actions.openDebugTools}
