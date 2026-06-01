@@ -2,7 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CSSProperties } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { expect, within } from 'storybook/test';
-import './ColorTokens.module.scss';
+import st from './ColorTokens.module.scss';
+import { classNames } from '../lib/classNames';
 import { DesignSystemStory, StorySection } from './DesignSystemStory';
 import { p } from '../styles/primitives';
 
@@ -114,21 +115,21 @@ function ColorSwatch({ groupTitle, name, value }: { groupTitle: string; name: st
   }, [value]);
 
   return (
-    <article className={'color-token-card'}>
+    <article className={st['color-token-card']}>
       <div
         ref={swatchRef}
         aria-hidden={'true'}
-        className={'color-token-preview'}
+        className={st['color-token-preview']}
         style={{ '--color-token-value': value } as CSSProperties}
       />
-      <div className={'color-token-content'}>
-        <h4 className={'color-token-name'}>{name}</h4>
-        <dl className={'color-token-details'}>
-          <div className={'color-token-detail color-token-detail-stacked'}>
+      <div className={st['color-token-content']}>
+        <h4 className={st['color-token-name']}>{name}</h4>
+        <dl className={st['color-token-details']}>
+          <div className={classNames(st['color-token-detail'], st['color-token-detail-stacked'])}>
             <dt>CSS Variable</dt>
-            <dd className={'color-token-variable'}>{cssVariable}</dd>
+            <dd className={st['color-token-variable']}>{cssVariable}</dd>
           </div>
-          <div className={'color-token-detail'}>
+          <div className={st['color-token-detail']}>
             <dt>Value</dt>
             <dd>{resolvedValue}</dd>
           </div>
@@ -141,12 +142,12 @@ function ColorSwatch({ groupTitle, name, value }: { groupTitle: string; name: st
 
 function ColorSection({ title, subtitle, colors }: ColorGroup) {
   return (
-    <section className={'color-token-section'}>
+    <section className={st['color-token-section']}>
       <h3 className={p.titleXs} style={{ margin: '0 0 0.25rem' }}>
         {title}
       </h3>
       {subtitle && <p className={p.subtitle}>{subtitle}</p>}
-      <div className={'color-token-grid'}>
+      <div className={st['color-token-grid']}>
         {Object.entries(colors).map(([name, value]) => (
           <ColorSwatch key={`${title}-${name}`} groupTitle={title} name={name} value={value} />
         ))}

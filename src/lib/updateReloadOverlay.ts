@@ -40,7 +40,7 @@ const ensureUpdateReloadOverlayStyles = (): void => {
       to { transform: rotate(360deg); }
     }
 
-    #${UPDATE_RELOAD_OVERLAY_ID} .pwa-update-spinner {
+    #${UPDATE_RELOAD_OVERLAY_ID} > span {
       animation: smart-shopping-list-update-spin 0.78s linear infinite;
     }
 
@@ -49,7 +49,7 @@ const ensureUpdateReloadOverlayStyles = (): void => {
         transition: none !important;
       }
 
-      #${UPDATE_RELOAD_OVERLAY_ID} .pwa-update-spinner {
+      #${UPDATE_RELOAD_OVERLAY_ID} > span {
         animation: none;
       }
     }
@@ -67,7 +67,9 @@ const createUpdateReloadOverlay = (initialOpacity = '0'): HTMLDivElement => {
   overlay.setAttribute('role', 'status');
   overlay.setAttribute('aria-live', 'polite');
   overlay.setAttribute('aria-label', createMessages(loadLocale()).pwaInstall.updateReloadLabel);
-  overlay.innerHTML = '<span class="pwa-update-spinner" aria-hidden="true"></span>';
+  const spinner = document.createElement('span');
+  spinner.setAttribute('aria-hidden', 'true');
+  overlay.append(spinner);
   overlay.style.cssText = [
     'align-items:center',
     'backdrop-filter:blur(1px)',
@@ -82,19 +84,16 @@ const createUpdateReloadOverlay = (initialOpacity = '0'): HTMLDivElement => {
     'z-index:2147483647',
   ].join(';');
 
-  const spinner = overlay.querySelector<HTMLElement>('.pwa-update-spinner');
-  if (spinner) {
-    spinner.style.cssText = [
-      'background:var(--panel, #ffffff)',
-      'border:4px solid var(--border, #d9deea)',
-      'border-radius:999px',
-      'border-top-color:var(--primary, #2563eb)',
-      'box-shadow:0 12px 32px var(--shadow-color, rgba(15, 23, 42, 0.16))',
-      'display:block',
-      'height:44px',
-      'width:44px',
-    ].join(';');
-  }
+  spinner.style.cssText = [
+    'background:var(--panel, #ffffff)',
+    'border:4px solid var(--border, #d9deea)',
+    'border-radius:999px',
+    'border-top-color:var(--primary, #2563eb)',
+    'box-shadow:0 12px 32px var(--shadow-color, rgba(15, 23, 42, 0.16))',
+    'display:block',
+    'height:44px',
+    'width:44px',
+  ].join(';');
 
   document.body.append(overlay);
   return overlay;

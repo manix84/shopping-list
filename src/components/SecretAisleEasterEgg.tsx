@@ -1,7 +1,8 @@
 import { mdiClose, mdiStarFourPoints } from '@mdi/js';
 import type { CSSProperties, PointerEvent, KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { useEffect, useRef, useState } from 'react';
-import './SecretAisleEasterEgg.module.scss';
+import st from './SecretAisleEasterEgg.module.scss';
+import { classNames } from '../lib/classNames';
 import { useI18n } from '../lib/i18n';
 import { p } from '../styles/primitives';
 
@@ -482,9 +483,9 @@ export function SecretAisleEasterEgg({ isVisible, onDismiss }: SecretAisleEaster
   if (!isVisible) { return null; }
 
   return (
-    <div className={'easter-egg-overlay'} role={'presentation'} onClick={handleBackdropClick}>
+    <div className={st['easter-egg-overlay']} role={'presentation'} onClick={handleBackdropClick}>
       <section
-        className={'easter-egg-dialog'}
+        className={st['easter-egg-dialog']}
         role={'dialog'}
         aria-modal={'true'}
         aria-labelledby={'easter-egg-title'}
@@ -492,7 +493,7 @@ export function SecretAisleEasterEgg({ isVisible, onDismiss }: SecretAisleEaster
       >
         <button
           type={'button'}
-          className={'button button-icon easter-egg-close'}
+          className={classNames(p.buttonIcon, st['easter-egg-close'])}
           aria-label={messages.easterEgg.dismiss}
           title={messages.easterEgg.dismiss}
           onClick={onDismiss}
@@ -503,11 +504,11 @@ export function SecretAisleEasterEgg({ isVisible, onDismiss }: SecretAisleEaster
           </svg>
         </button>
 
-        <div className={'easter-egg-visual'}>
-          <div className={'easter-egg-scanline'} aria-hidden={'true'} />
+        <div className={st['easter-egg-visual']}>
+          <div className={st['easter-egg-scanline']} aria-hidden={'true'} />
           <button
             type={'button'}
-            className={'easter-egg-star'}
+            className={st['easter-egg-star']}
             aria-label={messages.easterEgg.replay}
             title={messages.easterEgg.replay}
             onClick={handleReplayMelody}
@@ -517,7 +518,7 @@ export function SecretAisleEasterEgg({ isVisible, onDismiss }: SecretAisleEaster
             </svg>
           </button>
           <svg
-            className={'easter-egg-harp'}
+            className={st['easter-egg-harp']}
             role={'group'}
             aria-label={messages.easterEgg.harpStringsLabel}
             viewBox={`0 0 ${HARP_VIEWBOX_WIDTH} ${HARP_VIEWBOX_HEIGHT}`}
@@ -531,7 +532,7 @@ export function SecretAisleEasterEgg({ isVisible, onDismiss }: SecretAisleEaster
             {Array.from({ length: HARP_STRING_COUNT }, (_, index) => (
               <g key={index}>
                 <path
-                  className={'easter-egg-string-hit'}
+                  className={st['easter-egg-string-hit']}
                   d={harpStringPath(harpStringX(index))}
                   role={'button'}
                   tabIndex={isMelodyPlaying ? -1 : 0}
@@ -546,7 +547,7 @@ export function SecretAisleEasterEgg({ isVisible, onDismiss }: SecretAisleEaster
                   onKeyDown={(event) => handleStringKeyDown(event, index)}
                 />
                 <path
-                  className={`easter-egg-string ${activePluck?.string === index ? 'easter-egg-string-active' : ''}`}
+                  className={classNames(st['easter-egg-string'], activePluck?.string === index ? st['easter-egg-string-active'] : undefined)}
                   style={activePluck?.string === index ? noteColorStyle(index) : undefined}
                   d={harpStringPath(
                     harpStringX(index),
@@ -558,14 +559,14 @@ export function SecretAisleEasterEgg({ isVisible, onDismiss }: SecretAisleEaster
             ))}
           </svg>
           <div
-            className={`easter-egg-note-preview ${previewString === undefined ? 'easter-egg-note-preview-hidden' : ''}`}
+            className={classNames(st['easter-egg-note-preview'], previewString === undefined ? st['easter-egg-note-preview-hidden'] : undefined)}
             style={noteColorStyle(previewString)}
           >
             <span>{previewString === undefined ? null : stringNoteNames[previewString]}</span>
           </div>
         </div>
 
-        <div className={'easter-egg-copy'}>
+        <div className={st['easter-egg-copy']}>
           <h2 id={'easter-egg-title'} className={p.sectionGroup}>{messages.easterEgg.title}</h2>
           <p className={p.titleMd}>{messages.easterEgg.body}</p>
         </div>

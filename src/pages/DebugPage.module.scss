@@ -1,6 +1,5 @@
 @use "../styles/variables" as *;
 
-:global {
 .table-wrap {
   overflow-x: auto;
 }
@@ -839,5 +838,4 @@
     opacity: 0;
     transform: scale(1.42);
   }
-}
 }
