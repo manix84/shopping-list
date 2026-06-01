@@ -3,6 +3,7 @@ import type { CSSProperties, PointerEvent, KeyboardEvent as ReactKeyboardEvent }
 import { useEffect, useRef, useState } from 'react';
 import './SecretAisleEasterEgg.module.scss';
 import { useI18n } from '../lib/i18n';
+import { p } from '../styles/primitives';
 
 type SecretAisleEasterEggProps = {
   isVisible: boolean;
@@ -497,7 +498,7 @@ export function SecretAisleEasterEgg({ isVisible, onDismiss }: SecretAisleEaster
           onClick={onDismiss}
           autoFocus={true}
         >
-          <svg aria-hidden={'true'} className={'button-icon-svg'} viewBox={'0 0 24 24'}>
+          <svg aria-hidden={'true'} className={p.buttonIconSvg} viewBox={'0 0 24 24'}>
             <path d={mdiClose} fill={'currentColor'} />
           </svg>
         </button>
@@ -565,8 +566,8 @@ export function SecretAisleEasterEgg({ isVisible, onDismiss }: SecretAisleEaster
         </div>
 
         <div className={'easter-egg-copy'}>
-          <h2 id={'easter-egg-title'} className={'section-group'}>{messages.easterEgg.title}</h2>
-          <p className={'title title-md'}>{messages.easterEgg.body}</p>
+          <h2 id={'easter-egg-title'} className={p.sectionGroup}>{messages.easterEgg.title}</h2>
+          <p className={p.titleMd}>{messages.easterEgg.body}</p>
         </div>
       </section>
     </div>

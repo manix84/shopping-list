@@ -2,6 +2,7 @@ import { mdiClose, mdiDownload } from '@mdi/js';
 import { classNames } from '../lib/classNames';
 import { useI18n } from '../lib/i18n';
 import st from './PwaInstallBadge.module.scss';
+import { p } from '../styles/primitives';
 
 type PwaInstallBadgeProps = {
   canPromptInstall: boolean;
@@ -37,13 +38,13 @@ export function PwaInstallBadge({
       </div>
       <div className={classNames(st.actions, st.pwaInstallBadgeActions)}>
         {canPromptInstall ? (
-          <button type={'button'} className={'button button-primary button-sm'} onClick={onInstall}>
+          <button type={'button'} className={p.buttonPrimarySm} onClick={onInstall}>
             {messages.pwaInstall.installAction}
           </button>
         ) : null}
         <button
           type={'button'}
-          className={classNames('button button-icon', st.dismiss, st.pwaInstallDismiss)}
+          className={classNames(p.buttonIcon, st.dismiss, st.pwaInstallDismiss)}
           aria-label={messages.pwaInstall.dismissLabel}
           title={messages.pwaInstall.dismissLabel}
           onClick={onDismiss}

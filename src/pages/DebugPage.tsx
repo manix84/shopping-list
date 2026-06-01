@@ -53,6 +53,7 @@ import { classNames } from '../lib/classNames';
 import type { Messages } from '../lib/i18n';
 import { appVersion } from '../version';
 import st from '../components/ItemCard.module.scss';
+import { p } from '../styles/primitives';
 
 type DebugPageProps = {
   backendStatus: BackendStatus;
@@ -170,19 +171,19 @@ function ProductSuggestionReviewCard({
 
   return (
     <Card
-      bodyClassName={'stack'}
+      bodyClassName={p.stack}
       header={
-        <div className={'title-row'}>
+        <div className={p.titleRow}>
           <div>
-            <h3 className={'title title-xs'}>{suggestion.product}</h3>
-            <p className={'subtitle'}>
+            <h3 className={p.titleXs}>{suggestion.product}</h3>
+            <p className={p.subtitle}>
               {suggestion.countryCode.toUpperCase()} · {suggestion.reportCount} report{suggestion.reportCount === 1 ? '' : 's'} · confidence {Math.round(suggestion.confidence * 100)}%
             </p>
           </div>
-          <div className={'button-row'}>
+          <div className={p.buttonRow}>
             <button
               type={'button'}
-              className={'button button-primary'}
+              className={p.buttonPrimary}
               onClick={() => onApprove(suggestion, {
                 product,
                 aliases: aliasList,
@@ -192,21 +193,21 @@ function ProductSuggestionReviewCard({
             >
               Approve
             </button>
-            <button type={'button'} className={'button'} onClick={() => onReject(suggestion)}>
+            <button type={'button'} className={p.button} onClick={() => onReject(suggestion)}>
               Reject
             </button>
           </div>
         </div>
       }
     >
-      <div className={'form-grid'}>
-        <label className={'field'}>
+      <div className={p.formGrid}>
+        <label className={p.field}>
           <span>Product</span>
-          <input className={'input'} value={product} onChange={(event) => setProduct(event.target.value)} />
+          <input className={p.input} value={product} onChange={(event) => setProduct(event.target.value)} />
         </label>
-        <label className={'field'}>
+        <label className={p.field}>
           <span>Section</span>
-          <select className={'input'} value={section} onChange={(event) => setSection(event.target.value as SectionKey)}>
+          <select className={p.input} value={section} onChange={(event) => setSection(event.target.value as SectionKey)}>
             {sectionOptions.map((option) => (
               <option key={option.key} value={option.key}>
                 {option.groupLabel} / {option.label}
@@ -214,13 +215,13 @@ function ProductSuggestionReviewCard({
             ))}
           </select>
         </label>
-        <label className={'field field-full'}>
+        <label className={p.fieldFull}>
           <span>Aliases</span>
-          <input className={'input'} value={aliases} onChange={(event) => setAliases(event.target.value)} />
+          <input className={p.input} value={aliases} onChange={(event) => setAliases(event.target.value)} />
         </label>
       </div>
       {suggestion.latestRawItems.length > 0 ? (
-        <div className={'small-text'}>
+        <div className={p.smallText}>
           Recent sightings: {suggestion.latestRawItems.join(', ')}
         </div>
       ) : null}
@@ -245,8 +246,8 @@ function ProductRecategorizationCard({
     <div className={classNames(st.root, st.itemCard)}>
       <div className={classNames(st.row, st.itemRow)}>
         <div className={classNames(st.main, st.itemMain)}>
-          <div className={'title title-xs'}>{getDisplayValue(item)}</div>
-          <div className={'badge-row'}>
+          <div className={p.titleXs}>{getDisplayValue(item)}</div>
+          <div className={p.badgeRow}>
             <Badge>
               Current: {currentMeta.groupLabel} / {currentMeta.label}
             </Badge>
@@ -255,15 +256,15 @@ function ProductRecategorizationCard({
             </Badge>
           </div>
         </div>
-        <div className={'inline-row'}>
-          <select className={'input'} value={section} onChange={(event) => setSection(event.target.value as SectionKey)}>
+        <div className={p.inlineRow}>
+          <select className={p.input} value={section} onChange={(event) => setSection(event.target.value as SectionKey)}>
             {sectionOptions.map((option) => (
               <option key={option.key} value={option.key}>
                 {option.groupLabel} / {option.label}
               </option>
             ))}
           </select>
-          <button type={'button'} className={'button'} onClick={() => onSuggest(item, section)}>
+          <button type={'button'} className={p.button} onClick={() => onSuggest(item, section)}>
             Suggest
           </button>
         </div>
@@ -505,7 +506,7 @@ function DebugSettingSwitch({
     <label className={'debug-setting-switch'}>
       <span>
         <span className={'debug-setting-label'}>{label}</span>
-        <span className={'small-text'}>{hint}</span>
+        <span className={p.smallText}>{hint}</span>
       </span>
       <input
         className={'debug-setting-switch-input'}
@@ -533,9 +534,9 @@ function DebugEventButton({
     <div className={'debug-setting-switch'}>
       <span>
         <span className={'debug-setting-label'}>{label}</span>
-        <span className={'small-text'}>{hint}</span>
+        <span className={p.smallText}>{hint}</span>
       </span>
-      <button type={'button'} className={'button button-secondary'} onClick={onClick}>
+      <button type={'button'} className={p.buttonSecondary} onClick={onClick}>
         {messages.pages.debug.eventTriggerAction}
       </button>
     </div>
@@ -873,22 +874,22 @@ export function DebugPage({
   return (
     <Card
       header={
-        <div className={'title-row'}>
+        <div className={p.titleRow}>
           <div>
-            <h2 className={'title title-md'}>{messages.pages.debug.title}</h2>
-            <p className={'subtitle'}>{messages.pages.debug.subtitle}</p>
+            <h2 className={p.titleMd}>{messages.pages.debug.title}</h2>
+            <p className={p.subtitle}>{messages.pages.debug.subtitle}</p>
           </div>
-          <div className={'button-row'}>
-            <button type={'button'} className={'button'} onClick={onBackToEdit}>
+          <div className={p.buttonRow}>
+            <button type={'button'} className={p.button} onClick={onBackToEdit}>
               {messages.actions.backToEdit}
             </button>
-            <button type={'button'} className={'button'} onClick={onBackToSettings}>
+            <button type={'button'} className={p.button} onClick={onBackToSettings}>
               {messages.actions.backToSettings}
             </button>
           </div>
         </div>
       }
-      bodyClassName={'stack'}
+      bodyClassName={p.stack}
     >
       <div
         className={`debug-tablist ${isDebugTabDragging ? 'debug-tablist-dragging' : ''}`.trim()}
@@ -909,7 +910,7 @@ export function DebugPage({
             aria-selected={activeTab === tab.key}
             aria-controls={activeTab === tab.key ? `debug-panel-${tab.key}` : undefined}
             tabIndex={activeTab === tab.key ? 0 : -1}
-            className={`button debug-tab-button ${activeTab === tab.key ? 'button-active' : ''}`}
+            className={classNames(p.button, 'debug-tab-button', activeTab === tab.key ? p.buttonActive : undefined)}
             ref={(element) => {
               if (element) {
                 debugTabButtonRefs.current.set(tab.key, element);
@@ -936,14 +937,14 @@ export function DebugPage({
           aria-labelledby={'debug-tab-parsed'}
           header={
             <>
-              <h2 className={'title title-sm'}>{messages.pages.debug.parsedTitle}</h2>
-              <p className={'subtitle'}>{messages.pages.debug.parsedSubtitle}</p>
+              <h2 className={p.titleSm}>{messages.pages.debug.parsedTitle}</h2>
+              <p className={p.subtitle}>{messages.pages.debug.parsedSubtitle}</p>
             </>
           }
         >
-          <div className={'scroll-region stack'}>
+          <div className={classNames('scroll-region', p.stack)}>
             {items.length === 0 ? (
-              <div className={'empty-state'}>{messages.pages.edit.parsedEmpty}</div>
+              <div className={p.emptyState}>{messages.pages.edit.parsedEmpty}</div>
             ) : (
               items.map((item) => (
                 <ParsedItemCard
@@ -967,11 +968,11 @@ export function DebugPage({
           aria-labelledby={'debug-tab-state'}
           header={
             <>
-              <h2 className={'title title-sm'}>{messages.pages.debug.stateTitle}</h2>
-              <p className={'subtitle'}>{messages.pages.debug.stateSubtitle}</p>
+              <h2 className={p.titleSm}>{messages.pages.debug.stateTitle}</h2>
+              <p className={p.subtitle}>{messages.pages.debug.stateSubtitle}</p>
             </>
           }
-          bodyClassName={'stack'}
+          bodyClassName={p.stack}
         >
           {stateTests.map((test) => (
             <TestResultCard
@@ -982,7 +983,7 @@ export function DebugPage({
               passed={test.passed}
             />
           ))}
-          {!stateHasFailures ? <div className={'empty-state'}>{messages.pages.debug.allStatePass}</div> : null}
+          {!stateHasFailures ? <div className={p.emptyState}>{messages.pages.debug.allStatePass}</div> : null}
         </Card>
       ) : null}
 
@@ -993,11 +994,11 @@ export function DebugPage({
           aria-labelledby={'debug-tab-backend'}
           header={
             <>
-              <h2 className={'title title-sm'}>{messages.pages.debug.backendTitle}</h2>
-              <p className={'subtitle'}>{backendSummary(backendStatus, messages)}</p>
+              <h2 className={p.titleSm}>{messages.pages.debug.backendTitle}</h2>
+              <p className={p.subtitle}>{backendSummary(backendStatus, messages)}</p>
             </>
           }
-          bodyClassName={'stack'}
+          bodyClassName={p.stack}
         >
           <div className={`heartbeat-card heartbeat-card-${heartbeatTone}`}>
             <div className={'heartbeat-summary'}>
@@ -1010,8 +1011,8 @@ export function DebugPage({
                 <span className={'heartbeat-pulse-core'} />
               </div>
               <div>
-                <h3 className={'title title-xs'}>{heartbeatTitle}</h3>
-                <p className={'small-text'}>{messages.pages.debug.heartbeatSubtitle}</p>
+                <h3 className={p.titleXs}>{heartbeatTitle}</h3>
+                <p className={p.smallText}>{messages.pages.debug.heartbeatSubtitle}</p>
               </div>
             </div>
             <div className={'heartbeat-metrics'} aria-label={heartbeatTitle}>
@@ -1191,8 +1192,8 @@ export function DebugPage({
               <span aria-hidden={'true'}>{isHeartbeatDetailsOpen ? '−' : '+'}</span>
             </button>
             {isHeartbeatDetailsOpen ? (
-              <div className={'table-wrap'} id={'selected-heartbeat-details'}>
-                <table className={'debug-table debug-table-compact'}>
+              <div className={p.tableWrap} id={'selected-heartbeat-details'}>
+                <table className={p.debugTableCompact}>
                   <tbody>
                     <tr>
                       <th scope={'row'}>{messages.pages.debug.heartbeatLastChecked}</th>
@@ -1238,7 +1239,7 @@ export function DebugPage({
                       <th scope={'row'}>{messages.pages.debug.heartbeatDatabaseDetail}</th>
                       <td>
                         {activeHeartbeatDatabaseDetail === messages.labels.notApplicable ? (
-                          <span className={'muted'}>{activeHeartbeatDatabaseDetail}</span>
+                          <span className={p.muted}>{activeHeartbeatDatabaseDetail}</span>
                         ) : activeHeartbeatDatabaseDetail}
                       </td>
                     </tr>
@@ -1260,11 +1261,11 @@ export function DebugPage({
             </button>
             {isHeartbeatHistoryOpen ? (
               <div
-                className={'table-wrap heartbeat-status-history-wrap'}
+                className={classNames(p.tableWrap, 'heartbeat-status-history-wrap')}
                 id={'heartbeat-status-history-panel'}
                 ref={heartbeatHistoryWrapRef}
               >
-                <table className={'debug-table debug-table-compact'} aria-label={messages.pages.debug.heartbeatStatusHistory}>
+                <table className={p.debugTableCompact} aria-label={messages.pages.debug.heartbeatStatusHistory}>
                 <thead>
                   <tr>
                     <th scope={'col'}>{messages.pages.debug.heartbeatLastChecked}</th>
@@ -1361,8 +1362,8 @@ export function DebugPage({
             tone={checkTone(backendStatus.database.ok)}
             label={checkLabel(backendStatus.database.ok, messages)}
           />
-          <div className={'table-wrap'}>
-            <table className={'debug-table'}>
+          <div className={p.tableWrap}>
+            <table className={p.debugTable}>
               <tbody>
                 <tr>
                   <th scope={'row'}>{messages.pages.debug.appStorageModeLabel}</th>
@@ -1397,8 +1398,8 @@ export function DebugPage({
           aria-labelledby={'debug-tab-database-entry'}
           header={
             <>
-              <h2 className={'title title-sm'}>{messages.pages.debug.databaseEntryTitle}</h2>
-              <p className={'subtitle'}>{messages.pages.debug.databaseEntrySubtitle}</p>
+              <h2 className={p.titleSm}>{messages.pages.debug.databaseEntryTitle}</h2>
+              <p className={p.subtitle}>{messages.pages.debug.databaseEntrySubtitle}</p>
             </>
           }
         >
@@ -1428,7 +1429,7 @@ export function DebugPage({
               </pre>
             </div>
           ) : (
-            <div className={'empty-state'}>{messages.pages.debug.databaseEntryUnavailable}</div>
+            <div className={p.emptyState}>{messages.pages.debug.databaseEntryUnavailable}</div>
           )}
         </Card>
       ) : null}
@@ -1440,11 +1441,11 @@ export function DebugPage({
           aria-labelledby={'debug-tab-config'}
           header={
             <>
-              <h2 className={'title title-sm'}>{messages.pages.debug.configTitle}</h2>
-              <p className={'subtitle'}>{messages.pages.debug.configSubtitle}</p>
+              <h2 className={p.titleSm}>{messages.pages.debug.configTitle}</h2>
+              <p className={p.subtitle}>{messages.pages.debug.configSubtitle}</p>
             </>
           }
-          bodyClassName={'stack'}
+          bodyClassName={p.stack}
         >
           {configTests.map((test) => (
             <TestResultCard
@@ -1455,7 +1456,7 @@ export function DebugPage({
               passed={test.passed}
             />
           ))}
-          {!configHasFailures ? <div className={'empty-state'}>{messages.pages.debug.allConfigPass}</div> : null}
+          {!configHasFailures ? <div className={p.emptyState}>{messages.pages.debug.allConfigPass}</div> : null}
         </Card>
       ) : null}
 
@@ -1466,11 +1467,11 @@ export function DebugPage({
           aria-labelledby={'debug-tab-matcher'}
           header={
             <>
-              <h2 className={'title title-sm'}>{messages.pages.debug.matcherTitle}</h2>
-              <p className={'subtitle'}>{messages.pages.debug.matcherSubtitle}</p>
+              <h2 className={p.titleSm}>{messages.pages.debug.matcherTitle}</h2>
+              <p className={p.subtitle}>{messages.pages.debug.matcherSubtitle}</p>
             </>
           }
-          bodyClassName={'stack'}
+          bodyClassName={p.stack}
         >
           {matcherTests.map((test) => (
             <TestResultCard
@@ -1481,7 +1482,7 @@ export function DebugPage({
               passed={test.passed}
             />
           ))}
-          {!matcherHasFailures ? <div className={'empty-state'}>{messages.pages.debug.allMatcherPass}</div> : null}
+          {!matcherHasFailures ? <div className={p.emptyState}>{messages.pages.debug.allMatcherPass}</div> : null}
         </Card>
       ) : null}
 
@@ -1492,11 +1493,11 @@ export function DebugPage({
           aria-labelledby={'debug-tab-quantity'}
           header={
             <>
-              <h2 className={'title title-sm'}>{messages.pages.debug.quantityTitle}</h2>
-              <p className={'subtitle'}>{messages.pages.debug.quantitySubtitle}</p>
+              <h2 className={p.titleSm}>{messages.pages.debug.quantityTitle}</h2>
+              <p className={p.subtitle}>{messages.pages.debug.quantitySubtitle}</p>
             </>
           }
-          bodyClassName={'stack'}
+          bodyClassName={p.stack}
         >
           {countQuantityTests.map((test) => (
             <TestResultCard
@@ -1519,7 +1520,7 @@ export function DebugPage({
               passed={test.passed}
             />
           ))}
-          {!countQuantityHasFailures ? <div className={'empty-state'}>{messages.pages.debug.allQuantityPass}</div> : null}
+          {!countQuantityHasFailures ? <div className={p.emptyState}>{messages.pages.debug.allQuantityPass}</div> : null}
         </Card>
       ) : null}
 
@@ -1530,11 +1531,11 @@ export function DebugPage({
           aria-labelledby={'debug-tab-measurements'}
           header={
             <>
-              <h2 className={'title title-sm'}>{messages.pages.debug.measurementTitle}</h2>
-              <p className={'subtitle'}>{messages.pages.debug.measurementSubtitle}</p>
+              <h2 className={p.titleSm}>{messages.pages.debug.measurementTitle}</h2>
+              <p className={p.subtitle}>{messages.pages.debug.measurementSubtitle}</p>
             </>
           }
-          bodyClassName={'stack'}
+          bodyClassName={p.stack}
         >
           {measurementTests.map((test) => (
             <TestResultCard
@@ -1548,7 +1549,7 @@ export function DebugPage({
             />
           ))}
           {!measurementHasFailures ? (
-            <div className={'empty-state'}>{messages.pages.debug.allMeasurementPass}</div>
+            <div className={p.emptyState}>{messages.pages.debug.allMeasurementPass}</div>
           ) : null}
         </Card>
       ) : null}
@@ -1560,11 +1561,11 @@ export function DebugPage({
           aria-labelledby={'debug-tab-weights'}
           header={
             <>
-              <h2 className={'title title-sm'}>{messages.pages.debug.weightTitle}</h2>
-              <p className={'subtitle'}>{messages.pages.debug.weightSubtitle}</p>
+              <h2 className={p.titleSm}>{messages.pages.debug.weightTitle}</h2>
+              <p className={p.subtitle}>{messages.pages.debug.weightSubtitle}</p>
             </>
           }
-          bodyClassName={'stack'}
+          bodyClassName={p.stack}
         >
           {unitQuantityTests.map((test) => (
             <TestResultCard
@@ -1595,7 +1596,7 @@ export function DebugPage({
               passed={test.passed}
             />
           ))}
-          {!unitQuantityHasFailures ? <div className={'empty-state'}>{messages.pages.debug.allWeightPass}</div> : null}
+          {!unitQuantityHasFailures ? <div className={p.emptyState}>{messages.pages.debug.allWeightPass}</div> : null}
         </Card>
       ) : null}
 
@@ -1606,11 +1607,11 @@ export function DebugPage({
           aria-labelledby={'debug-tab-variants'}
           header={
             <>
-              <h2 className={'title title-sm'}>{messages.pages.debug.variantTitle}</h2>
-              <p className={'subtitle'}>{messages.pages.debug.variantSubtitle}</p>
+              <h2 className={p.titleSm}>{messages.pages.debug.variantTitle}</h2>
+              <p className={p.subtitle}>{messages.pages.debug.variantSubtitle}</p>
             </>
           }
-          bodyClassName={'stack'}
+          bodyClassName={p.stack}
         >
           {variantTests.map((test) => (
             <TestResultCard
@@ -1625,7 +1626,7 @@ export function DebugPage({
               passed={test.passed}
             />
           ))}
-          {!variantHasFailures ? <div className={'empty-state'}>{messages.pages.debug.allVariantPass}</div> : null}
+          {!variantHasFailures ? <div className={p.emptyState}>{messages.pages.debug.allVariantPass}</div> : null}
         </Card>
       ) : null}
 
@@ -1636,11 +1637,11 @@ export function DebugPage({
           aria-labelledby={'debug-tab-storage'}
           header={
             <>
-              <h2 className={'title title-sm'}>{messages.pages.debug.storageTitle}</h2>
-              <p className={'subtitle'}>{messages.pages.debug.storageSubtitle}</p>
+              <h2 className={p.titleSm}>{messages.pages.debug.storageTitle}</h2>
+              <p className={p.subtitle}>{messages.pages.debug.storageSubtitle}</p>
             </>
           }
-          bodyClassName={'stack'}
+          bodyClassName={p.stack}
         >
           {storageTests.map((test) => (
             <TestResultCard
@@ -1651,7 +1652,7 @@ export function DebugPage({
               passed={test.passed}
             />
           ))}
-          {!storageHasFailures ? <div className={'empty-state'}>{messages.pages.debug.allStoragePass}</div> : null}
+          {!storageHasFailures ? <div className={p.emptyState}>{messages.pages.debug.allStoragePass}</div> : null}
         </Card>
       ) : null}
 
@@ -1662,14 +1663,14 @@ export function DebugPage({
           aria-labelledby={'debug-tab-layout'}
           header={
             <>
-              <h2 className={'title title-sm'}>{messages.pages.debug.layoutTitle}</h2>
-              <p className={'subtitle'}>{messages.pages.debug.layoutSubtitle}</p>
+              <h2 className={p.titleSm}>{messages.pages.debug.layoutTitle}</h2>
+              <p className={p.subtitle}>{messages.pages.debug.layoutSubtitle}</p>
             </>
           }
-          bodyClassName={'stack'}
+          bodyClassName={p.stack}
         >
-          <div className={'table-wrap'}>
-            <table className={'debug-table'}>
+          <div className={p.tableWrap}>
+            <table className={p.debugTable}>
               <tbody>
                 <tr>
                   <th scope={'row'}>{messages.labels.countryProfile}</th>
@@ -1698,8 +1699,8 @@ export function DebugPage({
               </tbody>
             </table>
           </div>
-          <div className={'table-wrap'}>
-            <table className={'debug-table'}>
+          <div className={p.tableWrap}>
+            <table className={p.debugTable}>
               <thead>
                 <tr>
                   <th scope={'col'}>{messages.labels.order}</th>
@@ -1715,12 +1716,12 @@ export function DebugPage({
                     <td>
                       {group.label}
                       <br />
-                      <span className={'muted'}>{group.key}</span>
+                      <span className={p.muted}>{group.key}</span>
                     </td>
                     <td>
                       {section.label}
                       <br />
-                      <span className={'muted'}>{section.key}</span>
+                      <span className={p.muted}>{section.key}</span>
                     </td>
                     <td>
                       {section.keywords.length}
@@ -1740,30 +1741,30 @@ export function DebugPage({
           role={'tabpanel'}
           aria-labelledby={'debug-tab-products'}
           header={
-            <div className={'title-row'}>
+            <div className={p.titleRow}>
               <div>
-                <h2 className={'title title-sm'}>Unknown product suggestions</h2>
-                <p className={'subtitle'}>
+                <h2 className={p.titleSm}>Unknown product suggestions</h2>
+                <p className={p.subtitle}>
                   Review products reported under Other, or suggest a better section for a current item.
                 </p>
               </div>
-              <button type={'button'} className={'button'} onClick={onRefreshProductSuggestions}>
+              <button type={'button'} className={p.button} onClick={onRefreshProductSuggestions}>
                 Refresh
               </button>
             </div>
           }
-          bodyClassName={'stack'}
+          bodyClassName={p.stack}
         >
           {productSuggestionError ? (
-            <div className={'notice notice-error'}>{productSuggestionError}</div>
+            <div className={p.noticeError}>{productSuggestionError}</div>
           ) : null}
-          <section className={'stack'}>
+          <section className={p.stack}>
             <div>
-              <h3 className={'title title-xs'}>Suggest from current list</h3>
-              <p className={'subtitle'}>Choose a better section for an item that parsed into the wrong place.</p>
+              <h3 className={p.titleXs}>Suggest from current list</h3>
+              <p className={p.subtitle}>Choose a better section for an item that parsed into the wrong place.</p>
             </div>
             {items.length === 0 ? (
-              <div className={'empty-state'}>No current list items to suggest from.</div>
+              <div className={p.emptyState}>No current list items to suggest from.</div>
             ) : (
               items.map((item) => (
                 <ProductRecategorizationCard
@@ -1776,13 +1777,13 @@ export function DebugPage({
               ))
             )}
           </section>
-          <section className={'stack'}>
+          <section className={p.stack}>
             <div>
-              <h3 className={'title title-xs'}>Pending review</h3>
-              <p className={'subtitle'}>Approve suggestions to add them as runtime matcher overrides.</p>
+              <h3 className={p.titleXs}>Pending review</h3>
+              <p className={p.subtitle}>Approve suggestions to add them as runtime matcher overrides.</p>
             </div>
           {productSuggestions.length === 0 ? (
-            <div className={'empty-state'}>No pending product suggestions.</div>
+            <div className={p.emptyState}>No pending product suggestions.</div>
           ) : (
             productSuggestions.map((suggestion) => (
               <ProductSuggestionReviewCard
@@ -1811,14 +1812,14 @@ export function DebugPage({
           aria-labelledby={'debug-tab-events'}
           header={
             <>
-              <h2 className={'title title-sm'}>{messages.pages.debug.eventsTitle}</h2>
-              <p className={'subtitle'}>{messages.pages.debug.eventsSubtitle}</p>
+              <h2 className={p.titleSm}>{messages.pages.debug.eventsTitle}</h2>
+              <p className={p.subtitle}>{messages.pages.debug.eventsSubtitle}</p>
             </>
           }
-          bodyClassName={'stack'}
+          bodyClassName={p.stack}
         >
-          <div className={'table-wrap'}>
-            <table className={'debug-table'}>
+          <div className={p.tableWrap}>
+            <table className={p.debugTable}>
               <tbody>
                 <tr>
                   <th scope={'row'}>{messages.pages.debug.eventNotificationPermissionLabel}</th>
@@ -1841,10 +1842,10 @@ export function DebugPage({
               messages={messages}
             />
           </div>
-          <section className={'debug-event-group stack'}>
+          <section className={classNames('debug-event-group', p.stack)}>
             <div>
-              <h3 className={'title title-xs'}>{messages.pages.debug.eventsNotificationGroupTitle}</h3>
-              <p className={'subtitle'}>{messages.pages.debug.eventsNotificationGroupSubtitle}</p>
+              <h3 className={p.titleXs}>{messages.pages.debug.eventsNotificationGroupTitle}</h3>
+              <p className={p.subtitle}>{messages.pages.debug.eventsNotificationGroupSubtitle}</p>
             </div>
             <DebugEventButton
               label={messages.pages.debug.eventNotificationMinimalLabel}
@@ -1872,10 +1873,10 @@ export function DebugPage({
               onClick={() => onDebugNotificationTest('silent-follow-up')}
             />
           </section>
-          <section className={'debug-event-group stack'}>
+          <section className={classNames('debug-event-group', p.stack)}>
             <div>
-              <h3 className={'title title-xs'}>{messages.pages.debug.eventsToastGroupTitle}</h3>
-              <p className={'subtitle'}>{messages.pages.debug.eventsToastGroupSubtitle}</p>
+              <h3 className={p.titleXs}>{messages.pages.debug.eventsToastGroupTitle}</h3>
+              <p className={p.subtitle}>{messages.pages.debug.eventsToastGroupSubtitle}</p>
             </div>
             <DebugEventButton
               label={messages.pages.debug.eventToastSuccessLabel}
@@ -1903,10 +1904,10 @@ export function DebugPage({
               onClick={() => onDebugEventTest('toast-plain')}
             />
           </section>
-          <section className={'debug-event-group stack'}>
+          <section className={classNames('debug-event-group', p.stack)}>
             <div>
-              <h3 className={'title title-xs'}>{messages.pages.debug.eventsOtherGroupTitle}</h3>
-              <p className={'subtitle'}>{messages.pages.debug.eventsOtherGroupSubtitle}</p>
+              <h3 className={p.titleXs}>{messages.pages.debug.eventsOtherGroupTitle}</h3>
+              <p className={p.subtitle}>{messages.pages.debug.eventsOtherGroupSubtitle}</p>
             </div>
             <DebugEventButton
               label={messages.pages.debug.eventPwaInstallNudgeLabel}
@@ -1939,11 +1940,11 @@ export function DebugPage({
           aria-labelledby={'debug-tab-settings'}
           header={
             <>
-              <h2 className={'title title-sm'}>{messages.pages.debug.settingsTitle}</h2>
-              <p className={'subtitle'}>{messages.pages.debug.settingsSubtitle}</p>
+              <h2 className={p.titleSm}>{messages.pages.debug.settingsTitle}</h2>
+              <p className={p.subtitle}>{messages.pages.debug.settingsSubtitle}</p>
             </>
           }
-          bodyClassName={'stack'}
+          bodyClassName={p.stack}
         >
           <DebugSettingSwitch
             label={messages.pages.debug.debugModeLabel}
@@ -2003,14 +2004,14 @@ export function DebugPage({
           aria-labelledby={'debug-tab-host'}
           header={
             <>
-              <h2 className={'title title-sm'}>{messages.pages.debug.runtimeTitle}</h2>
-              <p className={'subtitle'}>{messages.pages.debug.runtimeSubtitle}</p>
+              <h2 className={p.titleSm}>{messages.pages.debug.runtimeTitle}</h2>
+              <p className={p.subtitle}>{messages.pages.debug.runtimeSubtitle}</p>
             </>
           }
         >
-          <div className={'stack'}>
-            <div className={'table-wrap'}>
-              <table className={'debug-table'}>
+          <div className={p.stack}>
+            <div className={p.tableWrap}>
+              <table className={p.debugTable}>
                 <tbody>
                   <tr>
                     <th scope={'row'}>{messages.pages.debug.runtimeHostnameLabel}</th>

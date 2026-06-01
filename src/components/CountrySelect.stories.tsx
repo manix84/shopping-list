@@ -5,6 +5,7 @@ import type { CountryCode } from '../types';
 import { Card } from './Card';
 import { CountrySelect } from './CountrySelect';
 import { StoryCanvas } from './storyFixtures';
+import { p } from '../styles/primitives';
 
 const meta = {
   title: 'Components/CountrySelect',
@@ -43,8 +44,8 @@ function CountrySelectExample({ value }: { value: CountryCode }) {
 
   return (
     <StoryCanvas>
-      <Card bodyClassName={'stack'}>
-        <div className={'field field-compact'}>
+      <Card bodyClassName={p.stack}>
+        <div className={p.fieldCompact}>
           <label htmlFor={'storybook-country'}>Store layout profile</label>
           <CountrySelect id={'storybook-country'} value={countryCode} onChange={setCountryCode} />
         </div>

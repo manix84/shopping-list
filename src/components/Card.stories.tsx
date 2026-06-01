@@ -3,6 +3,7 @@ import { expect, within } from 'storybook/test';
 import { Badge } from './Badge';
 import { Card } from './Card';
 import { StoryCanvas } from './storyFixtures';
+import { p } from '../styles/primitives';
 
 type CardStoryArgs = {
   heading: string;
@@ -51,15 +52,15 @@ function CardExample({ heading, subtitle, body, showHeader, bodyClassName }: Car
         header={
           showHeader ? (
             <>
-              <h2 className={'title title-md'}>{heading}</h2>
-              <p className={'subtitle'}>{subtitle}</p>
+              <h2 className={p.titleMd}>{heading}</h2>
+              <p className={p.subtitle}>{subtitle}</p>
             </>
           ) : undefined
         }
         bodyClassName={bodyClassName}
       >
         <p>{body}</p>
-        <div className={'badge-row'}>
+        <div className={p.badgeRow}>
           <Badge>Default badge</Badge>
           <Badge tone={'success'}>Ready</Badge>
         </div>
@@ -74,7 +75,7 @@ export const WithHeader: Story = {
     subtitle: 'Standard panel structure with header and body spacing.',
     body: 'Cards frame self-contained surfaces such as settings, panels, and repeated item groups.',
     showHeader: true,
-    bodyClassName: 'stack',
+    bodyClassName: p.stack,
   },
   render: (args) => <CardExample {...args} />,
   play: playCard,

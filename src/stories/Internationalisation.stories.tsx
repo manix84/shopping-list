@@ -3,6 +3,7 @@ import { expect, within } from 'storybook/test';
 import { createMessages, getDocumentLocale, getRouteViewLabel, SUPPORTED_LOCALES } from '../lib/i18n';
 import type { Messages } from '../lib/i18n';
 import { DesignSystemStory, StorySection } from './DesignSystemStory';
+import { p } from '../styles/primitives';
 
 const localeRows = SUPPORTED_LOCALES.map((locale) => {
   const messages = createMessages(locale);
@@ -79,12 +80,12 @@ export const Default: Story = {
   render: () => (
     <DesignSystemStory>
       <StorySection title={'Internationalisation'}>
-        <p className={'subtitle'} style={{ marginTop: 0 }}>
+        <p className={p.subtitle} style={{ marginTop: 0 }}>
           Runtime locale bundles are compared against English by unit tests. This page is for visual checks:
           labels, common navigation copy, document language codes, and strings that may wrap awkwardly.
         </p>
-        <div className={'table-wrap'}>
-          <table className={'debug-table'}>
+        <div className={p.tableWrap}>
+          <table className={p.debugTable}>
             <thead>
               <tr>
                 <th>Locale</th>
@@ -112,8 +113,8 @@ export const Default: Story = {
       </StorySection>
 
       <StorySection title={'Common UI copy'}>
-        <div className={'table-wrap'}>
-          <table className={'debug-table'}>
+        <div className={p.tableWrap}>
+          <table className={p.debugTable}>
             <thead>
               <tr>
                 <th>Key</th>
@@ -137,8 +138,8 @@ export const Default: Story = {
       </StorySection>
 
       <StorySection title={'Bundle health'}>
-        <div className={'table-wrap'}>
-          <table className={'debug-table'}>
+        <div className={p.tableWrap}>
+          <table className={p.debugTable}>
             <thead>
               <tr>
                 <th>Locale</th>

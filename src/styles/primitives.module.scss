@@ -1,6 +1,5 @@
 @use "./variables" as *;
 
-:global {
 .story-canvas {
   padding: 0 24px 24px;
 }
@@ -26,14 +25,12 @@
 }
 
 .konami-touch-tap-stage,
-.konami-touch-tap-stage body,
-.konami-touch-tap-stage .shopping-app {
+.konami-touch-tap-stage body {
   touch-action: manipulation;
 }
 
 .konami-touch-active,
-.konami-touch-active body,
-.konami-touch-active .shopping-app {
+.konami-touch-active body {
   overscroll-behavior-y: contain;
   touch-action: none;
 }
@@ -625,5 +622,4 @@
   .easter-egg-copy {
     padding-right: 0;
   }
-}
 }

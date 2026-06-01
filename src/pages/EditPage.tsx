@@ -8,6 +8,7 @@ import { SharedListHistoryPanel, SharedListPanel } from '../components/SharedLis
 import { useI18n } from '../lib/i18n';
 import { filterProductSuggestions, type ProductSuggestion } from '../lib/productSuggestions';
 import type { CountryCode, SaveStatus, SharedListHistoryEntry } from '../types';
+import { p } from '../styles/primitives';
 
 type EditPageProps = {
   input: string;
@@ -270,37 +271,37 @@ export function EditPage({
   };
 
   return (
-    <div className={'layout-split'}>
+    <div className={p.layoutSplit}>
       <Card
         header={
-          <div className={'title-row edit-page-header'}>
-            <div className={'edit-page-header-copy'}>
-              <div className={'page-title-with-status'}>
-                <h2 className={'title title-sm'}>{messages.pages.edit.title}</h2>
+          <div className={p.editPageHeader}>
+            <div className={p.editPageHeaderCopy}>
+              <div className={p.pageTitleWithStatus}>
+                <h2 className={p.titleSm}>{messages.pages.edit.title}</h2>
                 <SaveStatusIndicator status={saveStatus} />
               </div>
-              <p className={'subtitle'}>{messages.pages.edit.subtitle}</p>
+              <p className={p.subtitle}>{messages.pages.edit.subtitle}</p>
             </div>
-            <button type={'button'} className={'button edit-reset-all-button'} onClick={onResetAll}>
+            <button type={'button'} className={p.editResetAllButton} onClick={onResetAll}>
               {messages.actions.fullReset}
             </button>
           </div>
         }
-        bodyClassName={'stack'}
+        bodyClassName={p.stack}
       >
-        <div className={'field field-compact'}>
+        <div className={p.fieldCompact}>
           <label htmlFor={'list-country-select'}>{messages.pages.settings.countryLabel}</label>
           <CountrySelect id={'list-country-select'} value={countryCode} onChange={onCountryChange} />
-          <div className={'small-text'}>{messages.pages.edit.countryProfileHint}</div>
+          <div className={p.smallText}>{messages.pages.edit.countryProfileHint}</div>
         </div>
 
-        <div className={'field'}>
+        <div className={p.field}>
           <label htmlFor={'shopping-list-input'}>{messages.pages.edit.pasteLabel}</label>
-          <div className={'paste-autocomplete-shell'}>
+          <div className={p.pasteAutocompleteShell}>
             <textarea
               ref={textareaRef}
               id={'shopping-list-input'}
-              className={'textarea'}
+              className={p.textarea}
               value={input}
               onChange={(event) => handleTextareaChange(event.currentTarget.value, event.currentTarget)}
               onKeyDown={handleTextareaKeyDown}
@@ -320,7 +321,7 @@ export function EditPage({
             {isTextareaSuggestionListVisible ? (
               <ul
                 id={textareaSuggestionListId}
-                className={'product-suggestion-list product-suggestion-list-caret'}
+                className={p.productSuggestionListCaret}
                 role={'listbox'}
                 style={textareaSuggestionStyle}
               >
@@ -329,7 +330,7 @@ export function EditPage({
                     <button
                       id={`${textareaSuggestionListId}-option-${index}`}
                       type={'button'}
-                      className={`product-suggestion-option${index === textareaSuggestion.activeIndex ? ' product-suggestion-option-active' : ''}`}
+                      className={index === textareaSuggestion.activeIndex ? p.productSuggestionOptionActive : p.productSuggestionOption}
                       role={'option'}
                       aria-selected={index === textareaSuggestion.activeIndex}
                       aria-label={`${suggestion.value}, ${suggestion.sectionLabel}`}
@@ -337,8 +338,8 @@ export function EditPage({
                       onPointerEnter={() => setTextareaSuggestion((current) => ({ ...current, activeIndex: index }))}
                       onClick={() => selectTextareaSuggestion(suggestion)}
                     >
-                      <span className={'product-suggestion-value'}>{suggestion.value}</span>
-                      <span className={'product-suggestion-section'}>{suggestion.sectionLabel}</span>
+                      <span className={p.productSuggestionValue}>{suggestion.value}</span>
+                      <span className={p.productSuggestionSection}>{suggestion.sectionLabel}</span>
                     </button>
                   </li>
                 ))}
@@ -347,49 +348,49 @@ export function EditPage({
           </div>
         </div>
 
-        <div className={'field'}>
+        <div className={p.field}>
           <label htmlFor={'shopping-list-name'}>{messages.pages.edit.listNameLabel}</label>
           <input
             id={'shopping-list-name'}
-            className={'input'}
+            className={p.input}
             value={listName}
             onChange={(event) => onListNameChange(event.target.value)}
             placeholder={messages.pages.edit.listNamePlaceholder}
           />
-          <div className={'small-text'}>{messages.pages.edit.listNameHint}</div>
+          <div className={p.smallText}>{messages.pages.edit.listNameHint}</div>
         </div>
 
-        <div className={'edit-save-actions'}>
+        <div className={p.editSaveActions}>
           <button
             type={'button'}
-            className={'button'}
+            className={p.button}
             onClick={onSaveAndStay}
           >
-            <svg aria-hidden={'true'} className={'button-icon-svg'} viewBox={'0 0 24 24'}>
+            <svg aria-hidden={'true'} className={p.buttonIconSvg} viewBox={'0 0 24 24'}>
               <path d={mdiContentSave} fill={'currentColor'} />
             </svg>
             {messages.actions.saveAndStay}
           </button>
           <button
             type={'button'}
-            className={'button button-primary'}
+            className={p.buttonPrimary}
             onClick={onParse}
           >
-            <svg aria-hidden={'true'} className={'button-icon-svg'} viewBox={'0 0 24 24'}>
+            <svg aria-hidden={'true'} className={p.buttonIconSvg} viewBox={'0 0 24 24'}>
               <path d={mdiDirections} fill={'currentColor'} />
             </svg>
             {messages.actions.saveAndRoute}
           </button>
         </div>
 
-        <div className={'separator'} />
+        <div className={p.separator} />
         <StatsGrid total={total} checkedTotal={checkedTotal} progress={progress} />
       </Card>
 
-      <div className={'stack'}>
+      <div className={p.stack}>
         <Card
-          header={<h2 className={'title title-sm'}>{messages.sharing.recentListsTitle}</h2>}
-          bodyClassName={'stack'}
+          header={<h2 className={p.titleSm}>{messages.sharing.recentListsTitle}</h2>}
+          bodyClassName={p.stack}
         >
           <SharedListHistoryPanel
             canUseBackend={canUseBackend}
@@ -403,11 +404,11 @@ export function EditPage({
         <Card
           header={
             <>
-              <h2 className={'title title-sm'}>{messages.pages.edit.sharingTitle}</h2>
-              <p className={'subtitle'}>{messages.pages.edit.sharingSubtitle}</p>
+              <h2 className={p.titleSm}>{messages.pages.edit.sharingTitle}</h2>
+              <p className={p.subtitle}>{messages.pages.edit.sharingSubtitle}</p>
             </>
           }
-          bodyClassName={'stack'}
+          bodyClassName={p.stack}
         >
           <SharedListPanel
             listName={listName}

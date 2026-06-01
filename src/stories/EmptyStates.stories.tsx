@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, within } from 'storybook/test';
 import { DesignSystemStory, StorySection } from './DesignSystemStory';
+import { p } from '../styles/primitives';
 
 const meta = {
   title: 'Design System/Empty States',
@@ -21,7 +22,7 @@ export const Default: Story = {
   render: () => (
     <DesignSystemStory>
       <StorySection title={'Empty States'}>
-        <div className={'empty-state'}>Empty, loading, and unavailable states use this quiet dashed treatment.</div>
+        <div className={p.emptyState}>Empty, loading, and unavailable states use this quiet dashed treatment.</div>
       </StorySection>
     </DesignSystemStory>
   ),

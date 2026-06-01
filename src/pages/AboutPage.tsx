@@ -4,6 +4,7 @@ import { classNames } from '../lib/classNames';
 import { useI18n } from '../lib/i18n';
 import { appVersion } from '../version';
 import st from './AboutPage.module.scss';
+import { p } from '../styles/primitives';
 
 const logoHref = `${import.meta.env.BASE_URL}logo-animated-loop.svg`;
 const avatarHref = `${import.meta.env.BASE_URL}rob-avatar.png`;
@@ -77,8 +78,8 @@ export function AboutPage({
           </div>
 
           <div className={classNames(st.heading, st.aboutHeading)}>
-            <h2 id={'about-title'} className={'title title-md'}>{messages.app.title}</h2>
-            <p className={'subtitle'}>{about.tagline}</p>
+            <h2 id={'about-title'} className={p.titleMd}>{messages.app.title}</h2>
+            <p className={p.subtitle}>{about.tagline}</p>
           </div>
         </div>
 
@@ -92,7 +93,7 @@ export function AboutPage({
               {isUpdateAvailable ? (
                 <span className={classNames(st.updateAction, st.aboutUpdateAction)}>
                   {' ('}
-                  <button className={'button button-link'} type={'button'} onClick={onRefreshUpdate}>
+                  <button className={p.buttonLink} type={'button'} onClick={onRefreshUpdate}>
                     {about.updateAvailableAction}
                   </button>
                   {')'}
@@ -122,17 +123,17 @@ export function AboutPage({
           </div>
         </dl>
 
-        <div className={classNames(st.copy, st.aboutCopy, 'stack')}>
+        <div className={classNames(st.copy, st.aboutCopy, p.stack)}>
           <p>{about.bodyIntro}</p>
           <p>{about.bodyPrivacy}</p>
           <p>{about.bodyAuthor}</p>
         </div>
 
         <div className={classNames(st.actions, st.aboutActions)}>
-          <a className={'button button-primary'} href={'https://github.com/manix84/shopping-list'} rel={'noopener noreferrer'} target={'_blank'}>
+          <a className={p.buttonPrimary} href={'https://github.com/manix84/shopping-list'} rel={'noopener noreferrer'} target={'_blank'}>
             {about.sourceAction}
           </a>
-          <a className={'button'} href={'https://github.com/sponsors/manix84'} rel={'noopener noreferrer'} target={'_blank'}>
+          <a className={p.button} href={'https://github.com/sponsors/manix84'} rel={'noopener noreferrer'} target={'_blank'}>
             {about.sponsorAction}
           </a>
         </div>

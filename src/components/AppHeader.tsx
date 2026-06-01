@@ -9,6 +9,7 @@ import { Badge } from './Badge';
 import { Card } from './Card';
 import { PageTabs } from './PageTabs';
 import st from './AppHeader.module.scss';
+import { p } from '../styles/primitives';
 
 const ONLINE_BADGE_DURATION_MS = 6_000;
 const BADGE_FADE_DURATION_MS = 250;
@@ -124,7 +125,7 @@ export function AppHeader({
           className={classNames(st.card, st.appHeaderCard)}
           headerClassName={classNames(st.cardHeader, st.appHeaderCardHeader)}
           header={
-            <div className={'title-row'}>
+            <div className={p.titleRow}>
               <div className={classNames(st.titleBlock, st.titleBlockAlias)}>
                 <span
                   className={classNames(st.icon, st.easterEggTrigger, st.appIcon, st.appIconEasterEggTrigger)}
@@ -134,8 +135,8 @@ export function AppHeader({
                   <img className={classNames(st.iconImage, st.appIconImage)} src={logoHref} alt={''} width={'48'} height={'48'} />
                 </span>
                 <div>
-                  <h1 className={'title'}>{messages.app.title}</h1>
-                  <p className={'subtitle'}>{messages.app.subtitle}</p>
+                  <h1 className={p.title}>{messages.app.title}</h1>
+                  <p className={p.subtitle}>{messages.app.subtitle}</p>
                 </div>
               </div>
 
@@ -182,15 +183,15 @@ export function AppHeader({
                 <div className={classNames(st.mobileMenuShell, st.mobileMenuShellAlias)}>
                   <button
                     type={'button'}
-                    className={classNames('button', st.mobileMenuTrigger, st.mobileMenuTriggerAlias)}
+                    className={classNames(p.button, st.mobileMenuTrigger, st.mobileMenuTriggerAlias)}
                     aria-label={mobileMenuLabel}
                     aria-expanded={mobileMenuOpen}
                     aria-controls={mobileMenuOpen ? 'mobile-menu-panel' : undefined}
                     title={mobileMenuLabel}
                     onClick={() => setMobileMenuOpen((current) => !current)}
                   >
-                    <span className={'sr-only'}>{mobileMenuLabel}</span>
-                    <svg aria-hidden={'true'} className={'button-icon-svg'} viewBox={'0 0 24 24'}>
+                    <span className={p.srOnly}>{mobileMenuLabel}</span>
+                    <svg aria-hidden={'true'} className={p.buttonIconSvg} viewBox={'0 0 24 24'}>
                       <path d={mdiMenu} fill={'currentColor'} />
                     </svg>
                   </button>

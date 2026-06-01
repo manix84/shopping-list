@@ -124,11 +124,11 @@
   width: min(240px, calc(100vw - 20px));
   z-index: 30;
 
-  :global(.button-row) {
+  nav {
     flex-direction: column;
   }
 
-  :global(.button) {
+  button {
     justify-content: flex-start;
     width: 100%;
   }
@@ -229,7 +229,7 @@
 
 @media (max-width: 1080px) {
   .root {
-    :global(.subtitle) {
+    p {
       display: none;
     }
   }
@@ -240,18 +240,18 @@
     margin: 0 -10px 18px;
     padding: 12px 10px 14px;
 
-    :global(.title-row) {
+    .cardHeader > div {
       align-items: flex-start;
       flex-direction: row;
       flex-wrap: nowrap;
       position: relative;
     }
 
-    :global(.subtitle) {
+    p {
       display: none;
     }
 
-    :global(.title) {
+    h1 {
       font-size: 18px;
     }
   }

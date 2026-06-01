@@ -5,6 +5,7 @@ import { Badge } from './Badge';
 import { useI18n } from '../lib/i18n';
 import { classNames } from '../lib/classNames';
 import st from './ItemCard.module.scss';
+import { p } from '../styles/primitives';
 
 type ParsedItemCardProps = {
   item: Item;
@@ -25,7 +26,7 @@ export function ParsedItemCard({ item, config, onRename, onToggle, onDelete }: P
       <div className={classNames(st.row, st.itemRow)}>
         <div className={classNames(st.main, st.itemMain)}>
           <input
-            className={'input'}
+            className={p.input}
             defaultValue={displayValue}
             aria-label={`${messages.actions.editList}: ${displayValue}`}
             onBlur={(event) => {
@@ -35,7 +36,7 @@ export function ParsedItemCard({ item, config, onRename, onToggle, onDelete }: P
               }
             }}
           />
-          <div className={'badge-row'}>
+          <div className={p.badgeRow}>
             <Badge>
               {messages.labels.cleaned}: {item.cleaned}
             </Badge>
@@ -63,11 +64,11 @@ export function ParsedItemCard({ item, config, onRename, onToggle, onDelete }: P
             {getUnitQuantityDisplayValue(item) ? <Badge>{getUnitQuantityDisplayValue(item)}</Badge> : null}
           </div>
         </div>
-        <div className={'button-row'}>
-          <button type={'button'} className={'button'} onClick={() => onToggle(item.id)}>
+        <div className={p.buttonRow}>
+          <button type={'button'} className={p.button} onClick={() => onToggle(item.id)}>
             {item.checked ? messages.actions.untick : messages.actions.tick}
           </button>
-          <button type={'button'} className={'button button-danger'} onClick={() => onDelete(item.id)}>
+          <button type={'button'} className={p.buttonDanger} onClick={() => onDelete(item.id)}>
             {messages.actions.remove}
           </button>
         </div>

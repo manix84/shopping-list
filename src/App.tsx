@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import st from './App.module.scss';
+import { p } from './styles/primitives';
 import { COUNTRY_CONFIGS } from './config/countries';
 import { AppHeader } from './components/AppHeader';
 import { PredatorEasterEgg } from './components/PredatorEasterEgg';
@@ -1386,8 +1387,8 @@ export default function App() {
     };
 
     const setKonamiTouchState = (isActive: boolean, isTapStage: boolean) => {
-      document.documentElement.classList.toggle('konami-touch-active', isActive);
-      document.documentElement.classList.toggle('konami-touch-tap-stage', isTapStage);
+      document.documentElement.classList.toggle(p.konamiTouchActive, isActive);
+      document.documentElement.classList.toggle(p.konamiTouchTapStage, isTapStage);
       if (isActive) {
         addTouchMoveListener();
       } else {
