@@ -3,6 +3,7 @@ import { expect, within } from 'storybook/test';
 import { createMessages, getDocumentLocale, getRouteViewLabel, SUPPORTED_LOCALES } from '../lib/i18n';
 import type { Messages } from '../lib/i18n';
 import { DesignSystemStory, StorySection } from './DesignSystemStory';
+import { p } from '../styles/primitives';
 
 const localeRows = SUPPORTED_LOCALES.map((locale) => {
   const messages = createMessages(locale);

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { expect, within } from 'storybook/test';
 import './ColorTokens.module.scss';
 import { DesignSystemStory, StorySection } from './DesignSystemStory';
+import { p } from '../styles/primitives';
 
 interface ColorGroup {
   title: string;

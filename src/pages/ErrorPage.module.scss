@@ -158,11 +158,11 @@
 .copy {
   max-width: 560px;
 
-  :global(.title) {
+  h2 {
     font-size: 42px;
   }
 
-  :global(.subtitle) {
+  p {
     font-size: 17px;
     line-height: 1.55;
     max-width: 48ch;
@@ -176,7 +176,7 @@
   flex-wrap: wrap;
   gap: 10px;
 
-  :global(.button) {
+  button {
     align-items: center;
     display: inline-flex;
     gap: 8px;
@@ -196,7 +196,7 @@
   }
 
   .copy {
-    :global(.title) {
+    h2 {
       font-size: 32px;
     }
   }
@@ -239,11 +239,11 @@
   }
 
   .copy {
-    :global(.title) {
+    h2 {
       font-size: 28px;
     }
 
-    :global(.subtitle) {
+    p {
       font-size: 15px;
     }
   }

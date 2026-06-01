@@ -4,6 +4,7 @@ import type { SaveStatus } from '../types';
 import { Card } from './Card';
 import { SaveStatusIndicator, SAVE_CONFIRMATION_DURATION_MS, SAVE_STATUS_FADE_DURATION_MS } from './SaveStatusIndicator';
 import { StoryCanvas } from './storyFixtures';
+import { p } from '../styles/primitives';
 
 type SaveStatusIndicatorStoryArgs = {
   status: SaveStatus;
@@ -62,7 +63,7 @@ function SaveStatusIndicatorExample({ status }: SaveStatusIndicatorStoryArgs) {
             <SaveStatusIndicator status={status} />
           </div>
         }
-        bodyClassName={'stack'}
+        bodyClassName={p.stack}
       >
         <p className={p.smallText}>{status === 'idle' ? 'No visible save status' : `Current status: ${status}`}</p>
       </Card>

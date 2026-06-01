@@ -53,6 +53,7 @@ import { classNames } from '../lib/classNames';
 import type { Messages } from '../lib/i18n';
 import { appVersion } from '../version';
 import st from '../components/ItemCard.module.scss';
+import { p } from '../styles/primitives';
 
 type DebugPageProps = {
   backendStatus: BackendStatus;
@@ -170,9 +171,9 @@ function ProductSuggestionReviewCard({
 
   return (
     <Card
-      bodyClassName={'stack'}
+      bodyClassName={p.stack}
       header={
-        <div className={'title-row'}>
+        <div className={p.titleRow}>
           <div>
             <h3 className={p.titleXs}>{suggestion.product}</h3>
             <p className={p.subtitle}>
@@ -199,7 +200,7 @@ function ProductSuggestionReviewCard({
         </div>
       }
     >
-      <div className={'form-grid'}>
+      <div className={p.formGrid}>
         <label className={p.field}>
           <span>Product</span>
           <input className={p.input} value={product} onChange={(event) => setProduct(event.target.value)} />
@@ -873,7 +874,7 @@ export function DebugPage({
   return (
     <Card
       header={
-        <div className={'title-row'}>
+        <div className={p.titleRow}>
           <div>
             <h2 className={p.titleMd}>{messages.pages.debug.title}</h2>
             <p className={p.subtitle}>{messages.pages.debug.subtitle}</p>
@@ -888,7 +889,7 @@ export function DebugPage({
           </div>
         </div>
       }
-      bodyClassName={'stack'}
+      bodyClassName={p.stack}
     >
       <div
         className={`debug-tablist ${isDebugTabDragging ? 'debug-tablist-dragging' : ''}`.trim()}
@@ -909,7 +910,7 @@ export function DebugPage({
             aria-selected={activeTab === tab.key}
             aria-controls={activeTab === tab.key ? `debug-panel-${tab.key}` : undefined}
             tabIndex={activeTab === tab.key ? 0 : -1}
-            className={`button debug-tab-button ${activeTab === tab.key ? 'button-active' : ''}`}
+            className={classNames(p.button, 'debug-tab-button', activeTab === tab.key ? p.buttonActive : undefined)}
             ref={(element) => {
               if (element) {
                 debugTabButtonRefs.current.set(tab.key, element);
@@ -941,7 +942,7 @@ export function DebugPage({
             </>
           }
         >
-          <div className={'scroll-region stack'}>
+          <div className={classNames('scroll-region', p.stack)}>
             {items.length === 0 ? (
               <div className={p.emptyState}>{messages.pages.edit.parsedEmpty}</div>
             ) : (
@@ -971,7 +972,7 @@ export function DebugPage({
               <p className={p.subtitle}>{messages.pages.debug.stateSubtitle}</p>
             </>
           }
-          bodyClassName={'stack'}
+          bodyClassName={p.stack}
         >
           {stateTests.map((test) => (
             <TestResultCard
@@ -997,7 +998,7 @@ export function DebugPage({
               <p className={p.subtitle}>{backendSummary(backendStatus, messages)}</p>
             </>
           }
-          bodyClassName={'stack'}
+          bodyClassName={p.stack}
         >
           <div className={`heartbeat-card heartbeat-card-${heartbeatTone}`}>
             <div className={'heartbeat-summary'}>
@@ -1260,7 +1261,7 @@ export function DebugPage({
             </button>
             {isHeartbeatHistoryOpen ? (
               <div
-                className={'table-wrap heartbeat-status-history-wrap'}
+                className={classNames(p.tableWrap, 'heartbeat-status-history-wrap')}
                 id={'heartbeat-status-history-panel'}
                 ref={heartbeatHistoryWrapRef}
               >
@@ -1444,7 +1445,7 @@ export function DebugPage({
               <p className={p.subtitle}>{messages.pages.debug.configSubtitle}</p>
             </>
           }
-          bodyClassName={'stack'}
+          bodyClassName={p.stack}
         >
           {configTests.map((test) => (
             <TestResultCard
@@ -1470,7 +1471,7 @@ export function DebugPage({
               <p className={p.subtitle}>{messages.pages.debug.matcherSubtitle}</p>
             </>
           }
-          bodyClassName={'stack'}
+          bodyClassName={p.stack}
         >
           {matcherTests.map((test) => (
             <TestResultCard
@@ -1496,7 +1497,7 @@ export function DebugPage({
               <p className={p.subtitle}>{messages.pages.debug.quantitySubtitle}</p>
             </>
           }
-          bodyClassName={'stack'}
+          bodyClassName={p.stack}
         >
           {countQuantityTests.map((test) => (
             <TestResultCard
@@ -1534,7 +1535,7 @@ export function DebugPage({
               <p className={p.subtitle}>{messages.pages.debug.measurementSubtitle}</p>
             </>
           }
-          bodyClassName={'stack'}
+          bodyClassName={p.stack}
         >
           {measurementTests.map((test) => (
             <TestResultCard
@@ -1564,7 +1565,7 @@ export function DebugPage({
               <p className={p.subtitle}>{messages.pages.debug.weightSubtitle}</p>
             </>
           }
-          bodyClassName={'stack'}
+          bodyClassName={p.stack}
         >
           {unitQuantityTests.map((test) => (
             <TestResultCard
@@ -1610,7 +1611,7 @@ export function DebugPage({
               <p className={p.subtitle}>{messages.pages.debug.variantSubtitle}</p>
             </>
           }
-          bodyClassName={'stack'}
+          bodyClassName={p.stack}
         >
           {variantTests.map((test) => (
             <TestResultCard
@@ -1640,7 +1641,7 @@ export function DebugPage({
               <p className={p.subtitle}>{messages.pages.debug.storageSubtitle}</p>
             </>
           }
-          bodyClassName={'stack'}
+          bodyClassName={p.stack}
         >
           {storageTests.map((test) => (
             <TestResultCard
@@ -1666,7 +1667,7 @@ export function DebugPage({
               <p className={p.subtitle}>{messages.pages.debug.layoutSubtitle}</p>
             </>
           }
-          bodyClassName={'stack'}
+          bodyClassName={p.stack}
         >
           <div className={p.tableWrap}>
             <table className={p.debugTable}>
@@ -1740,7 +1741,7 @@ export function DebugPage({
           role={'tabpanel'}
           aria-labelledby={'debug-tab-products'}
           header={
-            <div className={'title-row'}>
+            <div className={p.titleRow}>
               <div>
                 <h2 className={p.titleSm}>Unknown product suggestions</h2>
                 <p className={p.subtitle}>
@@ -1752,7 +1753,7 @@ export function DebugPage({
               </button>
             </div>
           }
-          bodyClassName={'stack'}
+          bodyClassName={p.stack}
         >
           {productSuggestionError ? (
             <div className={p.noticeError}>{productSuggestionError}</div>
@@ -1815,7 +1816,7 @@ export function DebugPage({
               <p className={p.subtitle}>{messages.pages.debug.eventsSubtitle}</p>
             </>
           }
-          bodyClassName={'stack'}
+          bodyClassName={p.stack}
         >
           <div className={p.tableWrap}>
             <table className={p.debugTable}>
@@ -1841,7 +1842,7 @@ export function DebugPage({
               messages={messages}
             />
           </div>
-          <section className={'debug-event-group stack'}>
+          <section className={classNames('debug-event-group', p.stack)}>
             <div>
               <h3 className={p.titleXs}>{messages.pages.debug.eventsNotificationGroupTitle}</h3>
               <p className={p.subtitle}>{messages.pages.debug.eventsNotificationGroupSubtitle}</p>
@@ -1872,7 +1873,7 @@ export function DebugPage({
               onClick={() => onDebugNotificationTest('silent-follow-up')}
             />
           </section>
-          <section className={'debug-event-group stack'}>
+          <section className={classNames('debug-event-group', p.stack)}>
             <div>
               <h3 className={p.titleXs}>{messages.pages.debug.eventsToastGroupTitle}</h3>
               <p className={p.subtitle}>{messages.pages.debug.eventsToastGroupSubtitle}</p>
@@ -1903,7 +1904,7 @@ export function DebugPage({
               onClick={() => onDebugEventTest('toast-plain')}
             />
           </section>
-          <section className={'debug-event-group stack'}>
+          <section className={classNames('debug-event-group', p.stack)}>
             <div>
               <h3 className={p.titleXs}>{messages.pages.debug.eventsOtherGroupTitle}</h3>
               <p className={p.subtitle}>{messages.pages.debug.eventsOtherGroupSubtitle}</p>
@@ -1943,7 +1944,7 @@ export function DebugPage({
               <p className={p.subtitle}>{messages.pages.debug.settingsSubtitle}</p>
             </>
           }
-          bodyClassName={'stack'}
+          bodyClassName={p.stack}
         >
           <DebugSettingSwitch
             label={messages.pages.debug.debugModeLabel}

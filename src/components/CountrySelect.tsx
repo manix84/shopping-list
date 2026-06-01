@@ -4,6 +4,7 @@ import { COUNTRY_CONFIGS } from '../config/countries';
 import { classNames } from '../lib/classNames';
 import { useI18n } from '../lib/i18n';
 import type { CountryCode } from '../types';
+import { p } from '../styles/primitives';
 import st from './SettingsSelect.module.scss';
 
 type CountrySelectProps = {
@@ -43,7 +44,7 @@ export function CountrySelect({ id, value, onChange }: CountrySelectProps) {
       <button
         id={id}
         type={'button'}
-        className={classNames('select', st.button, st.settingsSelectButton)}
+        className={classNames(p.select, st.button, st.settingsSelectButton)}
         aria-haspopup={'listbox'}
         aria-expanded={open}
         aria-controls={open ? menuId : undefined}

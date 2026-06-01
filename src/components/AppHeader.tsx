@@ -9,6 +9,7 @@ import { Badge } from './Badge';
 import { Card } from './Card';
 import { PageTabs } from './PageTabs';
 import st from './AppHeader.module.scss';
+import { p } from '../styles/primitives';
 
 const ONLINE_BADGE_DURATION_MS = 6_000;
 const BADGE_FADE_DURATION_MS = 250;
@@ -124,7 +125,7 @@ export function AppHeader({
           className={classNames(st.card, st.appHeaderCard)}
           headerClassName={classNames(st.cardHeader, st.appHeaderCardHeader)}
           header={
-            <div className={'title-row'}>
+            <div className={p.titleRow}>
               <div className={classNames(st.titleBlock, st.titleBlockAlias)}>
                 <span
                   className={classNames(st.icon, st.easterEggTrigger, st.appIcon, st.appIconEasterEggTrigger)}
@@ -182,7 +183,7 @@ export function AppHeader({
                 <div className={classNames(st.mobileMenuShell, st.mobileMenuShellAlias)}>
                   <button
                     type={'button'}
-                    className={classNames('button', st.mobileMenuTrigger, st.mobileMenuTriggerAlias)}
+                    className={classNames(p.button, st.mobileMenuTrigger, st.mobileMenuTriggerAlias)}
                     aria-label={mobileMenuLabel}
                     aria-expanded={mobileMenuOpen}
                     aria-controls={mobileMenuOpen ? 'mobile-menu-panel' : undefined}

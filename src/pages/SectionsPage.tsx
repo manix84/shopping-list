@@ -4,6 +4,7 @@ import { Card } from '../components/Card';
 import { classNames } from '../lib/classNames';
 import { useI18n } from '../lib/i18n';
 import st from './SectionsPage.module.scss';
+import { p } from '../styles/primitives';
 
 type SectionsPageProps = {
   config: CountryConfig;
@@ -20,7 +21,7 @@ export function SectionsPage({ config }: SectionsPageProps) {
           <p className={p.subtitle}>{messages.pages.sections.subtitle}</p>
         </>
       }
-      bodyClassName={'stack'}
+      bodyClassName={p.stack}
     >
       <div className={p.stack}>
         {config.groups.map((group) => (

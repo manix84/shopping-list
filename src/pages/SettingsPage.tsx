@@ -15,6 +15,7 @@ import {
 import { classNames } from '../lib/classNames';
 import { getRouteViewLabel, type LocaleCode, useI18n } from '../lib/i18n';
 import st from './SettingsPage.module.scss';
+import { p } from '../styles/primitives';
 
 const THEME_OPTIONS: ThemeMode[] = ['system', 'light', 'dark'];
 
@@ -138,7 +139,7 @@ function SettingsSelect<T extends string>({
       <button
         id={id}
         type={'button'}
-        className={classNames('select', selectSt.button, selectSt.settingsSelectButton)}
+        className={classNames(p.select, selectSt.button, selectSt.settingsSelectButton)}
         aria-haspopup={'listbox'}
         aria-expanded={open}
         aria-controls={open ? menuId : undefined}
@@ -349,7 +350,7 @@ export function SettingsPage({
             <p className={p.subtitle}>{messages.pages.settings.subtitle}</p>
           </>
         }
-        bodyClassName={'stack'}
+        bodyClassName={p.stack}
       >
         <div className={p.fieldCompact}>
           <div>
@@ -416,7 +417,7 @@ export function SettingsPage({
           </button>
         </div>
 
-        <div className={classNames(st.footnote, st.settingsFootnote, 'small-text')}>{messages.labels.storedLocally}</div>
+        <div className={classNames(st.footnote, st.settingsFootnote, p.smallText)}>{messages.labels.storedLocally}</div>
       </Card>
       {installSetting}
     </>

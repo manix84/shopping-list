@@ -8,6 +8,7 @@ import { SharedListHistoryPanel, SharedListPanel } from '../components/SharedLis
 import { useI18n } from '../lib/i18n';
 import { filterProductSuggestions, type ProductSuggestion } from '../lib/productSuggestions';
 import type { CountryCode, SaveStatus, SharedListHistoryEntry } from '../types';
+import { p } from '../styles/primitives';
 
 type EditPageProps = {
   input: string;
@@ -273,20 +274,20 @@ export function EditPage({
     <div className={p.layoutSplit}>
       <Card
         header={
-          <div className={'title-row edit-page-header'}>
-            <div className={'edit-page-header-copy'}>
+          <div className={p.editPageHeader}>
+            <div className={p.editPageHeaderCopy}>
               <div className={p.pageTitleWithStatus}>
                 <h2 className={p.titleSm}>{messages.pages.edit.title}</h2>
                 <SaveStatusIndicator status={saveStatus} />
               </div>
               <p className={p.subtitle}>{messages.pages.edit.subtitle}</p>
             </div>
-            <button type={'button'} className={'button edit-reset-all-button'} onClick={onResetAll}>
+            <button type={'button'} className={p.editResetAllButton} onClick={onResetAll}>
               {messages.actions.fullReset}
             </button>
           </div>
         }
-        bodyClassName={'stack'}
+        bodyClassName={p.stack}
       >
         <div className={p.fieldCompact}>
           <label htmlFor={'list-country-select'}>{messages.pages.settings.countryLabel}</label>
@@ -296,7 +297,7 @@ export function EditPage({
 
         <div className={p.field}>
           <label htmlFor={'shopping-list-input'}>{messages.pages.edit.pasteLabel}</label>
-          <div className={'paste-autocomplete-shell'}>
+          <div className={p.pasteAutocompleteShell}>
             <textarea
               ref={textareaRef}
               id={'shopping-list-input'}
@@ -320,7 +321,7 @@ export function EditPage({
             {isTextareaSuggestionListVisible ? (
               <ul
                 id={textareaSuggestionListId}
-                className={'product-suggestion-list product-suggestion-list-caret'}
+                className={p.productSuggestionListCaret}
                 role={'listbox'}
                 style={textareaSuggestionStyle}
               >
@@ -329,7 +330,7 @@ export function EditPage({
                     <button
                       id={`${textareaSuggestionListId}-option-${index}`}
                       type={'button'}
-                      className={`product-suggestion-option${index === textareaSuggestion.activeIndex ? ' product-suggestion-option-active' : ''}`}
+                      className={index === textareaSuggestion.activeIndex ? p.productSuggestionOptionActive : p.productSuggestionOption}
                       role={'option'}
                       aria-selected={index === textareaSuggestion.activeIndex}
                       aria-label={`${suggestion.value}, ${suggestion.sectionLabel}`}
@@ -337,8 +338,8 @@ export function EditPage({
                       onPointerEnter={() => setTextareaSuggestion((current) => ({ ...current, activeIndex: index }))}
                       onClick={() => selectTextareaSuggestion(suggestion)}
                     >
-                      <span className={'product-suggestion-value'}>{suggestion.value}</span>
-                      <span className={'product-suggestion-section'}>{suggestion.sectionLabel}</span>
+                      <span className={p.productSuggestionValue}>{suggestion.value}</span>
+                      <span className={p.productSuggestionSection}>{suggestion.sectionLabel}</span>
                     </button>
                   </li>
                 ))}
@@ -359,7 +360,7 @@ export function EditPage({
           <div className={p.smallText}>{messages.pages.edit.listNameHint}</div>
         </div>
 
-        <div className={'edit-save-actions'}>
+        <div className={p.editSaveActions}>
           <button
             type={'button'}
             className={p.button}
@@ -389,7 +390,7 @@ export function EditPage({
       <div className={p.stack}>
         <Card
           header={<h2 className={p.titleSm}>{messages.sharing.recentListsTitle}</h2>}
-          bodyClassName={'stack'}
+          bodyClassName={p.stack}
         >
           <SharedListHistoryPanel
             canUseBackend={canUseBackend}
@@ -407,7 +408,7 @@ export function EditPage({
               <p className={p.subtitle}>{messages.pages.edit.sharingSubtitle}</p>
             </>
           }
-          bodyClassName={'stack'}
+          bodyClassName={p.stack}
         >
           <SharedListPanel
             listName={listName}

@@ -3,6 +3,7 @@ import type { CSSProperties, PointerEvent, KeyboardEvent as ReactKeyboardEvent }
 import { useEffect, useRef, useState } from 'react';
 import './SecretAisleEasterEgg.module.scss';
 import { useI18n } from '../lib/i18n';
+import { p } from '../styles/primitives';
 
 type SecretAisleEasterEggProps = {
   isVisible: boolean;

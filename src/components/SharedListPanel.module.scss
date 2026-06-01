@@ -21,12 +21,12 @@
 .shareQrCard { --module-alias: 1; }
 
 .linkRow {
-  > :global(.input) {
+  > input {
     flex: 1 1 auto;
     min-width: 0;
   }
 
-  > :global(.button) {
+  > button {
     flex: 0 0 auto;
   }
 }
@@ -39,7 +39,7 @@
     min-width: 0;
   }
 
-  > :global(.button) {
+  > button {
     flex: 0 0 auto;
   }
 }
@@ -459,8 +459,8 @@
     align-items: stretch;
     flex-direction: column;
 
-    > :global(.button),
-    > :global(.input),
+    > button,
+    > input,
     > .inputShell {
       width: 100%;
     }

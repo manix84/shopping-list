@@ -3,6 +3,7 @@ import { expect, userEvent, within } from 'storybook/test';
 import st from '../App.module.scss';
 import { classNames } from '../lib/classNames';
 import { DesignSystemStory, StorySection } from './DesignSystemStory';
+import { p } from '../styles/primitives';
 
 const checklist = [
   {

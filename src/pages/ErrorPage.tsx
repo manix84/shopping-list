@@ -3,6 +3,7 @@ import { Card } from '../components/Card';
 import { classNames } from '../lib/classNames';
 import { useI18n } from '../lib/i18n';
 import st from './ErrorPage.module.scss';
+import { p } from '../styles/primitives';
 
 type ErrorPageVariant = 'not-found' | 'server-error';
 

@@ -4,6 +4,7 @@ import { classNames } from '../lib/classNames';
 import { useI18n } from '../lib/i18n';
 import { appVersion } from '../version';
 import st from './AboutPage.module.scss';
+import { p } from '../styles/primitives';
 
 const logoHref = `${import.meta.env.BASE_URL}logo-animated-loop.svg`;
 const avatarHref = `${import.meta.env.BASE_URL}rob-avatar.png`;
@@ -122,7 +123,7 @@ export function AboutPage({
           </div>
         </dl>
 
-        <div className={classNames(st.copy, st.aboutCopy, 'stack')}>
+        <div className={classNames(st.copy, st.aboutCopy, p.stack)}>
           <p>{about.bodyIntro}</p>
           <p>{about.bodyPrivacy}</p>
           <p>{about.bodyAuthor}</p>

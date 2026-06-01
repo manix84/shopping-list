@@ -3,6 +3,7 @@ import { expect, within } from 'storybook/test';
 import { Badge } from './Badge';
 import { Card } from './Card';
 import { StoryCanvas } from './storyFixtures';
+import { p } from '../styles/primitives';
 
 type CardStoryArgs = {
   heading: string;
@@ -74,7 +75,7 @@ export const WithHeader: Story = {
     subtitle: 'Standard panel structure with header and body spacing.',
     body: 'Cards frame self-contained surfaces such as settings, panels, and repeated item groups.',
     showHeader: true,
-    bodyClassName: 'stack',
+    bodyClassName: p.stack,
   },
   render: (args) => <CardExample {...args} />,
   play: playCard,

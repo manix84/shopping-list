@@ -4,6 +4,7 @@ import { classNames } from '../lib/classNames';
 import { Badge } from './Badge';
 import { useI18n } from '../lib/i18n';
 import st from './RouteSectionCard.module.scss';
+import { p } from '../styles/primitives';
 
 type RouteSectionCardProps = {
   section: GroupedSectionView;
@@ -39,11 +40,11 @@ export function RouteSectionCard({ section, viewMode, onToggleSection, onToggleI
           <div className={classNames(st.group, st.sectionGroup)}>{section.groupLabel}</div>
           <h3 id={sectionTitleId} className={classNames(st.title, st.sectionTitle)}>{section.label}</h3>
           {!isCompact ? (
-            <div className={p.badgeRow}>
-              <Badge>
+            <div className={classNames(p.badgeRow, st.sectionBadgeRow)}>
+              <Badge className={st.sectionBadge}>
                 {section.checkedCount}/{section.items.length}
               </Badge>
-              {section.complete ? <Badge tone={'success'}>{messages.labels.done}</Badge> : null}
+              {section.complete ? <Badge tone={'success'} className={st.sectionBadge}>{messages.labels.done}</Badge> : null}
             </div>
           ) : null}
         </div>
@@ -84,23 +85,23 @@ export function RouteSectionCard({ section, viewMode, onToggleSection, onToggleI
                   </div>
                   {getSizeValue(item) ? (
                     <div className={classNames(st.quantity, st.checkTextQuantity)}>
-                      <Badge>{getSizeValue(item)}</Badge>
+                      <Badge className={st.quantityBadge}>{getSizeValue(item)}</Badge>
                     </div>
                   ) : null}
                   {getQuantityDisplayValue(item) ? (
                     <div className={classNames(st.quantity, st.checkTextQuantity)}>
-                      <Badge>{getQuantityDisplayValue(item)}</Badge>
+                      <Badge className={st.quantityBadge}>{getQuantityDisplayValue(item)}</Badge>
                     </div>
                   ) : null}
                   {getUnitQuantityDisplayValue(item) ? (
                     <div className={classNames(st.quantity, st.checkTextQuantity)}>
-                      <Badge>{getUnitQuantityDisplayValue(item)}</Badge>
+                      <Badge className={st.quantityBadge}>{getUnitQuantityDisplayValue(item)}</Badge>
                     </div>
                   ) : null}
                 </div>
               </div>
             </div>
-            {!isCompact ? <Badge>{section.label}</Badge> : null}
+            {!isCompact ? <Badge className={st.sectionBadge}>{section.label}</Badge> : null}
           </label>
         ))}
       </div>

@@ -5,6 +5,7 @@ import { Badge } from './Badge';
 import { useI18n } from '../lib/i18n';
 import { classNames } from '../lib/classNames';
 import st from './ItemCard.module.scss';
+import { p } from '../styles/primitives';
 
 type ParsedItemCardProps = {
   item: Item;

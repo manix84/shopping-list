@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import st from '../App.module.scss';
 import { classNames } from '../lib/classNames';
+import { p } from '../styles/primitives';
 import type { BackendStatus, GroupedSectionView, Item } from '../types';
 
 export const noop = () => undefined;
@@ -62,7 +63,7 @@ export const offlineBackend: BackendStatus = {
 
 export function StoryCanvas({ children }: { children: ReactNode }) {
   return (
-    <main className={'story-canvas'}>
+    <main className={p.storyCanvas}>
       <div className={classNames(st.shell, st.shoppingShell)} style={{ paddingBlock: 24 }}>
         {children}
       </div>

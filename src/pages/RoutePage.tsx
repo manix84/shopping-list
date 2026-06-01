@@ -12,8 +12,11 @@ import type { GroupedSectionView, MeasurementDisplayMode } from '../types';
 import { Card } from '../components/Card';
 import { RouteSectionCard } from '../components/RouteSectionCard';
 import { SaveStatusIndicator } from '../components/SaveStatusIndicator';
+import { classNames } from '../lib/classNames';
 import { getRouteViewLabel, useI18n } from '../lib/i18n';
 import type { RouteViewMode, SaveStatus } from '../types';
+import { p } from '../styles/primitives';
+import sharedSt from '../components/SharedListPanel.module.scss';
 
 type RoutePageProps = {
   listName: string;
@@ -86,30 +89,29 @@ export function RoutePage({
 
   return (
     <Card
-      bodyClassName={`route-page route-page-${viewMode}`}
       header={
-        <div className={'title-row route-page-header'}>
-          <div className={'route-page-header-copy'}>
+        <div className={p.routePageHeader}>
+          <div className={p.routePageHeaderCopy}>
             <div className={p.pageTitleWithStatus}>
               <h2 className={p.titleMd}>{routeTitle}</h2>
               <SaveStatusIndicator status={saveStatus} />
             </div>
             {showDefaultSubtitle ? <p className={p.subtitle}>{messages.pages.route.subtitle}</p> : null}
           </div>
-          <div className={'route-toolbar'}>
-            <div className={'route-toolbar-row'}>
-              <div className={'route-toolbar-group'}>
-                <button type={'button'} className={'button route-edit-button'} onClick={onOpenEdit}>
+          <div className={p.routeToolbar}>
+            <div className={p.routeToolbarRow}>
+              <div className={p.routeToolbarGroup}>
+                <button type={'button'} className={p.routeEditButton} onClick={onOpenEdit}>
                   {messages.actions.backToEdit}
                 </button>
               </div>
-              <div className={'route-toolbar-group'}>
-                <div className={'route-view-controls'} role={'group'} aria-label={messages.pages.route.title}>
+              <div className={p.routeToolbarGroup}>
+                <div className={p.routeViewControls} role={'group'} aria-label={messages.pages.route.title}>
                   {viewOptions.map((option) => (
                     <button
                       key={option.mode}
                       type={'button'}
-                      className={`button button-icon ${viewMode === option.mode ? 'button-active' : ''}`}
+                      className={viewMode === option.mode ? classNames(p.buttonIcon, p.buttonActive) : p.buttonIcon}
                       onClick={() => onViewModeChange(option.mode)}
                       aria-label={getRouteViewLabel(option.mode, messages)}
                       aria-pressed={viewMode === option.mode}
@@ -122,13 +124,13 @@ export function RoutePage({
                   ))}
                 </div>
               </div>
-              <div className={'route-toolbar-group'}>
-                <div className={'measurement-mode-controls'} role={'group'} aria-label={messages.labels.measurementMode}>
+              <div className={p.routeToolbarGroup}>
+                <div className={p.measurementModeControls} role={'group'} aria-label={messages.labels.measurementMode}>
                   {measurementOptions.map((option) => (
                     <button
                       key={option.mode}
                       type={'button'}
-                      className={`button button-icon ${measurementDisplayMode === option.mode ? 'button-active' : ''}`}
+                      className={measurementDisplayMode === option.mode ? classNames(p.buttonIcon, p.buttonActive) : p.buttonIcon}
                       onClick={() => onMeasurementDisplayModeChange(option.mode)}
                       aria-label={option.label}
                       aria-pressed={measurementDisplayMode === option.mode}
@@ -141,10 +143,10 @@ export function RoutePage({
                   ))}
                 </div>
               </div>
-              <div className={'route-toolbar-group'}>
+              <div className={p.routeToolbarGroup}>
                 <button
                   type={'button'}
-                  className={`button button-icon ${isFilterVisible ? 'button-active' : ''}`}
+                  className={isFilterVisible ? classNames(p.buttonIcon, p.buttonActive) : p.buttonIcon}
                   onClick={onToggleFilter}
                   aria-label={messages.actions.filterItems}
                   aria-pressed={isFilterVisible}
@@ -161,7 +163,7 @@ export function RoutePage({
             {isFilterVisible ? (
               <input
                 id={'route-filter-input'}
-                className={'input route-filter-input'}
+                className={p.routeFilterInput}
                 value={query}
                 onChange={(event) => onQueryChange(event.target.value)}
                 aria-label={messages.actions.filterItems}
@@ -174,9 +176,9 @@ export function RoutePage({
     >
       <div className={p.stack}>
         {!hasItems ? (
-          <div className={'empty-state stack'}>
+          <div className={p.emptyStateStack}>
             <div>{messages.pages.route.emptyNoItems}</div>
-            <div className={'button-row warning-actions'}>
+            <div className={classNames(p.buttonRow, p.warningActions)}>
               <button type={'button'} className={p.buttonPrimary} onClick={onOpenEdit}>
                 {messages.actions.goToEditList}
               </button>
@@ -198,7 +200,7 @@ export function RoutePage({
           </>
         )}
         {hasItems ? (
-          <div className={'route-reset-actions'}>
+          <div className={p.routeResetActions}>
             <button type={'button'} className={p.button} onClick={() => setIsResetTicksModalOpen(true)}>
               {messages.actions.resetTicks}
             </button>
@@ -206,9 +208,9 @@ export function RoutePage({
         ) : null}
       </div>
       {isResetTicksModalOpen ? (
-        <div className={'share-scanner-modal'} onClick={() => setIsResetTicksModalOpen(false)} role={'presentation'}>
+        <div className={classNames(sharedSt.scannerModal, sharedSt.shareScannerModal)} onClick={() => setIsResetTicksModalOpen(false)} role={'presentation'}>
           <div
-            className={'share-scanner-dialog stack'}
+            className={classNames(sharedSt.scannerDialog, sharedSt.shareScannerDialog, p.stack)}
             role={'dialog'}
             aria-modal={'true'}
             aria-labelledby={'reset-ticks-title'}
@@ -218,7 +220,7 @@ export function RoutePage({
               <h3 id={'reset-ticks-title'} className={p.titleXs}>{messages.pages.route.resetTicksConfirmTitle}</h3>
               <p className={p.subtitle}>{messages.pages.route.resetTicksConfirmBody}</p>
             </div>
-            <div className={'button-row warning-actions'}>
+            <div className={classNames(p.buttonRow, p.warningActions)}>
               <button type={'button'} className={p.button} onClick={() => setIsResetTicksModalOpen(false)} autoFocus>
                 {messages.actions.close}
               </button>

@@ -6,6 +6,7 @@ import { classNames } from '../lib/classNames';
 import { useI18n } from '../lib/i18n';
 import { extractSharedListId } from '../lib/sharedLinks';
 import st from './SharedListPanel.module.scss';
+import { p } from '../styles/primitives';
 
 type BarcodeDetectorResult = {
   rawValue?: string;
@@ -439,7 +440,7 @@ export function SharedListPanel({
 
           <div className={p.field}>
             <label htmlFor={'shopping-share-link'}>{messages.labels.sharedLink}</label>
-            <div className={classNames('inline-row', st.linkRow, st.shareLinkRow)}>
+            <div className={classNames(p.inlineRow, st.linkRow, st.shareLinkRow)}>
               <input id={'shopping-share-link'} className={p.input} readOnly value={shareLink} />
               <button type={'button'} className={p.button} onClick={() => void navigator.clipboard?.writeText(shareLink)}>
                 {messages.actions.copy}
@@ -489,11 +490,11 @@ export function SharedListPanel({
         <>
           <div className={p.field}>
             <label htmlFor={'shared-list-load-input'}>{messages.sharing.manualLinkLabel}</label>
-            <div className={classNames('inline-row', st.loadRow, st.shareLoadRow)}>
+            <div className={classNames(p.inlineRow, st.loadRow, st.shareLoadRow)}>
               <div className={classNames(st.inputShell, st.sharedInputShell, showSharedInputTick ? st.inputShellValid : undefined, showSharedInputTick ? st.sharedInputShellValid : undefined)}>
                 <input
                   id={'shared-list-load-input'}
-                  className={classNames('input', st.sharedInput, st.sharedInputAlias)}
+                  className={classNames(p.input, st.sharedInput, st.sharedInputAlias)}
                   value={sharedInput}
                   aria-describedby={sharedInputStatus !== 'idle' ? sharedInputStatusId : undefined}
                   aria-invalid={sharedInputStatus === 'missing' || sharedInputStatus === 'invalid'}
@@ -546,7 +547,7 @@ export function SharedListPanel({
       {scannerOpen ? (
         <div className={classNames(st.scannerModal, st.shareScannerModal)} onClick={closeScanner} role={'presentation'}>
           <div
-            className={classNames(st.scannerDialog, st.shareScannerDialog, 'stack')}
+            className={classNames(st.scannerDialog, st.shareScannerDialog, p.stack)}
             role={'dialog'}
             aria-modal={'true'}
             aria-labelledby={'share-scanner-title'}
@@ -648,7 +649,7 @@ export function SharedListHistoryPanel({
   }
 
   return (
-    <div className={classNames('stack', st.historyList, st.sharedHistoryList)}>
+    <div className={classNames(p.stack, st.historyList, st.sharedHistoryList)}>
       {historyEntries.map((entry) => (
         <div
           key={entry.listId}
@@ -665,7 +666,7 @@ export function SharedListHistoryPanel({
           onPointerCancel={handleHistoryPointerCancel}
           onClick={(event) => handleHistoryClick(entry.listId, event)}
         >
-          <div className={classNames('stack', st.historyContent, st.sharedHistoryContent)}>
+          <div className={classNames(p.stack, st.historyContent, st.sharedHistoryContent)}>
             <div className={classNames(st.historyTitleWrap, st.sharedHistoryTitleWrap)}>
               <div className={classNames(st.historyTitle, st.sharedHistoryTitle)}>{historyTitle(entry)}</div>
             </div>

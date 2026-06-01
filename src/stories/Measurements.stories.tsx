@@ -8,6 +8,7 @@ import { parseMeasurement } from '../lib/measurements';
 import { extractQuantifiedItem } from '../lib/quantity';
 import type { CountryConfig, MeasurementDisplayMode } from '../types';
 import { DesignSystemStory, StorySection } from './DesignSystemStory';
+import { p } from '../styles/primitives';
 
 const examples = [
   'Liquid smoke – ½ tsp',

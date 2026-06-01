@@ -3,6 +3,7 @@ import { expect, fn, userEvent, within } from 'storybook/test';
 import { Card } from './Card';
 import { PwaInstallBadge } from './PwaInstallBadge';
 import { StoryCanvas } from './storyFixtures';
+import { p } from '../styles/primitives';
 
 const meta = {
   title: 'Components/PwaInstallBadge',
@@ -46,7 +47,7 @@ export const PromptAvailable: Story = {
   },
   render: (args) => (
     <StoryCanvas>
-      <Card bodyClassName={'stack'}>
+      <Card bodyClassName={p.stack}>
         <p className={p.smallText}>
           The floating install badge is fixed to the viewport bottom, matching the production behavior.
         </p>

@@ -5,6 +5,7 @@ import type { PageKey } from '../types';
 import { Card } from './Card';
 import { PageTabs } from './PageTabs';
 import { StoryCanvas } from './storyFixtures';
+import { p } from '../styles/primitives';
 
 const meta = {
   title: 'Components/PageTabs',
@@ -47,7 +48,7 @@ function PageTabsExample({ page: initialPage, hasItems }: { page: PageKey; hasIt
 
   return (
     <StoryCanvas>
-      <Card bodyClassName={'stack'}>
+      <Card bodyClassName={p.stack}>
         <PageTabs page={page} hasItems={hasItems} onChange={setPage} />
         <div className={p.smallText}>Current page: {page}</div>
       </Card>

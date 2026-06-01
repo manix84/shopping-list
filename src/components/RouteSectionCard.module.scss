@@ -47,13 +47,14 @@
     line-height: 1.15;
   }
 
-  :global(.badge) {
+  .sectionBadge,
+  .quantityBadge {
     padding: 4px 8px;
   }
 
-  :global(.badge-row),
+  .sectionBadgeRow,
   .toggle,
-  .checkRow > :global(.badge) {
+  .checkRow > .sectionBadge {
     display: none;
   }
 
@@ -82,7 +83,7 @@
     white-space: nowrap;
   }
 
-  .quantity :global(.badge) {
+  .quantity .quantityBadge {
     padding: 3px 7px;
   }
 }
@@ -284,7 +285,7 @@
     top: 16px;
   }
 
-  .checkRow > :global(.badge) {
+  .checkRow > .sectionBadge {
     display: none;
   }
 

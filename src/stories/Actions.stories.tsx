@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, within } from 'storybook/test';
 import { DesignSystemStory, StorySection } from './DesignSystemStory';
+import { p } from '../styles/primitives';
 
 const meta = {
   title: 'Design System/Actions',
