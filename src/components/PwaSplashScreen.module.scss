@@ -18,6 +18,8 @@
   z-index: 1000;
 }
 
+.pwaSplash { --module-alias: 1; }
+
 .content {
   align-items: center;
   animation: content-in 0.42s ease-out both;
@@ -26,11 +28,15 @@
   gap: 16px;
 }
 
+.pwaSplashContent { --module-alias: 1; }
+
 .logo {
   display: block;
   height: clamp(132px, 30vw, 192px);
   width: clamp(132px, 30vw, 192px);
 }
+
+.pwaSplashLogo { --module-alias: 1; }
 
 .title {
   color: $text;
@@ -38,6 +44,8 @@
   font-weight: 700;
   letter-spacing: 0;
 }
+
+.pwaSplashTitle { --module-alias: 1; }
 
 @keyframes content-in {
   from {

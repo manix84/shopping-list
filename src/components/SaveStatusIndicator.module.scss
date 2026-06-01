@@ -14,10 +14,14 @@
   width: 34px;
 }
 
+.saveStatus { --module-alias: 1; }
+
 .svg {
   height: 18px;
   width: 18px;
 }
+
+.saveStatusSvg { --module-alias: 1; }
 
 .saving,
 .syncing {
@@ -30,11 +34,17 @@
   }
 }
 
+.saveStatusSaving { --module-alias: 1; }
+
+.saveStatusSyncing { --module-alias: 1; }
+
 .saved {
   background: $success-bg;
   border-color: $success-border;
   color: $success-text;
 }
+
+.saveStatusSaved { --module-alias: 1; }
 
 .error {
   background: $danger-bg;
@@ -42,9 +52,13 @@
   color: $danger-text;
 }
 
+.saveStatusError { --module-alias: 1; }
+
 .leaving {
   animation: fade-out 0.25s ease-in both;
 }
+
+.saveStatusLeaving { --module-alias: 1; }
 
 @keyframes fade-in {
   from {

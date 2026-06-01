@@ -41,10 +41,10 @@ export function PwaSplashScreen({ disabled = false }: PwaSplashScreenProps) {
   const logoHref = `${import.meta.env.BASE_URL}logo-animated-once.svg`;
 
   return (
-    <div className={classNames(st.root, 'pwa-splash')} role={'status'} aria-live={'polite'} aria-label={messages.app.title}>
-      <div className={classNames(st.content, 'pwa-splash-content')}>
-        <img className={classNames(st.logo, 'pwa-splash-logo')} src={logoHref} alt={''} />
-        <div className={classNames(st.title, 'pwa-splash-title')}>{messages.app.title}</div>
+    <div className={classNames(st.root, st.pwaSplash)} role={'status'} aria-live={'polite'} aria-label={messages.app.title}>
+      <div className={classNames(st.content, st.pwaSplashContent)}>
+        <img className={classNames(st.logo, st.pwaSplashLogo)} src={logoHref} alt={''} />
+        <div className={classNames(st.title, st.pwaSplashTitle)}>{messages.app.title}</div>
       </div>
     </div>
   );

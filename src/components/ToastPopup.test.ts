@@ -8,6 +8,7 @@ import {
   ToastPopup,
   type ToastTone,
 } from './ToastPopup';
+import st from './ToastPopup.module.scss';
 
 describe('ToastPopup', () => {
   it('maps tones to roles and icons', () => {
@@ -35,12 +36,14 @@ describe('ToastPopup', () => {
         message: `${tone} message`,
       }));
 
-      expect(html).toContain(`toast-popup-${tone}`);
+      const toneClassName = st[`toastPopup${tone[0].toUpperCase()}${tone.slice(1)}`];
+
+      expect(html).toContain(toneClassName);
       expect(html).toContain(`role="${roleForToastTone(tone)}"`);
       expect(html).toContain(`${tone} title`);
       expect(html).toContain(`${tone} message`);
       expect(html).toContain(iconForToastTone[tone]);
-      expect(html).toContain('toast-popup-icon');
+      expect(html).toContain(st.toastPopupIcon);
     }
   });
 
@@ -53,9 +56,9 @@ describe('ToastPopup', () => {
     }));
 
     expect(html).toContain('Plain message');
-    expect(html).toContain('toast-popup-no-icon');
-    expect(html).toContain('toast-popup-no-title');
-    expect(html).not.toContain('toast-popup-icon');
+    expect(html).toContain(st.toastPopupNoIcon);
+    expect(html).toContain(st.toastPopupNoTitle);
+    expect(html).not.toContain(st.toastPopupIcon);
     expect(html).not.toContain('<strong>');
   });
 });

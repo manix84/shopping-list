@@ -2798,9 +2798,9 @@ export default function App() {
   return (
     <I18nProvider value={{ locale, messages, setLocale }}>
       <PwaSplashScreen disabled={debugSettings.disablePwaSplash} />
-      <div className={classNames(st.app, 'shopping-app')}>
-        <div className={classNames(st.shell, 'shopping-shell')}>
-          <a className={classNames(st.skipLink, 'skip-link')} href={'#main-content'}>
+      <div className={classNames(st.app, st.shoppingApp)}>
+        <div className={classNames(st.shell, st.shoppingShell)}>
+          <a className={classNames(st.skipLink, st.skipLinkAlias)} href={'#main-content'}>
             {messages.actions.skipToMainContent}
           </a>
           <AppHeader
@@ -2817,7 +2817,7 @@ export default function App() {
             }}
           />
 
-          <main id={'main-content'} className={classNames(st.mainContent, 'main-content')} tabIndex={-1}>
+          <main id={'main-content'} className={classNames(st.mainContent, st.mainContentAlias)} tabIndex={-1}>
             {visiblePage === 'edit' ? (
               <EditPage
                 input={input}
@@ -2970,12 +2970,12 @@ export default function App() {
         />
         {isListLoadingOverlayVisible ? (
           <div
-            className={classNames(st.loadingOverlay, 'app-loading-overlay')}
+            className={classNames(st.loadingOverlay, st.appLoadingOverlay)}
             role={'status'}
             aria-live={'polite'}
             aria-label={messages.app.title}
           >
-            <span className={classNames(st.loadingSpinner, 'app-loading-spinner')} aria-hidden={'true'} />
+            <span className={classNames(st.loadingSpinner, st.appLoadingSpinner)} aria-hidden={'true'} />
           </div>
         ) : null}
         {debugModeNotice ? (

@@ -52,14 +52,14 @@ function ThemeIcon({ mode }: ThemeIconProps) {
   return (
     <span
       aria-hidden={'true'}
-      className={classNames(st.themeIcon, toneClassName, 'theme-option-icon', `theme-option-icon-${mode}`)}
+      className={classNames(st.themeIcon, toneClassName, st.themeOptionIcon, st[`themeOptionIcon${mode[0].toUpperCase()}${mode.slice(1)}`])}
     />
   );
 }
 
 function LocaleIcon({ locale }: { locale: LocaleCode }) {
   return (
-    <span aria-hidden={'true'} className={classNames(st.localeIcon, 'locale-option-icon')}>
+    <span aria-hidden={'true'} className={classNames(st.localeIcon, st.localeOptionIcon)}>
       {locale.toUpperCase()}
     </span>
   );
@@ -67,7 +67,7 @@ function LocaleIcon({ locale }: { locale: LocaleCode }) {
 
 function CountryIcon({ countryCode }: { countryCode: CountryCode }) {
   return (
-    <span aria-hidden={'true'} className={classNames(selectSt.countryIcon, 'country-option-icon')}>
+    <span aria-hidden={'true'} className={classNames(selectSt.countryIcon, selectSt.countryOptionIcon)}>
       {COUNTRY_CONFIGS[countryCode].flag}
     </span>
   );
@@ -77,7 +77,7 @@ function AutoDetectCountryIcon() {
   return (
     <span
       aria-hidden={'true'}
-      className={classNames(selectSt.countryIcon, st.countryIconAuto, 'country-option-icon', 'country-option-icon-auto')}
+      className={classNames(selectSt.countryIcon, st.countryIconAuto, selectSt.countryOptionIcon, st.countryOptionIconAuto)}
     />
   );
 }
@@ -91,20 +91,20 @@ function RouteDensityPreview({ mode }: { mode: RouteViewMode }) {
   return (
     <span
       aria-hidden={'true'}
-      className={classNames(st.routeDensityPreview, densityClassName, 'route-density-preview', `route-density-preview-${mode}`)}
+      className={classNames(st.routeDensityPreview, densityClassName, st.routeDensityPreviewAlias, st[`routeDensityPreview${mode[0].toUpperCase()}${mode.slice(1)}`])}
     >
-      <span className={classNames(st.routeDensityShell, 'route-density-preview-shell')}>
-        <span className={classNames(st.routeDensityRow, 'route-density-preview-row')}>
-          <span className={classNames(st.routeDensityDot, 'route-density-preview-dot')} />
-          <span className={classNames(st.routeDensityLine, st.routeDensityLineTitle, 'route-density-preview-line', 'route-density-preview-line-title')} />
+      <span className={classNames(st.routeDensityShell, st.routeDensityPreviewShell)}>
+        <span className={classNames(st.routeDensityRow, st.routeDensityPreviewRow)}>
+          <span className={classNames(st.routeDensityDot, st.routeDensityPreviewDot)} />
+          <span className={classNames(st.routeDensityLine, st.routeDensityLineTitle, st.routeDensityPreviewLine, st.routeDensityPreviewLineTitle)} />
         </span>
-        <span className={classNames(st.routeDensityRow, 'route-density-preview-row')}>
-          <span className={classNames(st.routeDensityDot, 'route-density-preview-dot')} />
-          <span className={classNames(st.routeDensityLine, 'route-density-preview-line')} />
+        <span className={classNames(st.routeDensityRow, st.routeDensityPreviewRow)}>
+          <span className={classNames(st.routeDensityDot, st.routeDensityPreviewDot)} />
+          <span className={classNames(st.routeDensityLine, st.routeDensityPreviewLine)} />
         </span>
-        <span className={classNames(st.routeDensityRow, 'route-density-preview-row')}>
-          <span className={classNames(st.routeDensityDot, 'route-density-preview-dot')} />
-          <span className={classNames(st.routeDensityLine, st.routeDensityLineShort, 'route-density-preview-line', 'route-density-preview-line-short')} />
+        <span className={classNames(st.routeDensityRow, st.routeDensityPreviewRow)}>
+          <span className={classNames(st.routeDensityDot, st.routeDensityPreviewDot)} />
+          <span className={classNames(st.routeDensityLine, st.routeDensityLineShort, st.routeDensityPreviewLine, st.routeDensityPreviewLineShort)} />
         </span>
       </span>
     </span>
@@ -128,7 +128,7 @@ function SettingsSelect<T extends string>({
 
   return (
     <div
-      className={classNames(selectSt.root, 'settings-select')}
+      className={classNames(selectSt.root, selectSt.settingsSelect)}
       onBlur={(event) => {
         if (!(event.relatedTarget instanceof Node) || !event.currentTarget.contains(event.relatedTarget)) {
           setOpen(false);
@@ -138,7 +138,7 @@ function SettingsSelect<T extends string>({
       <button
         id={id}
         type={'button'}
-        className={classNames('select', selectSt.button, 'settings-select-button')}
+        className={classNames('select', selectSt.button, selectSt.settingsSelectButton)}
         aria-haspopup={'listbox'}
         aria-expanded={open}
         aria-controls={open ? menuId : undefined}
@@ -149,17 +149,17 @@ function SettingsSelect<T extends string>({
           }
         }}
       >
-        <span className={classNames(selectSt.optionContent, 'settings-option-content')}>
-          {selectedOption.icon ? <span className={classNames(selectSt.optionIconSlot, 'settings-option-icon-slot')}>{selectedOption.icon}</span> : null}
+        <span className={classNames(selectSt.optionContent, selectSt.settingsOptionContent)}>
+          {selectedOption.icon ? <span className={classNames(selectSt.optionIconSlot, selectSt.settingsOptionIconSlot)}>{selectedOption.icon}</span> : null}
           <span>{selectedOption.label}</span>
         </span>
-        <svg aria-hidden={'true'} className={classNames(selectSt.chevron, 'settings-select-chevron-svg')} viewBox={'0 0 24 24'}>
+        <svg aria-hidden={'true'} className={classNames(selectSt.chevron, selectSt.settingsSelectChevronSvg)} viewBox={'0 0 24 24'}>
           <path d={mdiChevronDown} fill={'currentColor'} />
         </svg>
       </button>
 
       {open ? (
-        <div id={menuId} className={classNames(selectSt.menu, 'settings-select-menu')} role={'listbox'} aria-labelledby={id}>
+        <div id={menuId} className={classNames(selectSt.menu, selectSt.settingsSelectMenu)} role={'listbox'} aria-labelledby={id}>
           {options.map((option) => (
             <button
               key={option.value}
@@ -168,17 +168,17 @@ function SettingsSelect<T extends string>({
               aria-selected={value === option.value}
               className={classNames(
                 selectSt.option,
-                'settings-select-option',
+                selectSt.settingsSelectOption,
                 value === option.value ? selectSt.active : undefined,
-                value === option.value ? 'settings-select-option-active' : undefined,
+                value === option.value ? selectSt.settingsSelectOptionActive : undefined,
               )}
               onClick={() => {
                 onChange(option.value);
                 setOpen(false);
               }}
             >
-              <span className={classNames(selectSt.optionContent, 'settings-option-content')}>
-                {option.icon ? <span className={classNames(selectSt.optionIconSlot, 'settings-option-icon-slot')}>{option.icon}</span> : null}
+              <span className={classNames(selectSt.optionContent, selectSt.settingsOptionContent)}>
+                {option.icon ? <span className={classNames(selectSt.optionIconSlot, selectSt.settingsOptionIconSlot)}>{option.icon}</span> : null}
                 <span>{option.label}</span>
               </span>
             </button>
@@ -263,13 +263,13 @@ export function SettingsPage({
         : undefined;
 
   const installSetting = shouldShowInstallSetting ? (
-    <div className={classNames(st.installRow, 'settings-install-row')}>
-      <div className={classNames(st.installIcon, 'settings-install-icon')} aria-hidden={'true'}>
+    <div className={classNames(st.installRow, st.settingsInstallRow)}>
+      <div className={classNames(st.installIcon, st.settingsInstallIcon)} aria-hidden={'true'}>
         <svg viewBox={'0 0 24 24'}>
           <path d={mdiDownload} fill={'currentColor'} />
         </svg>
       </div>
-      <div className={classNames(st.installCopy, 'settings-install-copy')}>
+      <div className={classNames(st.installCopy, st.settingsInstallCopy)}>
         <h3>{installTitle}</h3>
         <p>{installDescription}</p>
       </div>
@@ -416,7 +416,7 @@ export function SettingsPage({
           </button>
         </div>
 
-        <div className={classNames(st.footnote, 'settings-footnote', 'small-text')}>{messages.labels.storedLocally}</div>
+        <div className={classNames(st.footnote, st.settingsFootnote, 'small-text')}>{messages.labels.storedLocally}</div>
       </Card>
       {installSetting}
     </>

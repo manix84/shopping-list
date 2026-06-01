@@ -20,6 +20,8 @@
   z-index: 80;
 }
 
+.pwaInstallBadge { --module-alias: 1; }
+
 .icon {
   align-items: center;
   background: color-mix(in srgb, $primary 12%, $panel);
@@ -39,6 +41,8 @@
   }
 }
 
+.pwaInstallBadgeIcon { --module-alias: 1; }
+
 .copy {
   min-width: 0;
 
@@ -56,11 +60,15 @@
   }
 }
 
+.pwaInstallBadgeCopy { --module-alias: 1; }
+
 .actions {
   align-items: center;
   display: inline-flex;
   gap: 8px;
 }
+
+.pwaInstallBadgeActions { --module-alias: 1; }
 
 .dismiss {
   height: 38px;
@@ -72,6 +80,8 @@
     width: 18px;
   }
 }
+
+.pwaInstallDismiss { --module-alias: 1; }
 
 @media (max-width: 640px) {
   .root {

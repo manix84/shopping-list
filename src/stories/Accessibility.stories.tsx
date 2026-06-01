@@ -84,7 +84,7 @@ export const Default: Story = {
       </StorySection>
 
       <StorySection title={'Keyboard and focus'}>
-        <a className={classNames(st.skipLink, 'skip-link')} href={'#storybook-accessibility-demo'}>
+        <a className={classNames(st.skipLink, st.skipLinkAlias)} href={'#storybook-accessibility-demo'}>
           Skip to demo content
         </a>
         <div className={'button-row'} role={'group'} aria-label={'Example controls'}>

@@ -45,43 +45,43 @@ export function ErrorPage({ variant, isDebugMode, onBackToEdit, onOpenDebug }: E
   const errorMessages = messages.pages.error;
 
   return (
-    <Card className={classNames(st.card, 'error-card')} bodyClassName={classNames(st.body, 'error-card-body')} aria-labelledby={'error-title'}>
-      <div className={classNames(st.visual, 'error-visual')} aria-hidden={'true'}>
-        <div className={classNames(st.map, 'error-map')}>
-          <div className={classNames(st.mapHeader, 'error-map-header')}>
+    <Card className={classNames(st.card, st.errorCard)} bodyClassName={classNames(st.body, st.errorCardBody)} aria-labelledby={'error-title'}>
+      <div className={classNames(st.visual, st.errorVisual)} aria-hidden={'true'}>
+        <div className={classNames(st.map, st.errorMap)}>
+          <div className={classNames(st.mapHeader, st.errorMapHeader)}>
             <span>{errorMessages[content.codeKey]}</span>
-            <svg className={classNames(st.mapIcon, 'error-map-icon')} viewBox={'0 0 24 24'}>
+            <svg className={classNames(st.mapIcon, st.errorMapIcon)} viewBox={'0 0 24 24'}>
               <path d={content.accentIcon} fill={'currentColor'} />
             </svg>
           </div>
-          <div className={classNames(st.mapRoute, 'error-map-route')}>
+          <div className={classNames(st.mapRoute, st.errorMapRoute)}>
             {Array.from({ length: 5 }, (_, index) => (
               <div
                 key={index}
                 className={classNames(
                   st.mapStop,
-                  'error-map-stop',
+                  st.errorMapStop,
                   index === 2 ? st.lostStop : undefined,
-                  index === 2 ? 'error-map-stop-lost' : undefined,
+                  index === 2 ? st.errorMapStopLost : undefined,
                 )}
               />
             ))}
           </div>
         </div>
-        <div className={classNames(st.iconBadge, 'error-icon-badge')}>
+        <div className={classNames(st.iconBadge, st.errorIconBadge)}>
           <svg viewBox={'0 0 24 24'}>
             <path d={content.icon} fill={'currentColor'} />
           </svg>
         </div>
       </div>
 
-      <div className={classNames(st.copy, 'error-copy')}>
+      <div className={classNames(st.copy, st.errorCopy)}>
         <p className={'section-group'}>{errorMessages[content.eyebrowKey]}</p>
         <h2 id={'error-title'} className={'title'}>{errorMessages[content.titleKey]}</h2>
         <p className={'subtitle'}>{errorMessages[content.subtitleKey]}</p>
       </div>
 
-      <div className={classNames(st.actions, 'error-actions')}>
+      <div className={classNames(st.actions, st.errorActions)}>
         <button type={'button'} className={'button button-primary'} onClick={onBackToEdit}>
           <svg aria-hidden={'true'} className={'button-icon-svg'} viewBox={'0 0 24 24'}>
             <path d={variant === 'not-found' ? mdiHomeOutline : mdiPencilOutline} fill={'currentColor'} />

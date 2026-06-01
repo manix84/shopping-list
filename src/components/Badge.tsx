@@ -12,9 +12,9 @@ export function Badge({ children, className, tone = 'default' }: BadgeProps) {
     <span
       className={classNames(
         st.root,
-        'badge',
+        st.badge,
         tone !== 'default' ? st[tone] : undefined,
-        tone !== 'default' ? `badge-${tone}` : undefined,
+        tone !== 'default' ? st[`badge${tone[0].toUpperCase()}${tone.slice(1)}`] : undefined,
         className,
       )}
     >

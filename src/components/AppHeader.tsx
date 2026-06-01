@@ -118,19 +118,20 @@ export function AppHeader({
   const logoHref = `${import.meta.env.BASE_URL}logo-mark.png`;
 
   return (
-    <header className={classNames(st.root, 'app-header')}>
-      <div className={classNames(st.inner, 'app-header-inner')}>
+    <header className={classNames(st.root, st.appHeader)}>
+      <div className={classNames(st.inner, st.appHeaderInner)}>
         <Card
-          className={classNames(st.card, 'app-header-card')}
+          className={classNames(st.card, st.appHeaderCard)}
+          headerClassName={classNames(st.cardHeader, st.appHeaderCardHeader)}
           header={
             <div className={'title-row'}>
-              <div className={classNames(st.titleBlock, 'title-block')}>
+              <div className={classNames(st.titleBlock, st.titleBlockAlias)}>
                 <span
-                  className={classNames(st.icon, st.easterEggTrigger, 'app-icon', 'app-icon-easter-egg-trigger')}
+                  className={classNames(st.icon, st.easterEggTrigger, st.appIcon, st.appIconEasterEggTrigger)}
                   aria-hidden={'true'}
                   onPointerDown={handleLogoPointerDown}
                 >
-                  <img className={classNames(st.iconImage, 'app-icon-image')} src={logoHref} alt={''} width={'48'} height={'48'} />
+                  <img className={classNames(st.iconImage, st.appIconImage)} src={logoHref} alt={''} width={'48'} height={'48'} />
                 </span>
                 <div>
                   <h1 className={'title'}>{messages.app.title}</h1>
@@ -138,12 +139,12 @@ export function AppHeader({
                 </div>
               </div>
 
-              <div className={classNames(st.actions, 'header-actions')}>
+              <div className={classNames(st.actions, st.headerActions)}>
                 {badge && connectionBadgeVisible ? (
-                  <div className={classNames(st.connectionShell, 'connection-badge-shell')} aria-live={'polite'}>
+                  <div className={classNames(st.connectionShell, st.connectionBadgeShell)} aria-live={'polite'}>
                     <button
                       type={'button'}
-                      className={classNames(st.connectionButton, 'connection-badge-button')}
+                      className={classNames(st.connectionButton, st.connectionBadgeButton)}
                       aria-expanded={canShowOfflineInfo ? offlineInfoOpen : undefined}
                       aria-describedby={canShowOfflineInfo && offlineInfoOpen ? 'offline-status-popover' : undefined}
                       disabled={!canShowOfflineInfo}
@@ -157,16 +158,16 @@ export function AppHeader({
                         tone={badge.tone}
                         className={classNames(
                           st.connectionBadge,
-                          'connection-badge',
+                          st.connectionBadgeAlias,
                           connectionBadgeLeaving ? st.connectionLeaving : undefined,
-                          connectionBadgeLeaving ? 'connection-badge-leaving' : undefined,
+                          connectionBadgeLeaving ? st.connectionBadgeLeavingAlias : undefined,
                         )}
                       >
                         {badge.label}
                       </Badge>
                     </button>
                     {canShowOfflineInfo && offlineInfoOpen ? (
-                      <div id={'offline-status-popover'} className={classNames(st.connectionPopover, 'connection-popover')} role={'tooltip'}>
+                      <div id={'offline-status-popover'} className={classNames(st.connectionPopover, st.connectionPopoverAlias)} role={'tooltip'}>
                         <strong>{messages.backendStatus.offlineTitle}</strong>
                         <p>{messages.backendStatus.offlineDescription}</p>
                         <p>{messages.backendStatus.offlineSyncDescription}</p>
@@ -174,14 +175,14 @@ export function AppHeader({
                     ) : null}
                   </div>
                 ) : null}
-                <div className={classNames(st.desktopMenuShell, 'desktop-menu-shell')}>
+                <div className={classNames(st.desktopMenuShell, st.desktopMenuShellAlias)}>
                   <PageTabs page={page} hasItems={hasItems} showDebugTools={isDebugMode} onChange={handleChangePage} />
                 </div>
 
-                <div className={classNames(st.mobileMenuShell, 'mobile-menu-shell')}>
+                <div className={classNames(st.mobileMenuShell, st.mobileMenuShellAlias)}>
                   <button
                     type={'button'}
-                    className={classNames('button', st.mobileMenuTrigger, 'mobile-menu-trigger')}
+                    className={classNames('button', st.mobileMenuTrigger, st.mobileMenuTriggerAlias)}
                     aria-label={mobileMenuLabel}
                     aria-expanded={mobileMenuOpen}
                     aria-controls={mobileMenuOpen ? 'mobile-menu-panel' : undefined}
@@ -195,7 +196,7 @@ export function AppHeader({
                   </button>
 
                   {mobileMenuOpen ? (
-                    <div id={'mobile-menu-panel'} className={classNames(st.mobileMenuPanel, 'mobile-menu-panel')}>
+                    <div id={'mobile-menu-panel'} className={classNames(st.mobileMenuPanel, st.mobileMenuPanelAlias)}>
                       <PageTabs page={page} hasItems={hasItems} showDebugTools={isDebugMode} onChange={handleChangePage} />
                     </div>
                   ) : null}

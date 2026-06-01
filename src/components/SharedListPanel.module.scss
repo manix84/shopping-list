@@ -18,6 +18,8 @@
   width: min(100%, 280px);
 }
 
+.shareQrCard { --module-alias: 1; }
+
 .linkRow {
   > :global(.input) {
     flex: 1 1 auto;
@@ -28,6 +30,8 @@
     flex: 0 0 auto;
   }
 }
+
+.shareLinkRow { --module-alias: 1; }
 
 .loadRow {
   > .inputShell {
@@ -40,6 +44,8 @@
   }
 }
 
+.shareLoadRow { --module-alias: 1; }
+
 .currentListName {
   color: $text;
   font-size: 18px;
@@ -47,12 +53,16 @@
   line-height: 1.2;
 }
 
+.sharedCurrentListName { --module-alias: 1; }
+
 .qrCardBlurred {
   .qrFrame {
     filter: blur(10px);
     transform: scale(1.06);
   }
 }
+
+.shareQrCardBlurred { --module-alias: 1; }
 
 .qrFrame {
   display: block;
@@ -65,11 +75,15 @@
     transform 0.32s ease;
 }
 
+.shareQrFrame { --module-alias: 1; }
+
 .qrImage {
   display: block;
   max-width: 100%;
   width: 100%;
 }
+
+.shareQrImage { --module-alias: 1; }
 
 .qrLogo {
   height: 22.5%;
@@ -80,6 +94,8 @@
   transform: translate(-50%, -50%);
   width: 22.5%;
 }
+
+.shareQrLogo { --module-alias: 1; }
 
 .qrOverlay {
   animation: qr-overlay-in 0.24s ease;
@@ -93,6 +109,8 @@
     opacity 0.24s ease,
     transform 0.24s ease;
 }
+
+.shareQrOverlay { --module-alias: 1; }
 
 .qrDialog {
   align-items: center;
@@ -110,12 +128,16 @@
   width: min(100%, 560px);
 }
 
+.shareQrDialog { --module-alias: 1; }
+
 .qrFrameLarge {
   border-radius: 14px;
   display: block;
   overflow: hidden;
   width: 100%;
 }
+
+.shareQrFrameLarge { --module-alias: 1; }
 
 .inputShell {
   flex: 1 1 auto;
@@ -128,11 +150,17 @@
   }
 }
 
+.sharedInputShell { --module-alias: 1; }
+
 .inputShellValid {
   .sharedInput {
     border-color: $success-border;
   }
 }
+
+.sharedInputShellValid { --module-alias: 1; }
+
+.sharedInputAlias { --module-alias: 1; }
 
 .inputTick {
   align-items: center;
@@ -148,6 +176,8 @@
   top: 0;
 }
 
+.sharedInputTick { --module-alias: 1; }
+
 .scannerModal {
   align-items: center;
   animation: modal-backdrop-in 0.24s ease;
@@ -160,6 +190,8 @@
   position: fixed;
   z-index: 80;
 }
+
+.shareScannerModal { --module-alias: 1; }
 
 .scannerDialog {
   animation: modal-card-in 0.26s ease;
@@ -175,12 +207,16 @@
   width: min(100%, 560px);
 }
 
+.shareScannerDialog { --module-alias: 1; }
+
 .scannerToolbar {
   align-items: center;
   display: flex;
   gap: 12px;
   justify-content: space-between;
 }
+
+.shareScannerToolbar { --module-alias: 1; }
 
 .scannerFrame {
   --scanner-accent: #2563eb;
@@ -193,13 +229,19 @@
   position: relative;
 }
 
+.shareScannerFrame { --module-alias: 1; }
+
 .scannerScanning {
   --scanner-accent: #2563eb;
 }
 
+.shareScannerFrameScanning { --module-alias: 1; }
+
 .scannerReady {
   --scanner-accent: #16a34a;
 }
+
+.shareScannerFrameReady { --module-alias: 1; }
 
 .scannerMissing {
   --scanner-accent: #dc2626;
@@ -207,11 +249,15 @@
   animation: scanner-pulse 1s ease-in-out infinite;
 }
 
+.shareScannerFrameMissing { --module-alias: 1; }
+
 .scannerVideo {
   height: 100%;
   object-fit: cover;
   width: 100%;
 }
+
+.shareScannerVideo { --module-alias: 1; }
 
 .scannerOverlay {
   align-items: center;
@@ -223,6 +269,8 @@
   position: absolute;
 }
 
+.shareScannerOverlay { --module-alias: 1; }
+
 .scannerTarget {
   border: 3px solid color-mix(in srgb, var(--scanner-accent) 72%, #fff 28%);
   border-radius: 24px;
@@ -232,6 +280,8 @@
   max-width: 62%;
   width: min(62vw, 250px);
 }
+
+.shareScannerTarget { --module-alias: 1; }
 
 .scannerStatus {
   align-self: center;
@@ -245,6 +295,8 @@
   text-align: center;
   width: fit-content;
 }
+
+.shareScannerStatus { --module-alias: 1; }
 
 .historyItem {
   align-items: center;
@@ -269,6 +321,10 @@
   }
 }
 
+.sharedHistoryItem { --module-alias: 1; }
+
+.sharedHistoryItemDisabled { --module-alias: 1; }
+
 .historyList {
   height: 320px;
   overflow-y: auto;
@@ -276,17 +332,23 @@
   scrollbar-gutter: stable;
 }
 
+.sharedHistoryList { --module-alias: 1; }
+
 .historyContent {
   flex: 1 1 auto;
   min-width: 0;
   overflow: hidden;
 }
 
+.sharedHistoryContent { --module-alias: 1; }
+
 .historyActions {
   display: flex;
   flex: 0 0 auto;
   gap: 8px;
 }
+
+.sharedHistoryActions { --module-alias: 1; }
 
 .historyTitleWrap {
   max-width: 100%;
@@ -309,6 +371,8 @@
   }
 }
 
+.sharedHistoryTitleWrap { --module-alias: 1; }
+
 .historyTitle {
   display: block;
   font-weight: 600;
@@ -318,6 +382,8 @@
   white-space: nowrap;
   width: 100%;
 }
+
+.sharedHistoryTitle { --module-alias: 1; }
 
 @keyframes scanner-pulse {
   0%,
